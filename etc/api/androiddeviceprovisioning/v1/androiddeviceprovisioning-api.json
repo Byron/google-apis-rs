@@ -13,6 +13,7 @@
     }, 
     "id": "androiddeviceprovisioning:v1", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://androiddeviceprovisioning.mtls.googleapis.com/", 
     "name": "androiddeviceprovisioning", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -425,7 +426,7 @@
                         "name": {
                             "description": "The name of the operation resource.", 
                             "location": "path", 
-                            "pattern": "^operations/.+$", 
+                            "pattern": "^operations/.*$", 
                             "required": true, 
                             "type": "string"
                         }
@@ -824,7 +825,7 @@
             }
         }
     }, 
-    "revision": "20190622", 
+    "revision": "20200408", 
     "rootUrl": "https://androiddeviceprovisioning.googleapis.com/", 
     "schemas": {
         "ClaimDeviceRequest": {
@@ -896,7 +897,7 @@
             "id": "Company", 
             "properties": {
                 "adminEmails": {
-                    "description": "Input only. Optional. Email address of customer's users in the admin role.\nEach email address must be associated with a Google Account.", 
+                    "description": "Optional. Input only. Email address of customer's users in the admin role.\nEach email address must be associated with a Google Account.", 
                     "items": {
                         "type": "string"
                     }, 
@@ -1761,13 +1762,13 @@
             "properties": {
                 "deviceMetadata": {
                     "$ref": "DeviceMetadata", 
-                    "description": "Required. The metdata to attach to the device."
+                    "description": "Required. The metadata to attach to the device."
                 }
             }, 
             "type": "object"
         }, 
         "UpdateMetadataArguments": {
-            "description": "Identifies metdata updates to one device.", 
+            "description": "Identifies metadata updates to one device.", 
             "id": "UpdateMetadataArguments", 
             "properties": {
                 "deviceId": {

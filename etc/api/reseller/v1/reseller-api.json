@@ -17,7 +17,7 @@
     "description": "Creates and manages your customers and their subscriptions.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/google-apps/reseller/", 
-    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/pox8safIyKhQhE-OIi12fI9ZcrM\"", 
+    "etag": "\"u9GIe6H63LSGq-9_t39K2Zx_EAc/4xq0Bw2LuAbeJZTw0U29AruL5y4\"", 
     "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png", 
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
@@ -366,7 +366,7 @@
                     ]
                 }, 
                 "delete": {
-                    "description": "Cancel or transfer a subscription to direct.", 
+                    "description": "Cancel, suspend, or transfer a subscription to direct.", 
                     "httpMethod": "DELETE", 
                     "id": "reseller.subscriptions.delete", 
                     "parameterOrder": [
@@ -575,7 +575,7 @@
             }
         }
     }, 
-    "revision": "20190228", 
+    "revision": "20191008", 
     "rootUrl": "https://www.googleapis.com/", 
     "schemas": {
         "Address": {

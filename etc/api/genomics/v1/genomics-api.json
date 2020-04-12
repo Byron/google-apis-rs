@@ -24,6 +24,7 @@
     }, 
     "id": "genomics:v1", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://genomics.mtls.googleapis.com/", 
     "name": "genomics", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -120,7 +121,7 @@
                         "name": {
                             "description": "The name of the operation resource to be cancelled.", 
                             "location": "path", 
-                            "pattern": "^operations/.+$", 
+                            "pattern": "^operations/.*$", 
                             "required": true, 
                             "type": "string"
                         }
@@ -149,7 +150,7 @@
                         "name": {
                             "description": "The name of the operation resource.", 
                             "location": "path", 
-                            "pattern": "^operations/.+$", 
+                            "pattern": "^operations/.*$", 
                             "required": true, 
                             "type": "string"
                         }
@@ -208,7 +209,7 @@
             }
         }
     }, 
-    "revision": "20190704", 
+    "revision": "20200316", 
     "rootUrl": "https://genomics.googleapis.com/", 
     "schemas": {
         "CancelOperationRequest": {
@@ -624,6 +625,10 @@
             "properties": {
                 "instance": {
                     "description": "The worker's instance name.", 
+                    "type": "string"
+                }, 
+                "machineType": {
+                    "description": "The machine type that was assigned for the worker.", 
                     "type": "string"
                 }, 
                 "zone": {

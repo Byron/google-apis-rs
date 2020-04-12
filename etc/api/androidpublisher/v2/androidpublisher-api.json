@@ -15,7 +15,7 @@
     "description": "Accesses Android application developers' Google Play accounts.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/android-publisher", 
-    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/Xzykam64w9J0PZpvN6-fPRpjjvM\"", 
+    "etag": "\"u9GIe6H63LSGq-9_t39K2Zx_EAc/k6ve9mvJLQYNtOLJVCwlyhkSP30\"", 
     "icons": {
         "x16": "https://www.google.com/images/icons/product/android-16.png", 
         "x32": "https://www.google.com/images/icons/product/android-32.png"
@@ -2328,7 +2328,7 @@
                             ], 
                             "parameters": {
                                 "endTime": {
-                                    "description": "The time, in milliseconds since the Epoch, of the newest voided in-app product purchase that you want to see in the response. The value of this parameter cannot be greater than the current time and is ignored if a pagination token is set. Default value is current time. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.", 
+                                    "description": "The time, in milliseconds since the Epoch, of the newest voided purchase that you want to see in the response. The value of this parameter cannot be greater than the current time and is ignored if a pagination token is set. Default value is current time. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.", 
                                     "format": "int64", 
                                     "location": "query", 
                                     "type": "string"
@@ -2350,7 +2350,7 @@
                                     "type": "integer"
                                 }, 
                                 "startTime": {
-                                    "description": "The time, in milliseconds since the Epoch, of the oldest voided in-app product purchase that you want to see in the response. The value of this parameter cannot be older than 30 days and is ignored if a pagination token is set. Default value is current time minus 30 days. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.", 
+                                    "description": "The time, in milliseconds since the Epoch, of the oldest voided purchase that you want to see in the response. The value of this parameter cannot be older than 30 days and is ignored if a pagination token is set. Default value is current time minus 30 days. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.", 
                                     "format": "int64", 
                                     "location": "query", 
                                     "type": "string"
@@ -2483,7 +2483,7 @@
             }
         }
     }, 
-    "revision": "20190702", 
+    "revision": "20200331", 
     "rootUrl": "https://www.googleapis.com/", 
     "schemas": {
         "Apk": {
@@ -2895,6 +2895,10 @@
                     "description": "A sha1 hash of the image that was uploaded.", 
                     "type": "string"
                 }, 
+                "sha256": {
+                    "description": "A sha256 hash of the image that was uploaded.", 
+                    "type": "string"
+                }, 
                 "url": {
                     "description": "A URL that will serve a preview of the image.", 
                     "type": "string"
@@ -2947,7 +2951,7 @@
                     "description": "Default price cannot be zero. In-app products can never be free. Default price is always in the developer's Checkout merchant currency."
                 }, 
                 "gracePeriod": {
-                    "description": "Grace period of the subscription, specified in ISO 8601 format. It will allow developers to give their subscribers a grace period when the payment for the new recurrence period is declined. Acceptable values = \"P3D\" (three days) and \"P7D\" (seven days)", 
+                    "description": "Grace period of the subscription, specified in ISO 8601 format. It will allow developers to give their subscribers a grace period when the payment for the new recurrence period is declined. Acceptable values = \"P3D\" (three days), \"P7D\" (seven days), \"P14D\" (fourteen days), and \"P30D\" (thirty days)", 
                     "type": "string"
                 }, 
                 "listings": {
@@ -2973,10 +2977,6 @@
                 "purchaseType": {
                     "description": "Purchase type enum value. Unmodifiable after creation.", 
                     "type": "string"
-                }, 
-                "season": {
-                    "$ref": "Season", 
-                    "description": "Definition of a season for a seasonal subscription. Can be defined only for yearly subscriptions."
                 }, 
                 "sku": {
                     "description": "The stock-keeping-unit (SKU) of the product, unique within an app.", 
@@ -3074,22 +3074,6 @@
             }, 
             "type": "object"
         }, 
-        "MonthDay": {
-            "id": "MonthDay", 
-            "properties": {
-                "day": {
-                    "description": "Day of a month, value in [1, 31] range. Valid range depends on the specified month.", 
-                    "format": "uint32", 
-                    "type": "integer"
-                }, 
-                "month": {
-                    "description": "Month of a year. e.g. 1 = JAN, 2 = FEB etc.", 
-                    "format": "uint32", 
-                    "type": "integer"
-                }
-            }, 
-            "type": "object"
-        }, 
         "PageInfo": {
             "id": "PageInfo", 
             "properties": {
@@ -3162,20 +3146,6 @@
             }, 
             "type": "object"
         }, 
-        "Prorate": {
-            "id": "Prorate", 
-            "properties": {
-                "defaultPrice": {
-                    "$ref": "Price", 
-                    "description": "Default price cannot be zero and must be less than the full subscription price. Default price is always in the developer's Checkout merchant currency. Targeted countries have their prices set automatically based on the default_price."
-                }, 
-                "start": {
-                    "$ref": "MonthDay", 
-                    "description": "Defines the first day on which the price takes effect."
-                }
-            }, 
-            "type": "object"
-        }, 
         "Review": {
             "id": "Review", 
             "properties": {
@@ -3244,27 +3214,6 @@
             "properties": {
                 "result": {
                     "$ref": "ReviewReplyResult"
-                }
-            }, 
-            "type": "object"
-        }, 
-        "Season": {
-            "id": "Season", 
-            "properties": {
-                "end": {
-                    "$ref": "MonthDay", 
-                    "description": "Inclusive end date of the recurrence period."
-                }, 
-                "prorations": {
-                    "description": "Optionally present list of prorations for the season. Each proration is a one-off discounted entry into a subscription. Each proration contains the first date on which the discount is available and the new pricing information.", 
-                    "items": {
-                        "$ref": "Prorate"
-                    }, 
-                    "type": "array"
-                }, 
-                "start": {
-                    "$ref": "MonthDay", 
-                    "description": "Inclusive start date of the recurrence period."
                 }
             }, 
             "type": "object"
@@ -3400,7 +3349,7 @@
                     "type": "string"
                 }, 
                 "purchaseType": {
-                    "description": "The type of purchase of the subscription. This field is only set if this purchase was not made using the standard in-app billing flow. Possible values are:  \n- Test (i.e. purchased from a license testing account)", 
+                    "description": "The type of purchase of the subscription. This field is only set if this purchase was not made using the standard in-app billing flow. Possible values are:  \n- Test (i.e. purchased from a license testing account) \n- Promo (i.e. purchased using a promo code)", 
                     "format": "int32", 
                     "type": "integer"
                 }, 
@@ -3443,13 +3392,6 @@
             "properties": {
                 "googleGroups": {
                     "description": "A list of all Google Groups, as email addresses, that define testers for this track.", 
-                    "items": {
-                        "type": "string"
-                    }, 
-                    "type": "array"
-                }, 
-                "googlePlusCommunities": {
-                    "description": "A list of all Google+ Communities, as URLs, that define testers for this track.", 
                     "items": {
                         "type": "string"
                     }, 
@@ -3597,7 +3539,7 @@
                     "type": "string"
                 }, 
                 "purchaseToken": {
-                    "description": "The token that was generated when a purchase was made. This uniquely identifies a purchase.", 
+                    "description": "The token which uniquely identifies a one-time purchase or subscription. To uniquely identify subscription renewals use order_id (available starting from version 3 of the API).", 
                     "type": "string"
                 }, 
                 "voidedTimeMillis": {

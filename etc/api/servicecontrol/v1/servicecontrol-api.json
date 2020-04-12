@@ -25,6 +25,7 @@
     }, 
     "id": "servicecontrol:v1", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://servicecontrol.mtls.googleapis.com/", 
     "name": "servicecontrol", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -166,7 +167,7 @@
                     ]
                 }, 
                 "report": {
-                    "description": "Reports operation results to Google Service Control, such as logs and\nmetrics. It should be called after an operation is completed.\n\nIf feasible, the client should aggregate reporting data for up to 5\nseconds to reduce API traffic. Limiting aggregation to 5 seconds is to\nreduce data loss during client crashes. Clients should carefully choose\nthe aggregation time window to avoid data loss risk more than 0.01%\nfor business and compliance reasons.\n\nNOTE: the ReportRequest has the size limit of 1MB.\n\nThis method requires the `servicemanagement.services.report` permission\non the specified service. For more information, see\n[Google Cloud IAM](https://cloud.google.com/iam).", 
+                    "description": "Reports operation results to Google Service Control, such as logs and\nmetrics. It should be called after an operation is completed.\n\nIf feasible, the client should aggregate reporting data for up to 5\nseconds to reduce API traffic. Limiting aggregation to 5 seconds is to\nreduce data loss during client crashes. Clients should carefully choose\nthe aggregation time window to avoid data loss risk more than 0.01%\nfor business and compliance reasons.\n\nNOTE: the ReportRequest has the size limit (wire-format byte size) of\n1MB.\n\nThis method requires the `servicemanagement.services.report` permission\non the specified service. For more information, see\n[Google Cloud IAM](https://cloud.google.com/iam).", 
                     "flatPath": "v1/services/{serviceName}:report", 
                     "httpMethod": "POST", 
                     "id": "servicecontrol.services.report", 
@@ -196,14 +197,14 @@
             }
         }
     }, 
-    "revision": "20190622", 
+    "revision": "20200407", 
     "rootUrl": "https://servicecontrol.googleapis.com/", 
     "schemas": {
         "AllocateInfo": {
             "id": "AllocateInfo", 
             "properties": {
                 "unusedArguments": {
-                    "description": "A list of label keys that were unused by the server in processing the\nrequest. Thus, for similar requests repeated in a certain future time\nwindow, the caller can choose to ignore these labels in the requests\nto achieve better client-side cache hits and quota aggregation.", 
+                    "description": "A list of label keys that were unused by the server in processing the\nrequest. Thus, for similar requests repeated in a certain future time\nwindow, the caller can choose to ignore these labels in the requests\nto achieve better client-side cache hits and quota aggregation for rate\nquota. This field is not populated for allocation quota checks.", 
                     "items": {
                         "type": "string"
                     }, 
@@ -256,6 +257,45 @@
                 "serviceConfigId": {
                     "description": "ID of the actual config used to process the request.", 
                     "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "AttributeValue": {
+            "description": "The allowed types for [VALUE] in a `[KEY]:[VALUE]` attribute.", 
+            "id": "AttributeValue", 
+            "properties": {
+                "boolValue": {
+                    "description": "A Boolean value represented by `true` or `false`.", 
+                    "type": "boolean"
+                }, 
+                "intValue": {
+                    "description": "A 64-bit signed integer.", 
+                    "format": "int64", 
+                    "type": "string"
+                }, 
+                "stringValue": {
+                    "$ref": "TruncatableString", 
+                    "description": "A string up to 256 bytes long."
+                }
+            }, 
+            "type": "object"
+        }, 
+        "Attributes": {
+            "description": "A set of attributes, each in the format `[KEY]:[VALUE]`.", 
+            "id": "Attributes", 
+            "properties": {
+                "attributeMap": {
+                    "additionalProperties": {
+                        "$ref": "AttributeValue"
+                    }, 
+                    "description": "The set of attributes. Each attribute's key can be up to 128 bytes\nlong. The value can be a string up to 256 bytes, a signed 64-bit integer,\nor the Boolean values `true` and `false`. For example:\n\n    \"/instance_id\": \"my-instance\"\n    \"/http/user_agent\": \"\"\n    \"/http/request_bytes\": 300\n    \"abc.com/myattribute\": true", 
+                    "type": "object"
+                }, 
+                "droppedAttributesCount": {
+                    "description": "The number of attributes that were discarded. Attributes can be discarded\nbecause their keys are too long or because there are too many attributes.\nIf this value is 0 then all attributes are valid.", 
+                    "format": "int32", 
+                    "type": "integer"
                 }
             }, 
             "type": "object"
@@ -394,6 +434,10 @@
                 }, 
                 "principalEmail": {
                     "description": "The email address of the authenticated user (or service account on behalf\nof third party principal) making the request. For privacy reasons, the\nprincipal email address is redacted for all read-only operations that fail\nwith a \"permission denied\" error.", 
+                    "type": "string"
+                }, 
+                "principalSubject": {
+                    "description": "String representation of identity of requesting party.\nPopulated for both first and third party identities.", 
                     "type": "string"
                 }, 
                 "serviceAccountDelegationInfo": {
@@ -609,7 +653,7 @@
                     "type": "string"
                 }, 
                 "serviceRolloutId": {
-                    "description": "Unimplemented. The current service rollout id used to process the request.", 
+                    "description": "The current service rollout id used to process the request.", 
                     "type": "string"
                 }
             }, 
@@ -948,6 +992,10 @@
                     ], 
                     "type": "string"
                 }, 
+                "sourceLocation": {
+                    "$ref": "LogEntrySourceLocation", 
+                    "description": "Optional. Source code location information associated with the log entry,\nif any."
+                }, 
                 "structPayload": {
                     "additionalProperties": {
                         "description": "Properties of the object.", 
@@ -995,6 +1043,26 @@
             }, 
             "type": "object"
         }, 
+        "LogEntrySourceLocation": {
+            "description": "Additional information about the source code location that produced the log\nentry.", 
+            "id": "LogEntrySourceLocation", 
+            "properties": {
+                "file": {
+                    "description": "Optional. Source file name. Depending on the runtime environment, this\nmight be a simple name or a fully-qualified name.", 
+                    "type": "string"
+                }, 
+                "function": {
+                    "description": "Optional. Human-readable name of the function or method being invoked, with\noptional context such as the class or package name. This information may be\nused in contexts such as the logs viewer, where a file and line number are\nless meaningful. The format can vary by language. For example:\n`qual.if.ied.Class.method` (Java), `dir/package.func` (Go), `function`\n(Python).", 
+                    "type": "string"
+                }, 
+                "line": {
+                    "description": "Optional. Line within the source file. 1-based; 0 indicates no line number\navailable.", 
+                    "format": "int64", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
         "MetricValue": {
             "description": "Represents a single metric value.", 
             "id": "MetricValue", 
@@ -1026,7 +1094,7 @@
                     "additionalProperties": {
                         "type": "string"
                     }, 
-                    "description": "The labels describing the metric value.\nSee comments on google.api.servicecontrol.v1.Operation.labels for\nthe overriding relationship.", 
+                    "description": "The labels describing the metric value.\nSee comments on google.api.servicecontrol.v1.Operation.labels for\nthe overriding relationship.\nNote that this map must not contain monitored resource labels.", 
                     "type": "object"
                 }, 
                 "moneyValue": {
@@ -1144,10 +1212,6 @@
                     "$ref": "QuotaProperties", 
                     "description": "Represents the properties needed for quota check. Applicable only if this\noperation is for a quota check request. If this is not specified, no quota\ncheck will be performed."
                 }, 
-                "resourceContainer": {
-                    "description": "DO NOT USE. This field is deprecated, use \"resources\" field instead.\nThe resource name of the parent of a resource in the resource hierarchy.\n\nThis can be in one of the following formats:\n    - \u201cprojects/<project-id or project-number>\u201d\n    - \u201cfolders/<folder-id>\u201d\n    - \u201corganizations/<organization-id>\u201d", 
-                    "type": "string"
-                }, 
                 "resources": {
                     "description": "The resources that are involved in the operation.\nThe maximum supported number of entries in this field is 100.", 
                     "items": {
@@ -1160,6 +1224,13 @@
                     "format": "google-datetime", 
                     "type": "string"
                 }, 
+                "traceSpans": {
+                    "description": "Unimplemented. A list of Cloud Trace spans. The span names shall contain\nthe id of the destination project which can be either the produce or the\nconsumer project.", 
+                    "items": {
+                        "$ref": "TraceSpan"
+                    }, 
+                    "type": "array"
+                }, 
                 "userLabels": {
                     "additionalProperties": {
                         "type": "string"
@@ -1171,7 +1242,7 @@
             "type": "object"
         }, 
         "Peer": {
-            "description": "This message defines attributes for a node that handles a network request.\nThe node can be either a service or an application that sends, forwards,\nor receives the request. Service peers should fill in the `service`,\n`principal`, and `labels` as appropriate.", 
+            "description": "This message defines attributes for a node that handles a network request.\nThe node can be either a service or an application that sends, forwards,\nor receives the request. Service peers should fill in\n`principal` and `labels` as appropriate.", 
             "id": "Peer", 
             "properties": {
                 "ip": {
@@ -1196,10 +1267,6 @@
                 }, 
                 "regionCode": {
                     "description": "The CLDR country/region code associated with the above IP address.\nIf the IP address is private, the `region_code` should reflect the\nphysical location where this peer is running.", 
-                    "type": "string"
-                }, 
-                "service": {
-                    "description": "The canonical service name of the peer.\n\nNOTE: different systems may have different service naming schemes.", 
                     "type": "string"
                 }
             }, 
@@ -1305,7 +1372,7 @@
                     "type": "string"
                 }, 
                 "operationId": {
-                    "description": "Identity of the operation. This is expected to be unique within the scope\nof the service that generated the operation, and guarantees idempotency in\ncase of retries.\n\nUUID version 4 is recommended, though not required. In scenarios where an\noperation is computed from existing information and an idempotent id is\ndesirable for deduplication purpose, UUID version 5 is recommended. See\nRFC 4122 for details.", 
+                    "description": "Identity of the operation. This is expected to be unique within the scope\nof the service that generated the operation, and guarantees idempotency in\ncase of retries.\n\nIn order to ensure best performance and latency in the Quota backends,\noperation_ids are optimally associated with time, so that related\noperations can be accessed fast in storage. For this reason, the\nrecommended token for services that intend to operate at a high QPS is\nUnix time in nanos + UUID", 
                     "type": "string"
                 }, 
                 "quotaMetrics": {
@@ -1321,13 +1388,15 @@
                         "UNSPECIFIED", 
                         "NORMAL", 
                         "BEST_EFFORT", 
-                        "CHECK_ONLY"
+                        "CHECK_ONLY", 
+                        "QUERY_ONLY"
                     ], 
                     "enumDescriptions": [
                         "Guard against implicit default. Must not be used.", 
                         "For AllocateQuota request, allocates quota for the amount specified in\nthe service configuration or specified using the quota metrics. If the\namount is higher than the available quota, allocation error will be\nreturned and no quota will be allocated.\nIf multiple quotas are part of the request, and one fails, none of the\nquotas are allocated or released.", 
                         "The operation allocates quota for the amount specified in the service\nconfiguration or specified using the quota metrics. If the amount is\nhigher than the available quota, request does not fail but all available\nquota will be allocated.\nFor rate quota, BEST_EFFORT will continue to deduct from other groups\neven if one does not have enough quota. For allocation, it will find the\nminimum available amount across all groups and deduct that amount from\nall the affected groups.", 
-                        "For AllocateQuota request, only checks if there is enough quota\navailable and does not change the available quota. No lock is placed on\nthe available quota either."
+                        "For AllocateQuota request, only checks if there is enough quota\navailable and does not change the available quota. No lock is placed on\nthe available quota either.", 
+                        "Unimplemented. When used in AllocateQuotaRequest, this returns the\neffective quota limit(s) in the response, and no quota check will be\nperformed. Not supported for other requests, and even for\nAllocateQuotaRequest, this is currently supported only for whitelisted\nservices."
                     ], 
                     "type": "string"
                 }
@@ -1392,7 +1461,7 @@
             "id": "ReportRequest", 
             "properties": {
                 "operations": {
-                    "description": "Operations to be reported.\n\nTypically the service should report one operation per request.\nPutting multiple operations into a single request is allowed, but should\nbe used only when multiple operations are natually available at the time\nof the report.\n\nIf multiple operations are in a single request, the total request size\nshould be no larger than 1MB. See ReportResponse.report_errors for\npartial failure behavior.", 
+                    "description": "Operations to be reported.\n\nTypically the service should report one operation per request.\nPutting multiple operations into a single request is allowed, but should\nbe used only when multiple operations are natually available at the time\nof the report.\n\nThere is no limit on the number of operations in the same ReportRequest,\nhowever the ReportRequest size should be no larger than 1MB. See\nReportResponse.report_errors for partial failure behavior.", 
                     "items": {
                         "$ref": "Operation"
                     }, 
@@ -1428,7 +1497,7 @@
                     "type": "string"
                 }, 
                 "serviceRolloutId": {
-                    "description": "Unimplemented. The current service rollout id used to process the request.", 
+                    "description": "The current service rollout id used to process the request.", 
                     "type": "string"
                 }
             }, 
@@ -1441,10 +1510,6 @@
                 "auth": {
                     "$ref": "Auth", 
                     "description": "The request authentication. May be absent for unauthenticated requests.\nDerived from the HTTP request `Authorization` header or equivalent."
-                }, 
-                "fragment": {
-                    "description": "The HTTP URL fragment. No URL decoding is performed.", 
-                    "type": "string"
                 }, 
                 "headers": {
                     "additionalProperties": {
@@ -1474,7 +1539,7 @@
                     "type": "string"
                 }, 
                 "query": {
-                    "description": "The HTTP URL query in the format of `name1=value`&name2=value2`, as it\nappears in the first line of the HTTP request. No decoding is performed.", 
+                    "description": "The HTTP URL query in the format of `name1=value1&name2=value2`, as it\nappears in the first line of the HTTP request. No decoding is performed.", 
                     "type": "string"
                 }, 
                 "reason": {
@@ -1545,7 +1610,7 @@
                     "type": "string"
                 }, 
                 "type": {
-                    "description": "The type of the resource. The scheme is platform-specific because\ndifferent platforms define their resources differently.", 
+                    "description": "The type of the resource. The syntax is platform-specific because\ndifferent platforms define their resources differently.\n\nFor Google APIs, the type format must be \"{service}/{kind}\".", 
                     "type": "string"
                 }
             }, 
@@ -1606,6 +1671,17 @@
             }, 
             "type": "object"
         }, 
+        "SpanContext": {
+            "description": "The context of a span, attached to\nExemplars\nin Distribution values during aggregation.\n\nIt contains the name of a span with format:\n\n    projects/[PROJECT_ID_OR_NUMBER]/traces/[TRACE_ID]/spans/[SPAN_ID]", 
+            "id": "SpanContext", 
+            "properties": {
+                "spanName": {
+                    "description": "The resource name of the span. The format is:\n\n    projects/[PROJECT_ID_OR_NUMBER]/traces/[TRACE_ID]/spans/[SPAN_ID]\n\n`[TRACE_ID]` is a unique identifier for a trace within a project;\nit is a 32-character hexadecimal encoding of a 16-byte array.\n\n`[SPAN_ID]` is a unique identifier for a span within a trace; it\nis a 16-character hexadecimal encoding of an 8-byte array.", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
         "Status": {
             "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors).", 
             "id": "Status", 
@@ -1644,6 +1720,92 @@
                     }, 
                     "description": "Metadata about third party identity.", 
                     "type": "object"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "TraceSpan": {
+            "description": "A span represents a single operation within a trace. Spans can be\nnested to form a trace tree. Often, a trace contains a root span\nthat describes the end-to-end latency, and one or more subspans for\nits sub-operations. A trace can also contain multiple root spans,\nor none at all. Spans do not need to be contiguous&mdash;there may be\ngaps or overlaps between spans in a trace.", 
+            "id": "TraceSpan", 
+            "properties": {
+                "attributes": {
+                    "$ref": "Attributes", 
+                    "description": "A set of attributes on the span. You can have up to 32 attributes per\nspan."
+                }, 
+                "childSpanCount": {
+                    "description": "An optional number of child spans that were generated while this span\nwas active. If set, allows implementation to detect missing child spans.", 
+                    "format": "int32", 
+                    "type": "integer"
+                }, 
+                "displayName": {
+                    "$ref": "TruncatableString", 
+                    "description": "A description of the span's operation (up to 128 bytes).\nStackdriver Trace displays the description in the\nGoogle Cloud Platform Console.\nFor example, the display name can be a qualified method name or a file name\nand a line number where the operation is called. A best practice is to use\nthe same display name within an application and at the same call point.\nThis makes it easier to correlate spans in different traces."
+                }, 
+                "endTime": {
+                    "description": "The end time of the span. On the client side, this is the time kept by\nthe local machine where the span execution ends. On the server side, this\nis the time when the server application handler stops running.", 
+                    "format": "google-datetime", 
+                    "type": "string"
+                }, 
+                "name": {
+                    "description": "The resource name of the span in the following format:\n\n    projects/[PROJECT_ID]/traces/[TRACE_ID]/spans/SPAN_ID is a unique identifier for a trace within a project;\nit is a 32-character hexadecimal encoding of a 16-byte array.\n\n[SPAN_ID] is a unique identifier for a span within a trace; it\nis a 16-character hexadecimal encoding of an 8-byte array.", 
+                    "type": "string"
+                }, 
+                "parentSpanId": {
+                    "description": "The [SPAN_ID] of this span's parent span. If this is a root span,\nthen this field must be empty.", 
+                    "type": "string"
+                }, 
+                "sameProcessAsParentSpan": {
+                    "description": "(Optional) Set this parameter to indicate whether this span is in\nthe same process as its parent. If you do not set this parameter,\nStackdriver Trace is unable to take advantage of this helpful\ninformation.", 
+                    "type": "boolean"
+                }, 
+                "spanId": {
+                    "description": "The [SPAN_ID] portion of the span's resource name.", 
+                    "type": "string"
+                }, 
+                "spanKind": {
+                    "description": "Distinguishes between spans generated in a particular context. For example,\ntwo spans with the same name may be distinguished using `CLIENT` (caller)\nand `SERVER` (callee) to identify an RPC call.", 
+                    "enum": [
+                        "SPAN_KIND_UNSPECIFIED", 
+                        "INTERNAL", 
+                        "SERVER", 
+                        "CLIENT", 
+                        "PRODUCER", 
+                        "CONSUMER"
+                    ], 
+                    "enumDescriptions": [
+                        "Unspecified. Do NOT use as default.\nImplementations MAY assume SpanKind.INTERNAL to be default.", 
+                        "Indicates that the span is used internally. Default value.", 
+                        "Indicates that the span covers server-side handling of an RPC or other\nremote network request.", 
+                        "Indicates that the span covers the client-side wrapper around an RPC or\nother remote request.", 
+                        "Indicates that the span describes producer sending a message to a broker.\nUnlike client and  server, there is no direct critical path latency\nrelationship between producer and consumer spans (e.g. publishing a\nmessage to a pubsub service).", 
+                        "Indicates that the span describes consumer receiving a message from a\nbroker. Unlike client and  server, there is no direct critical path\nlatency relationship between producer and consumer spans (e.g. receiving\na message from a pubsub service subscription)."
+                    ], 
+                    "type": "string"
+                }, 
+                "startTime": {
+                    "description": "The start time of the span. On the client side, this is the time kept by\nthe local machine where the span execution starts. On the server side, this\nis the time when the server's application handler starts running.", 
+                    "format": "google-datetime", 
+                    "type": "string"
+                }, 
+                "status": {
+                    "$ref": "Status", 
+                    "description": "An optional final status for this span."
+                }
+            }, 
+            "type": "object"
+        }, 
+        "TruncatableString": {
+            "description": "Represents a string that might be shortened to a specified length.", 
+            "id": "TruncatableString", 
+            "properties": {
+                "truncatedByteCount": {
+                    "description": "The number of bytes removed from the original string. If this\nvalue is 0, then the string was not shortened.", 
+                    "format": "int32", 
+                    "type": "integer"
+                }, 
+                "value": {
+                    "description": "The shortened string. For example, if the original string is 500\nbytes long and the limit of the string is 128 bytes, then\n`value` contains the first 128 bytes of the 500-byte string.\n\nTruncation always happens on a UTF8 character boundary. If there\nare multi-byte characters in the string, then the length of the\nshortened string might be less than the size limit.", 
+                    "type": "string"
                 }
             }, 
             "type": "object"

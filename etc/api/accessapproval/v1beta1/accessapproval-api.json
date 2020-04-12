@@ -22,6 +22,7 @@
     }, 
     "id": "accessapproval:v1beta1", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://accessapproval.mtls.googleapis.com/", 
     "name": "accessapproval", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -106,6 +107,31 @@
     "resources": {
         "folders": {
             "methods": {
+                "deleteAccessApprovalSettings": {
+                    "description": "Deletes the settings associated with a project, folder, or organization.\nThis will have the effect of disabling Access Approval for the project,\nfolder, or organization, but only if all ancestors also have Access\nApproval disabled. If Access Approval is enabled at a higher level of the\nhierarchy, then Access Approval will still be enabled at this level as\nthe settings are inherited.", 
+                    "flatPath": "v1beta1/folders/{foldersId}/accessApprovalSettings", 
+                    "httpMethod": "DELETE", 
+                    "id": "accessapproval.folders.deleteAccessApprovalSettings", 
+                    "parameterOrder": [
+                        "name"
+                    ], 
+                    "parameters": {
+                        "name": {
+                            "description": "Name of the AccessApprovalSettings to delete.", 
+                            "location": "path", 
+                            "pattern": "^folders/[^/]+/accessApprovalSettings$", 
+                            "required": true, 
+                            "type": "string"
+                        }
+                    }, 
+                    "path": "v1beta1/{+name}", 
+                    "response": {
+                        "$ref": "Empty"
+                    }, 
+                    "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                    ]
+                }, 
                 "getAccessApprovalSettings": {
                     "description": "Gets the settings associated with a project, folder, or organization.", 
                     "flatPath": "v1beta1/folders/{foldersId}/accessApprovalSettings", 
@@ -132,7 +158,7 @@
                     ]
                 }, 
                 "updateAccessApprovalSettings": {
-                    "description": "Updates the settings associated with a project, folder, or organization.\nCompletely replaces the existing settings.", 
+                    "description": "Updates the settings associated with a project, folder, or organization.\nSettings to update are determined by the value of field_mask.", 
                     "flatPath": "v1beta1/folders/{foldersId}/accessApprovalSettings", 
                     "httpMethod": "PATCH", 
                     "id": "accessapproval.folders.updateAccessApprovalSettings", 
@@ -145,6 +171,12 @@
                             "location": "path", 
                             "pattern": "^folders/[^/]+/accessApprovalSettings$", 
                             "required": true, 
+                            "type": "string"
+                        }, 
+                        "updateMask": {
+                            "description": "For the `FieldMask` definition, see\nhttps://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask\nIf this field is left unset, only the notification_emails field will be\nupdated.", 
+                            "format": "google-fieldmask", 
+                            "location": "query", 
                             "type": "string"
                         }
                     }, 
@@ -291,6 +323,31 @@
         }, 
         "organizations": {
             "methods": {
+                "deleteAccessApprovalSettings": {
+                    "description": "Deletes the settings associated with a project, folder, or organization.\nThis will have the effect of disabling Access Approval for the project,\nfolder, or organization, but only if all ancestors also have Access\nApproval disabled. If Access Approval is enabled at a higher level of the\nhierarchy, then Access Approval will still be enabled at this level as\nthe settings are inherited.", 
+                    "flatPath": "v1beta1/organizations/{organizationsId}/accessApprovalSettings", 
+                    "httpMethod": "DELETE", 
+                    "id": "accessapproval.organizations.deleteAccessApprovalSettings", 
+                    "parameterOrder": [
+                        "name"
+                    ], 
+                    "parameters": {
+                        "name": {
+                            "description": "Name of the AccessApprovalSettings to delete.", 
+                            "location": "path", 
+                            "pattern": "^organizations/[^/]+/accessApprovalSettings$", 
+                            "required": true, 
+                            "type": "string"
+                        }
+                    }, 
+                    "path": "v1beta1/{+name}", 
+                    "response": {
+                        "$ref": "Empty"
+                    }, 
+                    "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                    ]
+                }, 
                 "getAccessApprovalSettings": {
                     "description": "Gets the settings associated with a project, folder, or organization.", 
                     "flatPath": "v1beta1/organizations/{organizationsId}/accessApprovalSettings", 
@@ -317,7 +374,7 @@
                     ]
                 }, 
                 "updateAccessApprovalSettings": {
-                    "description": "Updates the settings associated with a project, folder, or organization.\nCompletely replaces the existing settings.", 
+                    "description": "Updates the settings associated with a project, folder, or organization.\nSettings to update are determined by the value of field_mask.", 
                     "flatPath": "v1beta1/organizations/{organizationsId}/accessApprovalSettings", 
                     "httpMethod": "PATCH", 
                     "id": "accessapproval.organizations.updateAccessApprovalSettings", 
@@ -330,6 +387,12 @@
                             "location": "path", 
                             "pattern": "^organizations/[^/]+/accessApprovalSettings$", 
                             "required": true, 
+                            "type": "string"
+                        }, 
+                        "updateMask": {
+                            "description": "For the `FieldMask` definition, see\nhttps://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask\nIf this field is left unset, only the notification_emails field will be\nupdated.", 
+                            "format": "google-fieldmask", 
+                            "location": "query", 
                             "type": "string"
                         }
                     }, 
@@ -476,6 +539,31 @@
         }, 
         "projects": {
             "methods": {
+                "deleteAccessApprovalSettings": {
+                    "description": "Deletes the settings associated with a project, folder, or organization.\nThis will have the effect of disabling Access Approval for the project,\nfolder, or organization, but only if all ancestors also have Access\nApproval disabled. If Access Approval is enabled at a higher level of the\nhierarchy, then Access Approval will still be enabled at this level as\nthe settings are inherited.", 
+                    "flatPath": "v1beta1/projects/{projectsId}/accessApprovalSettings", 
+                    "httpMethod": "DELETE", 
+                    "id": "accessapproval.projects.deleteAccessApprovalSettings", 
+                    "parameterOrder": [
+                        "name"
+                    ], 
+                    "parameters": {
+                        "name": {
+                            "description": "Name of the AccessApprovalSettings to delete.", 
+                            "location": "path", 
+                            "pattern": "^projects/[^/]+/accessApprovalSettings$", 
+                            "required": true, 
+                            "type": "string"
+                        }
+                    }, 
+                    "path": "v1beta1/{+name}", 
+                    "response": {
+                        "$ref": "Empty"
+                    }, 
+                    "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                    ]
+                }, 
                 "getAccessApprovalSettings": {
                     "description": "Gets the settings associated with a project, folder, or organization.", 
                     "flatPath": "v1beta1/projects/{projectsId}/accessApprovalSettings", 
@@ -502,7 +590,7 @@
                     ]
                 }, 
                 "updateAccessApprovalSettings": {
-                    "description": "Updates the settings associated with a project, folder, or organization.\nCompletely replaces the existing settings.", 
+                    "description": "Updates the settings associated with a project, folder, or organization.\nSettings to update are determined by the value of field_mask.", 
                     "flatPath": "v1beta1/projects/{projectsId}/accessApprovalSettings", 
                     "httpMethod": "PATCH", 
                     "id": "accessapproval.projects.updateAccessApprovalSettings", 
@@ -515,6 +603,12 @@
                             "location": "path", 
                             "pattern": "^projects/[^/]+/accessApprovalSettings$", 
                             "required": true, 
+                            "type": "string"
+                        }, 
+                        "updateMask": {
+                            "description": "For the `FieldMask` definition, see\nhttps://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask\nIf this field is left unset, only the notification_emails field will be\nupdated.", 
+                            "format": "google-fieldmask", 
+                            "location": "query", 
                             "type": "string"
                         }
                     }, 
@@ -660,19 +754,30 @@
             }
         }
     }, 
-    "revision": "20190628", 
+    "revision": "20200409", 
     "rootUrl": "https://accessapproval.googleapis.com/", 
     "schemas": {
         "AccessApprovalSettings": {
             "description": "Settings on a Project/Folder/Organization related to Access Approval.", 
             "id": "AccessApprovalSettings", 
             "properties": {
+                "enrolledAncestor": {
+                    "description": "Output only. This field is read only (not settable via\nUpdateAccessAccessApprovalSettings method). If the field is true, that\nindicates that at least one service is enrolled for Access Approval in one\nor more ancestors of the Project or Folder (this field will always be\nunset for the organization since organizations do not have ancestors).", 
+                    "type": "boolean"
+                }, 
+                "enrolledServices": {
+                    "description": "A list of Google Cloud Services for which the given resource has Access\nApproval enrolled. Access requests for the resource given by name against\nany of these services contained here will be required to have explicit\napproval. If name refers to an organization, enrollment can be done for\nindividual services. If name refers to a folder or project, enrollment can\nonly be done on an all or nothing basis.\n\nIf a cloud_product is repeated in this list, the first entry will be\nhonored and all following entries will be discarded. A maximum of 10\nenrolled services will be enforced, to be expanded as the set of supported\nservices is expanded.", 
+                    "items": {
+                        "$ref": "EnrolledService"
+                    }, 
+                    "type": "array"
+                }, 
                 "name": {
                     "description": "The resource name of the settings. Format is one of:\n<ol>\n  <li>\"projects/{project_id}/accessApprovalSettings\"</li>\n  <li>\"folders/{folder_id}/accessApprovalSettings\"</li>\n  <li>\"organizations/{organization_id}/accessApprovalSettings\"</li>\n<ol>", 
                     "type": "string"
                 }, 
                 "notificationEmails": {
-                    "description": "A list of email addresses to which notifications relating to approval\nrequests should be sent. Notifications relating to a resource will be sent\nto all emails in the settings of ancestor resources of that resource.", 
+                    "description": "A list of email addresses to which notifications relating to approval\nrequests should be sent. Notifications relating to a resource will be sent\nto all emails in the settings of ancestor resources of that resource. A\nmaximum of 50 email addresses are allowed.", 
                     "items": {
                         "type": "string"
                     }, 
@@ -809,6 +914,35 @@
                 "dismissTime": {
                     "description": "The time at which the approval request was dismissed.", 
                     "format": "google-datetime", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "Empty": {
+            "description": "A generic empty message that you can re-use to avoid defining duplicated\nempty messages in your APIs. A typical example is to use it as the request\nor the response type of an API method. For instance:\n\n    service Foo {\n      rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);\n    }\n\nThe JSON representation for `Empty` is empty JSON object `{}`.", 
+            "id": "Empty", 
+            "properties": {}, 
+            "type": "object"
+        }, 
+        "EnrolledService": {
+            "description": "Represents the enrollment of a cloud resource into a specific service.", 
+            "id": "EnrolledService", 
+            "properties": {
+                "cloudProduct": {
+                    "description": "The product for which Access Approval will be enrolled. Allowed values are\nlisted below (case-sensitive):\n<ol>\n  <li>all</li>\n  <li>appengine.googleapis.com</li>\n  <li>bigquery.googleapis.com</li>\n  <li>bigtable.googleapis.com</li>\n  <li>cloudkms.googleapis.com</li>\n  <li>compute.googleapis.com</li>\n  <li>dataflow.googleapis.com</li>\n  <li>iam.googleapis.com</li>\n  <li>pubsub.googleapis.com</li>\n  <li>storage.googleapis.com</li>\n<ol>", 
+                    "type": "string"
+                }, 
+                "enrollmentLevel": {
+                    "description": "The enrollment level of the service.", 
+                    "enum": [
+                        "ENROLLMENT_LEVEL_UNSPECIFIED", 
+                        "BLOCK_ALL"
+                    ], 
+                    "enumDescriptions": [
+                        "Default value for proto, shouldn't be used.", 
+                        "Service is enrolled in Access Approval for all requests"
+                    ], 
                     "type": "string"
                 }
             }, 

@@ -22,6 +22,7 @@
     }, 
     "id": "cloudbuild:v1alpha1", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://cloudbuild.mtls.googleapis.com/", 
     "name": "cloudbuild", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -109,7 +110,7 @@
                 "workerPools": {
                     "methods": {
                         "create": {
-                            "description": "Creates a `WorkerPool` to run the builds, and returns the new worker pool.\n\nThis API is experimental.", 
+                            "description": "Creates a `WorkerPool` to run the builds, and returns the new worker pool.", 
                             "flatPath": "v1alpha1/projects/{projectsId}/workerPools", 
                             "httpMethod": "POST", 
                             "id": "cloudbuild.projects.workerPools.create", 
@@ -137,7 +138,7 @@
                             ]
                         }, 
                         "delete": {
-                            "description": "Deletes a `WorkerPool` by its project ID and WorkerPool name.\n\nThis API is experimental.", 
+                            "description": "Deletes a `WorkerPool` by its project ID and WorkerPool name.", 
                             "flatPath": "v1alpha1/projects/{projectsId}/workerPools/{workerPoolsId}", 
                             "httpMethod": "DELETE", 
                             "id": "cloudbuild.projects.workerPools.delete", 
@@ -162,7 +163,7 @@
                             ]
                         }, 
                         "get": {
-                            "description": "Returns information about a `WorkerPool`.\n\nThis API is experimental.", 
+                            "description": "Returns information about a `WorkerPool`.", 
                             "flatPath": "v1alpha1/projects/{projectsId}/workerPools/{workerPoolsId}", 
                             "httpMethod": "GET", 
                             "id": "cloudbuild.projects.workerPools.get", 
@@ -187,7 +188,7 @@
                             ]
                         }, 
                         "list": {
-                            "description": "List project's `WorkerPool`s.\n\nThis API is experimental.", 
+                            "description": "List project's `WorkerPool`s.", 
                             "flatPath": "v1alpha1/projects/{projectsId}/workerPools", 
                             "httpMethod": "GET", 
                             "id": "cloudbuild.projects.workerPools.list", 
@@ -212,7 +213,7 @@
                             ]
                         }, 
                         "patch": {
-                            "description": "Update a `WorkerPool`.\n\nThis API is experimental.", 
+                            "description": "Update a `WorkerPool`.", 
                             "flatPath": "v1alpha1/projects/{projectsId}/workerPools/{workerPoolsId}", 
                             "httpMethod": "PATCH", 
                             "id": "cloudbuild.projects.workerPools.patch", 
@@ -244,7 +245,7 @@
             }
         }
     }, 
-    "revision": "20190702", 
+    "revision": "20200323", 
     "rootUrl": "https://cloudbuild.googleapis.com/", 
     "schemas": {
         "ArtifactObjects": {
@@ -354,6 +355,11 @@
                     "description": "Output only. ID of the project.", 
                     "type": "string"
                 }, 
+                "queueTtl": {
+                    "description": "TTL in queue for this build. If provided and the build is enqueued longer\nthan this value, the build will expire and the build status will be\n`EXPIRED`.\n\nThe TTL starts ticking from create_time.", 
+                    "format": "google-duration", 
+                    "type": "string"
+                }, 
                 "results": {
                     "$ref": "Results", 
                     "description": "Output only. Results of the build."
@@ -388,7 +394,8 @@
                         "FAILURE", 
                         "INTERNAL_ERROR", 
                         "TIMEOUT", 
-                        "CANCELLED"
+                        "CANCELLED", 
+                        "EXPIRED"
                     ], 
                     "enumDescriptions": [
                         "Status of the build is unknown.", 
@@ -398,7 +405,8 @@
                         "Build or step failed to complete successfully.", 
                         "Build or step failed due to an internal cause.", 
                         "Build or step took longer than was allowed.", 
-                        "Build or step was canceled by a user."
+                        "Build or step was canceled by a user.", 
+                        "Build was enqueued for longer than the value of `queue_ttl`."
                     ], 
                     "type": "string"
                 }, 
@@ -567,7 +575,7 @@
                     "type": "array"
                 }, 
                 "workerPool": {
-                    "description": "Option to specify a `WorkerPool` for the build. User specifies the pool\nwith the format \"[WORKERPOOL_PROJECT_ID]/[WORKERPOOL_NAME]\".\nThis is an experimental field.", 
+                    "description": "Option to specify a `WorkerPool` for the build.\nFormat: projects/{project}/workerPools/{workerPool}\n\nThis field is experimental.", 
                     "type": "string"
                 }
             }, 
@@ -628,7 +636,8 @@
                         "FAILURE", 
                         "INTERNAL_ERROR", 
                         "TIMEOUT", 
-                        "CANCELLED"
+                        "CANCELLED", 
+                        "EXPIRED"
                     ], 
                     "enumDescriptions": [
                         "Status of the build is unknown.", 
@@ -638,7 +647,8 @@
                         "Build or step failed to complete successfully.", 
                         "Build or step failed due to an internal cause.", 
                         "Build or step took longer than was allowed.", 
-                        "Build or step was canceled by a user."
+                        "Build or step was canceled by a user.", 
+                        "Build was enqueued for longer than the value of `queue_ttl`."
                     ], 
                     "type": "string"
                 }, 
@@ -771,7 +781,7 @@
             "id": "RepoSource", 
             "properties": {
                 "branchName": {
-                    "description": "Name of the branch to build.", 
+                    "description": "Regex matching branches to build.\n\nThe syntax of the regular expressions accepted is the syntax accepted by\nRE2 and described at https://github.com/google/re2/wiki/Syntax", 
                     "type": "string"
                 }, 
                 "commitSha": {
@@ -782,16 +792,27 @@
                     "description": "Directory, relative to the source root, in which to run the build.\n\nThis must be a relative path. If a step's `dir` is specified and is an\nabsolute path, this value is ignored for that step's execution.", 
                     "type": "string"
                 }, 
+                "invertRegex": {
+                    "description": "Only trigger a build if the revision regex does NOT match the revision\nregex.", 
+                    "type": "boolean"
+                }, 
                 "projectId": {
                     "description": "ID of the project that owns the Cloud Source Repository. If omitted, the\nproject ID requesting the build is assumed.", 
                     "type": "string"
                 }, 
                 "repoName": {
-                    "description": "Name of the Cloud Source Repository. If omitted, the name \"default\" is\nassumed.", 
+                    "description": "Required. Name of the Cloud Source Repository.", 
                     "type": "string"
                 }, 
+                "substitutions": {
+                    "additionalProperties": {
+                        "type": "string"
+                    }, 
+                    "description": "Substitutions to use in a triggered build.\nShould only be used with RunBuildTrigger", 
+                    "type": "object"
+                }, 
                 "tagName": {
-                    "description": "Name of the tag to build.", 
+                    "description": "Regex matching tags to build.\n\nThe syntax of the regular expressions accepted is the syntax accepted by\nRE2 and described at https://github.com/google/re2/wiki/Syntax", 
                     "type": "string"
                 }
             }, 
@@ -1031,7 +1052,7 @@
                         "Status of the `WorkerPool` is unknown.", 
                         "`WorkerPool` is being created.", 
                         "`WorkerPool` is running.", 
-                        "`WorkerPool` is being deleting: cancelling builds and draining workers.", 
+                        "`WorkerPool` is being deleted: cancelling builds and draining workers.", 
                         "`WorkerPool` is deleted."
                     ], 
                     "type": "string"

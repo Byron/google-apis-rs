@@ -21,7 +21,7 @@
     "baseUrl": "https://oslogin.googleapis.com/", 
     "batchPath": "batch", 
     "canonicalName": "Cloud OS Login", 
-    "description": "You can use OS Login to manage access to your VM instances using IAM roles. For more information, read [OS Login](/compute/docs/oslogin/).", 
+    "description": "You can use OS Login to manage access to your VM instances using IAM roles.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://cloud.google.com/compute/docs/oslogin/", 
     "fullyEncodeReservedExpansion": true, 
@@ -31,6 +31,7 @@
     }, 
     "id": "oslogin:v1alpha", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://oslogin.mtls.googleapis.com/", 
     "name": "oslogin", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -333,7 +334,7 @@
             }
         }
     }, 
-    "revision": "20190614", 
+    "revision": "20200329", 
     "rootUrl": "https://oslogin.googleapis.com/", 
     "schemas": {
         "Empty": {
@@ -399,6 +400,10 @@
                     "description": "The path to the home directory for this account.", 
                     "type": "string"
                 }, 
+                "name": {
+                    "description": "Output only. The canonical resource name.", 
+                    "type": "string"
+                }, 
                 "operatingSystemType": {
                     "description": "The operating system type where this account applies.", 
                     "enum": [
@@ -452,6 +457,10 @@
                 }, 
                 "key": {
                     "description": "Public key text in SSH format, defined by\n<a href=\"https://www.ietf.org/rfc/rfc4253.txt\" target=\"_blank\">RFC4253</a>\nsection 6.6.", 
+                    "type": "string"
+                }, 
+                "name": {
+                    "description": "Output only. The canonical resource name.", 
                     "type": "string"
                 }
             }, 

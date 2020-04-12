@@ -2,7 +2,7 @@
     "basePath": "", 
     "baseUrl": "https://safebrowsing.googleapis.com/", 
     "batchPath": "batch", 
-    "description": "Enables client applications to check web resources (most commonly URLs) against Google-generated lists of unsafe web resources.", 
+    "description": "Enables client applications to check web resources (most commonly URLs) against Google-generated lists of unsafe web resources. The Safe Browsing APIs are for non-commercial use only. If you need to use APIs to detect malicious URLs for commercial purposes \u2013 meaning \u201cfor sale or revenue-generating purposes\u201d \u2013 please refer to the Web Risk API.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/safe-browsing/", 
     "icons": {
@@ -11,6 +11,7 @@
     }, 
     "id": "safebrowsing:v4", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://safebrowsing.mtls.googleapis.com/", 
     "name": "safebrowsing", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -258,7 +259,7 @@
             }
         }
     }, 
-    "revision": "20190702", 
+    "revision": "20200407", 
     "rootUrl": "https://safebrowsing.googleapis.com/", 
     "schemas": {
         "Checksum": {
@@ -301,7 +302,7 @@
                     "type": "string"
                 }, 
                 "maxDatabaseEntries": {
-                    "description": "Sets the maximum number of entries that the client is willing to have\nin the local database. This should be a power of 2 between 2**10 and\n2**20. If zero, no database size limit is set.", 
+                    "description": "Sets the maximum number of entries that the client is willing to have\nin the local database for the specified list. This should be a power of\n2 between 2**10 and 2**20. If zero, no database size limit is set.", 
                     "format": "int32", 
                     "type": "integer"
                 }, 

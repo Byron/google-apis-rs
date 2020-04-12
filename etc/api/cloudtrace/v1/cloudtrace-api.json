@@ -18,7 +18,7 @@
     "baseUrl": "https://cloudtrace.googleapis.com/", 
     "batchPath": "batch", 
     "canonicalName": "Cloud Trace", 
-    "description": "Sends application trace data to Stackdriver Trace for viewing. Trace data is collected for all App Engine applications by default. Trace data from other applications can be provided using this API. This library is used to interact with the Trace API directly. If you are looking to instrument your application for Stackdriver Trace, we recommend using OpenCensus.\n", 
+    "description": "Sends application trace data to Cloud Trace for viewing. Trace data is collected for all App Engine applications by default. Trace data from other applications can be provided using this API. This library is used to interact with the Cloud Trace API directly. If you are looking to instrument your application for Cloud Trace, we recommend using OpenCensus.\n", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://cloud.google.com/trace", 
     "fullyEncodeReservedExpansion": true, 
@@ -28,6 +28,7 @@
     }, 
     "id": "cloudtrace:v1", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://cloudtrace.mtls.googleapis.com/", 
     "name": "cloudtrace", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -113,7 +114,7 @@
         "projects": {
             "methods": {
                 "patchTraces": {
-                    "description": "Sends new traces to Stackdriver Trace or updates existing traces. If the ID\nof a trace that you send matches that of an existing trace, any fields\nin the existing trace and its spans are overwritten by the provided values,\nand any new fields provided are merged with the existing trace data. If the\nID does not match, a new trace is created.", 
+                    "description": "Sends new traces to Stackdriver Trace or updates existing traces. If the ID\nof a trace that you send matches that of an existing trace, any fields\nin the existing trace and its spans are overwritten by the provided values,\nand any new fields provided are merged with the existing trace data. If the\nID does not match, a new trace is created.\nIn this case, writing traces is not considered an active developer\nmethod since traces are machine generated.", 
                     "flatPath": "v1/projects/{projectId}/traces", 
                     "httpMethod": "PATCH", 
                     "id": "cloudtrace.projects.patchTraces", 
@@ -122,7 +123,7 @@
                     ], 
                     "parameters": {
                         "projectId": {
-                            "description": "ID of the Cloud project where the trace data is stored.", 
+                            "description": "Required. ID of the Cloud project where the trace data is stored.", 
                             "location": "path", 
                             "required": true, 
                             "type": "string"
@@ -145,7 +146,7 @@
                 "traces": {
                     "methods": {
                         "get": {
-                            "description": "Gets a single trace by its ID.", 
+                            "description": "Gets a single trace by its ID.\nIn this case, getting for traces is considered an active developer method,\neven though it is technically a read-only method.", 
                             "flatPath": "v1/projects/{projectId}/traces/{traceId}", 
                             "httpMethod": "GET", 
                             "id": "cloudtrace.projects.traces.get", 
@@ -155,13 +156,13 @@
                             ], 
                             "parameters": {
                                 "projectId": {
-                                    "description": "ID of the Cloud project where the trace data is stored.", 
+                                    "description": "Required. ID of the Cloud project where the trace data is stored.", 
                                     "location": "path", 
                                     "required": true, 
                                     "type": "string"
                                 }, 
                                 "traceId": {
-                                    "description": "ID of the trace to return.", 
+                                    "description": "Required. ID of the trace to return.", 
                                     "location": "path", 
                                     "required": true, 
                                     "type": "string"
@@ -177,7 +178,7 @@
                             ]
                         }, 
                         "list": {
-                            "description": "Returns of a list of traces that match the specified filter conditions.", 
+                            "description": "Returns of a list of traces that match the specified filter conditions.\nIn this case, listing for traces is considered an active developer method,\neven though it is technically a read-only method.", 
                             "flatPath": "v1/projects/{projectId}/traces", 
                             "httpMethod": "GET", 
                             "id": "cloudtrace.projects.traces.list", 
@@ -192,28 +193,28 @@
                                     "type": "string"
                                 }, 
                                 "filter": {
-                                    "description": "An optional filter against labels for the request.\n\nBy default, searches use prefix matching. To specify exact match, prepend\na plus symbol (`+`) to the search term.\nMultiple terms are ANDed. Syntax:\n\n*   `root:NAME_PREFIX` or `NAME_PREFIX`: Return traces where any root\n    span starts with `NAME_PREFIX`.\n*   `+root:NAME` or `+NAME`: Return traces where any root span's name is\n    exactly `NAME`.\n*   `span:NAME_PREFIX`: Return traces where any span starts with\n    `NAME_PREFIX`.\n*   `+span:NAME`: Return traces where any span's name is exactly\n    `NAME`.\n*   `latency:DURATION`: Return traces whose overall latency is\n    greater or equal to than `DURATION`. Accepted units are nanoseconds\n    (`ns`), milliseconds (`ms`), and seconds (`s`). Default is `ms`. For\n    example, `latency:24ms` returns traces whose overall latency\n    is greater than or equal to 24 milliseconds.\n*   `label:LABEL_KEY`: Return all traces containing the specified\n    label key (exact match, case-sensitive) regardless of the key:value\n    pair's value (including empty values).\n*   `LABEL_KEY:VALUE_PREFIX`: Return all traces containing the specified\n    label key (exact match, case-sensitive) whose value starts with\n    `VALUE_PREFIX`. Both a key and a value must be specified.\n*   `+LABEL_KEY:VALUE`: Return all traces containing a key:value pair\n    exactly matching the specified text. Both a key and a value must be\n    specified.\n*   `method:VALUE`: Equivalent to `/http/method:VALUE`.\n*   `url:VALUE`: Equivalent to `/http/url:VALUE`.", 
+                                    "description": "Optional. A filter against labels for the request.\n\nBy default, searches use prefix matching. To specify exact match, prepend\na plus symbol (`+`) to the search term.\nMultiple terms are ANDed. Syntax:\n\n*   `root:NAME_PREFIX` or `NAME_PREFIX`: Return traces where any root\n    span starts with `NAME_PREFIX`.\n*   `+root:NAME` or `+NAME`: Return traces where any root span's name is\n    exactly `NAME`.\n*   `span:NAME_PREFIX`: Return traces where any span starts with\n    `NAME_PREFIX`.\n*   `+span:NAME`: Return traces where any span's name is exactly\n    `NAME`.\n*   `latency:DURATION`: Return traces whose overall latency is\n    greater or equal to than `DURATION`. Accepted units are nanoseconds\n    (`ns`), milliseconds (`ms`), and seconds (`s`). Default is `ms`. For\n    example, `latency:24ms` returns traces whose overall latency\n    is greater than or equal to 24 milliseconds.\n*   `label:LABEL_KEY`: Return all traces containing the specified\n    label key (exact match, case-sensitive) regardless of the key:value\n    pair's value (including empty values).\n*   `LABEL_KEY:VALUE_PREFIX`: Return all traces containing the specified\n    label key (exact match, case-sensitive) whose value starts with\n    `VALUE_PREFIX`. Both a key and a value must be specified.\n*   `+LABEL_KEY:VALUE`: Return all traces containing a key:value pair\n    exactly matching the specified text. Both a key and a value must be\n    specified.\n*   `method:VALUE`: Equivalent to `/http/method:VALUE`.\n*   `url:VALUE`: Equivalent to `/http/url:VALUE`.", 
                                     "location": "query", 
                                     "type": "string"
                                 }, 
                                 "orderBy": {
-                                    "description": "Field used to sort the returned traces. Optional.\nCan be one of the following:\n\n*   `trace_id`\n*   `name` (`name` field of root span in the trace)\n*   `duration` (difference between `end_time` and `start_time` fields of\n     the root span)\n*   `start` (`start_time` field of the root span)\n\nDescending order can be specified by appending `desc` to the sort field\n(for example, `name desc`).\n\nOnly one sort field is permitted.", 
+                                    "description": "Optional. Field used to sort the returned traces.\nCan be one of the following:\n\n*   `trace_id`\n*   `name` (`name` field of root span in the trace)\n*   `duration` (difference between `end_time` and `start_time` fields of\n     the root span)\n*   `start` (`start_time` field of the root span)\n\nDescending order can be specified by appending `desc` to the sort field\n(for example, `name desc`).\n\nOnly one sort field is permitted.", 
                                     "location": "query", 
                                     "type": "string"
                                 }, 
                                 "pageSize": {
-                                    "description": "Maximum number of traces to return. If not specified or <= 0, the\nimplementation selects a reasonable value.  The implementation may\nreturn fewer traces than the requested page size. Optional.", 
+                                    "description": "Optional. Maximum number of traces to return. If not specified or <= 0, the\nimplementation selects a reasonable value.  The implementation may\nreturn fewer traces than the requested page size.", 
                                     "format": "int32", 
                                     "location": "query", 
                                     "type": "integer"
                                 }, 
                                 "pageToken": {
-                                    "description": "Token identifying the page of results to return. If provided, use the\nvalue of the `next_page_token` field from a previous request. Optional.", 
+                                    "description": "Token identifying the page of results to return. If provided, use the\nvalue of the `next_page_token` field from a previous request.", 
                                     "location": "query", 
                                     "type": "string"
                                 }, 
                                 "projectId": {
-                                    "description": "ID of the Cloud project where the trace data is stored.", 
+                                    "description": "Required. ID of the Cloud project where the trace data is stored.", 
                                     "location": "path", 
                                     "required": true, 
                                     "type": "string"
@@ -225,7 +226,7 @@
                                     "type": "string"
                                 }, 
                                 "view": {
-                                    "description": "Type of data returned for traces in the list. Optional. Default is\n`MINIMAL`.", 
+                                    "description": "Optional. Type of data returned for traces in the list. Default is\n`MINIMAL`.", 
                                     "enum": [
                                         "VIEW_TYPE_UNSPECIFIED", 
                                         "MINIMAL", 
@@ -250,7 +251,7 @@
             }
         }
     }, 
-    "revision": "20190622", 
+    "revision": "20200330", 
     "rootUrl": "https://cloudtrace.googleapis.com/", 
     "schemas": {
         "Empty": {
@@ -334,7 +335,7 @@
                     "type": "string"
                 }, 
                 "parentSpanId": {
-                    "description": "ID of the parent span, if any. Optional.", 
+                    "description": "Optional. ID of the parent span, if any.", 
                     "format": "uint64", 
                     "type": "string"
                 }, 
@@ -367,7 +368,7 @@
         }
     }, 
     "servicePath": "", 
-    "title": "Stackdriver Trace API", 
+    "title": "Cloud Trace API", 
     "version": "v1", 
     "version_module": true
 }

@@ -25,6 +25,7 @@
     }, 
     "id": "language:v1", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://language.mtls.googleapis.com/", 
     "name": "language", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -226,7 +227,7 @@
             }
         }
     }, 
-    "revision": "20190623", 
+    "revision": "20200406", 
     "rootUrl": "https://language.googleapis.com/", 
     "schemas": {
         "AnalyzeEntitiesRequest": {
@@ -235,7 +236,7 @@
             "properties": {
                 "document": {
                     "$ref": "Document", 
-                    "description": "Input document."
+                    "description": "Required. Input document."
                 }, 
                 "encodingType": {
                     "description": "The encoding type used by the API to calculate offsets.", 
@@ -280,7 +281,7 @@
             "properties": {
                 "document": {
                     "$ref": "Document", 
-                    "description": "Input document."
+                    "description": "Required. Input document."
                 }, 
                 "encodingType": {
                     "description": "The encoding type used by the API to calculate offsets.", 
@@ -325,7 +326,7 @@
             "properties": {
                 "document": {
                     "$ref": "Document", 
-                    "description": "Input document."
+                    "description": "Required. Input document."
                 }, 
                 "encodingType": {
                     "description": "The encoding type used by the API to calculate sentence offsets.", 
@@ -374,7 +375,7 @@
             "properties": {
                 "document": {
                     "$ref": "Document", 
-                    "description": "Input document."
+                    "description": "Required. Input document."
                 }, 
                 "encodingType": {
                     "description": "The encoding type used by the API to calculate offsets.", 
@@ -426,7 +427,7 @@
             "properties": {
                 "document": {
                     "$ref": "Document", 
-                    "description": "Input document."
+                    "description": "Required. Input document."
                 }, 
                 "encodingType": {
                     "description": "The encoding type used by the API to calculate offsets.", 
@@ -446,7 +447,7 @@
                 }, 
                 "features": {
                     "$ref": "Features", 
-                    "description": "The enabled features."
+                    "description": "Required. The enabled features."
                 }
             }, 
             "type": "object"
@@ -504,7 +505,7 @@
                     "type": "number"
                 }, 
                 "name": {
-                    "description": "The name of the category representing the document, from the [predefined\ntaxonomy](/natural-language/docs/categories).", 
+                    "description": "The name of the category representing the document, from the [predefined\ntaxonomy](https://cloud.google.com/natural-language/docs/categories).", 
                     "type": "string"
                 }
             }, 
@@ -516,7 +517,7 @@
             "properties": {
                 "document": {
                     "$ref": "Document", 
-                    "description": "Input document."
+                    "description": "Required. Input document."
                 }
             }, 
             "type": "object"
@@ -734,7 +735,7 @@
                     "type": "string"
                 }, 
                 "language": {
-                    "description": "The language of the document (if not specified, the language is\nautomatically detected). Both ISO and BCP-47 language codes are\naccepted.<br>\n[Language Support](/natural-language/docs/languages)\nlists currently supported languages for each API method.\nIf the language (either specified by the caller or automatically detected)\nis not supported by the called API method, an `INVALID_ARGUMENT` error\nis returned.", 
+                    "description": "The language of the document (if not specified, the language is\nautomatically detected). Both ISO and BCP-47 language codes are\naccepted.<br>\n[Language\nSupport](https://cloud.google.com/natural-language/docs/languages) lists\ncurrently supported languages for each API method. If the language (either\nspecified by the caller or automatically detected) is not supported by the\ncalled API method, an `INVALID_ARGUMENT` error is returned.", 
                     "type": "string"
                 }, 
                 "type": {

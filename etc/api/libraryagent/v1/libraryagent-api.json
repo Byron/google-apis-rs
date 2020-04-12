@@ -22,6 +22,7 @@
     }, 
     "id": "libraryagent:v1", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://libraryagent.mtls.googleapis.com/", 
     "name": "libraryagent", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -116,7 +117,7 @@
                     ], 
                     "parameters": {
                         "name": {
-                            "description": "The name of the shelf to retrieve.", 
+                            "description": "Required. The name of the shelf to retrieve.", 
                             "location": "path", 
                             "pattern": "^shelves/[^/]+$", 
                             "required": true, 
@@ -172,7 +173,7 @@
                             ], 
                             "parameters": {
                                 "name": {
-                                    "description": "The name of the book to borrow.", 
+                                    "description": "Required. The name of the book to borrow.", 
                                     "location": "path", 
                                     "pattern": "^shelves/[^/]+/books/[^/]+$", 
                                     "required": true, 
@@ -197,7 +198,7 @@
                             ], 
                             "parameters": {
                                 "name": {
-                                    "description": "The name of the book to retrieve.", 
+                                    "description": "Required. The name of the book to retrieve.", 
                                     "location": "path", 
                                     "pattern": "^shelves/[^/]+/books/[^/]+$", 
                                     "required": true, 
@@ -233,7 +234,7 @@
                                     "type": "string"
                                 }, 
                                 "parent": {
-                                    "description": "The name of the shelf whose books we'd like to list.", 
+                                    "description": "Required. The name of the shelf whose books we'd like to list.", 
                                     "location": "path", 
                                     "pattern": "^shelves/[^/]+$", 
                                     "required": true, 
@@ -258,7 +259,7 @@
                             ], 
                             "parameters": {
                                 "name": {
-                                    "description": "The name of the book to return.", 
+                                    "description": "Required. The name of the book to return.", 
                                     "location": "path", 
                                     "pattern": "^shelves/[^/]+/books/[^/]+$", 
                                     "required": true, 
@@ -278,7 +279,7 @@
             }
         }
     }, 
-    "revision": "20190703", 
+    "revision": "20200409", 
     "rootUrl": "https://libraryagent.googleapis.com/", 
     "schemas": {
         "GoogleExampleLibraryagentV1Book": {

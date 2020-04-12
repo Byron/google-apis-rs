@@ -25,6 +25,7 @@
     }, 
     "id": "vault:v1", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://vault.mtls.googleapis.com/", 
     "name": "vault", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -1022,9 +1023,35 @@
                     }
                 }
             }
+        }, 
+        "operations": {
+            "methods": {
+                "delete": {
+                    "description": "Deletes a long-running operation. This method indicates that the client is\nno longer interested in the operation result. It does not cancel the\noperation. If the server doesn't support this method, it returns\n`google.rpc.Code.UNIMPLEMENTED`.", 
+                    "flatPath": "v1/operations/{operationsId}", 
+                    "httpMethod": "DELETE", 
+                    "id": "vault.operations.delete", 
+                    "parameterOrder": [
+                        "name"
+                    ], 
+                    "parameters": {
+                        "name": {
+                            "description": "The name of the operation resource to be deleted.", 
+                            "location": "path", 
+                            "pattern": "^operations/.*$", 
+                            "required": true, 
+                            "type": "string"
+                        }
+                    }, 
+                    "path": "v1/{+name}", 
+                    "response": {
+                        "$ref": "Empty"
+                    }
+                }
+            }
         }
     }, 
-    "revision": "20190614", 
+    "revision": "20200330", 
     "rootUrl": "https://vault.googleapis.com/", 
     "schemas": {
         "AccountInfo": {

@@ -3,58 +3,58 @@
         "oauth2": {
             "scopes": {
                 "https://www.googleapis.com/auth/fitness.activity.read": {
-                    "description": "View your activity information in Google Fit"
+                    "description": "Use Google Fit to see and store your physical activity data"
                 }, 
                 "https://www.googleapis.com/auth/fitness.activity.write": {
-                    "description": "View and store your activity information in Google Fit"
+                    "description": "See and add to your Google Fit physical activity data"
                 }, 
                 "https://www.googleapis.com/auth/fitness.blood_glucose.read": {
-                    "description": "View blood glucose data in Google Fit"
+                    "description": "See info about your blood glucose in Google Fit. I consent to Google sharing my blood glucose information with this app."
                 }, 
                 "https://www.googleapis.com/auth/fitness.blood_glucose.write": {
-                    "description": "View and store blood glucose data in Google Fit"
+                    "description": "See and add info about your blood glucose to Google Fit. I consent to Google sharing my blood glucose information with this app."
                 }, 
                 "https://www.googleapis.com/auth/fitness.blood_pressure.read": {
-                    "description": "View blood pressure data in Google Fit"
+                    "description": "See info about your blood pressure in Google Fit. I consent to Google sharing my blood pressure information with this app."
                 }, 
                 "https://www.googleapis.com/auth/fitness.blood_pressure.write": {
-                    "description": "View and store blood pressure data in Google Fit"
+                    "description": "See and add info about your blood pressure in Google Fit. I consent to Google sharing my blood pressure information with this app."
                 }, 
                 "https://www.googleapis.com/auth/fitness.body.read": {
-                    "description": "View body sensor information in Google Fit"
+                    "description": "See info about your body measurements and heart rate in Google Fit"
                 }, 
                 "https://www.googleapis.com/auth/fitness.body.write": {
-                    "description": "View and store body sensor data in Google Fit"
+                    "description": "See and add info about your body measurements and heart rate to Google Fit"
                 }, 
                 "https://www.googleapis.com/auth/fitness.body_temperature.read": {
-                    "description": "View body temperature data in Google Fit"
+                    "description": "See info about your body temperature in Google Fit. I consent to Google sharing my body temperature information with this app."
                 }, 
                 "https://www.googleapis.com/auth/fitness.body_temperature.write": {
-                    "description": "View and store body temperature data in Google Fit"
+                    "description": "See and add to info about your body temperature in Google Fit. I consent to Google sharing my body temperature information with this app."
                 }, 
                 "https://www.googleapis.com/auth/fitness.location.read": {
-                    "description": "View your stored location data in Google Fit"
+                    "description": "See your Google Fit speed and distance data"
                 }, 
                 "https://www.googleapis.com/auth/fitness.location.write": {
-                    "description": "View and store your location data in Google Fit"
+                    "description": "See and add to your Google Fit location data"
                 }, 
                 "https://www.googleapis.com/auth/fitness.nutrition.read": {
-                    "description": "View nutrition information in Google Fit"
+                    "description": "See info about your nutrition in Google Fit"
                 }, 
                 "https://www.googleapis.com/auth/fitness.nutrition.write": {
-                    "description": "View and store nutrition information in Google Fit"
+                    "description": "See and add to info about your nutrition in Google Fit"
                 }, 
                 "https://www.googleapis.com/auth/fitness.oxygen_saturation.read": {
-                    "description": "View oxygen saturation data in Google Fit"
+                    "description": "See info about your oxygen saturation in Google Fit. I consent to Google sharing my oxygen saturation information with this app."
                 }, 
                 "https://www.googleapis.com/auth/fitness.oxygen_saturation.write": {
-                    "description": "View and store oxygen saturation data in Google Fit"
+                    "description": "See and add info about your oxygen saturation in Google Fit. I consent to Google sharing my oxygen saturation information with this app."
                 }, 
                 "https://www.googleapis.com/auth/fitness.reproductive_health.read": {
-                    "description": "View reproductive health data in Google Fit"
+                    "description": "See info about your reproductive health in Google Fit. I consent to Google sharing my reporductive health information with this app."
                 }, 
                 "https://www.googleapis.com/auth/fitness.reproductive_health.write": {
-                    "description": "View and store reproductive health data in Google Fit"
+                    "description": "See and add info about your reproductive health in Google Fit. I consent to Google sharing my reporductive health information with this app."
                 }
             }
         }
@@ -65,7 +65,7 @@
     "description": "Stores and accesses user data in the fitness store from apps on any platform.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/fit/rest/", 
-    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/fX44KNhDgjKu-e34ZzTYrbvPZBI\"", 
+    "etag": "\"u9GIe6H63LSGq-9_t39K2Zx_EAc/iuUg3nKvw8ifICOqBNJ37HGT-yg\"", 
     "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png", 
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
@@ -127,7 +127,7 @@
                 "dataSources": {
                     "methods": {
                         "create": {
-                            "description": "Creates a new data source that is unique across all data sources belonging to this user. The data stream ID field can be omitted and will be generated by the server with the correct format. The data stream ID is an ordered combination of some fields from the data source. In addition to the data source fields reflected into the data source ID, the developer project number that is authenticated when creating the data source is included. This developer project number is obfuscated when read by any other developer reading public data types.", 
+                            "description": "Creates a new data source that is unique across all data sources belonging to this user.\n\nA data source is a unique source of sensor data. Data sources can expose raw data coming from hardware sensors on local or companion devices. They can also expose derived data, created by transforming or merging other data sources. Multiple data sources can exist for the same data type. Every data point in every dataset inserted into or read from the Fitness API has an associated data source.\n\nEach data source produces a unique stream of dataset updates, with a unique data source identifier. Not all changes to data source affect the data stream ID, so that data collected by updated versions of the same application/device can still be considered to belong to the same data source.\n\nData sources are identified using a string generated by the server, based on the contents of the source being created. The dataStreamId field should not be set when invoking this method. It will be automatically generated by the server with the correct format. If a dataStreamId is set, it must match the format that the server would generate. This format is a combination of some fields from the data source, and has a specific order. If it doesn't match, the request will fail with an error.\n\nSpecifying a DataType which is not a known type (beginning with \"com.google.\") will create a DataSource with a custom data type. Custom data types are only readable by the application that created them. Custom data types are deprecated; use standard data types instead.\n\nIn addition to the data source fields included in the data source ID, the developer project number that is authenticated when creating the data source is included. This developer project number is obfuscated when read by any other developer reading public data types.", 
                             "httpMethod": "POST", 
                             "id": "fitness.users.dataSources.create", 
                             "parameterOrder": [
@@ -578,7 +578,7 @@
                 "dataset": {
                     "methods": {
                         "aggregate": {
-                            "description": "Aggregates data of a certain type or stream into buckets divided by a given type of boundary. Multiple data sets of multiple types and from multiple sources can be aggreated into exactly one bucket type per request.", 
+                            "description": "Aggregates data of a certain type or stream into buckets divided by a given type of boundary. Multiple data sets of multiple types and from multiple sources can be aggregated into exactly one bucket type per request.", 
                             "httpMethod": "POST", 
                             "id": "fitness.users.dataset.aggregate", 
                             "parameterOrder": [
@@ -665,6 +665,13 @@
                                 "userId"
                             ], 
                             "parameters": {
+                                "activityType": {
+                                    "description": "If non-empty, only sessions with these activity types should be returned.", 
+                                    "format": "int32", 
+                                    "location": "query", 
+                                    "repeated": true, 
+                                    "type": "integer"
+                                }, 
                                 "endTime": {
                                     "description": "An RFC3339 timestamp. Only sessions ending between the start and end times will be included in the response.", 
                                     "location": "query", 
@@ -761,7 +768,7 @@
             }
         }
     }, 
-    "revision": "20190701", 
+    "revision": "20200407", 
     "rootUrl": "https://www.googleapis.com/", 
     "schemas": {
         "AggregateBucket": {
@@ -819,11 +826,11 @@
             "id": "AggregateBy", 
             "properties": {
                 "dataSourceId": {
-                    "description": "A data source ID to aggregate. Mutually exclusive of dataTypeName. Only data from the specified data source ID will be included in the aggregation. The dataset in the response will have the same data source ID.", 
+                    "description": "A data source ID to aggregate. Only data from the specified data source ID will be included in the aggregation. If specified, this data source must exist; the OAuth scopes in the supplied credentials must grant read access to this data type. The dataset in the response will have the same data source ID. Note: Data can be aggregated by either the dataTypeName or the dataSourceId, not both.", 
                     "type": "string"
                 }, 
                 "dataTypeName": {
-                    "description": "The data type to aggregate. All data sources providing this data type will contribute data to the aggregation. The response will contain a single dataset for this data type name. The dataset will have a data source ID of derived:com.google.:com.google.android.gms:aggregated", 
+                    "description": "The data type to aggregate. All data sources providing this data type will contribute data to the aggregation. The response will contain a single dataset for this data type name. The dataset will have a data source ID of derived::com.google.android.gms:aggregated. If the user has no data for this data type, an empty data set will be returned. Note: Data can be aggregated by either the dataTypeName or the dataSourceId, not both.", 
                     "type": "string"
                 }
             }, 
@@ -1143,7 +1150,7 @@
                             "fitness.users.dataSources.update"
                         ]
                     }, 
-                    "description": "A unique identifier for the data stream produced by this data source. The identifier includes:\n\n \n- The physical device's manufacturer, model, and serial number (UID). \n- The application's package name or name. Package name is used when the data source was created by an Android application. The developer project number is used when the data source was created by a REST client. \n- The data source's type. \n- The data source's stream name.  Note that not all attributes of the data source are used as part of the stream identifier. In particular, the version of the hardware/the application isn't used. This allows us to preserve the same stream through version updates. This also means that two DataSource objects may represent the same data stream even if they're not equal.\n\nThe exact format of the data stream ID created by an Android application is: type:dataType.name:application.packageName:device.manufacturer:device.model:device.uid:dataStreamName \n\nThe exact format of the data stream ID created by a REST client is: type:dataType.name:developer project number:device.manufacturer:device.model:device.uid:dataStreamName \n\nWhen any of the optional fields that make up the data stream ID are absent, they will be omitted from the data stream ID. The minimum viable data stream ID would be: type:dataType.name:developer project number\n\nFinally, the developer project number is obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the developer project number in clear and normal form.", 
+                    "description": "A unique identifier for the data stream produced by this data source. The identifier includes:\n\n \n- The physical device's manufacturer, model, and serial number (UID). \n- The application's package name or name. Package name is used when the data source was created by an Android application. The developer project number is used when the data source was created by a REST client. \n- The data source's type. \n- The data source's stream name.  Note that not all attributes of the data source are used as part of the stream identifier. In particular, the version of the hardware/the application isn't used. This allows us to preserve the same stream through version updates. This also means that two DataSource objects may represent the same data stream even if they're not equal.\n\nThe exact format of the data stream ID created by an Android application is: type:dataType.name:application.packageName:device.manufacturer:device.model:device.uid:dataStreamName \n\nThe exact format of the data stream ID created by a REST client is: type:dataType.name:developer project number:device.manufacturer:device.model:device.uid:dataStreamName \n\nWhen any of the optional fields that make up the data stream ID are absent, they will be omitted from the data stream ID. The minimum viable data stream ID would be: type:dataType.name:developer project number\n\nFinally, the developer project number and device UID are obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the developer project number in clear and normal form. This means a client will see a different set of data_stream_ids than another client with different credentials.", 
                     "type": "string"
                 }, 
                 "dataStreamName": {
@@ -1384,7 +1391,7 @@
                             "fitness.users.dataSources.update"
                         ]
                     }, 
-                    "description": "The serial number or other unique ID for the hardware. This field is obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the uid field in clear and normal form.", 
+                    "description": "The serial number or other unique ID for the hardware. This field is obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the uid field in clear and normal form.\n\nThe obfuscation preserves equality; that is, given two IDs, if id1 == id2, obfuscated(id1) == obfuscated(id2).", 
                     "type": "string"
                 }, 
                 "version": {
@@ -1560,7 +1567,7 @@
             "type": "object"
         }, 
         "Value": {
-            "description": "Holder object for the value of a single field in a data point.\n\nA field value has a particular format and is only ever set to one of an integer or a floating point value. LINT.IfChange", 
+            "description": "Holder object for the value of a single field in a data point.\n\nA field value has a particular format and is only ever set to one of an integer or a floating point value.", 
             "id": "Value", 
             "properties": {
                 "fpVal": {

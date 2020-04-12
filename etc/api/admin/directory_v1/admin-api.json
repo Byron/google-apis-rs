@@ -82,6 +82,9 @@
                 }, 
                 "https://www.googleapis.com/auth/admin.directory.userschema.readonly": {
                     "description": "View user schemas on your domain"
+                }, 
+                "https://www.googleapis.com/auth/cloud-platform": {
+                    "description": "View and manage your data across Google Cloud Platform services"
                 }
             }
         }
@@ -93,7 +96,7 @@
     "description": "Manages enterprise resources such as users and groups, administrative notifications, security features, and more.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/admin-sdk/directory/", 
-    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/eWNDpeAZuk1gV8zhFqMfz4qmrho\"", 
+    "etag": "\"u9GIe6H63LSGq-9_t39K2Zx_EAc/Q_N7e9cs3A1-s8__TCCHlsbCI_c\"", 
     "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png", 
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
@@ -252,7 +255,8 @@
                         "https://www.googleapis.com/auth/admin.directory.user", 
                         "https://www.googleapis.com/auth/admin.directory.user.alias", 
                         "https://www.googleapis.com/auth/admin.directory.user.alias.readonly", 
-                        "https://www.googleapis.com/auth/admin.directory.user.readonly"
+                        "https://www.googleapis.com/auth/admin.directory.user.readonly", 
+                        "https://www.googleapis.com/auth/cloud-platform"
                     ]
                 }
             }
@@ -348,7 +352,8 @@
                             "type": "string"
                         }, 
                         "maxResults": {
-                            "description": "Maximum number of results to return. Default is 100", 
+                            "default": "100", 
+                            "description": "Maximum number of results to return. Max allowed value is 200.", 
                             "format": "int32", 
                             "location": "query", 
                             "minimum": "1", 
@@ -938,7 +943,8 @@
                             "type": "string"
                         }, 
                         "maxResults": {
-                            "description": "Maximum number of results to return. Default is 200", 
+                            "default": "200", 
+                            "description": "Maximum number of results to return. Max allowed value is 200.", 
                             "format": "int32", 
                             "location": "query", 
                             "minimum": "1", 
@@ -979,7 +985,7 @@
                             "type": "string"
                         }, 
                         "userKey": {
-                            "description": "Email or immutable Id of the user if only those groups are to be listed, the given user is a member of. If Id, it should match with id of user object", 
+                            "description": "Email or immutable ID of the user if only those groups are to be listed, the given user is a member of. If it's an ID, it should match with the ID of the user object.", 
                             "location": "query", 
                             "type": "string"
                         }
@@ -1274,7 +1280,8 @@
                             "type": "boolean"
                         }, 
                         "maxResults": {
-                            "description": "Maximum number of results to return. Default is 200", 
+                            "default": "200", 
+                            "description": "Maximum number of results to return. Max allowed value is 200.", 
                             "format": "int32", 
                             "location": "query", 
                             "minimum": "1", 
@@ -1492,7 +1499,8 @@
                             "type": "string"
                         }, 
                         "maxResults": {
-                            "description": "Maximum number of results to return. Default is 100", 
+                            "default": "100", 
+                            "description": "Maximum number of results to return. Max allowed value is 100.", 
                             "format": "int32", 
                             "location": "query", 
                             "minimum": "1", 
@@ -1964,28 +1972,6 @@
                         "https://www.googleapis.com/auth/admin.directory.rolemanagement", 
                         "https://www.googleapis.com/auth/admin.directory.rolemanagement.readonly"
                     ]
-                }
-            }
-        }, 
-        "resolvedAppAccessSettings": {
-            "methods": {
-                "GetSettings": {
-                    "description": "Retrieves resolved app access settings of the logged in user.", 
-                    "httpMethod": "GET", 
-                    "id": "directory.resolvedAppAccessSettings.GetSettings", 
-                    "path": "resolvedappaccesssettings", 
-                    "response": {
-                        "$ref": "AppAccessCollections"
-                    }
-                }, 
-                "ListTrustedApps": {
-                    "description": "Retrieves the list of apps trusted by the admin of the logged in user.", 
-                    "httpMethod": "GET", 
-                    "id": "directory.resolvedAppAccessSettings.ListTrustedApps", 
-                    "path": "trustedapps", 
-                    "response": {
-                        "$ref": "TrustedApps"
-                    }
                 }
             }
         }, 
@@ -3378,7 +3364,8 @@
                             "type": "string"
                         }, 
                         "maxResults": {
-                            "description": "Maximum number of results to return. Default is 100. Max allowed is 500", 
+                            "default": "100", 
+                            "description": "Maximum number of results to return.", 
                             "format": "int32", 
                             "location": "query", 
                             "maximum": "500", 
@@ -3427,7 +3414,7 @@
                             "type": "string"
                         }, 
                         "showDeleted": {
-                            "description": "If set to true retrieves the list of deleted users. Default is false", 
+                            "description": "If set to true, retrieves the list of deleted users. (Default: false)", 
                             "location": "query", 
                             "type": "string"
                         }, 
@@ -3465,7 +3452,8 @@
                     }, 
                     "scopes": [
                         "https://www.googleapis.com/auth/admin.directory.user", 
-                        "https://www.googleapis.com/auth/admin.directory.user.readonly"
+                        "https://www.googleapis.com/auth/admin.directory.user.readonly", 
+                        "https://www.googleapis.com/auth/cloud-platform"
                     ], 
                     "supportsSubscription": true
                 }, 
@@ -3607,7 +3595,8 @@
                             "type": "string"
                         }, 
                         "maxResults": {
-                            "description": "Maximum number of results to return. Default is 100. Max allowed is 500", 
+                            "default": "100", 
+                            "description": "Maximum number of results to return.", 
                             "format": "int32", 
                             "location": "query", 
                             "maximum": "500", 
@@ -3656,7 +3645,7 @@
                             "type": "string"
                         }, 
                         "showDeleted": {
-                            "description": "If set to true retrieves the list of deleted users. Default is false", 
+                            "description": "If set to true, retrieves the list of deleted users. (Default: false)", 
                             "location": "query", 
                             "type": "string"
                         }, 
@@ -3698,7 +3687,8 @@
                     }, 
                     "scopes": [
                         "https://www.googleapis.com/auth/admin.directory.user", 
-                        "https://www.googleapis.com/auth/admin.directory.user.readonly"
+                        "https://www.googleapis.com/auth/admin.directory.user.readonly", 
+                        "https://www.googleapis.com/auth/cloud-platform"
                     ], 
                     "supportsSubscription": true
                 }
@@ -4017,7 +4007,7 @@
             }
         }
     }, 
-    "revision": "20190214", 
+    "revision": "20200204", 
     "rootUrl": "https://www.googleapis.com/", 
     "schemas": {
         "Alias": {
@@ -4067,50 +4057,6 @@
                     "default": "admin#directory#aliases", 
                     "description": "Kind of resource this is.", 
                     "type": "string"
-                }
-            }, 
-            "type": "object"
-        }, 
-        "AppAccessCollections": {
-            "description": "JSON template for App Access Collections Resource object in Directory API.", 
-            "id": "AppAccessCollections", 
-            "properties": {
-                "blockedApiAccessBuckets": {
-                    "description": "List of blocked api access buckets.", 
-                    "items": {
-                        "type": "string"
-                    }, 
-                    "type": "array"
-                }, 
-                "enforceSettingsForAndroidDrive": {
-                    "description": "Boolean to indicate whether to enforce app access settings on Android Drive or not.", 
-                    "type": "boolean"
-                }, 
-                "errorMessage": {
-                    "description": "Error message provided by the Admin that will be shown to the user when an app is blocked.", 
-                    "type": "string"
-                }, 
-                "etag": {
-                    "description": "ETag of the resource.", 
-                    "type": "string"
-                }, 
-                "kind": {
-                    "default": "admin#directory#appaccesscollection", 
-                    "description": "Identifies the resource as an app access collection. Value: admin#directory#appaccesscollection", 
-                    "type": "string"
-                }, 
-                "resourceId": {
-                    "description": "Unique ID of app access collection. (Readonly)", 
-                    "format": "int64", 
-                    "type": "string"
-                }, 
-                "resourceName": {
-                    "description": "Resource name given by the customer while creating/updating. Should be unique under given customer.", 
-                    "type": "string"
-                }, 
-                "trustDomainOwnedApps": {
-                    "description": "Boolean that indicates whether to trust domain owned apps.", 
-                    "type": "boolean"
                 }
             }, 
             "type": "object"
@@ -4494,6 +4440,11 @@
                     "description": "User of the device", 
                     "type": "string"
                 }, 
+                "autoUpdateExpiration": {
+                    "description": "(Read-only) The timestamp after which the device will stop receiving Chrome updates or support", 
+                    "format": "int64", 
+                    "type": "string"
+                }, 
                 "bootMode": {
                     "description": "Chromebook boot mode (Read-only)", 
                     "type": "string"
@@ -4599,12 +4550,20 @@
                     }, 
                     "type": "array"
                 }, 
+                "dockMacAddress": {
+                    "description": "(Read-only) Built-in MAC address for the docking station that the device connected to. Factory sets Media access control address (MAC address) assigned for use by a dock. Currently this is only supported on the Dell Arcada / Sarien devices and the Dell WD19 / WD19TB Docking Station. It is reserved specifically for MAC pass through device policy. The format is twelve (12) hexadecimal digits without any delimiter (uppercase letters). This is only relevant for Dell devices.", 
+                    "type": "string"
+                }, 
                 "etag": {
                     "description": "ETag of the resource.", 
                     "type": "string"
                 }, 
                 "ethernetMacAddress": {
                     "description": "Chromebook Mac Address on ethernet network interface (Read-only)", 
+                    "type": "string"
+                }, 
+                "ethernetMacAddress0": {
+                    "description": "(Read-only) MAC address used by the Chromebook\u2019s internal ethernet port, and for onboard network (ethernet) interface. The format is twelve (12) hexadecimal digits without any delimiter (uppercase letters). This is only relevant for some devices.", 
                     "type": "string"
                 }, 
                 "firmwareVersion": {
@@ -4630,8 +4589,12 @@
                     "description": "Chromebook Mac Address on wifi network interface (Read-only)", 
                     "type": "string"
                 }, 
+                "manufactureDate": {
+                    "description": "(Read-only) The date the device was manufactured in yyyy-mm-dd format.", 
+                    "type": "string"
+                }, 
                 "meid": {
-                    "description": "Mobile Equipment identifier for the 3G mobile card in the Chromebook (Read-only)", 
+                    "description": "Contains either the Mobile Equipment identifier (MEID) or the International Mobile Equipment Identity (IMEI) for the 3G mobile card in the Chromebook (Read-only)", 
                     "type": "string"
                 }, 
                 "model": {
@@ -5216,7 +5179,7 @@
                     "type": "string"
                 }, 
                 "id": {
-                    "description": "Unique identifier of customer member (Read-only) Unique identifier of group (Read-only) Unique identifier of member (Read-only)", 
+                    "description": "The unique ID of the group member. A member id can be used as a member request URI's memberKey. Unique identifier of group (Read-only) Unique identifier of member (Read-only)", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -5709,7 +5672,7 @@
                     "type": "string"
                 }, 
                 "serviceId": {
-                    "description": "The obfuscated ID of the service this privilege is for.", 
+                    "description": "The obfuscated ID of the service this privilege is for. This value is returned with Privileges.list().", 
                     "type": "string"
                 }, 
                 "serviceName": {
@@ -5795,7 +5758,7 @@
                                 "type": "string"
                             }, 
                             "serviceId": {
-                                "description": "The obfuscated ID of the service this privilege is for.", 
+                                "description": "The obfuscated ID of the service this privilege is for. This value is returned with Privileges.list().", 
                                 "type": "string"
                             }
                         }, 
@@ -6116,59 +6079,6 @@
             }, 
             "type": "object"
         }, 
-        "TrustedAppId": {
-            "description": "JSON template for Trusted App Ids Resource object in Directory API.", 
-            "id": "TrustedAppId", 
-            "properties": {
-                "androidPackageName": {
-                    "description": "Android package name.", 
-                    "type": "string"
-                }, 
-                "certificateHashSHA1": {
-                    "description": "SHA1 signature of the app certificate.", 
-                    "type": "string"
-                }, 
-                "certificateHashSHA256": {
-                    "description": "SHA256 signature of the app certificate.", 
-                    "type": "string"
-                }, 
-                "etag": {
-                    "type": "string"
-                }, 
-                "kind": {
-                    "default": "admin#directory#trustedappid", 
-                    "description": "Identifies the resource as a trusted AppId.", 
-                    "type": "string"
-                }
-            }, 
-            "type": "object"
-        }, 
-        "TrustedApps": {
-            "description": "JSON template for Trusted Apps response object of a user in Directory API.", 
-            "id": "TrustedApps", 
-            "properties": {
-                "etag": {
-                    "description": "ETag of the resource.", 
-                    "type": "string"
-                }, 
-                "kind": {
-                    "default": "admin#directory#trustedapplist", 
-                    "description": "Identifies the resource as trusted apps response.", 
-                    "type": "string"
-                }, 
-                "nextPageToken": {
-                    "type": "string"
-                }, 
-                "trustedApps": {
-                    "description": "Trusted Apps list.", 
-                    "items": {
-                        "$ref": "TrustedAppId"
-                    }, 
-                    "type": "array"
-                }
-            }, 
-            "type": "object"
-        }, 
         "User": {
             "description": "JSON template for User object in Directory API.", 
             "id": "User", 
@@ -6348,6 +6258,14 @@
                         ]
                     }, 
                     "description": "username of User", 
+                    "type": "string"
+                }, 
+                "recoveryEmail": {
+                    "description": "Recovery email of the user.", 
+                    "type": "string"
+                }, 
+                "recoveryPhone": {
+                    "description": "Recovery phone of the user. The phone number must be in the E.164 format, starting with the plus sign (+). Example: +16506661212.", 
                     "type": "string"
                 }, 
                 "relations": {
@@ -6693,7 +6611,7 @@
                     "type": "string"
                 }, 
                 "fullTimeEquivalent": {
-                    "description": "The full-time equivalent percent within the organization (100000 = 100%).", 
+                    "description": "The full-time equivalent millipercent within the organization (100000 = 100%).", 
                     "format": "int32", 
                     "type": "integer"
                 }, 

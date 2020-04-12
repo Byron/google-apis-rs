@@ -23,6 +23,7 @@
     }, 
     "id": "testing:v1", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://testing.mtls.googleapis.com/", 
     "name": "testing", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -272,7 +273,7 @@
             }
         }
     }, 
-    "revision": "20190627", 
+    "revision": "20200408", 
     "rootUrl": "https://testing.googleapis.com/", 
     "schemas": {
         "Account": {
@@ -377,6 +378,10 @@
                         "Run test without using orchestrator."
                     ], 
                     "type": "string"
+                }, 
+                "shardingOption": {
+                    "$ref": "ShardingOption", 
+                    "description": "The option to run tests in multiple shards in parallel."
                 }, 
                 "testApk": {
                     "$ref": "FileReference", 
@@ -528,6 +533,10 @@
                         "type": "string"
                     }, 
                     "type": "array"
+                }, 
+                "thumbnailUrl": {
+                    "description": "URL of a thumbnail image of the device.", 
+                    "type": "string"
                 }
             }, 
             "type": "object"
@@ -1056,7 +1065,7 @@
             "type": "object"
         }, 
         "IosModel": {
-            "description": "A description of an iOS device tests may be run on.", 
+            "description": "A description of an iOS device tests may be run on.\nNext tag: 12", 
             "id": "IosModel", 
             "properties": {
                 "deviceCapabilities": {
@@ -1090,6 +1099,21 @@
                     "description": "The human-readable name for this device model.\nExamples: \"iPhone 4s\", \"iPad Mini 2\".", 
                     "type": "string"
                 }, 
+                "screenDensity": {
+                    "description": "Screen density in DPI.", 
+                    "format": "int32", 
+                    "type": "integer"
+                }, 
+                "screenX": {
+                    "description": "Screen size in the horizontal (X) dimension measured in pixels.", 
+                    "format": "int32", 
+                    "type": "integer"
+                }, 
+                "screenY": {
+                    "description": "Screen size in the vertical (Y) dimension measured in pixels.", 
+                    "format": "int32", 
+                    "type": "integer"
+                }, 
                 "supportedVersionIds": {
                     "description": "The set of iOS major software versions this device supports.", 
                     "items": {
@@ -1122,6 +1146,29 @@
                     "description": "The set of available orientations.", 
                     "items": {
                         "$ref": "Orientation"
+                    }, 
+                    "type": "array"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "IosTestLoop": {
+            "description": "A test of an iOS application that implements one or more game loop scenarios.\nThis test type accepts an archived application (.ipa file) and a list of\ninteger scenarios that will be executed on the app sequentially.", 
+            "id": "IosTestLoop", 
+            "properties": {
+                "appBundleId": {
+                    "description": "Output only. The bundle id for the application under test.", 
+                    "type": "string"
+                }, 
+                "appIpa": {
+                    "$ref": "FileReference", 
+                    "description": "Required. The .ipa of the application to test."
+                }, 
+                "scenarios": {
+                    "description": "The list of scenarios that should be run during the test. Defaults to the\nsingle scenario 0 if unspecified.", 
+                    "items": {
+                        "format": "int32", 
+                        "type": "integer"
                     }, 
                     "type": "array"
                 }
@@ -1223,6 +1270,20 @@
                     "description": "Tags for this dimension.\nExample: \"default\".", 
                     "items": {
                         "type": "string"
+                    }, 
+                    "type": "array"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "ManualSharding": {
+            "description": "Shards test cases into the specified groups of packages, classes, and/or\nmethods.\n\nWith manual sharding enabled, specifying test targets via\nenvironment_variables or in InstrumentationTest is invalid.", 
+            "id": "ManualSharding", 
+            "properties": {
+                "testTargetsForShard": {
+                    "description": "Required. Group of packages, classes, and/or test methods to be run for\neach shard. The number of shard_test_targets must be >= 1 and <= 50.", 
+                    "items": {
+                        "$ref": "TestTargetsForShard"
                     }, 
                     "type": "array"
                 }
@@ -1396,6 +1457,42 @@
             }, 
             "type": "object"
         }, 
+        "Shard": {
+            "description": "Output only. Details about the shard.", 
+            "id": "Shard", 
+            "properties": {
+                "numShards": {
+                    "description": "Output only. The total number of shards.", 
+                    "format": "int32", 
+                    "type": "integer"
+                }, 
+                "shardIndex": {
+                    "description": "Output only. The index of the shard among all the shards.", 
+                    "format": "int32", 
+                    "type": "integer"
+                }, 
+                "testTargetsForShard": {
+                    "$ref": "TestTargetsForShard", 
+                    "description": "Output only. Test targets for each shard."
+                }
+            }, 
+            "type": "object"
+        }, 
+        "ShardingOption": {
+            "description": "Options for enabling sharding.", 
+            "id": "ShardingOption", 
+            "properties": {
+                "manualSharding": {
+                    "$ref": "ManualSharding", 
+                    "description": "Shards test cases into the specified groups of packages, classes, and/or\nmethods."
+                }, 
+                "uniformSharding": {
+                    "$ref": "UniformSharding", 
+                    "description": "Uniformly shards test cases given a total number of shards."
+                }
+            }, 
+            "type": "object"
+        }, 
         "StartActivityIntent": {
             "description": "A starting intent specified by an action, uri, and categories.", 
             "id": "StartActivityIntent", 
@@ -1414,6 +1511,17 @@
                 "uri": {
                     "description": "URI for the action.", 
                     "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "SystraceSetup": {
+            "id": "SystraceSetup", 
+            "properties": {
+                "durationSeconds": {
+                    "description": "Systrace duration in seconds.\nShould be between 1 and 30 seconds. 0 disables systrace.", 
+                    "format": "int32", 
+                    "type": "integer"
                 }
             }, 
             "type": "object"
@@ -1478,6 +1586,10 @@
                 "projectId": {
                     "description": "Output only. The cloud project that owns the test execution.", 
                     "type": "string"
+                }, 
+                "shard": {
+                    "$ref": "Shard", 
+                    "description": "Output only. Details about the shard."
                 }, 
                 "state": {
                     "description": "Output only. Indicates the current progress of the test execution\n(e.g., FINISHED).", 
@@ -1579,6 +1691,8 @@
                         "PLIST_CANNOT_BE_PARSED", 
                         "TEST_ONLY_APK", 
                         "MALFORMED_IPA", 
+                        "MISSING_URL_SCHEME", 
+                        "MALFORMED_APP_BUNDLE", 
                         "NO_CODE_APK", 
                         "INVALID_INPUT_APK", 
                         "INVALID_APK_PREVIEW_SDK"
@@ -1613,7 +1727,9 @@
                         "XC tests which run on physical devices must have\n\"IsAppHostedTestBundle\" == \"true\" in the xctestrun file.", 
                         "An Info.plist file in the XCTest zip could not be parsed.", 
                         "The APK is marked as \"testOnly\".\nDeprecated and not currently used.", 
-                        "The input IPA could not be parsed.\nDeprecated and not currently used.", 
+                        "The input IPA could not be parsed.", 
+                        "The application doesn't register the game loop URL scheme.", 
+                        "The iOS application bundle (.app) couldn't be processed.", 
                         "APK contains no code.\nSee also\nhttps://developer.android.com/guide/topics/manifest/application-element.html#code", 
                         "Either the provided input APK path was malformed,\nthe APK file does not exist, or the user does not have permission to\naccess the APK file.", 
                         "APK is built for a preview SDK which is unsupported"
@@ -1738,6 +1854,10 @@
                 "networkProfile": {
                     "description": "The network traffic profile used for running the test.\nAvailable network profiles can be queried by using the\nNETWORK_CONFIGURATION environment type when calling\nTestEnvironmentDiscoveryService.GetTestEnvironmentCatalog.", 
                     "type": "string"
+                }, 
+                "systrace": {
+                    "$ref": "SystraceSetup", 
+                    "description": "Systrace configuration for the run.\nIf set a systrace will be taken, starting on test start and lasting for the\nconfigured duration. The systrace file thus obtained is put in the results\nbucket together with the other artifacts from the run."
                 }
             }, 
             "type": "object"
@@ -1766,6 +1886,10 @@
                     "description": "Disables video recording. May reduce test latency.", 
                     "type": "boolean"
                 }, 
+                "iosTestLoop": {
+                    "$ref": "IosTestLoop", 
+                    "description": "An iOS application with a test loop."
+                }, 
                 "iosTestSetup": {
                     "$ref": "IosTestSetup", 
                     "description": "Test setup requirements for iOS."
@@ -1782,6 +1906,20 @@
                     "description": "Max time a test execution is allowed to run before it is\nautomatically cancelled.\nThe default value is 5 min.", 
                     "format": "google-duration", 
                     "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "TestTargetsForShard": {
+            "description": "Test targets for a shard.", 
+            "id": "TestTargetsForShard", 
+            "properties": {
+                "testTargets": {
+                    "description": "Group of packages, classes, and/or test methods to be run for each shard.\nThe targets need to be specified in AndroidJUnitRunner argument format. For\nexample, \u201cpackage com.my.packages\u201d \u201cclass com.my.package.MyClass\u201d.\n\nThe number of shard_test_targets must be greater than 0.", 
+                    "items": {
+                        "type": "string"
+                    }, 
+                    "type": "array"
                 }
             }, 
             "type": "object"
@@ -1871,6 +2009,18 @@
                     "description": "Packet loss ratio (0.0 - 1.0).", 
                     "format": "float", 
                     "type": "number"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "UniformSharding": {
+            "description": "Uniformly shards test cases given a total number of shards.\n\nFor Instrumentation test, it will be translated to \u201c-e numShard\u201d \u201c-e\nshardIndex\u201d AndroidJUnitRunner arguments. With uniform sharding enabled,\nspecifying these sharding arguments via environment_variables is invalid.", 
+            "id": "UniformSharding", 
+            "properties": {
+                "numShards": {
+                    "description": "Required. Total number of shards. The number must be >= 1 and <= 50.", 
+                    "format": "int32", 
+                    "type": "integer"
                 }
             }, 
             "type": "object"

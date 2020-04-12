@@ -21,6 +21,7 @@
     }, 
     "id": "adexchangebuyer2:v2beta1", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://adexchangebuyer.mtls.googleapis.com/", 
     "name": "adexchangebuyer2", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -2485,7 +2486,7 @@
             }
         }
     }, 
-    "revision": "20190701", 
+    "revision": "20200409", 
     "rootUrl": "https://adexchangebuyer.googleapis.com/", 
     "schemas": {
         "AbsoluteDateRange": {
@@ -2653,7 +2654,7 @@
                 }, 
                 "impressionsWon": {
                     "$ref": "MetricValue", 
-                    "description": "The number of bids that won an impression."
+                    "description": "The number of bids that won the auction."
                 }, 
                 "measurableImpressions": {
                     "$ref": "MetricValue", 
@@ -2693,8 +2694,8 @@
                     "enumDescriptions": [
                         "A placeholder for an undefined status.\nThis value will never be returned in responses.", 
                         "The response had no bids.", 
-                        "The response had no bids for the specified account, though it may have\nincluded bids on behalf of other accounts.", 
-                        "The response had no bids for the specified deal, though it may have\nincluded bids on other deals on behalf of the account to which the deal\nbelongs."
+                        "The response had no bids for the specified account, though it may have\nincluded bids on behalf of other accounts.\nApplies if:\n1. Request is on behalf of a bidder and an account filter is present.\n2. Request is on behalf of a child seat.", 
+                        "The response had no bids for the specified deal, though it may have\nincluded bids on other deals on behalf of the account to which the deal\nbelongs. If request is on behalf of a bidder and an account filter is not\npresent, this also includes responses that have bids on behalf of\naccounts other than the account to which the deal belongs."
                     ], 
                     "type": "string"
                 }
@@ -3093,14 +3094,18 @@
                         "NOT_CHECKED", 
                         "CONDITIONALLY_APPROVED", 
                         "APPROVED", 
-                        "DISAPPROVED"
+                        "DISAPPROVED", 
+                        "PENDING_REVIEW", 
+                        "STATUS_TYPE_UNSPECIFIED"
                     ], 
                     "enumDescriptions": [
                         "The status is unknown.", 
                         "The creative has not been checked.", 
                         "The creative has been conditionally approved.\nSee serving_restrictions for details.", 
                         "The creative has been approved.", 
-                        "The creative has been disapproved."
+                        "The creative has been disapproved.", 
+                        "Placeholder for transition to v1beta1. Currently not used.", 
+                        "Placeholder for transition to v1beta1. Currently not used."
                     ], 
                     "type": "string"
                 }, 
@@ -3171,14 +3176,18 @@
                         "NOT_CHECKED", 
                         "CONDITIONALLY_APPROVED", 
                         "APPROVED", 
-                        "DISAPPROVED"
+                        "DISAPPROVED", 
+                        "PENDING_REVIEW", 
+                        "STATUS_TYPE_UNSPECIFIED"
                     ], 
                     "enumDescriptions": [
                         "The status is unknown.", 
                         "The creative has not been checked.", 
                         "The creative has been conditionally approved.\nSee serving_restrictions for details.", 
                         "The creative has been approved.", 
-                        "The creative has been disapproved."
+                        "The creative has been disapproved.", 
+                        "Placeholder for transition to v1beta1. Currently not used.", 
+                        "Placeholder for transition to v1beta1. Currently not used."
                     ], 
                     "type": "string"
                 }, 
@@ -3939,7 +3948,8 @@
                         "UNSUPPORTED_LANGUAGE", 
                         "NON_SSL_COMPLIANT", 
                         "TEMPORARY_PAUSE", 
-                        "BAIL_BONDS"
+                        "BAIL_BONDS", 
+                        "EXPERIMENTAL_MEDICAL_TREATMENT"
                     ], 
                     "enumDescriptions": [
                         "The length of the image animation is longer than allowed.", 
@@ -4042,7 +4052,8 @@
                         "Unsupported language.", 
                         "Non-SSL compliant.", 
                         "Temporary pausing of creative.", 
-                        "Promotes services related to bail bonds."
+                        "Promotes services related to bail bonds.", 
+                        "Promotes speculative and/or experimental medical treatments."
                     ], 
                     "type": "string"
                 }
@@ -4101,8 +4112,26 @@
                     ], 
                     "type": "string"
                 }, 
+                "format": {
+                    "description": "Creative format bidded on or allowed to bid on, can be empty.", 
+                    "enum": [
+                        "FORMAT_UNSPECIFIED", 
+                        "NATIVE_DISPLAY", 
+                        "NATIVE_VIDEO", 
+                        "NON_NATIVE_DISPLAY", 
+                        "NON_NATIVE_VIDEO"
+                    ], 
+                    "enumDescriptions": [
+                        "A placeholder for an undefined format; indicates that no format filter\nwill be applied.", 
+                        "The ad impression is a native ad, and display (i.e., image) format.", 
+                        "The ad impression is a native ad, and video format.", 
+                        "The ad impression is not a native ad, and display (i.e., image) format.", 
+                        "The ad impression is not a native ad, and video format."
+                    ], 
+                    "type": "string"
+                }, 
                 "formats": {
-                    "description": "The list of formats on which to filter; may be empty. The filters\nrepresented by multiple formats are ORed together (i.e., if non-empty,\nresults must match any one of the formats).", 
+                    "description": "Creative formats bidded on or allowed to bid on, can be empty. Although\nthis field is a list, it can only be populated with a single item. A\nHTTP 400 bad request error will be returned in the response if you specify\nmultiple items.", 
                     "enumDescriptions": [
                         "A placeholder for an undefined format; indicates that no format filter\nwill be applied.", 
                         "The ad impression is a native ad, and display (i.e., image) format.", 

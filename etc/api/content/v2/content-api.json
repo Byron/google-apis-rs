@@ -15,7 +15,7 @@
     "description": "Manages product items, inventory, and Merchant Center accounts for Google Shopping.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/shopping-content", 
-    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/Uj8dqhaMoa_WrlzoiCKu1I4cNbk\"", 
+    "etag": "\"u9GIe6H63LSGq-9_t39K2Zx_EAc/FCbogHEaDYtIb38u_EKa1gG2PAw\"", 
     "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png", 
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
@@ -319,46 +319,6 @@
                         "https://www.googleapis.com/auth/content"
                     ]
                 }, 
-                "patch": {
-                    "description": "Updates a Merchant Center account. This method supports patch semantics.", 
-                    "httpMethod": "PATCH", 
-                    "id": "content.accounts.patch", 
-                    "parameterOrder": [
-                        "merchantId", 
-                        "accountId"
-                    ], 
-                    "parameters": {
-                        "accountId": {
-                            "description": "The ID of the account.", 
-                            "format": "uint64", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }, 
-                        "dryRun": {
-                            "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).", 
-                            "location": "query", 
-                            "type": "boolean"
-                        }, 
-                        "merchantId": {
-                            "description": "The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.", 
-                            "format": "uint64", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }
-                    }, 
-                    "path": "{merchantId}/accounts/{accountId}", 
-                    "request": {
-                        "$ref": "Account"
-                    }, 
-                    "response": {
-                        "$ref": "Account"
-                    }, 
-                    "scopes": [
-                        "https://www.googleapis.com/auth/content"
-                    ]
-                }, 
                 "update": {
                     "description": "Updates a Merchant Center account.", 
                     "httpMethod": "PUT", 
@@ -585,46 +545,6 @@
                     "path": "{merchantId}/accounttax", 
                     "response": {
                         "$ref": "AccounttaxListResponse"
-                    }, 
-                    "scopes": [
-                        "https://www.googleapis.com/auth/content"
-                    ]
-                }, 
-                "patch": {
-                    "description": "Updates the tax settings of the account. This method supports patch semantics.", 
-                    "httpMethod": "PATCH", 
-                    "id": "content.accounttax.patch", 
-                    "parameterOrder": [
-                        "merchantId", 
-                        "accountId"
-                    ], 
-                    "parameters": {
-                        "accountId": {
-                            "description": "The ID of the account for which to get/update account tax settings.", 
-                            "format": "uint64", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }, 
-                        "dryRun": {
-                            "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).", 
-                            "location": "query", 
-                            "type": "boolean"
-                        }, 
-                        "merchantId": {
-                            "description": "The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.", 
-                            "format": "uint64", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }
-                    }, 
-                    "path": "{merchantId}/accounttax/{accountId}", 
-                    "request": {
-                        "$ref": "AccountTax"
-                    }, 
-                    "response": {
-                        "$ref": "AccountTax"
                     }, 
                     "scopes": [
                         "https://www.googleapis.com/auth/content"
@@ -861,46 +781,6 @@
                     "path": "{merchantId}/datafeeds", 
                     "response": {
                         "$ref": "DatafeedsListResponse"
-                    }, 
-                    "scopes": [
-                        "https://www.googleapis.com/auth/content"
-                    ]
-                }, 
-                "patch": {
-                    "description": "Updates a datafeed configuration of your Merchant Center account. This method supports patch semantics.", 
-                    "httpMethod": "PATCH", 
-                    "id": "content.datafeeds.patch", 
-                    "parameterOrder": [
-                        "merchantId", 
-                        "datafeedId"
-                    ], 
-                    "parameters": {
-                        "datafeedId": {
-                            "description": "The ID of the datafeed.", 
-                            "format": "uint64", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }, 
-                        "dryRun": {
-                            "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).", 
-                            "location": "query", 
-                            "type": "boolean"
-                        }, 
-                        "merchantId": {
-                            "description": "The ID of the account that manages the datafeed. This account cannot be a multi-client account.", 
-                            "format": "uint64", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }
-                    }, 
-                    "path": "{merchantId}/datafeeds/{datafeedId}", 
-                    "request": {
-                        "$ref": "Datafeed"
-                    }, 
-                    "response": {
-                        "$ref": "Datafeed"
                     }, 
                     "scopes": [
                         "https://www.googleapis.com/auth/content"
@@ -1251,46 +1131,6 @@
                         "https://www.googleapis.com/auth/content"
                     ]
                 }, 
-                "patch": {
-                    "description": "Updates the LIA settings of the account. This method supports patch semantics.", 
-                    "httpMethod": "PATCH", 
-                    "id": "content.liasettings.patch", 
-                    "parameterOrder": [
-                        "merchantId", 
-                        "accountId"
-                    ], 
-                    "parameters": {
-                        "accountId": {
-                            "description": "The ID of the account for which to get or update LIA settings.", 
-                            "format": "uint64", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }, 
-                        "dryRun": {
-                            "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).", 
-                            "location": "query", 
-                            "type": "boolean"
-                        }, 
-                        "merchantId": {
-                            "description": "The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.", 
-                            "format": "uint64", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }
-                    }, 
-                    "path": "{merchantId}/liasettings/{accountId}", 
-                    "request": {
-                        "$ref": "LiaSettings"
-                    }, 
-                    "response": {
-                        "$ref": "LiaSettings"
-                    }, 
-                    "scopes": [
-                        "https://www.googleapis.com/auth/content"
-                    ]
-                }, 
                 "requestgmbaccess": {
                     "description": "Requests access to a specified Google My Business account.", 
                     "httpMethod": "POST", 
@@ -1586,146 +1426,6 @@
                     }, 
                     "response": {
                         "$ref": "OrderinvoicesCreateRefundInvoiceResponse"
-                    }, 
-                    "scopes": [
-                        "https://www.googleapis.com/auth/content"
-                    ]
-                }
-            }
-        }, 
-        "orderpayments": {
-            "methods": {
-                "notifyauthapproved": {
-                    "description": "Notify about successfully authorizing user's payment method for a given amount.", 
-                    "httpMethod": "POST", 
-                    "id": "content.orderpayments.notifyauthapproved", 
-                    "parameterOrder": [
-                        "merchantId", 
-                        "orderId"
-                    ], 
-                    "parameters": {
-                        "merchantId": {
-                            "description": "The ID of the account that manages the order. This cannot be a multi-client account.", 
-                            "format": "uint64", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }, 
-                        "orderId": {
-                            "description": "The ID of the order for for which payment authorization is happening.", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }
-                    }, 
-                    "path": "{merchantId}/orderpayments/{orderId}/notifyAuthApproved", 
-                    "request": {
-                        "$ref": "OrderpaymentsNotifyAuthApprovedRequest"
-                    }, 
-                    "response": {
-                        "$ref": "OrderpaymentsNotifyAuthApprovedResponse"
-                    }, 
-                    "scopes": [
-                        "https://www.googleapis.com/auth/content"
-                    ]
-                }, 
-                "notifyauthdeclined": {
-                    "description": "Notify about failure to authorize user's payment method.", 
-                    "httpMethod": "POST", 
-                    "id": "content.orderpayments.notifyauthdeclined", 
-                    "parameterOrder": [
-                        "merchantId", 
-                        "orderId"
-                    ], 
-                    "parameters": {
-                        "merchantId": {
-                            "description": "The ID of the account that manages the order. This cannot be a multi-client account.", 
-                            "format": "uint64", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }, 
-                        "orderId": {
-                            "description": "The ID of the order for which payment authorization was declined.", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }
-                    }, 
-                    "path": "{merchantId}/orderpayments/{orderId}/notifyAuthDeclined", 
-                    "request": {
-                        "$ref": "OrderpaymentsNotifyAuthDeclinedRequest"
-                    }, 
-                    "response": {
-                        "$ref": "OrderpaymentsNotifyAuthDeclinedResponse"
-                    }, 
-                    "scopes": [
-                        "https://www.googleapis.com/auth/content"
-                    ]
-                }, 
-                "notifycharge": {
-                    "description": "Notify about charge on user's selected payments method.", 
-                    "httpMethod": "POST", 
-                    "id": "content.orderpayments.notifycharge", 
-                    "parameterOrder": [
-                        "merchantId", 
-                        "orderId"
-                    ], 
-                    "parameters": {
-                        "merchantId": {
-                            "description": "The ID of the account that manages the order. This cannot be a multi-client account.", 
-                            "format": "uint64", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }, 
-                        "orderId": {
-                            "description": "The ID of the order for which charge is happening.", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }
-                    }, 
-                    "path": "{merchantId}/orderpayments/{orderId}/notifyCharge", 
-                    "request": {
-                        "$ref": "OrderpaymentsNotifyChargeRequest"
-                    }, 
-                    "response": {
-                        "$ref": "OrderpaymentsNotifyChargeResponse"
-                    }, 
-                    "scopes": [
-                        "https://www.googleapis.com/auth/content"
-                    ]
-                }, 
-                "notifyrefund": {
-                    "description": "Notify about refund on user's selected payments method.", 
-                    "httpMethod": "POST", 
-                    "id": "content.orderpayments.notifyrefund", 
-                    "parameterOrder": [
-                        "merchantId", 
-                        "orderId"
-                    ], 
-                    "parameters": {
-                        "merchantId": {
-                            "description": "The ID of the account that manages the order. This cannot be a multi-client account.", 
-                            "format": "uint64", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }, 
-                        "orderId": {
-                            "description": "The ID of the order for which charge is happening.", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }
-                    }, 
-                    "path": "{merchantId}/orderpayments/{orderId}/notifyRefund", 
-                    "request": {
-                        "$ref": "OrderpaymentsNotifyRefundRequest"
-                    }, 
-                    "response": {
-                        "$ref": "OrderpaymentsNotifyRefundResponse"
                     }, 
                     "scopes": [
                         "https://www.googleapis.com/auth/content"
@@ -2265,9 +1965,11 @@
                                 "template1", 
                                 "template1a", 
                                 "template1b", 
-                                "template2"
+                                "template2", 
+                                "template3"
                             ], 
                             "enumDescriptions": [
+                                "", 
                                 "", 
                                 "", 
                                 "", 
@@ -2287,7 +1989,7 @@
                     ]
                 }, 
                 "instorerefundlineitem": {
-                    "description": "Notifies that item return and refund was handled directly by merchant outside of Google payments processing (e.g. cash refund done in store).\nNote: We recommend calling the returnrefundlineitem method to refund in-store returns. We will issue the refund directly to the customer. This helps to prevent possible differences arising between merchant and Google transaction records. We also recommend having the point of sale system communicate with Google to ensure that customers do not receive a double refund by first refunding via Google then via an in-store return.", 
+                    "description": "Deprecated. Notifies that item return and refund was handled directly by merchant outside of Google payments processing (e.g. cash refund done in store).\nNote: We recommend calling the returnrefundlineitem method to refund in-store returns. We will issue the refund directly to the customer. This helps to prevent possible differences arising between merchant and Google transaction records. We also recommend having the point of sale system communicate with Google to ensure that customers do not receive a double refund by first refunding via Google then via an in-store return.", 
                     "httpMethod": "POST", 
                     "id": "content.orders.instorerefundlineitem", 
                     "parameterOrder": [
@@ -3094,7 +2796,7 @@
                     ]
                 }, 
                 "list": {
-                    "description": "Lists the products in your Merchant Center account.", 
+                    "description": "Lists the products in your Merchant Center account. The response might contain fewer items than specified by maxResults. Rely on nextPageToken to determine if there are more items to be requested.", 
                     "httpMethod": "GET", 
                     "id": "content.products.list", 
                     "parameterOrder": [
@@ -3358,6 +3060,30 @@
                         "https://www.googleapis.com/auth/content"
                     ]
                 }, 
+                "getsupportedpickupservices": {
+                    "description": "Retrieves supported pickup services for an account.", 
+                    "httpMethod": "GET", 
+                    "id": "content.shippingsettings.getsupportedpickupservices", 
+                    "parameterOrder": [
+                        "merchantId"
+                    ], 
+                    "parameters": {
+                        "merchantId": {
+                            "description": "The ID of the account for which to retrieve the supported pickup services.", 
+                            "format": "uint64", 
+                            "location": "path", 
+                            "required": true, 
+                            "type": "string"
+                        }
+                    }, 
+                    "path": "{merchantId}/supportedPickupServices", 
+                    "response": {
+                        "$ref": "ShippingsettingsGetSupportedPickupServicesResponse"
+                    }, 
+                    "scopes": [
+                        "https://www.googleapis.com/auth/content"
+                    ]
+                }, 
                 "list": {
                     "description": "Lists the shipping settings of the sub-accounts in your Merchant Center account.", 
                     "httpMethod": "GET", 
@@ -3388,46 +3114,6 @@
                     "path": "{merchantId}/shippingsettings", 
                     "response": {
                         "$ref": "ShippingsettingsListResponse"
-                    }, 
-                    "scopes": [
-                        "https://www.googleapis.com/auth/content"
-                    ]
-                }, 
-                "patch": {
-                    "description": "Updates the shipping settings of the account. This method supports patch semantics.", 
-                    "httpMethod": "PATCH", 
-                    "id": "content.shippingsettings.patch", 
-                    "parameterOrder": [
-                        "merchantId", 
-                        "accountId"
-                    ], 
-                    "parameters": {
-                        "accountId": {
-                            "description": "The ID of the account for which to get/update shipping settings.", 
-                            "format": "uint64", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }, 
-                        "dryRun": {
-                            "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).", 
-                            "location": "query", 
-                            "type": "boolean"
-                        }, 
-                        "merchantId": {
-                            "description": "The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.", 
-                            "format": "uint64", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }
-                    }, 
-                    "path": "{merchantId}/shippingsettings/{accountId}", 
-                    "request": {
-                        "$ref": "ShippingSettings"
-                    }, 
-                    "response": {
-                        "$ref": "ShippingSettings"
                     }, 
                     "scopes": [
                         "https://www.googleapis.com/auth/content"
@@ -3476,11 +3162,11 @@
             }
         }
     }, 
-    "revision": "20190702", 
+    "revision": "20200310", 
     "rootUrl": "https://www.googleapis.com/", 
     "schemas": {
         "Account": {
-            "description": "Account data. After the creation of a new account it may take a few minutes before it is fully operational. The methods delete, insert, patch, and update require the admin role.", 
+            "description": "Account data. After the creation of a new account it may take a few minutes before it is fully operational. The methods delete, insert, and update require the admin role.", 
             "id": "Account", 
             "properties": {
                 "adultContent": {
@@ -3508,7 +3194,7 @@
                             "content.accounts.update"
                         ]
                     }, 
-                    "description": "Merchant Center account ID.", 
+                    "description": "Required for update. Merchant Center account ID.", 
                     "format": "uint64", 
                     "type": "string"
                 }, 
@@ -3524,7 +3210,7 @@
                             "content.accounts.update"
                         ]
                     }, 
-                    "description": "Display name for the account.", 
+                    "description": "Required. Display name for the account.", 
                     "type": "string"
                 }, 
                 "reviewsUrl": {
@@ -3591,7 +3277,7 @@
                     "type": "string"
                 }, 
                 "status": {
-                    "description": "Status of the link between this Merchant Center account and the AdWords account. Upon retrieval, it represents the actual status of the link and can be either active if it was approved in Google AdWords or pending if it's pending approval. Upon insertion, it represents the intended status of the link. Re-uploading a link with status active when it's still pending or with status pending when it's already active will have no effect: the status will remain unchanged. Re-uploading a link with deprecated status inactive is equivalent to not submitting the link at all and will delete the link if it was active or cancel the link request if it was pending.", 
+                    "description": "Status of the link between this Merchant Center account and the AdWords account. Upon retrieval, it represents the actual status of the link and can be either active if it was approved in Google AdWords or pending if it's pending approval. Upon insertion, it represents the intended status of the link. Re-uploading a link with status active when it's still pending or with status pending when it's already active will have no effect: the status will remain unchanged. Re-uploading a link with deprecated status inactive is equivalent to not submitting the link at all and will delete the link if it was active or cancel the link request if it was pending.\n\nAcceptable values are:  \n- \"active\" \n- \"pending\"", 
                     "type": "string"
                 }
             }, 
@@ -3641,7 +3327,7 @@
                     "type": "string"
                 }, 
                 "status": {
-                    "description": "Status of the link between this Merchant Center account and the GMB account.", 
+                    "description": "Status of the link between this Merchant Center account and the GMB account.\n\nAcceptable values are:  \n- \"active\" \n- \"pending\"", 
                     "type": "string"
                 }
             }, 
@@ -3728,7 +3414,7 @@
                     "type": "string"
                 }, 
                 "severity": {
-                    "description": "Severity of the issue.", 
+                    "description": "Severity of the issue.\n\nAcceptable values are:  \n- \"critical\" \n- \"error\" \n- \"suggestion\"", 
                     "type": "string"
                 }, 
                 "title": {
@@ -3773,6 +3459,7 @@
                     "type": "integer"
                 }, 
                 "severity": {
+                    "description": "Acceptable values are:  \n- \"critical\" \n- \"error\" \n- \"suggestion\"", 
                     "type": "string"
                 }, 
                 "submittedValue": {
@@ -3845,7 +3532,7 @@
             "id": "AccountStatusProducts", 
             "properties": {
                 "channel": {
-                    "description": "The channel the data applies to.", 
+                    "description": "The channel the data applies to.\n\nAcceptable values are:  \n- \"local\" \n- \"online\"", 
                     "type": "string"
                 }, 
                 "country": {
@@ -3906,7 +3593,7 @@
                             "content.accounttax.update"
                         ]
                     }, 
-                    "description": "The ID of the account to which these account tax settings belong.", 
+                    "description": "Required. The ID of the account to which these account tax settings belong.", 
                     "format": "uint64", 
                     "type": "string"
                 }, 
@@ -3939,7 +3626,7 @@
                             "content.accounttax.update"
                         ]
                     }, 
-                    "description": "State (or province) is which the tax is applicable, described by its location ID (also called criteria ID).", 
+                    "description": "Required. State (or province) is which the tax is applicable, described by its location ID (also called criteria ID).", 
                     "format": "uint64", 
                     "type": "string"
                 }, 
@@ -4072,7 +3759,7 @@
                     "type": "string"
                 }, 
                 "method": {
-                    "description": "The method of the batch entry.", 
+                    "description": "The method of the batch entry.\n\nAcceptable values are:  \n- \"claimWebsite\" \n- \"delete\" \n- \"get\" \n- \"insert\" \n- \"link\" \n- \"update\"", 
                     "type": "string"
                 }, 
                 "overwrite": {
@@ -4086,11 +3773,11 @@
             "id": "AccountsCustomBatchRequestEntryLinkRequest", 
             "properties": {
                 "action": {
-                    "description": "Action to perform for this link. The \"request\" action is only available to select merchants.", 
+                    "description": "Action to perform for this link. The \"request\" action is only available to select merchants.\n\nAcceptable values are:  \n- \"approve\" \n- \"remove\" \n- \"request\"", 
                     "type": "string"
                 }, 
                 "linkType": {
-                    "description": "Type of the link between the two accounts.", 
+                    "description": "Type of the link between the two accounts.\n\nAcceptable values are:  \n- \"channelPartner\" \n- \"eCommercePlatform\"", 
                     "type": "string"
                 }, 
                 "linkedAccountId": {
@@ -4141,7 +3828,7 @@
                     "type": "string"
                 }, 
                 "linkStatus": {
-                    "description": "Deprecated. This field is never set.", 
+                    "description": "Deprecated. This field is never set.\n\nAcceptable values are:  \n- \"active\" \n- \"inactive\" \n- \"pending\"", 
                     "type": "string"
                 }
             }, 
@@ -4151,11 +3838,11 @@
             "id": "AccountsLinkRequest", 
             "properties": {
                 "action": {
-                    "description": "Action to perform for this link. The \"request\" action is only available to select merchants.", 
+                    "description": "Action to perform for this link. The \"request\" action is only available to select merchants.\n\nAcceptable values are:  \n- \"approve\" \n- \"remove\" \n- \"request\"", 
                     "type": "string"
                 }, 
                 "linkType": {
-                    "description": "Type of the link between the two accounts.", 
+                    "description": "Type of the link between the two accounts.\n\nAcceptable values are:  \n- \"channelPartner\" \n- \"eCommercePlatform\"", 
                     "type": "string"
                 }, 
                 "linkedAccountId": {
@@ -4237,7 +3924,7 @@
                     "type": "string"
                 }, 
                 "method": {
-                    "description": "The method (get).", 
+                    "description": "The method of the batch entry.\n\nAcceptable values are:  \n- \"get\"", 
                     "type": "string"
                 }
             }, 
@@ -4339,6 +4026,7 @@
                     "type": "string"
                 }, 
                 "method": {
+                    "description": "The method of the batch entry.\n\nAcceptable values are:  \n- \"get\" \n- \"update\"", 
                     "type": "string"
                 }
             }, 
@@ -4494,7 +4182,7 @@
                     "type": "string"
                 }, 
                 "type": {
-                    "description": "The type of the attribute.", 
+                    "description": "The type of the attribute.\n\nAcceptable values are:  \n- \"boolean\" \n- \"datetimerange\" \n- \"float\" \n- \"group\" \n- \"int\" \n- \"price\" \n- \"text\" \n- \"time\" \n- \"url\"", 
                     "type": "string"
                 }, 
                 "unit": {
@@ -4529,9 +4217,11 @@
             "id": "CustomerReturnReason", 
             "properties": {
                 "description": {
+                    "description": "Description of the reason.", 
                     "type": "string"
                 }, 
                 "reasonCode": {
+                    "description": "Code of the return reason.\n\nAcceptable values are:  \n- \"betterPriceFound\" \n- \"changedMind\" \n- \"damagedOrDefectiveItem\" \n- \"didNotMatchDescription\" \n- \"doesNotFit\" \n- \"expiredItem\" \n- \"incorrectItemReceived\" \n- \"noLongerNeeded\" \n- \"notSpecified\" \n- \"orderedWrongItem\" \n- \"other\" \n- \"qualityNotExpected\" \n- \"receivedTooLate\" \n- \"undeliverable\"", 
                     "type": "string"
                 }
             }, 
@@ -4576,7 +4266,7 @@
                             "content.datafeeds.update"
                         ]
                     }, 
-                    "description": "The type of data feed. For product inventory feeds, only feeds for local stores, not online stores, are supported.", 
+                    "description": "Required. The type of data feed. For product inventory feeds, only feeds for local stores, not online stores, are supported.\n\nAcceptable values are:  \n- \"local products\" \n- \"product inventory\" \n- \"products\"", 
                     "type": "string"
                 }, 
                 "fetchSchedule": {
@@ -4590,7 +4280,7 @@
                             "content.datafeeds.update"
                         ]
                     }, 
-                    "description": "The filename of the feed. All feeds must have a unique file name.", 
+                    "description": "Required. The filename of the feed. All feeds must have a unique file name.", 
                     "type": "string"
                 }, 
                 "format": {
@@ -4603,7 +4293,7 @@
                             "content.datafeeds.update"
                         ]
                     }, 
-                    "description": "The ID of the data feed.", 
+                    "description": "Required for update. The ID of the data feed.", 
                     "format": "int64", 
                     "type": "string"
                 }, 
@@ -4625,7 +4315,7 @@
                             "content.datafeeds.insert"
                         ]
                     }, 
-                    "description": "A descriptive name of the data feed.", 
+                    "description": "Required for insert. A descriptive name of the data feed.", 
                     "type": "string"
                 }, 
                 "targetCountry": {
@@ -4682,7 +4372,7 @@
                     "type": "string"
                 }, 
                 "weekday": {
-                    "description": "The day of the week the feed file should be fetched.", 
+                    "description": "The day of the week the feed file should be fetched.\n\nAcceptable values are:  \n- \"monday\" \n- \"tuesday\" \n- \"wednesday\" \n- \"thursday\" \n- \"friday\" \n- \"saturday\" \n- \"sunday\"", 
                     "type": "string"
                 }
             }, 
@@ -4692,15 +4382,15 @@
             "id": "DatafeedFormat", 
             "properties": {
                 "columnDelimiter": {
-                    "description": "Delimiter for the separation of values in a delimiter-separated values feed. If not specified, the delimiter will be auto-detected. Ignored for non-DSV data feeds.", 
+                    "description": "Delimiter for the separation of values in a delimiter-separated values feed. If not specified, the delimiter will be auto-detected. Ignored for non-DSV data feeds.\n\nAcceptable values are:  \n- \"pipe\" \n- \"tab\" \n- \"tilde\"", 
                     "type": "string"
                 }, 
                 "fileEncoding": {
-                    "description": "Character encoding scheme of the data feed. If not specified, the encoding will be auto-detected.", 
+                    "description": "Character encoding scheme of the data feed. If not specified, the encoding will be auto-detected.\n\nAcceptable values are:  \n- \"latin-1\" \n- \"utf-16be\" \n- \"utf-16le\" \n- \"utf-8\" \n- \"windows-1252\"", 
                     "type": "string"
                 }, 
                 "quotingMode": {
-                    "description": "Specifies how double quotes are interpreted. If not specified, the mode will be auto-detected. Ignored for non-DSV data feeds.", 
+                    "description": "Specifies how double quotes are interpreted. If not specified, the mode will be auto-detected. Ignored for non-DSV data feeds.\n\nAcceptable values are:  \n- \"normal character\" \n- \"value quoting\"", 
                     "type": "string"
                 }
             }, 
@@ -4750,7 +4440,7 @@
                     "type": "string"
                 }, 
                 "processingStatus": {
-                    "description": "The processing status of the feed.", 
+                    "description": "The processing status of the feed.\n\nAcceptable values are:  \n- \"\"failure\": The feed could not be processed or all items had errors.\" \n- \"in progress\": The feed is being processed. \n- \"none\": The feed has not yet been processed. For example, a feed that has never been uploaded will have this processing status. \n- \"success\": The feed was processed successfully, though some items might have had errors.", 
                     "type": "string"
                 }, 
                 "warnings": {
@@ -4825,7 +4515,7 @@
                     "type": "array"
                 }, 
                 "includedDestinations": {
-                    "description": "The list of destinations to include for this target (corresponds to checked check boxes in Merchant Center). Default destinations are always included unless provided in the excluded_destination field.", 
+                    "description": "The list of destinations to include for this target (corresponds to checked check boxes in Merchant Center). Default destinations are always included unless provided in excludedDestinations.\n\nList of supported destinations (if available to the account):  \n- DisplayAds \n- Shopping \n- ShoppingActions \n- SurfacesAcrossGoogle", 
                     "items": {
                         "type": "string"
                     }, 
@@ -4875,6 +4565,7 @@
                     "type": "string"
                 }, 
                 "method": {
+                    "description": "The method of the batch entry.\n\nAcceptable values are:  \n- \"delete\" \n- \"fetchNow\" \n- \"get\" \n- \"insert\" \n- \"update\"", 
                     "type": "string"
                 }
             }, 
@@ -4991,6 +4682,7 @@
                     "type": "string"
                 }, 
                 "method": {
+                    "description": "The method of the batch entry.\n\nAcceptable values are:  \n- \"get\"", 
                     "type": "string"
                 }
             }, 
@@ -5281,7 +4973,7 @@
                     "type": "string"
                 }, 
                 "type": {
-                    "description": "The holiday type. Always present.", 
+                    "description": "The holiday type. Always present.\n\nAcceptable values are:  \n- \"Christmas\" \n- \"Easter\" \n- \"Father's Day\" \n- \"Halloween\" \n- \"Independence Day (USA)\" \n- \"Mother's Day\" \n- \"Thanksgiving\" \n- \"Valentine's Day\"", 
                     "type": "string"
                 }
             }, 
@@ -5306,7 +4998,7 @@
             "id": "Inventory", 
             "properties": {
                 "availability": {
-                    "description": "The availability of the product.", 
+                    "description": "The availability of the product.\n\nAcceptable values are:  \n- \"in stock\" \n- \"out of stock\" \n- \"preorder\"", 
                     "type": "string"
                 }, 
                 "customLabel0": {
@@ -5460,11 +5152,11 @@
             "id": "InventoryPickup", 
             "properties": {
                 "pickupMethod": {
-                    "description": "Whether store pickup is available for this offer and whether the pickup option should be shown as buy, reserve, or not supported. Only supported for local inventory. Unless the value is \"not supported\", must be submitted together with pickupSla.", 
+                    "description": "Whether store pickup is available for this offer and whether the pickup option should be shown as buy, reserve, or not supported. Only supported for local inventory. Unless the value is \"not supported\", must be submitted together with pickupSla.\n\nAcceptable values are:  \n- \"buy\" \n- \"not supported\" \n- \"reserve\" \n- \"ship to store\"", 
                     "type": "string"
                 }, 
                 "pickupSla": {
-                    "description": "The expected date that an order will be ready for pickup, relative to when the order is placed. Only supported for local inventory. Must be submitted together with pickupMethod.", 
+                    "description": "The expected date that an order will be ready for pickup, relative to when the order is placed. Only supported for local inventory. Must be submitted together with pickupMethod.\n\nAcceptable values are:  \n- \"five day\" \n- \"four day\" \n- \"multi day\" \n- \"multi week\" \n- \"next day\" \n- \"same day\" \n- \"seven day\" \n- \"six day\" \n- \"three day\" \n- \"two day\"", 
                     "type": "string"
                 }
             }, 
@@ -5474,7 +5166,7 @@
             "id": "InventorySetRequest", 
             "properties": {
                 "availability": {
-                    "description": "The availability of the product.", 
+                    "description": "The availability of the product.\n\nAcceptable values are:  \n- \"in stock\" \n- \"out of stock\" \n- \"preorder\"", 
                     "type": "string"
                 }, 
                 "customLabel0": {
@@ -5593,7 +5285,7 @@
                     "description": "[required] Total additional charge for this type."
                 }, 
                 "type": {
-                    "description": "[required] Type of the additional charge.", 
+                    "description": "[required] Type of the additional charge.\n\nAcceptable values are:  \n- \"shipping\"", 
                     "type": "string"
                 }
             }, 
@@ -5603,7 +5295,7 @@
             "id": "LiaAboutPageSettings", 
             "properties": {
                 "status": {
-                    "description": "The status of the verification process for the About page.", 
+                    "description": "The status of the verification process for the About page.\n\nAcceptable values are:  \n- \"active\" \n- \"inactive\" \n- \"pending\"", 
                     "type": "string"
                 }, 
                 "url": {
@@ -5626,7 +5318,7 @@
                             "content.liasettings.update"
                         ]
                     }, 
-                    "description": "CLDR country code (e.g. \"US\").", 
+                    "description": "Required. CLDR country code (e.g. \"US\").", 
                     "type": "string"
                 }, 
                 "hostedLocalStorefrontActive": {
@@ -5664,11 +5356,11 @@
                     "type": "string"
                 }, 
                 "inventoryVerificationContactStatus": {
-                    "description": "The status of the verification contact.", 
+                    "description": "The status of the verification contact.\n\nAcceptable values are:  \n- \"active\" \n- \"inactive\" \n- \"pending\"", 
                     "type": "string"
                 }, 
                 "status": {
-                    "description": "The status of the inventory verification process.", 
+                    "description": "The status of the inventory verification process.\n\nAcceptable values are:  \n- \"active\" \n- \"inactive\" \n- \"pending\"", 
                     "type": "string"
                 }
             }, 
@@ -5682,7 +5374,7 @@
                     "type": "string"
                 }, 
                 "status": {
-                    "description": "The status of the ?On display to order? feature.", 
+                    "description": "The status of the ?On display to order? feature.\n\nAcceptable values are:  \n- \"active\" \n- \"inactive\" \n- \"pending\"", 
                     "type": "string"
                 }
             }, 
@@ -5779,6 +5471,7 @@
                     "type": "string"
                 }, 
                 "method": {
+                    "description": "The method of the batch entry.\n\nAcceptable values are:  \n- \"get\" \n- \"getAccessibleGmbAccounts\" \n- \"requestGmbAccess\" \n- \"requestInventoryVerification\" \n- \"setInventoryVerificationContact\" \n- \"update\"", 
                     "type": "string"
                 }, 
                 "posDataProviderId": {
@@ -5986,27 +5679,34 @@
             "type": "object"
         }, 
         "MerchantOrderReturn": {
+            "description": "Order return. Production access (all methods) requires the order manager role. Sandbox access does not.", 
             "id": "MerchantOrderReturn", 
             "properties": {
                 "creationDate": {
+                    "description": "The date of creation of the return, in ISO 8601 format.", 
                     "type": "string"
                 }, 
                 "merchantOrderId": {
+                    "description": "Merchant defined order ID.", 
                     "type": "string"
                 }, 
                 "orderId": {
+                    "description": "Google order ID.", 
                     "type": "string"
                 }, 
                 "orderReturnId": {
+                    "description": "Order return ID generated by Google.", 
                     "type": "string"
                 }, 
                 "returnItems": {
+                    "description": "Items of the return.", 
                     "items": {
                         "$ref": "MerchantOrderReturnItem"
                     }, 
                     "type": "array"
                 }, 
                 "returnShipments": {
+                    "description": "Shipments of the return.", 
                     "items": {
                         "$ref": "ReturnShipment"
                     }, 
@@ -6019,31 +5719,37 @@
             "id": "MerchantOrderReturnItem", 
             "properties": {
                 "customerReturnReason": {
-                    "$ref": "CustomerReturnReason"
+                    "$ref": "CustomerReturnReason", 
+                    "description": "The reason that the customer chooses to return an item."
                 }, 
                 "itemId": {
+                    "description": "Product level item ID. If the returned items are of the same product, they will have the same ID.", 
                     "type": "string"
                 }, 
                 "merchantReturnReason": {
-                    "$ref": "RefundReason"
+                    "$ref": "RefundReason", 
+                    "description": "The reason that merchant chooses to accept a return item."
                 }, 
                 "product": {
-                    "$ref": "OrderLineItemProduct"
+                    "$ref": "OrderLineItemProduct", 
+                    "description": "Product data from the time of the order placement."
                 }, 
                 "returnShipmentIds": {
+                    "description": "IDs of the return shipments that this return item belongs to.", 
                     "items": {
                         "type": "string"
                     }, 
                     "type": "array"
                 }, 
                 "state": {
+                    "description": "State of the item.\n\nAcceptable values are:  \n- \"canceled\" \n- \"new\" \n- \"received\" \n- \"refunded\" \n- \"rejected\"", 
                     "type": "string"
                 }
             }, 
             "type": "object"
         }, 
         "Order": {
-            "description": "Order. All methods require the order manager role.", 
+            "description": "Order. Production access (all methods) requires the order manager role. Sandbox access does not.", 
             "id": "Order", 
             "properties": {
                 "acknowledged": {
@@ -6051,7 +5757,7 @@
                     "type": "boolean"
                 }, 
                 "channelType": {
-                    "description": "Deprecated.", 
+                    "description": "Deprecated.\n\nAcceptable values are:  \n- \"googleExpress\" \n- \"purchasesOnGoogle\"", 
                     "type": "string"
                 }, 
                 "customer": {
@@ -6060,7 +5766,7 @@
                 }, 
                 "deliveryDetails": {
                     "$ref": "OrderDeliveryDetails", 
-                    "description": "Delivery details for shipments."
+                    "description": "Delivery details for shipments of type delivery."
                 }, 
                 "id": {
                     "description": "The REST ID of the order. Globally unique.", 
@@ -6095,15 +5801,19 @@
                     "description": "The details of the payment method."
                 }, 
                 "paymentStatus": {
-                    "description": "The status of the payment.", 
+                    "description": "The status of the payment.\n\nAcceptable values are:  \n- \"paymentCaptured\" \n- \"paymentRejected\" \n- \"paymentSecured\" \n- \"pendingAuthorization\"", 
                     "type": "string"
+                }, 
+                "pickupDetails": {
+                    "$ref": "OrderPickupDetails", 
+                    "description": "Pickup details for shipments of type pickup."
                 }, 
                 "placedDate": {
                     "description": "The date when the order was placed, in ISO 8601 format.", 
                     "type": "string"
                 }, 
                 "promotions": {
-                    "description": "The details of the merchant provided promotions applied to the order. More details about the program are here.", 
+                    "description": "The details of the merchant provided promotions applied to the order.\n\nTo determine which promotions apply to which products, check the Promotions[].Benefits[].OfferIds field against the LineItems[].Product.OfferId field for each promotion. If a promotion is applied to more than 1 offerId, divide the discount value by the number of affected offers to determine how much discount to apply to each offerId.\n\nExamples:  \n- To calculate the line item level discount for a single specific item: For each promotion, subtract the Promotions[].Benefits[].Discount.value amount from the LineItems[].Price.value. \n- To calculate the line item level discount for multiple quantity of a specific item: For each promotion, divide the Promotions[].Benefits[].Discount.value by the quantity of products and substract it from LineItems[].Product.Price.value for each quantity item.  \n\nOnly 1 promotion can be applied to an offerId in a given order. To refund an item which had a promotion applied to it, make sure to refund the amount after first subtracting the promotion discount from the item price.\n\nMore details about the program are here.", 
                     "items": {
                         "$ref": "OrderLegacyPromotion"
                     }, 
@@ -6132,15 +5842,15 @@
                     "description": "The tax for the total shipping cost."
                 }, 
                 "shippingOption": {
-                    "description": "Deprecated. Shipping details are provided with line items instead.", 
+                    "description": "Deprecated. Shipping details are provided with line items instead.\n\nAcceptable values are:  \n- \"economy\" \n- \"expedited\" \n- \"oneDay\" \n- \"sameDay\" \n- \"standard\" \n- \"twoDay\"", 
                     "type": "string"
                 }, 
                 "status": {
-                    "description": "The status of the order.", 
+                    "description": "The status of the order.\n\nAcceptable values are:  \n- \"canceled\" \n- \"delivered\" \n- \"inProgress\" \n- \"partiallyDelivered\" \n- \"partiallyReturned\" \n- \"partiallyShipped\" \n- \"pendingShipment\" \n- \"returned\" \n- \"shipped\"", 
                     "type": "string"
                 }, 
                 "taxCollector": {
-                    "description": "The party responsible for collecting and remitting taxes.", 
+                    "description": "The party responsible for collecting and remitting taxes.\n\nAcceptable values are:  \n- \"marketplaceFacilitator\" \n- \"merchant\"", 
                     "type": "string"
                 }
             }, 
@@ -6194,7 +5904,7 @@
             "id": "OrderCancellation", 
             "properties": {
                 "actor": {
-                    "description": "The actor that created the cancellation.", 
+                    "description": "The actor that created the cancellation.\n\nAcceptable values are:  \n- \"customer\" \n- \"googleBot\" \n- \"googleCustomerService\" \n- \"googlePayments\" \n- \"googleSabre\" \n- \"merchant\"", 
                     "type": "string"
                 }, 
                 "creationDate": {
@@ -6207,7 +5917,7 @@
                     "type": "integer"
                 }, 
                 "reason": {
-                    "description": "The reason for the cancellation. Orders that are cancelled with a noInventory reason will lead to the removal of the product from Shopping Actions until you make an update to that product. This will not affect your Shopping ads.", 
+                    "description": "The reason for the cancellation. Orders that are canceled with a noInventory reason will lead to the removal of the product from Shopping Actions until you make an update to that product. This will not affect your Shopping ads.\n\nAcceptable values are:  \n- \"autoPostInternal\" \n- \"autoPostInvalidBillingAddress\" \n- \"autoPostNoInventory\" \n- \"autoPostPriceError\" \n- \"autoPostUndeliverableShippingAddress\" \n- \"couponAbuse\" \n- \"customerCanceled\" \n- \"customerInitiatedCancel\" \n- \"customerSupportRequested\" \n- \"failToPushOrderGoogleError\" \n- \"failToPushOrderMerchantError\" \n- \"failToPushOrderMerchantFulfillmentError\" \n- \"failToPushOrderToMerchant\" \n- \"failToPushOrderToMerchantOutOfStock\" \n- \"invalidCoupon\" \n- \"malformedShippingAddress\" \n- \"merchantDidNotShipOnTime\" \n- \"noInventory\" \n- \"orderTimeout\" \n- \"other\" \n- \"paymentAbuse\" \n- \"paymentDeclined\" \n- \"priceError\" \n- \"returnRefundAbuse\" \n- \"shippingPriceError\" \n- \"taxError\" \n- \"undeliverableShippingAddress\" \n- \"unsupportedPoBoxAddress\"", 
                     "type": "string"
                 }, 
                 "reasonText": {
@@ -6232,6 +5942,10 @@
                     "description": "Full name of the customer.", 
                     "type": "string"
                 }, 
+                "invoiceReceivingEmail": {
+                    "description": "Email address for the merchant to send value-added tax or invoice documentation of the order. This documentation is made available to the customer.", 
+                    "type": "string"
+                }, 
                 "marketingRightsInfo": {
                     "$ref": "OrderCustomerMarketingRightsInfo", 
                     "description": "Customer's marketing preferences. Contains the marketing opt-in information that is current at the time that the merchant call. User preference selections can change from one order to the next so preferences must be checked with every order."
@@ -6243,7 +5957,7 @@
             "id": "OrderCustomerMarketingRightsInfo", 
             "properties": {
                 "explicitMarketingPreference": {
-                    "description": "Last known customer selection regarding marketing preferences. In certain cases this selection might not be known, so this field would be empty. If a customer selected granted in their most recent order, they can be subscribed to marketing emails. Customers who have chosen denied must not be subscribed, or must be unsubscribed if already opted-in.", 
+                    "description": "Last known customer selection regarding marketing preferences. In certain cases this selection might not be known, so this field would be empty. If a customer selected granted in their most recent order, they can be subscribed to marketing emails. Customers who have chosen denied must not be subscribed, or must be unsubscribed if already opted-in.\n\nAcceptable values are:  \n- \"denied\" \n- \"granted\"", 
                     "type": "string"
                 }, 
                 "lastUpdatedTimestamp": {
@@ -6297,11 +6011,11 @@
                     "type": "string"
                 }, 
                 "productApplicability": {
-                    "description": "Whether the promotion is applicable to all products or only specific products.", 
+                    "description": "Whether the promotion is applicable to all products or only specific products.\n\nAcceptable values are:  \n- \"allProducts\" \n- \"specificProducts\"", 
                     "type": "string"
                 }, 
                 "redemptionChannel": {
-                    "description": "Indicates that the promotion is valid online.", 
+                    "description": "Indicates that the promotion is valid online.\n\nAcceptable values are:  \n- \"online\"", 
                     "type": "string"
                 }
             }, 
@@ -6322,7 +6036,7 @@
                     "type": "array"
                 }, 
                 "subType": {
-                    "description": "Further describes the benefit of the promotion. Note that we will expand on this enumeration as we support new promotion sub-types.", 
+                    "description": "Further describes the benefit of the promotion. Note that we will expand on this enumeration as we support new promotion sub-types.\n\nAcceptable values are:  \n- \"buyMGetMoneyOff\" \n- \"buyMGetNMoneyOff\" \n- \"buyMGetNPercentOff\" \n- \"buyMGetPercentOff\" \n- \"freeGift\" \n- \"freeGiftWithItemId\" \n- \"freeGiftWithValue\" \n- \"freeOvernightShipping\" \n- \"freeShipping\" \n- \"freeTwoDayShipping\" \n- \"moneyOff\" \n- \"percentageOff\" \n- \"rewardPoints\" \n- \"salePrice\"", 
                     "type": "string"
                 }, 
                 "taxImpact": {
@@ -6330,7 +6044,7 @@
                     "description": "The impact on tax when the promotion is applied."
                 }, 
                 "type": {
-                    "description": "Describes whether the promotion applies to products (e.g. 20% off) or to shipping (e.g. Free Shipping).", 
+                    "description": "Describes whether the promotion applies to products (e.g. 20% off) or to shipping (e.g. Free Shipping).\n\nAcceptable values are:  \n- \"product\" \n- \"shipping\"", 
                     "type": "string"
                 }
             }, 
@@ -6385,6 +6099,11 @@
                     "format": "uint32", 
                     "type": "integer"
                 }, 
+                "quantityReadyForPickup": {
+                    "description": "Number of items ready for pickup.", 
+                    "format": "uint32", 
+                    "type": "integer"
+                }, 
                 "quantityReturned": {
                     "description": "Number of items returned.", 
                     "format": "uint32", 
@@ -6425,11 +6144,11 @@
                     "type": "string"
                 }, 
                 "channel": {
-                    "description": "The item's channel (online or local).", 
+                    "description": "The item's channel (online or local).\n\nAcceptable values are:  \n- \"local\" \n- \"online\"", 
                     "type": "string"
                 }, 
                 "condition": {
-                    "description": "Condition or state of the item.", 
+                    "description": "Condition or state of the item.\n\nAcceptable values are:  \n- \"new\" \n- \"refurbished\" \n- \"used\"", 
                     "type": "string"
                 }, 
                 "contentLanguage": {
@@ -6530,7 +6249,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "How many days later the item can be returned.", 
+                    "description": "Required. How many days later the item can be returned.", 
                     "format": "int32", 
                     "type": "integer"
                 }, 
@@ -6540,7 +6259,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "Whether the item is returnable.", 
+                    "description": "Required. Whether the item is returnable.", 
                     "type": "boolean"
                 }, 
                 "policyUrl": {
@@ -6549,7 +6268,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "URL of the item return policy.", 
+                    "description": "Required. URL of the item return policy.", 
                     "type": "string"
                 }
             }, 
@@ -6564,7 +6283,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "The delivery by date, in ISO 8601 format.", 
+                    "description": "Required. The delivery by date, in ISO 8601 format.", 
                     "type": "string"
                 }, 
                 "method": {
@@ -6574,7 +6293,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "Details of the shipping method."
+                    "description": "Required. Details of the shipping method."
                 }, 
                 "shipByDate": {
                     "annotations": {
@@ -6582,7 +6301,11 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "The ship by date, in ISO 8601 format.", 
+                    "description": "Required. The ship by date, in ISO 8601 format.", 
+                    "type": "string"
+                }, 
+                "type": {
+                    "description": "Type of shipment. Indicates whether deliveryDetails or pickupDetails is applicable for this shipment.\n\nAcceptable values are:  \n- \"delivery\" \n- \"pickup\"", 
                     "type": "string"
                 }
             }, 
@@ -6601,7 +6324,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "Maximum transit time.", 
+                    "description": "Required. Maximum transit time.", 
                     "format": "uint32", 
                     "type": "integer"
                 }, 
@@ -6611,7 +6334,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "The name of the shipping method.", 
+                    "description": "Required. The name of the shipping method.", 
                     "type": "string"
                 }, 
                 "minDaysInTransit": {
@@ -6620,7 +6343,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "Minimum transit time.", 
+                    "description": "Required. Minimum transit time.", 
                     "format": "uint32", 
                     "type": "integer"
                 }
@@ -6673,11 +6396,46 @@
             }, 
             "type": "object"
         }, 
+        "OrderPickupDetails": {
+            "id": "OrderPickupDetails", 
+            "properties": {
+                "address": {
+                    "$ref": "OrderAddress", 
+                    "description": "Address of the pickup location where the shipment should be sent. Note that recipientName in the address is the name of the business at the pickup location."
+                }, 
+                "collectors": {
+                    "description": "Collectors authorized to pick up shipment from the pickup location.", 
+                    "items": {
+                        "$ref": "OrderPickupDetailsCollector"
+                    }, 
+                    "type": "array"
+                }, 
+                "locationId": {
+                    "description": "ID of the pickup location.", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "OrderPickupDetailsCollector": {
+            "id": "OrderPickupDetailsCollector", 
+            "properties": {
+                "name": {
+                    "description": "Name of the person picking up the shipment.", 
+                    "type": "string"
+                }, 
+                "phoneNumber": {
+                    "description": "Phone number of the person picking up the shipment.", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
         "OrderRefund": {
             "id": "OrderRefund", 
             "properties": {
                 "actor": {
-                    "description": "The actor that created the refund.", 
+                    "description": "The actor that created the refund.\n\nAcceptable values are:  \n- \"customer\" \n- \"googleBot\" \n- \"googleCustomerService\" \n- \"googlePayments\" \n- \"googleSabre\" \n- \"merchant\"", 
                     "type": "string"
                 }, 
                 "amount": {
@@ -6689,7 +6447,7 @@
                     "type": "string"
                 }, 
                 "reason": {
-                    "description": "The reason for the refund.", 
+                    "description": "The reason for the refund.\n\nAcceptable values are:  \n- \"adjustment\" \n- \"autoPostInternal\" \n- \"autoPostInvalidBillingAddress\" \n- \"autoPostNoInventory\" \n- \"autoPostPriceError\" \n- \"autoPostUndeliverableShippingAddress\" \n- \"couponAbuse\" \n- \"courtesyAdjustment\" \n- \"customerCanceled\" \n- \"customerDiscretionaryReturn\" \n- \"customerInitiatedMerchantCancel\" \n- \"customerSupportRequested\" \n- \"deliveredLateByCarrier\" \n- \"deliveredTooLate\" \n- \"expiredItem\" \n- \"failToPushOrderGoogleError\" \n- \"failToPushOrderMerchantError\" \n- \"failToPushOrderMerchantFulfillmentError\" \n- \"failToPushOrderToMerchant\" \n- \"failToPushOrderToMerchantOutOfStock\" \n- \"feeAdjustment\" \n- \"invalidCoupon\" \n- \"lateShipmentCredit\" \n- \"malformedShippingAddress\" \n- \"merchantDidNotShipOnTime\" \n- \"noInventory\" \n- \"orderTimeout\" \n- \"other\" \n- \"paymentAbuse\" \n- \"paymentDeclined\" \n- \"priceAdjustment\" \n- \"priceError\" \n- \"productArrivedDamaged\" \n- \"productNotAsDescribed\" \n- \"promoReallocation\" \n- \"qualityNotAsExpected\" \n- \"returnRefundAbuse\" \n- \"shippingCostAdjustment\" \n- \"shippingPriceError\" \n- \"taxAdjustment\" \n- \"taxError\" \n- \"undeliverableShippingAddress\" \n- \"unsupportedPoBoxAddress\" \n- \"wrongProductShipped\"", 
                     "type": "string"
                 }, 
                 "reasonText": {
@@ -6778,7 +6536,7 @@
             "id": "OrderReturn", 
             "properties": {
                 "actor": {
-                    "description": "The actor that created the refund.", 
+                    "description": "The actor that created the refund.\n\nAcceptable values are:  \n- \"customer\" \n- \"googleBot\" \n- \"googleCustomerService\" \n- \"googlePayments\" \n- \"googleSabre\" \n- \"merchant\"", 
                     "type": "string"
                 }, 
                 "creationDate": {
@@ -6791,7 +6549,7 @@
                     "type": "integer"
                 }, 
                 "reason": {
-                    "description": "The reason for the return.", 
+                    "description": "The reason for the return.\n\nAcceptable values are:  \n- \"customerDiscretionaryReturn\" \n- \"customerInitiatedMerchantCancel\" \n- \"deliveredTooLate\" \n- \"expiredItem\" \n- \"invalidCoupon\" \n- \"malformedShippingAddress\" \n- \"other\" \n- \"productArrivedDamaged\" \n- \"productNotAsDescribed\" \n- \"qualityNotAsExpected\" \n- \"undeliverableShippingAddress\" \n- \"unsupportedPoBoxAddress\" \n- \"wrongProductShipped\"", 
                     "type": "string"
                 }, 
                 "reasonText": {
@@ -6805,7 +6563,7 @@
             "id": "OrderShipment", 
             "properties": {
                 "carrier": {
-                    "description": "The carrier handling the shipment.\n\nAcceptable values for US are:  \n- \"gsx\" \n- \"ups\" \n- \"usps\" \n- \"fedex\" \n- \"dhl\" \n- \"ecourier\" \n- \"cxt\" \n- \"google\" \n- \"ontrac\" \n- \"emsy\" \n- \"ont\" \n- \"deliv\" \n- \"dynamex\" \n- \"lasership\" \n- \"mpx\" \n- \"uds\" \n- \"efw\"  \n\nAcceptable values for FR are:  \n- \"colissimo\" \n- \"chronopost\" \n- \"gls\" \n- \"dpd\" \n- \"bpost\"", 
+                    "description": "The carrier handling the shipment.\n\nFor supported carriers, Google includes the carrier name and tracking URL in emails to customers. For select supported carriers, Google also automatically updates the shipment status based on the provided shipment ID. Note: You can also use unsupported carriers, but emails to customers will not include the carrier name or tracking URL, and there will be no automatic order status updates. \nSupported carriers for US are:  \n- \"ups\" (United Parcel Service) automatic status updates \n- \"usps\" (United States Postal Service) automatic status updates \n- \"fedex\" (FedEx) automatic status updates  \n- \"dhl\" (DHL eCommerce) automatic status updates (US only) \n- \"ontrac\" (OnTrac) automatic status updates  \n- \"dhl express\" (DHL Express)\n- \"deliv\" (Deliv) \n- \"dynamex\" (TForce) \n- \"lasership\" (LaserShip) \n- \"mpx\" (Military Parcel Xpress) \n- \"uds\" (United Delivery Service) \n- \"efw\" (Estes Forwarding Worldwide) \n- \"jd logistics\" (JD Logistics) \n- \"yunexpress\" (YunExpress) \n- \"china post\" (China Post) \n- \"china ems\" (China Post Express Mail Service) \n- \"singapore post\" (Singapore Post) \n- \"pos malaysia\" (Pos Malaysia) \n- \"postnl\" (PostNL) \n- \"ptt\" (PTT Turkish Post) \n- \"eub\" (ePacket) \n- \"chukou1\" (Chukou1 Logistics)  \nSupported carriers for FR are:  \n- \"la poste\" (La Poste) automatic status updates  \n- \"colissimo\" (Colissimo by La Poste) automatic status updates \n- \"ups\" (United Parcel Service) automatic status updates  \n- \"chronopost\" (Chronopost by La Poste) \n- \"gls\" (General Logistics Systems France) \n- \"dpd\" (DPD Group by GeoPost) \n- \"bpost\" (Belgian Post Group) \n- \"colis prive\" (Colis Priv\u00e9) \n- \"boxtal\" (Boxtal) \n- \"geodis\" (GEODIS) \n- \"tnt\" (TNT) \n- \"db schenker\" (DB Schenker) \n- \"aramex\" (Aramex)", 
                     "type": "string"
                 }, 
                 "creationDate": {
@@ -6828,7 +6586,7 @@
                     "type": "array"
                 }, 
                 "status": {
-                    "description": "The status of the shipment.", 
+                    "description": "The status of the shipment.\n\nAcceptable values are:  \n- \"delivered\" \n- \"readyForPickup\" \n- \"shipped\" \n- \"undeliverable\"", 
                     "type": "string"
                 }, 
                 "trackingId": {
@@ -6842,7 +6600,7 @@
             "id": "OrderShipmentLineItemShipment", 
             "properties": {
                 "lineItemId": {
-                    "description": "The ID of the line item that is shipped. Either lineItemId or productId is required.", 
+                    "description": "The ID of the line item that is shipped. This value is assigned by Google when an order is created. Either lineItemId or productId is required.", 
                     "type": "string"
                 }, 
                 "productId": {
@@ -6890,7 +6648,7 @@
             "id": "OrderinvoicesCreateChargeInvoiceResponse", 
             "properties": {
                 "executionStatus": {
-                    "description": "The status of the execution.", 
+                    "description": "The status of the execution.\n\nAcceptable values are:  \n- \"duplicate\" \n- \"executed\"", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -6934,7 +6692,7 @@
             "id": "OrderinvoicesCreateRefundInvoiceResponse", 
             "properties": {
                 "executionStatus": {
-                    "description": "The status of the execution.", 
+                    "description": "The status of the execution.\n\nAcceptable values are:  \n- \"duplicate\" \n- \"executed\"", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -6953,7 +6711,7 @@
                     "type": "string"
                 }, 
                 "reason": {
-                    "description": "[required] Reason for the refund.", 
+                    "description": "[required] Reason for the refund.\n\nAcceptable values are:  \n- \"adjustment\" \n- \"autoPostInternal\" \n- \"autoPostInvalidBillingAddress\" \n- \"autoPostNoInventory\" \n- \"autoPostPriceError\" \n- \"autoPostUndeliverableShippingAddress\" \n- \"couponAbuse\" \n- \"courtesyAdjustment\" \n- \"customerCanceled\" \n- \"customerDiscretionaryReturn\" \n- \"customerInitiatedMerchantCancel\" \n- \"customerSupportRequested\" \n- \"deliveredLateByCarrier\" \n- \"deliveredTooLate\" \n- \"expiredItem\" \n- \"failToPushOrderGoogleError\" \n- \"failToPushOrderMerchantError\" \n- \"failToPushOrderMerchantFulfillmentError\" \n- \"failToPushOrderToMerchant\" \n- \"failToPushOrderToMerchantOutOfStock\" \n- \"feeAdjustment\" \n- \"invalidCoupon\" \n- \"lateShipmentCredit\" \n- \"malformedShippingAddress\" \n- \"merchantDidNotShipOnTime\" \n- \"noInventory\" \n- \"orderTimeout\" \n- \"other\" \n- \"paymentAbuse\" \n- \"paymentDeclined\" \n- \"priceAdjustment\" \n- \"priceError\" \n- \"productArrivedDamaged\" \n- \"productNotAsDescribed\" \n- \"promoReallocation\" \n- \"qualityNotAsExpected\" \n- \"returnRefundAbuse\" \n- \"shippingCostAdjustment\" \n- \"shippingPriceError\" \n- \"taxAdjustment\" \n- \"taxError\" \n- \"undeliverableShippingAddress\" \n- \"unsupportedPoBoxAddress\" \n- \"wrongProductShipped\"", 
                     "type": "string"
                 }
             }, 
@@ -6967,133 +6725,7 @@
                     "type": "string"
                 }, 
                 "reason": {
-                    "description": "[required] Reason for the return.", 
-                    "type": "string"
-                }
-            }, 
-            "type": "object"
-        }, 
-        "OrderpaymentsNotifyAuthApprovedRequest": {
-            "id": "OrderpaymentsNotifyAuthApprovedRequest", 
-            "properties": {
-                "authAmountPretax": {
-                    "$ref": "Price", 
-                    "description": "Authorized amount for pre-tax charge on user's credit card."
-                }, 
-                "authAmountTax": {
-                    "$ref": "Price", 
-                    "description": "Authorized amount for tax charge on user's credit card."
-                }
-            }, 
-            "type": "object"
-        }, 
-        "OrderpaymentsNotifyAuthApprovedResponse": {
-            "id": "OrderpaymentsNotifyAuthApprovedResponse", 
-            "properties": {
-                "executionStatus": {
-                    "description": "The status of the execution.", 
-                    "type": "string"
-                }, 
-                "kind": {
-                    "default": "content#orderpaymentsNotifyAuthApprovedResponse", 
-                    "description": "Identifies what kind of resource this is. Value: the fixed string \"content#orderpaymentsNotifyAuthApprovedResponse\".", 
-                    "type": "string"
-                }
-            }, 
-            "type": "object"
-        }, 
-        "OrderpaymentsNotifyAuthDeclinedRequest": {
-            "id": "OrderpaymentsNotifyAuthDeclinedRequest", 
-            "properties": {
-                "declineReason": {
-                    "description": "Reason why payment authorization was declined.", 
-                    "type": "string"
-                }
-            }, 
-            "type": "object"
-        }, 
-        "OrderpaymentsNotifyAuthDeclinedResponse": {
-            "id": "OrderpaymentsNotifyAuthDeclinedResponse", 
-            "properties": {
-                "executionStatus": {
-                    "description": "The status of the execution.", 
-                    "type": "string"
-                }, 
-                "kind": {
-                    "default": "content#orderpaymentsNotifyAuthDeclinedResponse", 
-                    "description": "Identifies what kind of resource this is. Value: the fixed string \"content#orderpaymentsNotifyAuthDeclinedResponse\".", 
-                    "type": "string"
-                }
-            }, 
-            "type": "object"
-        }, 
-        "OrderpaymentsNotifyChargeRequest": {
-            "id": "OrderpaymentsNotifyChargeRequest", 
-            "properties": {
-                "chargeState": {
-                    "description": "Whether charge was successful.", 
-                    "type": "string"
-                }, 
-                "invoiceId": {
-                    "description": "Deprecated. Please use invoiceIds instead.", 
-                    "type": "string"
-                }, 
-                "invoiceIds": {
-                    "description": "Invoice IDs from the orderinvoices service that correspond to the charge.", 
-                    "items": {
-                        "type": "string"
-                    }, 
-                    "type": "array"
-                }
-            }, 
-            "type": "object"
-        }, 
-        "OrderpaymentsNotifyChargeResponse": {
-            "id": "OrderpaymentsNotifyChargeResponse", 
-            "properties": {
-                "executionStatus": {
-                    "description": "The status of the execution.", 
-                    "type": "string"
-                }, 
-                "kind": {
-                    "default": "content#orderpaymentsNotifyChargeResponse", 
-                    "description": "Identifies what kind of resource this is. Value: the fixed string \"content#orderpaymentsNotifyChargeResponse\".", 
-                    "type": "string"
-                }
-            }, 
-            "type": "object"
-        }, 
-        "OrderpaymentsNotifyRefundRequest": {
-            "id": "OrderpaymentsNotifyRefundRequest", 
-            "properties": {
-                "invoiceId": {
-                    "description": "Deprecated. Please use invoiceIds instead.", 
-                    "type": "string"
-                }, 
-                "invoiceIds": {
-                    "description": "Invoice IDs from the orderinvoices service that correspond to the refund.", 
-                    "items": {
-                        "type": "string"
-                    }, 
-                    "type": "array"
-                }, 
-                "refundState": {
-                    "description": "Whether refund was successful.", 
-                    "type": "string"
-                }
-            }, 
-            "type": "object"
-        }, 
-        "OrderpaymentsNotifyRefundResponse": {
-            "id": "OrderpaymentsNotifyRefundResponse", 
-            "properties": {
-                "executionStatus": {
-                    "description": "The status of the execution.", 
-                    "type": "string"
-                }, 
-                "kind": {
-                    "default": "content#orderpaymentsNotifyRefundResponse", 
-                    "description": "Identifies what kind of resource this is. Value: the fixed string \"content#orderpaymentsNotifyRefundResponse\".", 
+                    "description": "[required] Reason for the return.\n\nAcceptable values are:  \n- \"customerDiscretionaryReturn\" \n- \"customerInitiatedMerchantCancel\" \n- \"deliveredTooLate\" \n- \"expiredItem\" \n- \"invalidCoupon\" \n- \"malformedShippingAddress\" \n- \"other\" \n- \"productArrivedDamaged\" \n- \"productNotAsDescribed\" \n- \"qualityNotAsExpected\" \n- \"undeliverableShippingAddress\" \n- \"unsupportedPoBoxAddress\" \n- \"wrongProductShipped\"", 
                     "type": "string"
                 }
             }, 
@@ -7178,7 +6810,7 @@
             "id": "OrdersAcknowledgeResponse", 
             "properties": {
                 "executionStatus": {
-                    "description": "The status of the execution.", 
+                    "description": "The status of the execution.\n\nAcceptable values are:  \n- \"duplicate\" \n- \"executed\"", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -7233,7 +6865,7 @@
                     "type": "integer"
                 }, 
                 "reason": {
-                    "description": "The reason for the cancellation.", 
+                    "description": "The reason for the cancellation.\n\nAcceptable values are:  \n- \"customerInitiatedCancel\" \n- \"invalidCoupon\" \n- \"malformedShippingAddress\" \n- \"noInventory\" \n- \"other\" \n- \"priceError\" \n- \"shippingPriceError\" \n- \"taxError\" \n- \"undeliverableShippingAddress\" \n- \"unsupportedPoBoxAddress\"", 
                     "type": "string"
                 }, 
                 "reasonText": {
@@ -7247,7 +6879,7 @@
             "id": "OrdersCancelLineItemResponse", 
             "properties": {
                 "executionStatus": {
-                    "description": "The status of the execution.", 
+                    "description": "The status of the execution.\n\nAcceptable values are:  \n- \"duplicate\" \n- \"executed\"", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -7266,7 +6898,7 @@
                     "type": "string"
                 }, 
                 "reason": {
-                    "description": "The reason for the cancellation.", 
+                    "description": "The reason for the cancellation.\n\nAcceptable values are:  \n- \"customerInitiatedCancel\" \n- \"invalidCoupon\" \n- \"malformedShippingAddress\" \n- \"noInventory\" \n- \"other\" \n- \"priceError\" \n- \"shippingPriceError\" \n- \"taxError\" \n- \"undeliverableShippingAddress\" \n- \"unsupportedPoBoxAddress\"", 
                     "type": "string"
                 }, 
                 "reasonText": {
@@ -7280,7 +6912,7 @@
             "id": "OrdersCancelResponse", 
             "properties": {
                 "executionStatus": {
-                    "description": "The status of the execution.", 
+                    "description": "The status of the execution.\n\nAcceptable values are:  \n- \"duplicate\" \n- \"executed\"", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -7295,7 +6927,7 @@
             "id": "OrdersCancelTestOrderByCustomerRequest", 
             "properties": {
                 "reason": {
-                    "description": "The reason for the cancellation.", 
+                    "description": "The reason for the cancellation.\n\nAcceptable values are:  \n- \"changedMind\" \n- \"orderedWrongItem\" \n- \"other\"", 
                     "type": "string"
                 }
             }, 
@@ -7320,7 +6952,7 @@
                     "type": "string"
                 }, 
                 "templateName": {
-                    "description": "The test order template to use. Specify as an alternative to testOrder as a shortcut for retrieving a template and then creating an order using that template.", 
+                    "description": "The test order template to use. Specify as an alternative to testOrder as a shortcut for retrieving a template and then creating an order using that template.\n\nAcceptable values are:  \n- \"template1\" \n- \"template1a\" \n- \"template1b\" \n- \"template2\" \n- \"template3\"", 
                     "type": "string"
                 }, 
                 "testOrder": {
@@ -7416,7 +7048,7 @@
                     "type": "string"
                 }, 
                 "method": {
-                    "description": "The method to apply.", 
+                    "description": "The method of the batch entry.\n\nAcceptable values are:  \n- \"acknowledge\" \n- \"cancel\" \n- \"cancelLineItem\" \n- \"get\" \n- \"getByMerchantOrderId\" \n- \"inStoreRefundLineItem\" \n- \"refund\" \n- \"rejectReturnLineItem\" \n- \"returnLineItem\" \n- \"returnRefundLineItem\" \n- \"setLineItemMetadata\" \n- \"shipLineItems\" \n- \"updateLineItemShippingDetails\" \n- \"updateMerchantOrderId\" \n- \"updateShipment\"", 
                     "type": "string"
                 }, 
                 "operationId": {
@@ -7466,7 +7098,7 @@
             "id": "OrdersCustomBatchRequestEntryCancel", 
             "properties": {
                 "reason": {
-                    "description": "The reason for the cancellation.", 
+                    "description": "The reason for the cancellation.\n\nAcceptable values are:  \n- \"customerInitiatedCancel\" \n- \"invalidCoupon\" \n- \"malformedShippingAddress\" \n- \"noInventory\" \n- \"other\" \n- \"priceError\" \n- \"shippingPriceError\" \n- \"taxError\" \n- \"undeliverableShippingAddress\" \n- \"unsupportedPoBoxAddress\"", 
                     "type": "string"
                 }, 
                 "reasonText": {
@@ -7505,7 +7137,7 @@
                     "type": "integer"
                 }, 
                 "reason": {
-                    "description": "The reason for the cancellation.", 
+                    "description": "The reason for the cancellation.\n\nAcceptable values are:  \n- \"customerInitiatedCancel\" \n- \"invalidCoupon\" \n- \"malformedShippingAddress\" \n- \"noInventory\" \n- \"other\" \n- \"priceError\" \n- \"shippingPriceError\" \n- \"taxError\" \n- \"undeliverableShippingAddress\" \n- \"unsupportedPoBoxAddress\"", 
                     "type": "string"
                 }, 
                 "reasonText": {
@@ -7555,7 +7187,7 @@
                     "type": "integer"
                 }, 
                 "reason": {
-                    "description": "The reason for the return.", 
+                    "description": "The reason for the return.\n\nAcceptable values are:  \n- \"customerDiscretionaryReturn\" \n- \"customerInitiatedMerchantCancel\" \n- \"deliveredTooLate\" \n- \"expiredItem\" \n- \"invalidCoupon\" \n- \"malformedShippingAddress\" \n- \"other\" \n- \"productArrivedDamaged\" \n- \"productNotAsDescribed\" \n- \"qualityNotAsExpected\" \n- \"undeliverableShippingAddress\" \n- \"unsupportedPoBoxAddress\" \n- \"wrongProductShipped\"", 
                     "type": "string"
                 }, 
                 "reasonText": {
@@ -7581,7 +7213,7 @@
                     "description": "Tax amount that corresponds to refund amount in amountPretax. Optional, but if filled, amountPretax must be set. Calculated automatically if not provided."
                 }, 
                 "reason": {
-                    "description": "The reason for the refund.", 
+                    "description": "The reason for the refund.\n\nAcceptable values are:  \n- \"adjustment\" \n- \"courtesyAdjustment\" \n- \"customerCanceled\" \n- \"customerDiscretionaryReturn\" \n- \"deliveredLateByCarrier\" \n- \"feeAdjustment\" \n- \"lateShipmentCredit\" \n- \"noInventory\" \n- \"other\" \n- \"priceError\" \n- \"productArrivedDamaged\" \n- \"productNotAsDescribed\" \n- \"shippingCostAdjustment\" \n- \"taxAdjustment\" \n- \"undeliverableShippingAddress\" \n- \"wrongProductShipped\"", 
                     "type": "string"
                 }, 
                 "reasonText": {
@@ -7608,7 +7240,7 @@
                     "type": "integer"
                 }, 
                 "reason": {
-                    "description": "The reason for the return.", 
+                    "description": "The reason for the return.\n\nAcceptable values are:  \n- \"damagedOrUsed\" \n- \"missingComponent\" \n- \"notEligible\" \n- \"other\" \n- \"outOfReturnWindow\"", 
                     "type": "string"
                 }, 
                 "reasonText": {
@@ -7635,7 +7267,7 @@
                     "type": "integer"
                 }, 
                 "reason": {
-                    "description": "The reason for the return.", 
+                    "description": "The reason for the return.\n\nAcceptable values are:  \n- \"customerDiscretionaryReturn\" \n- \"customerInitiatedMerchantCancel\" \n- \"deliveredTooLate\" \n- \"expiredItem\" \n- \"invalidCoupon\" \n- \"malformedShippingAddress\" \n- \"other\" \n- \"productArrivedDamaged\" \n- \"productNotAsDescribed\" \n- \"qualityNotAsExpected\" \n- \"undeliverableShippingAddress\" \n- \"unsupportedPoBoxAddress\" \n- \"wrongProductShipped\"", 
                     "type": "string"
                 }, 
                 "reasonText": {
@@ -7670,7 +7302,7 @@
                     "type": "integer"
                 }, 
                 "reason": {
-                    "description": "The reason for the return.", 
+                    "description": "The reason for the return.\n\nAcceptable values are:  \n- \"customerDiscretionaryReturn\" \n- \"customerInitiatedMerchantCancel\" \n- \"deliveredTooLate\" \n- \"expiredItem\" \n- \"invalidCoupon\" \n- \"malformedShippingAddress\" \n- \"other\" \n- \"productArrivedDamaged\" \n- \"productNotAsDescribed\" \n- \"qualityNotAsExpected\" \n- \"undeliverableShippingAddress\" \n- \"unsupportedPoBoxAddress\" \n- \"wrongProductShipped\"", 
                     "type": "string"
                 }, 
                 "reasonText": {
@@ -7749,7 +7381,7 @@
                             "content.orders.shiplineitems"
                         ]
                     }, 
-                    "description": "The ID of the shipment. This is assigned by the merchant and is unique to each shipment.", 
+                    "description": "Required. The ID of the shipment. This is assigned by the merchant and is unique to each shipment.", 
                     "type": "string"
                 }, 
                 "trackingId": {
@@ -7797,7 +7429,7 @@
                     "type": "string"
                 }, 
                 "status": {
-                    "description": "New status for the shipment. Not updated if missing.", 
+                    "description": "New status for the shipment. Not updated if missing.\n\nAcceptable values are:  \n- \"delivered\" \n- \"undeliverable\"", 
                     "type": "string"
                 }, 
                 "trackingId": {
@@ -7838,7 +7470,7 @@
                     "description": "A list of errors defined if and only if the request failed."
                 }, 
                 "executionStatus": {
-                    "description": "The status of the execution. Only defined if  \n- the request was successful; and \n- the method is not get, getByMerchantOrderId, or one of the test methods.", 
+                    "description": "The status of the execution. Only defined if  \n- the request was successful; and \n- the method is not get, getByMerchantOrderId, or one of the test methods.  \n\nAcceptable values are:  \n- \"duplicate\" \n- \"executed\"", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -7912,7 +7544,7 @@
                     "type": "integer"
                 }, 
                 "reason": {
-                    "description": "The reason for the return.", 
+                    "description": "The reason for the return.\n\nAcceptable values are:  \n- \"customerDiscretionaryReturn\" \n- \"customerInitiatedMerchantCancel\" \n- \"deliveredTooLate\" \n- \"expiredItem\" \n- \"invalidCoupon\" \n- \"malformedShippingAddress\" \n- \"other\" \n- \"productArrivedDamaged\" \n- \"productNotAsDescribed\" \n- \"qualityNotAsExpected\" \n- \"undeliverableShippingAddress\" \n- \"unsupportedPoBoxAddress\" \n- \"wrongProductShipped\"", 
                     "type": "string"
                 }, 
                 "reasonText": {
@@ -7926,7 +7558,7 @@
             "id": "OrdersInStoreRefundLineItemResponse", 
             "properties": {
                 "executionStatus": {
-                    "description": "The status of the execution.", 
+                    "description": "The status of the execution.\n\nAcceptable values are:  \n- \"duplicate\" \n- \"executed\"", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -7978,7 +7610,7 @@
                     "type": "string"
                 }, 
                 "reason": {
-                    "description": "The reason for the refund.", 
+                    "description": "The reason for the refund.\n\nAcceptable values are:  \n- \"adjustment\" \n- \"courtesyAdjustment\" \n- \"customerCanceled\" \n- \"customerDiscretionaryReturn\" \n- \"deliveredLateByCarrier\" \n- \"feeAdjustment\" \n- \"lateShipmentCredit\" \n- \"noInventory\" \n- \"other\" \n- \"priceError\" \n- \"productArrivedDamaged\" \n- \"productNotAsDescribed\" \n- \"shippingCostAdjustment\" \n- \"taxAdjustment\" \n- \"undeliverableShippingAddress\" \n- \"wrongProductShipped\"", 
                     "type": "string"
                 }, 
                 "reasonText": {
@@ -7992,7 +7624,7 @@
             "id": "OrdersRefundResponse", 
             "properties": {
                 "executionStatus": {
-                    "description": "The status of the execution.", 
+                    "description": "The status of the execution.\n\nAcceptable values are:  \n- \"duplicate\" \n- \"executed\"", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -8024,7 +7656,7 @@
                     "type": "integer"
                 }, 
                 "reason": {
-                    "description": "The reason for the return.", 
+                    "description": "The reason for the return.\n\nAcceptable values are:  \n- \"damagedOrUsed\" \n- \"missingComponent\" \n- \"notEligible\" \n- \"other\" \n- \"outOfReturnWindow\"", 
                     "type": "string"
                 }, 
                 "reasonText": {
@@ -8038,7 +7670,7 @@
             "id": "OrdersRejectReturnLineItemResponse", 
             "properties": {
                 "executionStatus": {
-                    "description": "The status of the execution.", 
+                    "description": "The status of the execution.\n\nAcceptable values are:  \n- \"duplicate\" \n- \"executed\"", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -8070,7 +7702,7 @@
                     "type": "integer"
                 }, 
                 "reason": {
-                    "description": "The reason for the return.", 
+                    "description": "The reason for the return.\n\nAcceptable values are:  \n- \"customerDiscretionaryReturn\" \n- \"customerInitiatedMerchantCancel\" \n- \"deliveredTooLate\" \n- \"expiredItem\" \n- \"invalidCoupon\" \n- \"malformedShippingAddress\" \n- \"other\" \n- \"productArrivedDamaged\" \n- \"productNotAsDescribed\" \n- \"qualityNotAsExpected\" \n- \"undeliverableShippingAddress\" \n- \"unsupportedPoBoxAddress\" \n- \"wrongProductShipped\"", 
                     "type": "string"
                 }, 
                 "reasonText": {
@@ -8084,7 +7716,7 @@
             "id": "OrdersReturnLineItemResponse", 
             "properties": {
                 "executionStatus": {
-                    "description": "The status of the execution.", 
+                    "description": "The status of the execution.\n\nAcceptable values are:  \n- \"duplicate\" \n- \"executed\"", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -8124,7 +7756,7 @@
                     "type": "integer"
                 }, 
                 "reason": {
-                    "description": "The reason for the return.", 
+                    "description": "The reason for the return.\n\nAcceptable values are:  \n- \"customerDiscretionaryReturn\" \n- \"customerInitiatedMerchantCancel\" \n- \"deliveredTooLate\" \n- \"expiredItem\" \n- \"invalidCoupon\" \n- \"malformedShippingAddress\" \n- \"other\" \n- \"productArrivedDamaged\" \n- \"productNotAsDescribed\" \n- \"qualityNotAsExpected\" \n- \"undeliverableShippingAddress\" \n- \"unsupportedPoBoxAddress\" \n- \"wrongProductShipped\"", 
                     "type": "string"
                 }, 
                 "reasonText": {
@@ -8138,7 +7770,7 @@
             "id": "OrdersReturnRefundLineItemResponse", 
             "properties": {
                 "executionStatus": {
-                    "description": "The status of the execution.", 
+                    "description": "The status of the execution.\n\nAcceptable values are:  \n- \"duplicate\" \n- \"executed\"", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -8177,7 +7809,7 @@
             "id": "OrdersSetLineItemMetadataResponse", 
             "properties": {
                 "executionStatus": {
-                    "description": "The status of the execution.", 
+                    "description": "The status of the execution.\n\nAcceptable values are:  \n- \"duplicate\" \n- \"executed\"", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -8232,7 +7864,7 @@
             "id": "OrdersShipLineItemsResponse", 
             "properties": {
                 "executionStatus": {
-                    "description": "The status of the execution.", 
+                    "description": "The status of the execution.\n\nAcceptable values are:  \n- \"duplicate\" \n- \"executed\"", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -8273,7 +7905,7 @@
             "id": "OrdersUpdateLineItemShippingDetailsResponse", 
             "properties": {
                 "executionStatus": {
-                    "description": "The status of the execution.", 
+                    "description": "The status of the execution.\n\nAcceptable values are:  \n- \"duplicate\" \n- \"executed\"", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -8302,7 +7934,7 @@
             "id": "OrdersUpdateMerchantOrderIdResponse", 
             "properties": {
                 "executionStatus": {
-                    "description": "The status of the execution.", 
+                    "description": "The status of the execution.\n\nAcceptable values are:  \n- \"duplicate\" \n- \"executed\"", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -8333,7 +7965,7 @@
                     "type": "string"
                 }, 
                 "status": {
-                    "description": "New status for the shipment. Not updated if missing.", 
+                    "description": "New status for the shipment. Not updated if missing.\n\nAcceptable values are:  \n- \"delivered\" \n- \"undeliverable\"", 
                     "type": "string"
                 }, 
                 "trackingId": {
@@ -8347,12 +7979,44 @@
             "id": "OrdersUpdateShipmentResponse", 
             "properties": {
                 "executionStatus": {
-                    "description": "The status of the execution.", 
+                    "description": "The status of the execution.\n\nAcceptable values are:  \n- \"duplicate\" \n- \"executed\"", 
                     "type": "string"
                 }, 
                 "kind": {
                     "default": "content#ordersUpdateShipmentResponse", 
                     "description": "Identifies what kind of resource this is. Value: the fixed string \"content#ordersUpdateShipmentResponse\".", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "PickupCarrierService": {
+            "id": "PickupCarrierService", 
+            "properties": {
+                "carrierName": {
+                    "description": "The name of the pickup carrier (e.g., \"UPS\"). Required.", 
+                    "type": "string"
+                }, 
+                "serviceName": {
+                    "description": "The name of the pickup service (e.g., \"Access point\"). Required.", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "PickupServicesPickupService": {
+            "id": "PickupServicesPickupService", 
+            "properties": {
+                "carrierName": {
+                    "description": "The name of the carrier (e.g., \"UPS\"). Always present.", 
+                    "type": "string"
+                }, 
+                "country": {
+                    "description": "The CLDR country code of the carrier (e.g., \"US\"). Always present.", 
+                    "type": "string"
+                }, 
+                "serviceName": {
+                    "description": "The name of the pickup service (e.g., \"Access point\"). Always present.", 
                     "type": "string"
                 }
             }, 
@@ -8389,6 +8053,7 @@
                     "type": "string"
                 }, 
                 "method": {
+                    "description": "The method of the batch entry.\n\nAcceptable values are:  \n- \"delete\" \n- \"get\" \n- \"insert\" \n- \"inventory\" \n- \"sale\"", 
                     "type": "string"
                 }, 
                 "sale": {
@@ -8507,7 +8172,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "The two-letter ISO 639-1 language code for the item.", 
+                    "description": "Required. The two-letter ISO 639-1 language code for the item.", 
                     "type": "string"
                 }, 
                 "gtin": {
@@ -8520,7 +8185,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "A unique identifier for the item.", 
+                    "description": "Required. A unique identifier for the item.", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -8535,7 +8200,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "The current price of the item."
+                    "description": "Required. The current price of the item."
                 }, 
                 "quantity": {
                     "annotations": {
@@ -8543,7 +8208,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "The available quantity of the item.", 
+                    "description": "Required. The available quantity of the item.", 
                     "format": "int64", 
                     "type": "string"
                 }, 
@@ -8553,7 +8218,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.", 
+                    "description": "Required. The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.", 
                     "type": "string"
                 }, 
                 "targetCountry": {
@@ -8562,7 +8227,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "The CLDR territory code for the item.", 
+                    "description": "Required. The CLDR territory code for the item.", 
                     "type": "string"
                 }, 
                 "timestamp": {
@@ -8571,7 +8236,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "The inventory timestamp, in ISO 8601 format.", 
+                    "description": "Required. The inventory timestamp, in ISO 8601 format.", 
                     "type": "string"
                 }
             }, 
@@ -8586,7 +8251,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "The two-letter ISO 639-1 language code for the item.", 
+                    "description": "Required. The two-letter ISO 639-1 language code for the item.", 
                     "type": "string"
                 }, 
                 "gtin": {
@@ -8599,7 +8264,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "A unique identifier for the item.", 
+                    "description": "Required. A unique identifier for the item.", 
                     "type": "string"
                 }, 
                 "price": {
@@ -8609,7 +8274,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "The current price of the item."
+                    "description": "Required. The current price of the item."
                 }, 
                 "quantity": {
                     "annotations": {
@@ -8617,7 +8282,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "The available quantity of the item.", 
+                    "description": "Required. The available quantity of the item.", 
                     "format": "int64", 
                     "type": "string"
                 }, 
@@ -8627,7 +8292,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.", 
+                    "description": "Required. The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.", 
                     "type": "string"
                 }, 
                 "targetCountry": {
@@ -8636,7 +8301,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "The CLDR territory code for the item.", 
+                    "description": "Required. The CLDR territory code for the item.", 
                     "type": "string"
                 }, 
                 "timestamp": {
@@ -8645,7 +8310,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "The inventory timestamp, in ISO 8601 format.", 
+                    "description": "Required. The inventory timestamp, in ISO 8601 format.", 
                     "type": "string"
                 }
             }, 
@@ -8660,7 +8325,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "The two-letter ISO 639-1 language code for the item.", 
+                    "description": "Required. The two-letter ISO 639-1 language code for the item.", 
                     "type": "string"
                 }, 
                 "gtin": {
@@ -8673,7 +8338,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "A unique identifier for the item.", 
+                    "description": "Required. A unique identifier for the item.", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -8688,7 +8353,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "The current price of the item."
+                    "description": "Required. The current price of the item."
                 }, 
                 "quantity": {
                     "annotations": {
@@ -8696,7 +8361,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "The available quantity of the item.", 
+                    "description": "Required. The available quantity of the item.", 
                     "format": "int64", 
                     "type": "string"
                 }, 
@@ -8706,7 +8371,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.", 
+                    "description": "Required. The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.", 
                     "type": "string"
                 }, 
                 "targetCountry": {
@@ -8715,7 +8380,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "The CLDR territory code for the item.", 
+                    "description": "Required. The CLDR territory code for the item.", 
                     "type": "string"
                 }, 
                 "timestamp": {
@@ -8724,7 +8389,7 @@
                             "content.pos.inventory"
                         ]
                     }, 
-                    "description": "The inventory timestamp, in ISO 8601 format.", 
+                    "description": "Required. The inventory timestamp, in ISO 8601 format.", 
                     "type": "string"
                 }
             }, 
@@ -8757,7 +8422,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "The two-letter ISO 639-1 language code for the item.", 
+                    "description": "Required. The two-letter ISO 639-1 language code for the item.", 
                     "type": "string"
                 }, 
                 "gtin": {
@@ -8770,7 +8435,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "A unique identifier for the item.", 
+                    "description": "Required. A unique identifier for the item.", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -8785,7 +8450,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "The price of the item."
+                    "description": "Required. The price of the item."
                 }, 
                 "quantity": {
                     "annotations": {
@@ -8793,7 +8458,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "The relative change of the available quantity. Negative for items returned.", 
+                    "description": "Required. The relative change of the available quantity. Negative for items returned.", 
                     "format": "int64", 
                     "type": "string"
                 }, 
@@ -8807,7 +8472,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.", 
+                    "description": "Required. The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.", 
                     "type": "string"
                 }, 
                 "targetCountry": {
@@ -8816,7 +8481,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "The CLDR territory code for the item.", 
+                    "description": "Required. The CLDR territory code for the item.", 
                     "type": "string"
                 }, 
                 "timestamp": {
@@ -8825,7 +8490,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "The inventory timestamp, in ISO 8601 format.", 
+                    "description": "Required. The inventory timestamp, in ISO 8601 format.", 
                     "type": "string"
                 }
             }, 
@@ -8840,7 +8505,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "The two-letter ISO 639-1 language code for the item.", 
+                    "description": "Required. The two-letter ISO 639-1 language code for the item.", 
                     "type": "string"
                 }, 
                 "gtin": {
@@ -8853,7 +8518,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "A unique identifier for the item.", 
+                    "description": "Required. A unique identifier for the item.", 
                     "type": "string"
                 }, 
                 "price": {
@@ -8863,7 +8528,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "The price of the item."
+                    "description": "Required. The price of the item."
                 }, 
                 "quantity": {
                     "annotations": {
@@ -8871,7 +8536,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "The relative change of the available quantity. Negative for items returned.", 
+                    "description": "Required. The relative change of the available quantity. Negative for items returned.", 
                     "format": "int64", 
                     "type": "string"
                 }, 
@@ -8885,7 +8550,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.", 
+                    "description": "Required. The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.", 
                     "type": "string"
                 }, 
                 "targetCountry": {
@@ -8894,7 +8559,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "The CLDR territory code for the item.", 
+                    "description": "Required. The CLDR territory code for the item.", 
                     "type": "string"
                 }, 
                 "timestamp": {
@@ -8903,7 +8568,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "The inventory timestamp, in ISO 8601 format.", 
+                    "description": "Required. The inventory timestamp, in ISO 8601 format.", 
                     "type": "string"
                 }
             }, 
@@ -8918,7 +8583,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "The two-letter ISO 639-1 language code for the item.", 
+                    "description": "Required. The two-letter ISO 639-1 language code for the item.", 
                     "type": "string"
                 }, 
                 "gtin": {
@@ -8931,7 +8596,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "A unique identifier for the item.", 
+                    "description": "Required. A unique identifier for the item.", 
                     "type": "string"
                 }, 
                 "kind": {
@@ -8946,7 +8611,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "The price of the item."
+                    "description": "Required. The price of the item."
                 }, 
                 "quantity": {
                     "annotations": {
@@ -8954,7 +8619,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "The relative change of the available quantity. Negative for items returned.", 
+                    "description": "Required. The relative change of the available quantity. Negative for items returned.", 
                     "format": "int64", 
                     "type": "string"
                 }, 
@@ -8968,7 +8633,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.", 
+                    "description": "Required. The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.", 
                     "type": "string"
                 }, 
                 "targetCountry": {
@@ -8977,7 +8642,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "The CLDR territory code for the item.", 
+                    "description": "Required. The CLDR territory code for the item.", 
                     "type": "string"
                 }, 
                 "timestamp": {
@@ -8986,7 +8651,7 @@
                             "content.pos.sale"
                         ]
                     }, 
-                    "description": "The inventory timestamp, in ISO 8601 format.", 
+                    "description": "Required. The inventory timestamp, in ISO 8601 format.", 
                     "type": "string"
                 }
             }, 
@@ -9007,7 +8672,7 @@
                             "content.pos.insert"
                         ]
                     }, 
-                    "description": "The street address of the store.", 
+                    "description": "Required. The street address of the store.", 
                     "type": "string"
                 }, 
                 "storeCode": {
@@ -9016,7 +8681,7 @@
                             "content.pos.insert"
                         ]
                     }, 
-                    "description": "A store identifier that is unique for the given merchant.", 
+                    "description": "Required. A store identifier that is unique for the given merchant.", 
                     "type": "string"
                 }
             }, 
@@ -9109,7 +8774,7 @@
                     "type": "string"
                 }, 
                 "ageGroup": {
-                    "description": "Target age group of the item.", 
+                    "description": "Target age group of the item.\n\nAcceptable values are:  \n- \"adult\" \n- \"infant\" \n- \"kids\" \n- \"newborn\" \n- \"toddler\" \n- \"youngAdult\"", 
                     "type": "string"
                 }, 
                 "aspects": {
@@ -9120,7 +8785,7 @@
                     "type": "array"
                 }, 
                 "availability": {
-                    "description": "Availability status of the item.", 
+                    "description": "Availability status of the item.\n\nAcceptable values are:  \n- \"in stock\" \n- \"out of stock\" \n- \"preorder\"", 
                     "type": "string"
                 }, 
                 "availabilityDate": {
@@ -9137,7 +8802,7 @@
                             "content.products.insert"
                         ]
                     }, 
-                    "description": "The item's channel (online or local).", 
+                    "description": "Required. The item's channel (online or local).\n\nAcceptable values are:  \n- \"local\" \n- \"online\"", 
                     "type": "string"
                 }, 
                 "color": {
@@ -9145,7 +8810,7 @@
                     "type": "string"
                 }, 
                 "condition": {
-                    "description": "Condition or state of the item.", 
+                    "description": "Condition or state of the item.\n\nAcceptable values are:  \n- \"local\" \n- \"online\"", 
                     "type": "string"
                 }, 
                 "contentLanguage": {
@@ -9154,7 +8819,7 @@
                             "content.products.insert"
                         ]
                     }, 
-                    "description": "The two-letter ISO 639-1 language code for the item.", 
+                    "description": "Required. The two-letter ISO 639-1 language code for the item.", 
                     "type": "string"
                 }, 
                 "costOfGoodsSold": {
@@ -9162,7 +8827,7 @@
                     "description": "Cost of goods sold. Used for gross profit reporting."
                 }, 
                 "customAttributes": {
-                    "description": "A list of custom (merchant-provided) attributes. It can also be used for submitting any attribute of the feed specification in its generic form (e.g., { \"name\": \"size type\", \"value\": \"regular\" }). This is useful for submitting attributes not explicitly exposed by the API.", 
+                    "description": "A list of custom (merchant-provided) attributes. It can also be used for submitting any attribute of the feed specification in its generic form (e.g., { \"name\": \"size type\", \"value\": \"regular\" }). This is useful for submitting attributes not explicitly exposed by the API, such as additional attributes used for Shopping Actions.", 
                     "items": {
                         "$ref": "CustomAttribute"
                     }, 
@@ -9231,7 +8896,7 @@
                     "type": "number"
                 }, 
                 "energyEfficiencyClass": {
-                    "description": "The energy efficiency class as defined in EU directive 2010/30/EU.", 
+                    "description": "The energy efficiency class as defined in EU directive 2010/30/EU.\n\nAcceptable values are:  \n- \"A\" \n- \"A+\" \n- \"A++\" \n- \"A+++\" \n- \"B\" \n- \"C\" \n- \"D\" \n- \"E\" \n- \"F\" \n- \"G\"", 
                     "type": "string"
                 }, 
                 "expirationDate": {
@@ -9239,7 +8904,7 @@
                     "type": "string"
                 }, 
                 "gender": {
-                    "description": "Target gender of the item.", 
+                    "description": "Target gender of the item.\n\nAcceptable values are:  \n- \"female\" \n- \"male\" \n- \"unisex\"", 
                     "type": "string"
                 }, 
                 "googleProductCategory": {
@@ -9292,7 +8957,7 @@
                     "type": "string"
                 }, 
                 "maxEnergyEfficiencyClass": {
-                    "description": "The energy efficiency class as defined in EU directive 2010/30/EU.", 
+                    "description": "The energy efficiency class as defined in EU directive 2010/30/EU.\n\nAcceptable values are:  \n- \"A\" \n- \"A+\" \n- \"A++\" \n- \"A+++\" \n- \"B\" \n- \"C\" \n- \"D\" \n- \"E\" \n- \"F\" \n- \"G\"", 
                     "type": "string"
                 }, 
                 "maxHandlingTime": {
@@ -9301,7 +8966,7 @@
                     "type": "string"
                 }, 
                 "minEnergyEfficiencyClass": {
-                    "description": "The energy efficiency class as defined in EU directive 2010/30/EU.", 
+                    "description": "The energy efficiency class as defined in EU directive 2010/30/EU.\n\nAcceptable values are:  \n- \"A\" \n- \"A+\" \n- \"A++\" \n- \"A+++\" \n- \"B\" \n- \"C\" \n- \"D\" \n- \"E\" \n- \"F\" \n- \"G\"", 
                     "type": "string"
                 }, 
                 "minHandlingTime": {
@@ -9328,7 +8993,7 @@
                             "content.products.insert"
                         ]
                     }, 
-                    "description": "A unique identifier for the item. Leading and trailing whitespaces are stripped and multiple whitespaces are replaced by a single whitespace upon submission. Only valid unicode characters are accepted. See the products feed specification for details.\nNote: Content API methods that operate on products take the REST ID of the product, not this identifier.", 
+                    "description": "Required. A unique identifier for the item. Leading and trailing whitespaces are stripped and multiple whitespaces are replaced by a single whitespace upon submission. Only valid unicode characters are accepted. See the products feed specification for details.\nNote: Content API methods that operate on products take the REST ID of the product, not this identifier.", 
                     "type": "string"
                 }, 
                 "onlineOnly": {
@@ -9395,22 +9060,22 @@
                     "description": "Width of the item for shipping."
                 }, 
                 "sizeSystem": {
-                    "description": "System in which the size is specified. Recommended for apparel items.", 
+                    "description": "System in which the size is specified. Recommended for apparel items.\n\nAcceptable values are:  \n- \"AU\" \n- \"BR\" \n- \"CN\" \n- \"DE\" \n- \"EU\" \n- \"FR\" \n- \"IT\" \n- \"JP\" \n- \"MEX\" \n- \"UK\" \n- \"US\"", 
                     "type": "string"
                 }, 
                 "sizeType": {
-                    "description": "The cut of the item. Recommended for apparel items.", 
+                    "description": "The cut of the item. Recommended for apparel items.\n\nAcceptable values are:  \n- \"big and tall\" \n- \"maternity\" \n- \"oversize\" \n- \"petite\" \n- \"plus\" \n- \"regular\"", 
                     "type": "string"
                 }, 
                 "sizes": {
-                    "description": "Size of the item.", 
+                    "description": "Size of the item. Only one value is allowed. For variants with different sizes, insert a separate product for each size with the same itemGroupId value (see size definition).", 
                     "items": {
                         "type": "string"
                     }, 
                     "type": "array"
                 }, 
                 "source": {
-                    "description": "The source of the offer, i.e., how the offer was created.", 
+                    "description": "The source of the offer, i.e., how the offer was created.\n\nAcceptable values are:  \n- \"api\" \n- \"crawl\" \n- \"feed\"", 
                     "type": "string"
                 }, 
                 "targetCountry": {
@@ -9419,7 +9084,7 @@
                             "content.products.insert"
                         ]
                     }, 
-                    "description": "The CLDR territory code for the item.", 
+                    "description": "Required. The CLDR territory code for the item.", 
                     "type": "string"
                 }, 
                 "taxes": {
@@ -9502,7 +9167,7 @@
                     "type": "string"
                 }, 
                 "intention": {
-                    "description": "Whether the destination is required, excluded or should be validated.", 
+                    "description": "Whether the destination is required, excluded or should be validated.\n\nAcceptable values are:  \n- \"default\" \n- \"excluded\" \n- \"optional\" \n- \"required\"", 
                     "type": "string"
                 }
             }, 
@@ -9675,7 +9340,7 @@
                     "type": "boolean"
                 }, 
                 "approvalStatus": {
-                    "description": "The destination's approval status.", 
+                    "description": "The destination's approval status.\n\nAcceptable values are:  \n- \"approved\" \n- \"disapproved\"", 
                     "type": "string"
                 }, 
                 "destination": {
@@ -9683,7 +9348,7 @@
                     "type": "string"
                 }, 
                 "intention": {
-                    "description": "Provided for backward compatibility only. Always set to \"required\".", 
+                    "description": "Provided for backward compatibility only. Always set to \"required\".\n\nAcceptable values are:  \n- \"default\" \n- \"excluded\" \n- \"optional\" \n- \"required\"", 
                     "type": "string"
                 }
             }, 
@@ -9811,17 +9476,13 @@
                     "format": "uint32", 
                     "type": "integer"
                 }, 
-                "feedId": {
-                    "description": "The ContentAPI feed id.", 
-                    "format": "uint64", 
-                    "type": "string"
-                }, 
                 "merchantId": {
                     "description": "The ID of the managing account.", 
                     "format": "uint64", 
                     "type": "string"
                 }, 
                 "method": {
+                    "description": "The method of the batch entry.\n\nAcceptable values are:  \n- \"delete\" \n- \"get\" \n- \"insert\"", 
                     "type": "string"
                 }, 
                 "product": {
@@ -9937,6 +9598,7 @@
                     "type": "string"
                 }, 
                 "method": {
+                    "description": "The method of the batch entry.\n\nAcceptable values are:  \n- \"get\"", 
                     "type": "string"
                 }, 
                 "productId": {
@@ -10067,9 +9729,11 @@
             "id": "RefundReason", 
             "properties": {
                 "description": {
+                    "description": "Description of the reason.", 
                     "type": "string"
                 }, 
                 "reasonCode": {
+                    "description": "Code of the refund reason.\n\nAcceptable values are:  \n- \"adjustment\" \n- \"autoPostInternal\" \n- \"autoPostInvalidBillingAddress\" \n- \"autoPostNoInventory\" \n- \"autoPostPriceError\" \n- \"autoPostUndeliverableShippingAddress\" \n- \"couponAbuse\" \n- \"courtesyAdjustment\" \n- \"customerCanceled\" \n- \"customerDiscretionaryReturn\" \n- \"customerInitiatedMerchantCancel\" \n- \"customerSupportRequested\" \n- \"deliveredLateByCarrier\" \n- \"deliveredTooLate\" \n- \"expiredItem\" \n- \"failToPushOrderGoogleError\" \n- \"failToPushOrderMerchantError\" \n- \"failToPushOrderMerchantFulfillmentError\" \n- \"failToPushOrderToMerchant\" \n- \"failToPushOrderToMerchantOutOfStock\" \n- \"feeAdjustment\" \n- \"invalidCoupon\" \n- \"lateShipmentCredit\" \n- \"malformedShippingAddress\" \n- \"merchantDidNotShipOnTime\" \n- \"noInventory\" \n- \"orderTimeout\" \n- \"other\" \n- \"paymentAbuse\" \n- \"paymentDeclined\" \n- \"priceAdjustment\" \n- \"priceError\" \n- \"productArrivedDamaged\" \n- \"productNotAsDescribed\" \n- \"promoReallocation\" \n- \"qualityNotAsExpected\" \n- \"returnRefundAbuse\" \n- \"shippingCostAdjustment\" \n- \"shippingPriceError\" \n- \"taxAdjustment\" \n- \"taxError\" \n- \"undeliverableShippingAddress\" \n- \"unsupportedPoBoxAddress\" \n- \"wrongProductShipped\"", 
                     "type": "string"
                 }
             }, 
@@ -10079,27 +9743,34 @@
             "id": "ReturnShipment", 
             "properties": {
                 "creationDate": {
+                    "description": "The date of creation of the shipment, in ISO 8601 format.", 
                     "type": "string"
                 }, 
                 "deliveryDate": {
+                    "description": "The date of delivery of the shipment, in ISO 8601 format.", 
                     "type": "string"
                 }, 
                 "returnMethodType": {
+                    "description": "Type of the return method.\n\nAcceptable values are:  \n- \"byMail\" \n- \"contactCustomerSupport\" \n- \"returnless\"", 
                     "type": "string"
                 }, 
                 "shipmentId": {
+                    "description": "Shipment ID generated by Google.", 
                     "type": "string"
                 }, 
                 "shipmentTrackingInfos": {
+                    "description": "Tracking information of the shipment. One return shipment might be handled by several shipping carriers sequentially.", 
                     "items": {
                         "$ref": "ShipmentTrackingInfo"
                     }, 
                     "type": "array"
                 }, 
                 "shippingDate": {
+                    "description": "The date of shipping of the shipment, in ISO 8601 format.", 
                     "type": "string"
                 }, 
                 "state": {
+                    "description": "State of the shipment.\n\nAcceptable values are:  \n- \"completed\" \n- \"new\" \n- \"shipped\" \n- \"undeliverable\"", 
                     "type": "string"
                 }
             }, 
@@ -10138,7 +9809,7 @@
                     "description": "Time spent in various aspects from order to the delivery of the product. Required."
                 }, 
                 "eligibility": {
-                    "description": "Eligibility for this service.", 
+                    "description": "Eligibility for this service.\n\nAcceptable values are:  \n- \"All scenarios\" \n- \"All scenarios except Shopping Actions\" \n- \"Shopping Actions\"", 
                     "type": "string"
                 }, 
                 "minimumOrderValue": {
@@ -10149,12 +9820,20 @@
                     "description": "Free-form name of the service. Must be unique within target account. Required.", 
                     "type": "string"
                 }, 
+                "pickupService": {
+                    "$ref": "PickupCarrierService", 
+                    "description": "The carrier-service pair delivering items to collection points. The list of supported pickup services can be retrieved via the getSupportedPickupServices method. Required if and only if the service delivery type is pickup."
+                }, 
                 "rateGroups": {
                     "description": "Shipping rate group definitions. Only the last one is allowed to have an empty applicableShippingLabels, which means \"everything else\". The other applicableShippingLabels must not overlap.", 
                     "items": {
                         "$ref": "RateGroup"
                     }, 
                     "type": "array"
+                }, 
+                "shipmentType": {
+                    "description": "Type of locations this service ships orders to.\n\nAcceptable values are:  \n- \"delivery\" \n- \"pickup\"", 
+                    "type": "string"
                 }
             }, 
             "type": "object"
@@ -10209,9 +9888,11 @@
             "id": "ShipmentTrackingInfo", 
             "properties": {
                 "carrier": {
+                    "description": "The shipping carrier that handles the package.\n\nAcceptable values are:  \n- \"boxtal\" \n- \"bpost\" \n- \"chronopost\" \n- \"colisPrive\" \n- \"colissimo\" \n- \"cxt\" \n- \"deliv\" \n- \"dhl\" \n- \"dpd\" \n- \"dynamex\" \n- \"eCourier\" \n- \"easypost\" \n- \"efw\" \n- \"fedex\" \n- \"fedexSmartpost\" \n- \"geodis\" \n- \"gls\" \n- \"googleCourier\" \n- \"gsx\" \n- \"jdLogistics\" \n- \"laPoste\" \n- \"lasership\" \n- \"manual\" \n- \"mpx\" \n- \"onTrac\" \n- \"other\" \n- \"tnt\" \n- \"uds\" \n- \"ups\" \n- \"usps\"", 
                     "type": "string"
                 }, 
                 "trackingNumber": {
+                    "description": "The tracking number for the package.", 
                     "type": "string"
                 }
             }, 
@@ -10276,6 +9957,7 @@
                     "type": "string"
                 }, 
                 "method": {
+                    "description": "The method of the batch entry.\n\nAcceptable values are:  \n- \"get\" \n- \"update\"", 
                     "type": "string"
                 }, 
                 "shippingSettings": {
@@ -10364,6 +10046,24 @@
             }, 
             "type": "object"
         }, 
+        "ShippingsettingsGetSupportedPickupServicesResponse": {
+            "id": "ShippingsettingsGetSupportedPickupServicesResponse", 
+            "properties": {
+                "kind": {
+                    "default": "content#shippingsettingsGetSupportedPickupServicesResponse", 
+                    "description": "Identifies what kind of resource this is. Value: the fixed string \"content#shippingsettingsGetSupportedPickupServicesResponse\".", 
+                    "type": "string"
+                }, 
+                "pickupServices": {
+                    "description": "A list of supported pickup services. May be empty.", 
+                    "items": {
+                        "$ref": "PickupServicesPickupService"
+                    }, 
+                    "type": "array"
+                }
+            }, 
+            "type": "object"
+        }, 
         "ShippingsettingsListResponse": {
             "id": "ShippingsettingsListResponse", 
             "properties": {
@@ -10420,7 +10120,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "The details of the customer who placed the order."
+                    "description": "Required. The details of the customer who placed the order."
                 }, 
                 "enableOrderinvoices": {
                     "description": "Whether the orderinvoices service should support this order.", 
@@ -10437,14 +10137,14 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "Line items that are ordered. At least one line item must be provided.", 
+                    "description": "Required. Line items that are ordered. At least one line item must be provided.", 
                     "items": {
                         "$ref": "TestOrderLineItem"
                     }, 
                     "type": "array"
                 }, 
                 "notificationMode": {
-                    "description": "Determines if test order must be pulled by merchant or pushed to merchant via push integration.", 
+                    "description": "Determines if test order must be pulled by merchant or pushed to merchant via push integration.\n\nAcceptable values are:  \n- \"checkoutIntegration\" \n- \"merchantPull\"", 
                     "type": "string"
                 }, 
                 "paymentMethod": {
@@ -10457,7 +10157,11 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "Identifier of one of the predefined delivery addresses for the delivery.", 
+                    "description": "Required. Identifier of one of the predefined delivery addresses for the delivery.\n\nAcceptable values are:  \n- \"dwight\" \n- \"jim\" \n- \"pam\"", 
+                    "type": "string"
+                }, 
+                "predefinedPickupDetails": {
+                    "description": "Identifier of one of the predefined pickup details. Required for orders containing line items with shipping type pickup.\n\nAcceptable values are:  \n- \"dwight\" \n- \"jim\" \n- \"pam\"", 
                     "type": "string"
                 }, 
                 "promotions": {
@@ -10474,7 +10178,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "The price of shipping for all items. Shipping tax is automatically calculated for MFL orders. For non-MFL orders, tax settings from Merchant Center are applied. Note that shipping is not taxed in certain states."
+                    "description": "Required. The price of shipping for all items. Shipping tax is automatically calculated for orders where marketplace facilitator tax laws are applicable. Otherwise, tax settings from Merchant Center are applied. Note that shipping is not taxed in certain states."
                 }, 
                 "shippingCostTax": {
                     "$ref": "Price", 
@@ -10486,7 +10190,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "The requested shipping option.", 
+                    "description": "Required. The requested shipping option.\n\nAcceptable values are:  \n- \"economy\" \n- \"expedited\" \n- \"oneDay\" \n- \"sameDay\" \n- \"standard\" \n- \"twoDay\"", 
                     "type": "string"
                 }
             }, 
@@ -10501,7 +10205,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "Email address of the customer.", 
+                    "description": "Required. Email address of the customer.\n\nAcceptable values are:  \n- \"pog.dwight.schrute@gmail.com\" \n- \"pog.jim.halpert@gmail.com\" \n- \"penpog.pam.beesly@gmail.comding\"", 
                     "type": "string"
                 }, 
                 "explicitMarketingPreference": {
@@ -10523,7 +10227,7 @@
             "id": "TestOrderCustomerMarketingRightsInfo", 
             "properties": {
                 "explicitMarketingPreference": {
-                    "description": "Last know user use selection regards marketing preferences. In certain cases selection might not be known, so this field would be empty.", 
+                    "description": "Last know user use selection regards marketing preferences. In certain cases selection might not be known, so this field would be empty.\n\nAcceptable values are:  \n- \"denied\" \n- \"granted\"", 
                     "type": "string"
                 }, 
                 "lastUpdatedTimestamp": {
@@ -10538,7 +10242,7 @@
             "properties": {
                 "product": {
                     "$ref": "TestOrderLineItemProduct", 
-                    "description": "Product data from the time of the order placement."
+                    "description": "Required. Product data from the time of the order placement."
                 }, 
                 "quantityOrdered": {
                     "annotations": {
@@ -10546,7 +10250,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "Number of items ordered.", 
+                    "description": "Required. Number of items ordered.", 
                     "format": "uint32", 
                     "type": "integer"
                 }, 
@@ -10557,7 +10261,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "Details of the return policy for the line item."
+                    "description": "Required. Details of the return policy for the line item."
                 }, 
                 "shippingDetails": {
                     "$ref": "OrderLineItemShippingDetails", 
@@ -10566,7 +10270,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "Details of the requested shipping for the line item."
+                    "description": "Required. Details of the requested shipping for the line item."
                 }, 
                 "unitTax": {
                     "$ref": "Price", 
@@ -10584,11 +10288,11 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "Brand of the item.", 
+                    "description": "Required. Brand of the item.", 
                     "type": "string"
                 }, 
                 "channel": {
-                    "description": "Deprecated.", 
+                    "description": "Deprecated.\n\nAcceptable values are:  \n- \"online\"", 
                     "type": "string"
                 }, 
                 "condition": {
@@ -10597,7 +10301,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "Condition or state of the item.", 
+                    "description": "Required. Condition or state of the item.\n\nAcceptable values are:  \n- \"new\"", 
                     "type": "string"
                 }, 
                 "contentLanguage": {
@@ -10606,7 +10310,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "The two-letter ISO 639-1 language code for the item.", 
+                    "description": "Required. The two-letter ISO 639-1 language code for the item.\n\nAcceptable values are:  \n- \"en\" \n- \"fr\"", 
                     "type": "string"
                 }, 
                 "fees": {
@@ -10626,7 +10330,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "URL of an image of the item.", 
+                    "description": "Required. URL of an image of the item.", 
                     "type": "string"
                 }, 
                 "itemGroupId": {
@@ -10643,7 +10347,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "An identifier of the item.", 
+                    "description": "Required. An identifier of the item.", 
                     "type": "string"
                 }, 
                 "price": {
@@ -10653,7 +10357,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "The price for the product. Tax is automatically calculated for MFL orders. For non-MFL orders, tax settings from Merchant Center are applied."
+                    "description": "Required. The price for the product. Tax is automatically calculated for orders where marketplace facilitator tax laws are applicable. Otherwise, tax settings from Merchant Center are applied."
                 }, 
                 "targetCountry": {
                     "annotations": {
@@ -10661,7 +10365,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "The CLDR territory code of the target country of the product.", 
+                    "description": "Required. The CLDR territory code of the target country of the product.", 
                     "type": "string"
                 }, 
                 "title": {
@@ -10670,7 +10374,7 @@
                             "content.orders.createtestorder"
                         ]
                     }, 
-                    "description": "The title of the product.", 
+                    "description": "Required. The title of the product.", 
                     "type": "string"
                 }, 
                 "variantAttributes": {
@@ -10701,11 +10405,11 @@
                     "type": "string"
                 }, 
                 "predefinedBillingAddress": {
-                    "description": "The billing address.", 
+                    "description": "The billing address.\n\nAcceptable values are:  \n- \"dwight\" \n- \"jim\" \n- \"pam\"", 
                     "type": "string"
                 }, 
                 "type": {
-                    "description": "The type of instrument. Note that real orders might have different values than the four values accepted by createTestOrder.", 
+                    "description": "The type of instrument. Note that real orders might have different values than the four values accepted by createTestOrder.\n\nAcceptable values are:  \n- \"AMEX\" \n- \"DISCOVER\" \n- \"MASTERCARD\" \n- \"VISA\"", 
                     "type": "string"
                 }
             }, 
@@ -10811,7 +10515,7 @@
                     "type": "array"
                 }, 
                 "type": {
-                    "description": "[required] Type of the additional charge.", 
+                    "description": "[required] Type of the additional charge.\n\nAcceptable values are:  \n- \"shipping\"", 
                     "type": "string"
                 }
             }, 
@@ -10829,7 +10533,7 @@
                     "type": "string"
                 }, 
                 "taxType": {
-                    "description": "[required] Type of the tax.", 
+                    "description": "[required] Type of the tax.\n\nAcceptable values are:  \n- \"otherFee\" \n- \"otherFeeTax\" \n- \"sales\"", 
                     "type": "string"
                 }
             }, 
@@ -10866,11 +10570,11 @@
             "id": "Weight", 
             "properties": {
                 "unit": {
-                    "description": "The weight unit.", 
+                    "description": "Required. The weight unit.\n\nAcceptable values are:  \n- \"kg\" \n- \"lb\"", 
                     "type": "string"
                 }, 
                 "value": {
-                    "description": "The weight represented as a number.", 
+                    "description": "Required. The weight represented as a number.", 
                     "type": "string"
                 }
             }, 

@@ -6,12 +6,14 @@
     "description": "Provides tools for running validation tests against single URLs", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/webmaster-tools/search-console-api/", 
+    "fullyEncodeReservedExpansion": true, 
     "icons": {
         "x16": "http://www.google.com/images/icons/product/search-16.gif", 
         "x32": "http://www.google.com/images/icons/product/search-32.gif"
     }, 
     "id": "searchconsole:v1", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://searchconsole.mtls.googleapis.com/", 
     "name": "searchconsole", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -118,7 +120,7 @@
             }
         }
     }, 
-    "revision": "20190629", 
+    "revision": "20200409", 
     "rootUrl": "https://searchconsole.googleapis.com/", 
     "schemas": {
         "BlockedResource": {

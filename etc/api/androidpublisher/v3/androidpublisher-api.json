@@ -15,7 +15,7 @@
     "description": "Accesses Android application developers' Google Play accounts.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/android-publisher", 
-    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/tLEn1KkE5NEmlpywSz1Qx5p8WMk\"", 
+    "etag": "\"u9GIe6H63LSGq-9_t39K2Zx_EAc/4LB2xyDuShFcAwfdsvXJqDirMa4\"", 
     "icons": {
         "x16": "https://www.google.com/images/icons/product/android-16.png", 
         "x32": "https://www.google.com/images/icons/product/android-32.png"
@@ -851,6 +851,8 @@
                                 }, 
                                 "imageType": {
                                     "enum": [
+                                        "automotiveScreenshots", 
+                                        "daydreamStereoImage", 
                                         "featureGraphic", 
                                         "icon", 
                                         "phoneScreenshots", 
@@ -862,6 +864,8 @@
                                         "wearScreenshots"
                                     ], 
                                     "enumDescriptions": [
+                                        "", 
+                                        "", 
                                         "", 
                                         "", 
                                         "", 
@@ -913,6 +917,8 @@
                                 }, 
                                 "imageType": {
                                     "enum": [
+                                        "automotiveScreenshots", 
+                                        "daydreamStereoImage", 
                                         "featureGraphic", 
                                         "icon", 
                                         "phoneScreenshots", 
@@ -924,6 +930,8 @@
                                         "wearScreenshots"
                                     ], 
                                     "enumDescriptions": [
+                                        "", 
+                                        "", 
                                         "", 
                                         "", 
                                         "", 
@@ -978,6 +986,8 @@
                                 }, 
                                 "imageType": {
                                     "enum": [
+                                        "automotiveScreenshots", 
+                                        "daydreamStereoImage", 
                                         "featureGraphic", 
                                         "icon", 
                                         "phoneScreenshots", 
@@ -989,6 +999,8 @@
                                         "wearScreenshots"
                                     ], 
                                     "enumDescriptions": [
+                                        "", 
+                                        "", 
                                         "", 
                                         "", 
                                         "", 
@@ -1059,6 +1071,8 @@
                                 }, 
                                 "imageType": {
                                     "enum": [
+                                        "automotiveScreenshots", 
+                                        "daydreamStereoImage", 
                                         "featureGraphic", 
                                         "icon", 
                                         "phoneScreenshots", 
@@ -1070,6 +1084,8 @@
                                         "wearScreenshots"
                                     ], 
                                     "enumDescriptions": [
+                                        "", 
+                                        "", 
                                         "", 
                                         "", 
                                         "", 
@@ -2227,7 +2243,7 @@
                             ], 
                             "parameters": {
                                 "endTime": {
-                                    "description": "The time, in milliseconds since the Epoch, of the newest voided in-app product purchase that you want to see in the response. The value of this parameter cannot be greater than the current time and is ignored if a pagination token is set. Default value is current time. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.", 
+                                    "description": "The time, in milliseconds since the Epoch, of the newest voided purchase that you want to see in the response. The value of this parameter cannot be greater than the current time and is ignored if a pagination token is set. Default value is current time. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.", 
                                     "format": "int64", 
                                     "location": "query", 
                                     "type": "string"
@@ -2249,7 +2265,7 @@
                                     "type": "integer"
                                 }, 
                                 "startTime": {
-                                    "description": "The time, in milliseconds since the Epoch, of the oldest voided in-app product purchase that you want to see in the response. The value of this parameter cannot be older than 30 days and is ignored if a pagination token is set. Default value is current time minus 30 days. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.", 
+                                    "description": "The time, in milliseconds since the Epoch, of the oldest voided purchase that you want to see in the response. The value of this parameter cannot be older than 30 days and is ignored if a pagination token is set. Default value is current time minus 30 days. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.", 
                                     "format": "int64", 
                                     "location": "query", 
                                     "type": "string"
@@ -2257,6 +2273,12 @@
                                 "token": {
                                     "location": "query", 
                                     "type": "string"
+                                }, 
+                                "type": {
+                                    "description": "The type of voided purchases that you want to see in the response. Possible values are:  \n- 0: Only voided in-app product purchases will be returned in the response. This is the default value.\n- 1: Both voided in-app purchases and voided subscription purchases will be returned in the response.  Note: Before requesting to receive voided subscription purchases, you must switch to use orderId in the response which uniquely identifies one-time purchases and subscriptions. Otherwise, you will receive multiple subscription orders with the same PurchaseToken, because subscription renewal orders share the same PurchaseToken.", 
+                                    "format": "int32", 
+                                    "location": "query", 
+                                    "type": "integer"
                                 }
                             }, 
                             "path": "{packageName}/purchases/voidedpurchases", 
@@ -2380,9 +2402,158 @@
                     ]
                 }
             }
+        }, 
+        "systemapks": {
+            "resources": {
+                "variants": {
+                    "methods": {
+                        "create": {
+                            "description": "Creates a new variant of APK which is suitable for inclusion in a system image.", 
+                            "httpMethod": "POST", 
+                            "id": "androidpublisher.systemapks.variants.create", 
+                            "parameterOrder": [
+                                "packageName", 
+                                "versionCode"
+                            ], 
+                            "parameters": {
+                                "packageName": {
+                                    "description": "Unique identifier for the Android app; for example, \"com.spiffygame\".", 
+                                    "location": "path", 
+                                    "required": true, 
+                                    "type": "string"
+                                }, 
+                                "versionCode": {
+                                    "description": "The version code of the App Bundle.", 
+                                    "format": "int64", 
+                                    "location": "path", 
+                                    "required": true, 
+                                    "type": "string"
+                                }
+                            }, 
+                            "path": "{packageName}/systemApks/{versionCode}/variants", 
+                            "request": {
+                                "$ref": "SystemApkVariantsCreateRequest"
+                            }, 
+                            "response": {
+                                "$ref": "Variant"
+                            }, 
+                            "scopes": [
+                                "https://www.googleapis.com/auth/androidpublisher"
+                            ]
+                        }, 
+                        "download": {
+                            "description": "Download a previously created APK which is suitable for inclusion in a system image.", 
+                            "httpMethod": "GET", 
+                            "id": "androidpublisher.systemapks.variants.download", 
+                            "parameterOrder": [
+                                "packageName", 
+                                "versionCode", 
+                                "variantId"
+                            ], 
+                            "parameters": {
+                                "packageName": {
+                                    "description": "Unique identifier for the Android app; for example, \"com.spiffygame\".", 
+                                    "location": "path", 
+                                    "required": true, 
+                                    "type": "string"
+                                }, 
+                                "variantId": {
+                                    "format": "uint32", 
+                                    "location": "path", 
+                                    "required": true, 
+                                    "type": "integer"
+                                }, 
+                                "versionCode": {
+                                    "description": "The version code of the App Bundle.", 
+                                    "format": "int64", 
+                                    "location": "path", 
+                                    "required": true, 
+                                    "type": "string"
+                                }
+                            }, 
+                            "path": "{packageName}/systemApks/{versionCode}/variants/{variantId}:download", 
+                            "scopes": [
+                                "https://www.googleapis.com/auth/androidpublisher"
+                            ], 
+                            "supportsMediaDownload": true, 
+                            "useMediaDownloadService": true
+                        }, 
+                        "get": {
+                            "description": "Returns a previously created system APK variant.", 
+                            "httpMethod": "GET", 
+                            "id": "androidpublisher.systemapks.variants.get", 
+                            "parameterOrder": [
+                                "packageName", 
+                                "versionCode", 
+                                "variantId"
+                            ], 
+                            "parameters": {
+                                "packageName": {
+                                    "description": "Unique identifier for the Android app; for example, \"com.spiffygame\".", 
+                                    "location": "path", 
+                                    "required": true, 
+                                    "type": "string"
+                                }, 
+                                "variantId": {
+                                    "description": "Unique identifier for this variant.", 
+                                    "format": "uint32", 
+                                    "location": "path", 
+                                    "required": true, 
+                                    "type": "integer"
+                                }, 
+                                "versionCode": {
+                                    "description": "The version code of the App Bundle.", 
+                                    "format": "int64", 
+                                    "location": "path", 
+                                    "required": true, 
+                                    "type": "string"
+                                }
+                            }, 
+                            "path": "{packageName}/systemApks/{versionCode}/variants/{variantId}", 
+                            "response": {
+                                "$ref": "Variant"
+                            }, 
+                            "scopes": [
+                                "https://www.googleapis.com/auth/androidpublisher"
+                            ]
+                        }, 
+                        "list": {
+                            "description": "Returns the list of previously created system APK variants.", 
+                            "httpMethod": "GET", 
+                            "id": "androidpublisher.systemapks.variants.list", 
+                            "parameterOrder": [
+                                "packageName", 
+                                "versionCode"
+                            ], 
+                            "parameters": {
+                                "packageName": {
+                                    "description": "Unique identifier for the Android app; for example, \"com.spiffygame\".", 
+                                    "location": "path", 
+                                    "required": true, 
+                                    "type": "string"
+                                }, 
+                                "versionCode": {
+                                    "description": "The version code of the App Bundle.", 
+                                    "format": "int64", 
+                                    "location": "path", 
+                                    "required": true, 
+                                    "type": "string"
+                                }
+                            }, 
+                            "path": "{packageName}/systemApks/{versionCode}/variants", 
+                            "response": {
+                                "$ref": "SystemApkVariantsListResponse"
+                            }, 
+                            "scopes": [
+                                "https://www.googleapis.com/auth/androidpublisher"
+                            ]
+                        }
+                    }
+                }
+            }
         }
     }, 
-    "revision": "20190702", 
+    "revision": "20200331", 
     "rootUrl": "https://www.googleapis.com/", 
     "schemas": {
         "Apk": {
@@ -2391,6 +2562,9 @@
                 "binary": {
                     "$ref": "ApkBinary", 
                     "description": "Information about the binary payload of this APK."
+                }, 
+                "testBinary": {
+                    "$ref": "ApkBinary"
                 }, 
                 "versionCode": {
                     "description": "The version code of the APK, as specified in the APK's manifest file.", 
@@ -2539,6 +2713,31 @@
             }, 
             "type": "object"
         }, 
+        "Control": {
+            "id": "Control", 
+            "properties": {
+                "modRanges": {
+                    "items": {
+                        "$ref": "ModRange"
+                    }, 
+                    "type": "array"
+                }, 
+                "stratifiedSamplings": {
+                    "items": {
+                        "$ref": "StratifiedSampling"
+                    }, 
+                    "type": "array"
+                }, 
+                "versionCodes": {
+                    "items": {
+                        "format": "int64", 
+                        "type": "string"
+                    }, 
+                    "type": "array"
+                }
+            }, 
+            "type": "object"
+        }, 
         "CountryTargeting": {
             "id": "CountryTargeting", 
             "properties": {
@@ -2639,6 +2838,28 @@
                     "description": "Screen width in pixels", 
                     "format": "int32", 
                     "type": "integer"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "DeviceSpec": {
+            "id": "DeviceSpec", 
+            "properties": {
+                "screenDensity": {
+                    "format": "uint32", 
+                    "type": "integer"
+                }, 
+                "supportedAbis": {
+                    "items": {
+                        "type": "string"
+                    }, 
+                    "type": "array"
+                }, 
+                "supportedLocales": {
+                    "items": {
+                        "type": "string"
+                    }, 
+                    "type": "array"
                 }
             }, 
             "type": "object"
@@ -2778,6 +2999,10 @@
                     "description": "A sha1 hash of the image that was uploaded.", 
                     "type": "string"
                 }, 
+                "sha256": {
+                    "description": "A sha256 hash of the image that was uploaded.", 
+                    "type": "string"
+                }, 
                 "url": {
                     "description": "A URL that will serve a preview of the image.", 
                     "type": "string"
@@ -2830,7 +3055,7 @@
                     "description": "Default price cannot be zero. In-app products can never be free. Default price is always in the developer's Checkout merchant currency."
                 }, 
                 "gracePeriod": {
-                    "description": "Grace period of the subscription, specified in ISO 8601 format. It will allow developers to give their subscribers a grace period when the payment for the new recurrence period is declined. Acceptable values = \"P3D\" (three days) and \"P7D\" (seven days)", 
+                    "description": "Grace period of the subscription, specified in ISO 8601 format. It will allow developers to give their subscribers a grace period when the payment for the new recurrence period is declined. Acceptable values = \"P3D\" (three days), \"P7D\" (seven days), \"P14D\" (fourteen days), and \"P30D\" (thirty days)", 
                     "type": "string"
                 }, 
                 "listings": {
@@ -2856,10 +3081,6 @@
                 "purchaseType": {
                     "description": "Purchase type enum value. Unmodifiable after creation.", 
                     "type": "string"
-                }, 
-                "season": {
-                    "$ref": "Season", 
-                    "description": "Definition of a season for a seasonal subscription. Can be defined only for yearly subscriptions."
                 }, 
                 "sku": {
                     "description": "The stock-keeping-unit (SKU) of the product, unique within an app.", 
@@ -3015,18 +3236,16 @@
             }, 
             "type": "object"
         }, 
-        "MonthDay": {
-            "id": "MonthDay", 
+        "ModRange": {
+            "id": "ModRange", 
             "properties": {
-                "day": {
-                    "description": "Day of a month, value in [1, 31] range. Valid range depends on the specified month.", 
-                    "format": "uint32", 
-                    "type": "integer"
+                "end": {
+                    "format": "int64", 
+                    "type": "string"
                 }, 
-                "month": {
-                    "description": "Month of a year. e.g. 1 = JAN, 2 = FEB etc.", 
-                    "format": "uint32", 
-                    "type": "integer"
+                "start": {
+                    "format": "int64", 
+                    "type": "string"
                 }
             }, 
             "type": "object"
@@ -3090,6 +3309,10 @@
                     "description": "The order id associated with the purchase of the inapp product.", 
                     "type": "string"
                 }, 
+                "productId": {
+                    "description": "The inapp product SKU.", 
+                    "type": "string"
+                }, 
                 "purchaseState": {
                     "description": "The purchase state of the order. Possible values are:  \n- Purchased \n- Canceled \n- Pending", 
                     "format": "int32", 
@@ -3100,8 +3323,17 @@
                     "format": "int64", 
                     "type": "string"
                 }, 
+                "purchaseToken": {
+                    "description": "The purchase token generated to identify this purchase.", 
+                    "type": "string"
+                }, 
                 "purchaseType": {
                     "description": "The type of purchase of the inapp product. This field is only set if this purchase was not made using the standard in-app billing flow. Possible values are:  \n- Test (i.e. purchased from a license testing account) \n- Promo (i.e. purchased using a promo code) \n- Rewarded (i.e. from watching a video ad instead of paying)", 
+                    "format": "int32", 
+                    "type": "integer"
+                }, 
+                "quantity": {
+                    "description": "The quantity associated with the purchase of the inapp product.", 
                     "format": "int32", 
                     "type": "integer"
                 }
@@ -3114,20 +3346,6 @@
                 "developerPayload": {
                     "description": "Payload to attach to the purchase.", 
                     "type": "string"
-                }
-            }, 
-            "type": "object"
-        }, 
-        "Prorate": {
-            "id": "Prorate", 
-            "properties": {
-                "defaultPrice": {
-                    "$ref": "Price", 
-                    "description": "Default price cannot be zero and must be less than the full subscription price. Default price is always in the developer's Checkout merchant currency. Targeted countries have their prices set automatically based on the default_price."
-                }, 
-                "start": {
-                    "$ref": "MonthDay", 
-                    "description": "Defines the first day on which the price takes effect."
                 }
             }, 
             "type": "object"
@@ -3204,23 +3422,55 @@
             }, 
             "type": "object"
         }, 
-        "Season": {
-            "id": "Season", 
+        "Sampling": {
+            "id": "Sampling", 
             "properties": {
-                "end": {
-                    "$ref": "MonthDay", 
-                    "description": "Inclusive end date of the recurrence period."
-                }, 
-                "prorations": {
-                    "description": "Optionally present list of prorations for the season. Each proration is a one-off discounted entry into a subscription. Each proration contains the first date on which the discount is available and the new pricing information.", 
+                "modRanges": {
                     "items": {
-                        "$ref": "Prorate"
+                        "$ref": "ModRange"
                     }, 
                     "type": "array"
                 }, 
-                "start": {
-                    "$ref": "MonthDay", 
-                    "description": "Inclusive start date of the recurrence period."
+                "modulus": {
+                    "format": "int64", 
+                    "type": "string"
+                }, 
+                "salt": {
+                    "format": "int32", 
+                    "type": "integer"
+                }, 
+                "stratifiedSamplings": {
+                    "items": {
+                        "$ref": "StratifiedSampling"
+                    }, 
+                    "type": "array"
+                }, 
+                "useAndroidId": {
+                    "type": "boolean"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "StratifiedSampling": {
+            "id": "StratifiedSampling", 
+            "properties": {
+                "modRanges": {
+                    "items": {
+                        "$ref": "ModRange"
+                    }, 
+                    "type": "array"
+                }, 
+                "stratum": {
+                    "$ref": "Stratum"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "Stratum": {
+            "id": "Stratum", 
+            "properties": {
+                "brand": {
+                    "type": "string"
                 }
             }, 
             "type": "object"
@@ -3318,6 +3568,10 @@
                     "format": "int64", 
                     "type": "string"
                 }, 
+                "externalAccountId": {
+                    "description": "User account identifier in the third-party service. Only present if account linking happened as part of the subscription purchase flow.", 
+                    "type": "string"
+                }, 
                 "familyName": {
                     "description": "The family name of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.", 
                     "type": "string"
@@ -3369,8 +3623,17 @@
                     "description": "The profile name of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.", 
                     "type": "string"
                 }, 
+                "promotionCode": {
+                    "description": "The promotion code applied on this purchase. This field is only set if a vanity code promotion is applied when the subscription was purchased.", 
+                    "type": "string"
+                }, 
+                "promotionType": {
+                    "description": "The type of promotion applied on this purchase. This field is only set if a promotion is applied when the subscription was purchased. Possible values are:  \n- One time code \n- Vanity code", 
+                    "format": "int32", 
+                    "type": "integer"
+                }, 
                 "purchaseType": {
-                    "description": "The type of purchase of the subscription. This field is only set if this purchase was not made using the standard in-app billing flow. Possible values are:  \n- Test (i.e. purchased from a license testing account)", 
+                    "description": "The type of purchase of the subscription. This field is only set if this purchase was not made using the standard in-app billing flow. Possible values are:  \n- Test (i.e. purchased from a license testing account) \n- Promo (i.e. purchased using a promo code)", 
                     "format": "int32", 
                     "type": "integer"
                 }, 
@@ -3418,18 +3681,50 @@
             }, 
             "type": "object"
         }, 
+        "SystemApkVariantsCreateRequest": {
+            "id": "SystemApkVariantsCreateRequest", 
+            "properties": {
+                "deviceSpec": {
+                    "$ref": "DeviceSpec"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "SystemApkVariantsListResponse": {
+            "id": "SystemApkVariantsListResponse", 
+            "properties": {
+                "variants": {
+                    "items": {
+                        "$ref": "Variant"
+                    }, 
+                    "type": "array"
+                }
+            }, 
+            "type": "object"
+        }, 
         "Testers": {
             "id": "Testers", 
             "properties": {
-                "googleGroups": {
-                    "description": "A list of all Google Groups, as email addresses, that define testers for this track.", 
+                "autoEnrolledAndroidGroups": {
                     "items": {
                         "type": "string"
                     }, 
                     "type": "array"
                 }, 
-                "googlePlusCommunities": {
-                    "description": "A list of all Google+ Communities, as URLs, that define testers for this track.", 
+                "autoEnrolledGoogleGroups": {
+                    "items": {
+                        "type": "string"
+                    }, 
+                    "type": "array"
+                }, 
+                "excludedGoogleGroups": {
+                    "items": {
+                        "type": "string"
+                    }, 
+                    "type": "array"
+                }, 
+                "googleGroups": {
+                    "description": "A list of all Google Groups, as email addresses, that define testers for this track.", 
                     "items": {
                         "type": "string"
                     }, 
@@ -3484,12 +3779,29 @@
         "TrackRelease": {
             "id": "TrackRelease", 
             "properties": {
+                "controls": {
+                    "items": {
+                        "$ref": "Control"
+                    }, 
+                    "type": "array"
+                }, 
                 "countryTargeting": {
                     "$ref": "CountryTargeting"
+                }, 
+                "inAppUpdatePriority": {
+                    "description": "In-app update priority of the release. All newly added APKs in the release will be considered at this priority. in_app_update_priority can take values between [0, 5]. 5 is the highest priority. Default priority is 0. See https://developer.android.com/guide/playcore/in-app-updates.", 
+                    "format": "int32", 
+                    "type": "integer"
                 }, 
                 "name": {
                     "description": "The release name, used to identify this release in the Play Console UI. Not required to be unique. This is optional, if not set it will be generated from the version_name in the APKs.", 
                     "type": "string"
+                }, 
+                "pinnedVersions": {
+                    "items": {
+                        "$ref": "TrackReleasePin"
+                    }, 
+                    "type": "array"
                 }, 
                 "releaseNotes": {
                     "description": "The description of what is new in the app in this release.", 
@@ -3497,6 +3809,12 @@
                         "$ref": "LocalizedText"
                     }, 
                     "type": "array"
+                }, 
+                "rollbackEnabled": {
+                    "type": "boolean"
+                }, 
+                "sampling": {
+                    "$ref": "Sampling"
                 }, 
                 "status": {
                     "description": "The desired status of this release.", 
@@ -3514,6 +3832,72 @@
                         "type": "string"
                     }, 
                     "type": "array"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "TrackReleasePin": {
+            "id": "TrackReleasePin", 
+            "properties": {
+                "targetings": {
+                    "items": {
+                        "$ref": "TrackReleasePinPinTargeting"
+                    }, 
+                    "type": "array"
+                }, 
+                "versionCodes": {
+                    "items": {
+                        "format": "int64", 
+                        "type": "string"
+                    }, 
+                    "type": "array"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "TrackReleasePinPinTargeting": {
+            "id": "TrackReleasePinPinTargeting", 
+            "properties": {
+                "countryCodes": {
+                    "items": {
+                        "type": "string"
+                    }, 
+                    "type": "array"
+                }, 
+                "devices": {
+                    "items": {
+                        "$ref": "TrackReleasePinPinTargetingDevicePin"
+                    }, 
+                    "type": "array"
+                }, 
+                "phoneskyVersions": {
+                    "items": {
+                        "format": "int64", 
+                        "type": "string"
+                    }, 
+                    "type": "array"
+                }, 
+                "sdkVersions": {
+                    "items": {
+                        "format": "int32", 
+                        "type": "integer"
+                    }, 
+                    "type": "array"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "TrackReleasePinPinTargetingDevicePin": {
+            "id": "TrackReleasePinPinTargetingDevicePin", 
+            "properties": {
+                "brand": {
+                    "type": "string"
+                }, 
+                "device": {
+                    "type": "string"
+                }, 
+                "product": {
+                    "type": "string"
                 }
             }, 
             "type": "object"
@@ -3594,6 +3978,20 @@
             }, 
             "type": "object"
         }, 
+        "Variant": {
+            "description": "Represents the variant of a generated system APK from an uploaded App Bundle.", 
+            "id": "Variant", 
+            "properties": {
+                "deviceSpec": {
+                    "$ref": "DeviceSpec"
+                }, 
+                "variantId": {
+                    "format": "uint32", 
+                    "type": "integer"
+                }
+            }, 
+            "type": "object"
+        }, 
         "VoidedPurchase": {
             "description": "A VoidedPurchase resource indicates a purchase that was either canceled/refunded/charged-back.", 
             "id": "VoidedPurchase", 
@@ -3603,14 +4001,28 @@
                     "description": "This kind represents a voided purchase object in the androidpublisher service.", 
                     "type": "string"
                 }, 
+                "orderId": {
+                    "description": "The order id which uniquely identifies a one-time purchase, subscription purchase, or subscription renewal.", 
+                    "type": "string"
+                }, 
                 "purchaseTimeMillis": {
                     "description": "The time at which the purchase was made, in milliseconds since the epoch (Jan 1, 1970).", 
                     "format": "int64", 
                     "type": "string"
                 }, 
                 "purchaseToken": {
-                    "description": "The token that was generated when a purchase was made. This uniquely identifies a purchase.", 
+                    "description": "The token which uniquely identifies a one-time purchase or subscription. To uniquely identify subscription renewals use order_id (available starting from version 3 of the API).", 
                     "type": "string"
+                }, 
+                "voidedReason": {
+                    "description": "The reason why the purchase was voided, possible values are:  \n- Other \n- Remorse \n- Not_received \n- Defective \n- Accidental_purchase \n- Fraud \n- Friendly_fraud \n- Chargeback", 
+                    "format": "int32", 
+                    "type": "integer"
+                }, 
+                "voidedSource": {
+                    "description": "The initiator of voided purchase, possible values are:  \n- User \n- Developer \n- Google", 
+                    "format": "int32", 
+                    "type": "integer"
                 }, 
                 "voidedTimeMillis": {
                     "description": "The time at which the purchase was canceled/refunded/charged-back, in milliseconds since the epoch (Jan 1, 1970).", 

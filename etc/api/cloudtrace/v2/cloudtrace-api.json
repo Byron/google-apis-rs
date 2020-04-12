@@ -15,7 +15,7 @@
     "baseUrl": "https://cloudtrace.googleapis.com/", 
     "batchPath": "batch", 
     "canonicalName": "Cloud Trace", 
-    "description": "Sends application trace data to Stackdriver Trace for viewing. Trace data is collected for all App Engine applications by default. Trace data from other applications can be provided using this API. This library is used to interact with the Trace API directly. If you are looking to instrument your application for Stackdriver Trace, we recommend using OpenCensus.\n", 
+    "description": "Sends application trace data to Cloud Trace for viewing. Trace data is collected for all App Engine applications by default. Trace data from other applications can be provided using this API. This library is used to interact with the Cloud Trace API directly. If you are looking to instrument your application for Cloud Trace, we recommend using OpenCensus.\n", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://cloud.google.com/trace", 
     "fullyEncodeReservedExpansion": true, 
@@ -25,6 +25,7 @@
     }, 
     "id": "cloudtrace:v2", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://cloudtrace.mtls.googleapis.com/", 
     "name": "cloudtrace", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -112,7 +113,7 @@
                 "traces": {
                     "methods": {
                         "batchWrite": {
-                            "description": "Sends new spans to new or existing traces. You cannot update\nexisting spans.", 
+                            "description": "Sends new spans to new or existing traces. You cannot update\nexisting spans.\nIn this case, writing traces is not considered an active developer\nmethod since traces are machine generated.", 
                             "flatPath": "v2/projects/{projectsId}/traces:batchWrite", 
                             "httpMethod": "POST", 
                             "id": "cloudtrace.projects.traces.batchWrite", 
@@ -145,7 +146,7 @@
                         "spans": {
                             "methods": {
                                 "createSpan": {
-                                    "description": "Creates a new span.", 
+                                    "description": "Creates a new span.\nIn this case, writing traces is not considered an active developer\nmethod since traces are machine generated.", 
                                     "flatPath": "v2/projects/{projectsId}/traces/{tracesId}/spans/{spansId}", 
                                     "httpMethod": "POST", 
                                     "id": "cloudtrace.projects.traces.spans.createSpan", 
@@ -180,7 +181,7 @@
             }
         }
     }, 
-    "revision": "20190622", 
+    "revision": "20200330", 
     "rootUrl": "https://cloudtrace.googleapis.com/", 
     "schemas": {
         "Annotation": {
@@ -242,7 +243,7 @@
             "id": "BatchWriteSpansRequest", 
             "properties": {
                 "spans": {
-                    "description": "A list of new spans. The span names must not match existing\nspans, or the results are undefined.", 
+                    "description": "Required. A list of new spans. The span names must not match existing\nspans, or the results are undefined.", 
                     "items": {
                         "$ref": "Span"
                     }, 
@@ -369,16 +370,16 @@
                     "description": "A set of attributes on the span. You can have up to 32 attributes per\nspan."
                 }, 
                 "childSpanCount": {
-                    "description": "An optional number of child spans that were generated while this span\nwas active. If set, allows implementation to detect missing child spans.", 
+                    "description": "Optional. The number of child spans that were generated while this span\nwas active. If set, allows implementation to detect missing child spans.", 
                     "format": "int32", 
                     "type": "integer"
                 }, 
                 "displayName": {
                     "$ref": "TruncatableString", 
-                    "description": "A description of the span's operation (up to 128 bytes).\nStackdriver Trace displays the description in the\nGoogle Cloud Platform Console.\nFor example, the display name can be a qualified method name or a file name\nand a line number where the operation is called. A best practice is to use\nthe same display name within an application and at the same call point.\nThis makes it easier to correlate spans in different traces."
+                    "description": "Required. A description of the span's operation (up to 128 bytes).\nStackdriver Trace displays the description in the\nGoogle Cloud Platform Console.\nFor example, the display name can be a qualified method name or a file name\nand a line number where the operation is called. A best practice is to use\nthe same display name within an application and at the same call point.\nThis makes it easier to correlate spans in different traces."
                 }, 
                 "endTime": {
-                    "description": "The end time of the span. On the client side, this is the time kept by\nthe local machine where the span execution ends. On the server side, this\nis the time when the server application handler stops running.", 
+                    "description": "Required. The end time of the span. On the client side, this is the time kept by\nthe local machine where the span execution ends. On the server side, this\nis the time when the server application handler stops running.", 
                     "format": "google-datetime", 
                     "type": "string"
                 }, 
@@ -395,11 +396,31 @@
                     "type": "string"
                 }, 
                 "sameProcessAsParentSpan": {
-                    "description": "(Optional) Set this parameter to indicate whether this span is in\nthe same process as its parent. If you do not set this parameter,\nStackdriver Trace is unable to take advantage of this helpful\ninformation.", 
+                    "description": "Optional. Set this parameter to indicate whether this span is in\nthe same process as its parent. If you do not set this parameter,\nStackdriver Trace is unable to take advantage of this helpful\ninformation.", 
                     "type": "boolean"
                 }, 
                 "spanId": {
-                    "description": "The [SPAN_ID] portion of the span's resource name.", 
+                    "description": "Required. The [SPAN_ID] portion of the span's resource name.", 
+                    "type": "string"
+                }, 
+                "spanKind": {
+                    "description": "Distinguishes between spans generated in a particular context. For example,\ntwo spans with the same name may be distinguished using `CLIENT` (caller)\nand `SERVER` (callee) to identify an RPC call.", 
+                    "enum": [
+                        "SPAN_KIND_UNSPECIFIED", 
+                        "INTERNAL", 
+                        "SERVER", 
+                        "CLIENT", 
+                        "PRODUCER", 
+                        "CONSUMER"
+                    ], 
+                    "enumDescriptions": [
+                        "Unspecified. Do NOT use as default.\nImplementations MAY assume SpanKind.INTERNAL to be default.", 
+                        "Indicates that the span is used internally. Default value.", 
+                        "Indicates that the span covers server-side handling of an RPC or other\nremote network request.", 
+                        "Indicates that the span covers the client-side wrapper around an RPC or\nother remote request.", 
+                        "Indicates that the span describes producer sending a message to a broker.\nUnlike client and  server, there is no direct critical path latency\nrelationship between producer and consumer spans (e.g. publishing a\nmessage to a pubsub service).", 
+                        "Indicates that the span describes consumer recieving a message from a\nbroker. Unlike client and  server, there is no direct critical path\nlatency relationship between producer and consumer spans (e.g. receiving\na message from a pubsub service subscription)."
+                    ], 
                     "type": "string"
                 }, 
                 "stackTrace": {
@@ -407,13 +428,13 @@
                     "description": "Stack trace captured at the start of the span."
                 }, 
                 "startTime": {
-                    "description": "The start time of the span. On the client side, this is the time kept by\nthe local machine where the span execution starts. On the server side, this\nis the time when the server's application handler starts running.", 
+                    "description": "Required. The start time of the span. On the client side, this is the time kept by\nthe local machine where the span execution starts. On the server side, this\nis the time when the server's application handler starts running.", 
                     "format": "google-datetime", 
                     "type": "string"
                 }, 
                 "status": {
                     "$ref": "Status", 
-                    "description": "An optional final status for this span."
+                    "description": "Optional. The final status for this span."
                 }, 
                 "timeEvents": {
                     "$ref": "TimeEvents", 
@@ -583,7 +604,7 @@
         }
     }, 
     "servicePath": "", 
-    "title": "Stackdriver Trace API", 
+    "title": "Cloud Trace API", 
     "version": "v2", 
     "version_module": true
 }

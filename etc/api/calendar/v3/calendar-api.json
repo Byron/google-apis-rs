@@ -26,7 +26,7 @@
     "description": "Manipulates events and other calendar data.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/google-apps/calendar/firstapp", 
-    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/Uw1wZjyl7UpAF8rQe1IdxXCUbFE\"", 
+    "etag": "\"u9GIe6H63LSGq-9_t39K2Zx_EAc/7Yu8Dg6pIx8hQ9JbwRYcDNjZYUM\"", 
     "icons": {
         "x16": "http://www.google.com/images/icons/product/calendar-16.png", 
         "x32": "http://www.google.com/images/icons/product/calendar-32.png"
@@ -837,7 +837,7 @@
                     ], 
                     "parameters": {
                         "alwaysIncludeEmail": {
-                            "description": "Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.", 
+                            "description": "Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).", 
                             "location": "query", 
                             "type": "boolean"
                         }, 
@@ -994,7 +994,7 @@
                     ], 
                     "parameters": {
                         "alwaysIncludeEmail": {
-                            "description": "Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.", 
+                            "description": "Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).", 
                             "location": "query", 
                             "type": "boolean"
                         }, 
@@ -1078,7 +1078,7 @@
                     ], 
                     "parameters": {
                         "alwaysIncludeEmail": {
-                            "description": "Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.", 
+                            "description": "Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).", 
                             "location": "query", 
                             "type": "boolean"
                         }, 
@@ -1267,7 +1267,7 @@
                     ], 
                     "parameters": {
                         "alwaysIncludeEmail": {
-                            "description": "Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.", 
+                            "description": "Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).", 
                             "location": "query", 
                             "type": "boolean"
                         }, 
@@ -1397,7 +1397,7 @@
                     ], 
                     "parameters": {
                         "alwaysIncludeEmail": {
-                            "description": "Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.", 
+                            "description": "Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).", 
                             "location": "query", 
                             "type": "boolean"
                         }, 
@@ -1475,7 +1475,7 @@
                     ], 
                     "parameters": {
                         "alwaysIncludeEmail": {
-                            "description": "Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.", 
+                            "description": "Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).", 
                             "location": "query", 
                             "type": "boolean"
                         }, 
@@ -1724,7 +1724,7 @@
             }
         }
     }, 
-    "revision": "20190702", 
+    "revision": "20200405", 
     "rootUrl": "https://www.googleapis.com/", 
     "schemas": {
         "Acl": {
@@ -1785,7 +1785,8 @@
                 "scope": {
                     "annotations": {
                         "required": [
-                            "calendar.acl.insert"
+                            "calendar.acl.insert", 
+                            "calendar.acl.update"
                         ]
                     }, 
                     "description": "The scope of the rule.", 
@@ -1793,7 +1794,8 @@
                         "type": {
                             "annotations": {
                                 "required": [
-                                    "calendar.acl.insert"
+                                    "calendar.acl.insert", 
+                                    "calendar.acl.update"
                                 ]
                             }, 
                             "description": "The type of the scope. Possible values are:  \n- \"default\" - The public scope. This is the default value. \n- \"user\" - Limits the scope to a single user. \n- \"group\" - Limits the scope to a group. \n- \"domain\" - Limits the scope to a domain.  Note: The permissions granted to the \"default\", or public, scope apply to any user, authenticated or not.", 
@@ -1991,7 +1993,7 @@
             "id": "CalendarNotification", 
             "properties": {
                 "method": {
-                    "description": "The method used to deliver the notification. Possible values are:  \n- \"email\" - Notifications are sent via email. \n- \"sms\" - Deprecated. Once this feature is shutdown, the API will no longer return notifications using this method. Any newly added SMS notifications will be ignored. See  Google Calendar SMS notifications to be removed for more information.\nNotifications are sent via SMS. This value is read-only and is ignored on inserts and updates. SMS notifications are only available for G Suite customers.  \nRequired when adding a notification.", 
+                    "description": "The method used to deliver the notification. The possible value is:  \n- \"email\" - Notifications are sent via email.  \nRequired when adding a notification.", 
                     "type": "string"
                 }, 
                 "type": {
@@ -2103,7 +2105,7 @@
             "id": "ConferenceData", 
             "properties": {
                 "conferenceId": {
-                    "description": "The ID of the conference.\nCan be used by developers to keep track of conferences, should not be displayed to users.\nValues for solution types:  \n- \"eventHangout\": unset.\n- \"eventNamedHangout\": the name of the Hangout.\n- \"hangoutsMeet\": the 10-letter meeting code, for example \"aaa-bbbb-ccc\".  Optional.", 
+                    "description": "The ID of the conference.\nCan be used by developers to keep track of conferences, should not be displayed to users.\nValues for solution types:  \n- \"eventHangout\": unset.\n- \"eventNamedHangout\": the name of the Hangout.\n- \"hangoutsMeet\": the 10-letter meeting code, for example \"aaa-bbbb-ccc\".\n- \"addOn\": defined by 3P conference provider.  Optional.", 
                     "type": "string"
                 }, 
                 "conferenceSolution": {
@@ -2203,7 +2205,7 @@
             "id": "ConferenceSolutionKey", 
             "properties": {
                 "type": {
-                    "description": "The conference solution type.\nIf a client encounters an unfamiliar or empty type, it should still be able to display the entry points. However, it should disallow modifications.\nThe possible values are:  \n- \"eventHangout\" for Hangouts for consumers (http://hangouts.google.com)\n- \"eventNamedHangout\" for classic Hangouts for G Suite users (http://hangouts.google.com)\n- \"hangoutsMeet\" for Hangouts Meet (http://meet.google.com)", 
+                    "description": "The conference solution type.\nIf a client encounters an unfamiliar or empty type, it should still be able to display the entry points. However, it should disallow modifications.\nThe possible values are:  \n- \"eventHangout\" for Hangouts for consumers (http://hangouts.google.com)\n- \"eventNamedHangout\" for classic Hangouts for G Suite users (http://hangouts.google.com)\n- \"hangoutsMeet\" for Hangouts Meet (http://meet.google.com)\n- \"addOn\" for 3P conference providers", 
                     "type": "string"
                 }
             }, 
@@ -2354,7 +2356,7 @@
                     "type": "object"
                 }, 
                 "description": {
-                    "description": "Description of the event. Optional.", 
+                    "description": "Description of the event. Can contain HTML. Optional.", 
                     "type": "string"
                 }, 
                 "end": {
@@ -2522,7 +2524,7 @@
                 }, 
                 "privateCopy": {
                     "default": "false", 
-                    "description": "Whether this is a private event copy where changes are not shared with other copies on other calendars. Optional. Immutable. The default is False.", 
+                    "description": "If set to True, Event propagation is disabled. Note that it is not the same thing as Private event properties. Optional. Immutable. The default is False.", 
                     "type": "boolean"
                 }, 
                 "recurrence": {
@@ -2710,7 +2712,7 @@
             "id": "EventReminder", 
             "properties": {
                 "method": {
-                    "description": "The method used by this reminder. Possible values are:  \n- \"email\" - Reminders are sent via email. \n- \"sms\" - Deprecated. Once this feature is shutdown, the API will no longer return reminders using this method. Any newly added SMS reminders will be ignored. See  Google Calendar SMS notifications to be removed for more information.\nReminders are sent via SMS. These are only available for G Suite customers. Requests to set SMS reminders for other account types are ignored. \n- \"popup\" - Reminders are sent via a UI popup.  \nRequired when adding a reminder.", 
+                    "description": "The method used by this reminder. Possible values are:  \n- \"email\" - Reminders are sent via email. \n- \"popup\" - Reminders are sent via a UI popup.  \nRequired when adding a reminder.", 
                     "type": "string"
                 }, 
                 "minutes": {

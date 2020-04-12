@@ -22,6 +22,7 @@
     }, 
     "id": "serviceconsumermanagement:v1", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://serviceconsumermanagement.mtls.googleapis.com/", 
     "name": "serviceconsumermanagement", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -118,7 +119,7 @@
                         "name": {
                             "description": "The name of the operation resource to be cancelled.", 
                             "location": "path", 
-                            "pattern": "^operations/.+$", 
+                            "pattern": "^operations/.*$", 
                             "required": true, 
                             "type": "string"
                         }
@@ -146,7 +147,7 @@
                         "name": {
                             "description": "The name of the operation resource to be deleted.", 
                             "location": "path", 
-                            "pattern": "^operations/.+$", 
+                            "pattern": "^operations/.*$", 
                             "required": true, 
                             "type": "string"
                         }
@@ -359,7 +360,7 @@
                             ]
                         }, 
                         "create": {
-                            "description": "Creates a tenancy unit with no tenant resources.", 
+                            "description": "Creates a tenancy unit with no tenant resources.\nIf tenancy unit already exists, it will be returned,\nhowever, in this case, returned TenancyUnit does not have tenant_resources\nfield set and ListTenancyUnit has to be used to get a complete\nTenancyUnit with all fields populated.", 
                             "flatPath": "v1/services/{servicesId}/{servicesId1}/{servicesId2}/tenancyUnits", 
                             "httpMethod": "POST", 
                             "id": "serviceconsumermanagement.services.tenancyUnits.create", 
@@ -541,7 +542,7 @@
             }
         }
     }, 
-    "revision": "20190625", 
+    "revision": "20200408", 
     "rootUrl": "https://serviceconsumermanagement.googleapis.com/", 
     "schemas": {
         "AddTenantProjectRequest": {
@@ -650,7 +651,7 @@
             "id": "AuthProvider", 
             "properties": {
                 "audiences": {
-                    "description": "The list of JWT\n[audiences](https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-32#section-4.1.3).\nthat are allowed to access. A JWT containing any of these audiences will\nbe accepted. When this setting is absent, only JWTs with audience\n\"https://Service_name/API_name\"\nwill be accepted. For example, if no audiences are in the setting,\nLibraryService API will only accept JWTs with the following audience\n\"https://library-example.googleapis.com/google.example.library.v1.LibraryService\".\n\nExample:\n\n    audiences: bookstore_android.apps.googleusercontent.com,\n               bookstore_web.apps.googleusercontent.com", 
+                    "description": "The list of JWT\n[audiences](https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-32#section-4.1.3).\nthat are allowed to access. A JWT containing any of these audiences will\nbe accepted. When this setting is absent, JWTs with audiences:\n  - \"https://[service.name]/[google.protobuf.Api.name]\"\n  - \"https://[service.name]/\"\nwill be accepted.\nFor example, if no audiences are in the setting, LibraryService API will\naccept JWTs with the following audiences:\n  -\n  https://library-example.googleapis.com/google.example.library.v1.LibraryService\n  - https://library-example.googleapis.com/\n\nExample:\n\n    audiences: bookstore_android.apps.googleusercontent.com,\n               bookstore_web.apps.googleusercontent.com", 
                     "type": "string"
                 }, 
                 "authorizationUrl": {
@@ -668,6 +669,13 @@
                 "jwksUri": {
                     "description": "URL of the provider's public key set to validate signature of the JWT. See\n[OpenID\nDiscovery](https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata).\nOptional if the key set document:\n - can be retrieved from\n   [OpenID\n   Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html of\n   the issuer.\n - can be inferred from the email domain of the issuer (e.g. a Google\n service account).\n\nExample: https://www.googleapis.com/oauth2/v1/certs", 
                     "type": "string"
+                }, 
+                "jwtLocations": {
+                    "description": "Defines the locations to extract the JWT.\n\nJWT locations can be either from HTTP headers or URL query parameters.\nThe rule is that the first match wins. The checking order is: checking\nall headers first, then URL query parameters.\n\nIf not specified,  default to use following 3 locations:\n   1) Authorization: Bearer\n   2) x-goog-iap-jwt-assertion\n   3) access_token query parameter\n\nDefault locations can be specified as followings:\n   jwt_locations:\n   - header: Authorization\n     value_prefix: \"Bearer \"\n   - header: x-goog-iap-jwt-assertion\n   - query: access_token", 
+                    "items": {
+                        "$ref": "JwtLocation"
+                    }, 
+                    "type": "array"
                 }
             }, 
             "type": "object"
@@ -753,16 +761,20 @@
             "id": "BackendRule", 
             "properties": {
                 "address": {
-                    "description": "The address of the API backend.", 
+                    "description": "The address of the API backend.\n\nThe scheme is used to determine the backend protocol and security.\nThe following schemes are accepted:\n\n   SCHEME        PROTOCOL    SECURITY\n   http://       HTTP        None\n   https://      HTTP        TLS\n   grpc://       gRPC        None\n   grpcs://      gRPC        TLS\n\nIt is recommended to explicitly include a scheme. Leaving out the scheme\nmay cause constrasting behaviors across platforms.\n\nIf the port is unspecified, the default is:\n- 80 for schemes without TLS\n- 443 for schemes with TLS\n\nFor HTTP backends, use protocol\nto specify the protocol version.", 
                     "type": "string"
                 }, 
                 "deadline": {
-                    "description": "The number of seconds to wait for a response from a request.  The default\ndeadline for gRPC is infinite (no deadline) and HTTP requests is 5 seconds.", 
+                    "description": "The number of seconds to wait for a response from a request. The default\nvaries based on the request protocol and deployment environment.", 
                     "format": "double", 
                     "type": "number"
                 }, 
+                "disableAuth": {
+                    "description": "When disable_auth is true, a JWT ID token won't be generated and the\noriginal \"Authorization\" HTTP header will be preserved. If the header is\nused to carry the original token and is expected by the backend, this\nfield must be set to true to preserve the header.", 
+                    "type": "boolean"
+                }, 
                 "jwtAudience": {
-                    "description": "The JWT audience is used when generating a JWT id token for the backend.", 
+                    "description": "The JWT audience is used when generating a JWT ID token for the backend.\nThis ID token will be added in the HTTP \"authorization\" header, and sent\nto the backend.", 
                     "type": "string"
                 }, 
                 "minDeadline": {
@@ -786,6 +798,14 @@
                         "Use the backend address as-is, with no modification to the path. If the\nURL pattern contains variables, the variable names and values will be\nappended to the query string. If a query string parameter and a URL\npattern variable have the same name, this may result in duplicate keys in\nthe query string.\n\n# Examples\n\nGiven the following operation config:\n\n    Method path:        /api/company/{cid}/user/{uid}\n    Backend address:    https://example.cloudfunctions.net/getUser\n\nRequests to the following request paths will call the backend at the\ntranslated path:\n\n    Request path: /api/company/widgetworks/user/johndoe\n    Translated:\n    https://example.cloudfunctions.net/getUser?cid=widgetworks&uid=johndoe\n\n    Request path: /api/company/widgetworks/user/johndoe?timezone=EST\n    Translated:\n    https://example.cloudfunctions.net/getUser?timezone=EST&cid=widgetworks&uid=johndoe", 
                         "The request path will be appended to the backend address.\n\n# Examples\n\nGiven the following operation config:\n\n    Method path:        /api/company/{cid}/user/{uid}\n    Backend address:    https://example.appspot.com\n\nRequests to the following request paths will call the backend at the\ntranslated path:\n\n    Request path: /api/company/widgetworks/user/johndoe\n    Translated:\n    https://example.appspot.com/api/company/widgetworks/user/johndoe\n\n    Request path: /api/company/widgetworks/user/johndoe?timezone=EST\n    Translated:\n    https://example.appspot.com/api/company/widgetworks/user/johndoe?timezone=EST"
                     ], 
+                    "type": "string"
+                }, 
+                "protocol": {
+                    "description": "The protocol used for sending a request to the backend.\nThe supported values are \"http/1.1\" and \"h2\".\n\nThe default value is inferred from the scheme in the\naddress field:\n\n   SCHEME        PROTOCOL\n   http://       http/1.1\n   https://      http/1.1\n   grpc://       h2\n   grpcs://      h2\n\nFor secure HTTP backends (https://) that support HTTP/2, set this field\nto \"h2\" for improved performance.\n\nConfiguring this field to non-default values is only supported for secure\nHTTP backends. This field will be ignored for all other backends.\n\nSee\nhttps://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids\nfor more details on the supported values.", 
+                    "type": "string"
+                }, 
+                "renameTo": {
+                    "description": "Unimplemented. Do not use.\n\nThe new name the selected proto elements should be renamed to.\n\nThe package, the service and the method can all be renamed.\nThe backend server should implement the renamed proto. However, clients\nshould call the original method, and ESF routes the traffic to the renamed\nmethod.\n\nHTTP clients should call the URL mapped to the original method.\ngRPC and Stubby clients should call the original method with package name.\n\nFor legacy reasons, ESF allows Stubby clients to call with the\nshort name (without the package name). However, for API Versioning(or\nmultiple methods mapped to the same short name), all Stubby clients must\ncall the method's full name with the package name, otherwise the first one\n(selector) wins.\n\nIf this `rename_to` is specified with a trailing `*`, the `selector` must\nbe specified with a trailing `*` as well. The all element short names\nmatched by the `*` in the selector will be kept in the `rename_to`.\n\nFor example,\n    rename_rules:\n    - selector: |-\n        google.example.library.v1.*\n      rename_to: google.example.library.*\n\nThe selector matches `google.example.library.v1.Library.CreateShelf` and\n`google.example.library.v1.Library.CreateBook`, they will be renamed to\n`google.example.library.Library.CreateShelf` and\n`google.example.library.Library.CreateBook`. It essentially renames the\nproto package name section of the matched proto service and methods.", 
                     "type": "string"
                 }, 
                 "selector": {
@@ -1006,6 +1026,10 @@
                         "$ref": "DocumentationRule"
                     }, 
                     "type": "array"
+                }, 
+                "serviceRootUrl": {
+                    "description": "Specifies the service root url if the default one (the service name\nfrom the yaml file) is not suitable. This can be seen in any fully\nspecified service urls as well as sections that show a base that other\nurls are relative to.", 
+                    "type": "string"
                 }, 
                 "summary": {
                     "description": "A short summary of what the service does. Can only be provided by\nplain text.", 
@@ -1271,6 +1295,10 @@
                     }, 
                     "type": "array"
                 }, 
+                "allowHalfDuplex": {
+                    "description": "When this flag is set to true, HTTP requests will be allowed to invoke a\nhalf-duplex streaming method.", 
+                    "type": "boolean"
+                }, 
                 "body": {
                     "description": "The name of the request field whose value is mapped to the HTTP request\nbody, or `*` for mapping all request fields not captured by the path\npattern to the HTTP body, or omitted for not having any HTTP request body.\n\nNOTE: the referred field must be present at the top-level of the request\nmessage type.", 
                     "type": "string"
@@ -1305,6 +1333,25 @@
                 }, 
                 "selector": {
                     "description": "Selects a method to which this rule applies.\n\nRefer to selector for syntax details.", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "JwtLocation": {
+            "description": "Specifies a location to extract JWT from an API request.", 
+            "id": "JwtLocation", 
+            "properties": {
+                "header": {
+                    "description": "Specifies HTTP header name to extract JWT token.", 
+                    "type": "string"
+                }, 
+                "query": {
+                    "description": "Specifies URL query parameter name to extract JWT token.", 
+                    "type": "string"
+                }, 
+                "valuePrefix": {
+                    "description": "The value prefix. The value format is \"value_prefix{token}\"\nOnly applies to \"in\" header type. Must be empty for \"in\" query type.\nIf not empty, the header value has to match (case sensitive) this prefix.\nIf not matched, JWT will not be extracted. If matched, JWT will be\nextracted after the prefix is removed.\n\nFor example, for \"Authorization: Bearer {JWT}\",\nvalue_prefix=\"Bearer \" with a space at the end.", 
                     "type": "string"
                 }
             }, 
@@ -1509,6 +1556,8 @@
                     "description": "Optional. The launch stage of the metric definition.", 
                     "enum": [
                         "LAUNCH_STAGE_UNSPECIFIED", 
+                        "UNIMPLEMENTED", 
+                        "PRELAUNCH", 
                         "EARLY_ACCESS", 
                         "ALPHA", 
                         "BETA", 
@@ -1517,6 +1566,8 @@
                     ], 
                     "enumDescriptions": [
                         "Do not use this default value.", 
+                        "The feature is not yet implemented. Users can not use it.", 
+                        "Prelaunch features are hidden from users and are only visible internally.", 
                         "Early Access features are limited to a closed group of testers. To use\nthese features, you must sign up in advance and sign a Trusted Tester\nagreement (which includes confidentiality provisions). These features may\nbe unstable, changed in backward-incompatible ways, and are not\nguaranteed to be released.", 
                         "Alpha is a limited availability test for releases before they are cleared\nfor widespread use. By Alpha, all significant design issues are resolved\nand we are in the process of verifying functionality. Alpha customers\nneed to apply for access, agree to applicable terms, and have their\nprojects whitelisted. Alpha releases don\u2019t have to be feature complete,\nno SLAs are provided, and there are no technical support obligations, but\nthey will be far enough along that customers can actually use them in\ntest environments or for limited-use tests -- just like they would in\nnormal production cases.", 
                         "Beta is the point at which we are ready to open a release for any\ncustomer to use. There are no SLA or technical support obligations in a\nBeta release. Products will be complete from a feature perspective, but\nmay have some open outstanding issues. Beta releases are suitable for\nlimited production use cases.", 
@@ -1545,6 +1596,13 @@
                     ], 
                     "type": "string"
                 }, 
+                "monitoredResourceTypes": {
+                    "description": "Read-only. If present, then a time\nseries, which is identified partially by\na metric type and a MonitoredResourceDescriptor, that is associated\nwith this metric type can only be associated with one of the monitored\nresource types listed here.", 
+                    "items": {
+                        "type": "string"
+                    }, 
+                    "type": "array"
+                }, 
                 "name": {
                     "description": "The resource name of the metric descriptor.", 
                     "type": "string"
@@ -1554,7 +1612,7 @@
                     "type": "string"
                 }, 
                 "unit": {
-                    "description": "The unit in which the metric value is reported. It is only applicable\nif the `value_type` is `INT64`, `DOUBLE`, or `DISTRIBUTION`. The\nsupported units are a subset of [The Unified Code for Units of\nMeasure](http://unitsofmeasure.org/ucum.html) standard:\n\n**Basic units (UNIT)**\n\n* `bit`   bit\n* `By`    byte\n* `s`     second\n* `min`   minute\n* `h`     hour\n* `d`     day\n\n**Prefixes (PREFIX)**\n\n* `k`     kilo    (10**3)\n* `M`     mega    (10**6)\n* `G`     giga    (10**9)\n* `T`     tera    (10**12)\n* `P`     peta    (10**15)\n* `E`     exa     (10**18)\n* `Z`     zetta   (10**21)\n* `Y`     yotta   (10**24)\n* `m`     milli   (10**-3)\n* `u`     micro   (10**-6)\n* `n`     nano    (10**-9)\n* `p`     pico    (10**-12)\n* `f`     femto   (10**-15)\n* `a`     atto    (10**-18)\n* `z`     zepto   (10**-21)\n* `y`     yocto   (10**-24)\n* `Ki`    kibi    (2**10)\n* `Mi`    mebi    (2**20)\n* `Gi`    gibi    (2**30)\n* `Ti`    tebi    (2**40)\n\n**Grammar**\n\nThe grammar also includes these connectors:\n\n* `/`    division (as an infix operator, e.g. `1/s`).\n* `.`    multiplication (as an infix operator, e.g. `GBy.d`)\n\nThe grammar for a unit is as follows:\n\n    Expression = Component { \".\" Component } { \"/\" Component } ;\n\n    Component = ( [ PREFIX ] UNIT | \"%\" ) [ Annotation ]\n              | Annotation\n              | \"1\"\n              ;\n\n    Annotation = \"{\" NAME \"}\" ;\n\nNotes:\n\n* `Annotation` is just a comment if it follows a `UNIT` and is\n   equivalent to `1` if it is used alone. For examples,\n   `{requests}/s == 1/s`, `By{transmitted}/s == By/s`.\n* `NAME` is a sequence of non-blank printable ASCII characters not\n   containing '{' or '}'.\n* `1` represents dimensionless value 1, such as in `1/s`.\n* `%` represents dimensionless value 1/100, and annotates values giving\n   a percentage.", 
+                    "description": "The units in which the metric value is reported. It is only applicable\nif the `value_type` is `INT64`, `DOUBLE`, or `DISTRIBUTION`. The `unit`\ndefines the representation of the stored metric values.\n\nDifferent systems may scale the values to be more easily displayed (so a\nvalue of `0.02KBy` _might_ be displayed as `20By`, and a value of\n`3523KBy` _might_ be displayed as `3.5MBy`). However, if the `unit` is\n`KBy`, then the value of the metric is always in thousands of bytes, no\nmatter how it may be displayed..\n\nIf you want a custom metric to record the exact number of CPU-seconds used\nby a job, you can create an `INT64 CUMULATIVE` metric whose `unit` is\n`s{CPU}` (or equivalently `1s{CPU}` or just `s`). If the job uses 12,005\nCPU-seconds, then the value is written as `12005`.\n\nAlternatively, if you want a custom metric to record data in a more\ngranular way, you can create a `DOUBLE CUMULATIVE` metric whose `unit` is\n`ks{CPU}`, and then write the value `12.005` (which is `12005/1000`),\nor use `Kis{CPU}` and write `11.723` (which is `12005/1024`).\n\nThe supported units are a subset of [The Unified Code for Units of\nMeasure](http://unitsofmeasure.org/ucum.html) standard:\n\n**Basic units (UNIT)**\n\n* `bit`   bit\n* `By`    byte\n* `s`     second\n* `min`   minute\n* `h`     hour\n* `d`     day\n\n**Prefixes (PREFIX)**\n\n* `k`     kilo    (10^3)\n* `M`     mega    (10^6)\n* `G`     giga    (10^9)\n* `T`     tera    (10^12)\n* `P`     peta    (10^15)\n* `E`     exa     (10^18)\n* `Z`     zetta   (10^21)\n* `Y`     yotta   (10^24)\n\n* `m`     milli   (10^-3)\n* `u`     micro   (10^-6)\n* `n`     nano    (10^-9)\n* `p`     pico    (10^-12)\n* `f`     femto   (10^-15)\n* `a`     atto    (10^-18)\n* `z`     zepto   (10^-21)\n* `y`     yocto   (10^-24)\n\n* `Ki`    kibi    (2^10)\n* `Mi`    mebi    (2^20)\n* `Gi`    gibi    (2^30)\n* `Ti`    tebi    (2^40)\n* `Pi`    pebi    (2^50)\n\n**Grammar**\n\nThe grammar also includes these connectors:\n\n* `/`    division or ratio (as an infix operator). For examples,\n         `kBy/{email}` or `MiBy/10ms` (although you should almost never\n         have `/s` in a metric `unit`; rates should always be computed at\n         query time from the underlying cumulative or delta value).\n* `.`    multiplication or composition (as an infix operator). For\n         examples, `GBy.d` or `k{watt}.h`.\n\nThe grammar for a unit is as follows:\n\n    Expression = Component { \".\" Component } { \"/\" Component } ;\n\n    Component = ( [ PREFIX ] UNIT | \"%\" ) [ Annotation ]\n              | Annotation\n              | \"1\"\n              ;\n\n    Annotation = \"{\" NAME \"}\" ;\n\nNotes:\n\n* `Annotation` is just a comment if it follows a `UNIT`. If the annotation\n   is used alone, then the unit is equivalent to `1`. For examples,\n   `{request}/s == 1/s`, `By{transmitted}/s == By/s`.\n* `NAME` is a sequence of non-blank printable ASCII characters not\n   containing `{` or `}`.\n* `1` represents a unitary [dimensionless\n   unit](https://en.wikipedia.org/wiki/Dimensionless_quantity) of 1, such\n   as in `1/s`. It is typically used when none of the basic units are\n   appropriate. For example, \"new users per day\" can be represented as\n   `1/d` or `{new-users}/d` (and a metric value `5` would mean \"5 new\n   users). Alternatively, \"thousands of page views per day\" would be\n   represented as `1000/d` or `k1/d` or `k{page_views}/d` (and a metric\n   value of `5.3` would mean \"5300 page views per day\").\n* `%` represents dimensionless value of 1/100, and annotates values giving\n   a percentage (so the metric values are typically in the range of 0..100,\n   and a metric value `3` means \"3 percent\").\n* `10^2.%` indicates a metric contains a ratio, typically in the range\n   0..1, that will be multiplied by 100 and displayed as a percentage\n   (so a metric value `0.03` means \"3 percent\").", 
                     "type": "string"
                 }, 
                 "valueType": {
@@ -1592,9 +1650,11 @@
                     "type": "string"
                 }, 
                 "launchStage": {
-                    "description": "Deprecated. Please use the MetricDescriptor.launch_stage instead.\nThe launch stage of the metric definition.", 
+                    "description": "Deprecated. Must use the MetricDescriptor.launch_stage instead.", 
                     "enum": [
                         "LAUNCH_STAGE_UNSPECIFIED", 
+                        "UNIMPLEMENTED", 
+                        "PRELAUNCH", 
                         "EARLY_ACCESS", 
                         "ALPHA", 
                         "BETA", 
@@ -1603,6 +1663,8 @@
                     ], 
                     "enumDescriptions": [
                         "Do not use this default value.", 
+                        "The feature is not yet implemented. Users can not use it.", 
+                        "Prelaunch features are hidden from users and are only visible internally.", 
                         "Early Access features are limited to a closed group of testers. To use\nthese features, you must sign up in advance and sign a Trusted Tester\nagreement (which includes confidentiality provisions). These features may\nbe unstable, changed in backward-incompatible ways, and are not\nguaranteed to be released.", 
                         "Alpha is a limited availability test for releases before they are cleared\nfor widespread use. By Alpha, all significant design issues are resolved\nand we are in the process of verifying functionality. Alpha customers\nneed to apply for access, agree to applicable terms, and have their\nprojects whitelisted. Alpha releases don\u2019t have to be feature complete,\nno SLAs are provided, and there are no technical support obligations, but\nthey will be far enough along that customers can actually use them in\ntest environments or for limited-use tests -- just like they would in\nnormal production cases.", 
                         "Beta is the point at which we are ready to open a release for any\ncustomer to use. There are no SLA or technical support obligations in a\nBeta release. Products will be complete from a feature perspective, but\nmay have some open outstanding issues. Beta releases are suitable for\nlimited production use cases.", 
@@ -1676,6 +1738,8 @@
                     "description": "Optional. The launch stage of the monitored resource definition.", 
                     "enum": [
                         "LAUNCH_STAGE_UNSPECIFIED", 
+                        "UNIMPLEMENTED", 
+                        "PRELAUNCH", 
                         "EARLY_ACCESS", 
                         "ALPHA", 
                         "BETA", 
@@ -1684,6 +1748,8 @@
                     ], 
                     "enumDescriptions": [
                         "Do not use this default value.", 
+                        "The feature is not yet implemented. Users can not use it.", 
+                        "Prelaunch features are hidden from users and are only visible internally.", 
                         "Early Access features are limited to a closed group of testers. To use\nthese features, you must sign up in advance and sign a Trusted Tester\nagreement (which includes confidentiality provisions). These features may\nbe unstable, changed in backward-incompatible ways, and are not\nguaranteed to be released.", 
                         "Alpha is a limited availability test for releases before they are cleared\nfor widespread use. By Alpha, all significant design issues are resolved\nand we are in the process of verifying functionality. Alpha customers\nneed to apply for access, agree to applicable terms, and have their\nprojects whitelisted. Alpha releases don\u2019t have to be feature complete,\nno SLAs are provided, and there are no technical support obligations, but\nthey will be far enough along that customers can actually use them in\ntest environments or for limited-use tests -- just like they would in\nnormal production cases.", 
                         "Beta is the point at which we are ready to open a release for any\ncustomer to use. There are no SLA or technical support obligations in a\nBeta release. Products will be complete from a feature perspective, but\nmay have some open outstanding issues. Beta releases are suitable for\nlimited production use cases.", 
@@ -1886,7 +1952,7 @@
                     "type": "string"
                 }, 
                 "duration": {
-                    "description": "Duration of this limit in textual notation. Example: \"100s\", \"24h\", \"1d\".\nFor duration longer than a day, only multiple of days is supported. We\nsupport only \"100s\" and \"1d\" for now. Additional support will be added in\nthe future. \"0\" indicates indefinite duration.\n\nUsed by group-based quotas only.", 
+                    "description": "Duration of this limit in textual notation. Must be \"100s\" or \"1d\".\n\nUsed by group-based quotas only.", 
                     "type": "string"
                 }, 
                 "freeTier": {
@@ -1975,7 +2041,7 @@
                     "description": "Billing configuration."
                 }, 
                 "configVersion": {
-                    "description": "The semantic version of the service configuration. The config version\naffects the interpretation of the service configuration. For example,\ncertain features are enabled by default for certain config versions.\nThe latest config version is `3`.", 
+                    "description": "The semantic version of the service configuration. The config version\naffects the interpretation of the service configuration. For example,\ncertain features are enabled by default for certain config versions.\n\nThe latest config version is `3`.", 
                     "format": "uint32", 
                     "type": "integer"
                 }, 
@@ -2014,7 +2080,7 @@
                     "description": "HTTP configuration."
                 }, 
                 "id": {
-                    "description": "A unique ID for a specific instance of this message, typically assigned\nby the client for tracking purpose. If empty, the server may choose to\ngenerate one instead. Must be no longer than 60 characters.", 
+                    "description": "A unique ID for a specific instance of this message, typically assigned\nby the client for tracking purpose. Must be no longer than 63 characters\nand only lower case letters, digits, '.', '_' and '-' are allowed. If\nempty, the server may choose to generate one instead.", 
                     "type": "string"
                 }, 
                 "logging": {
@@ -2105,6 +2171,25 @@
                         "type": "string"
                     }, 
                     "type": "array"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "ServiceIdentity": {
+            "description": "The per-product per-project service identity for a service.\n\n\nUse this field to configure per-product per-project service identity.\nExample of a service identity configuration.\n\n    usage:\n      service_identity:\n      - service_account_parent: \"projects/123456789\"\n        display_name: \"Cloud XXX Service Agent\"\n        description: \"Used as the identity of Cloud XXX to access resources\"", 
+            "id": "ServiceIdentity", 
+            "properties": {
+                "description": {
+                    "description": "Optional. A user-specified opaque description of the service account.\nMust be less than or equal to 256 UTF-8 bytes.", 
+                    "type": "string"
+                }, 
+                "displayName": {
+                    "description": "Optional. A user-specified name for the service account.\nMust be less than or equal to 100 UTF-8 bytes.", 
+                    "type": "string"
+                }, 
+                "serviceAccountParent": {
+                    "description": "A service account project that hosts the service accounts.\n\nAn example name would be:\n`projects/123456789`", 
+                    "type": "string"
                 }
             }, 
             "type": "object"
@@ -2413,6 +2498,10 @@
                         "$ref": "UsageRule"
                     }, 
                     "type": "array"
+                }, 
+                "serviceIdentity": {
+                    "$ref": "ServiceIdentity", 
+                    "description": "The configuration of a per-product per-project service identity."
                 }
             }, 
             "type": "object"
@@ -2476,6 +2565,17 @@
             "properties": {}, 
             "type": "object"
         }, 
+        "V1Beta1GenerateServiceIdentityResponse": {
+            "description": "Response message for the `GenerateServiceIdentity` method.\n\nThis response message is assigned to the `response` field of the returned\nOperation when that operation is done.", 
+            "id": "V1Beta1GenerateServiceIdentityResponse", 
+            "properties": {
+                "identity": {
+                    "$ref": "V1Beta1ServiceIdentity", 
+                    "description": "ServiceIdentity that was created or retrieved."
+                }
+            }, 
+            "type": "object"
+        }, 
         "V1Beta1ImportProducerOverridesResponse": {
             "description": "Response message for ImportProducerOverrides", 
             "id": "V1Beta1ImportProducerOverridesResponse", 
@@ -2498,7 +2598,7 @@
                     "additionalProperties": {
                         "type": "string"
                     }, 
-                    "description": "If this map is nonempty, then this override applies only to specific values\nfor dimensions defined in the limit unit.\n\nFor example, an override on a limit with the unit 1/{project}/{region}\ncould contain an entry with the key \"region\" and the value \"us-east-1\";\nthe override is only applied to quota consumed in that region.\n\nThis map has the following restrictions:\n- Keys that are not defined in the limit's unit are not valid keys.\n  Any string appearing in {brackets} in the unit (besides {project} or\n  {user}) is a defined key.\n- \"project\" is not a valid key; the project is already specified in\n  the parent resource name.\n- \"user\" is not a valid key; the API does not support quota overrides\n  that apply only to a specific user.\n- If \"region\" appears as a key, its value must be a valid Cloud region.\n- If \"zone\" appears as a key, its value must be a valid Cloud zone.\n- If any valid key other than \"region\" or \"zone\" appears in the map, then\n  all valid keys other than \"region\" or \"zone\" must also appear in the map.", 
+                    "description": "\nIf this map is nonempty, then this override applies only to specific values\nfor dimensions defined in the limit unit.\n\nFor example, an override on a limit with the unit 1/{project}/{region}\ncould contain an entry with the key \"region\" and the value \"us-east-1\";\nthe override is only applied to quota consumed in that region.\n\nThis map has the following restrictions:\n\n*   Keys that are not defined in the limit's unit are not valid keys.\n    Any string appearing in {brackets} in the unit (besides {project} or\n    {user}) is a defined key.\n*   \"project\" is not a valid key; the project is already specified in\n    the parent resource name.\n*   \"user\" is not a valid key; the API does not support quota overrides\n    that apply only to a specific user.\n*   If \"region\" appears as a key, its value must be a valid Cloud region.\n*   If \"zone\" appears as a key, its value must be a valid Cloud zone.\n*   If any valid key other than \"region\" or \"zone\" appears in the map, then\n    all valid keys other than \"region\" or \"zone\" must also appear in the\n    map.", 
                     "type": "object"
                 }, 
                 "metric": {
@@ -2527,6 +2627,48 @@
             "properties": {}, 
             "type": "object"
         }, 
+        "V1Beta1ServiceIdentity": {
+            "description": "A service identity in the Identity and Access Management API.", 
+            "id": "V1Beta1ServiceIdentity", 
+            "properties": {
+                "email": {
+                    "description": "The email address of the service identity.", 
+                    "type": "string"
+                }, 
+                "name": {
+                    "description": "P4 service identity resource name.\n\nAn example name would be:\n`services/serviceconsumermanagement.googleapis.com/projects/123/serviceIdentities/default`", 
+                    "type": "string"
+                }, 
+                "tag": {
+                    "description": "The P4 service identity configuration tag. This must be defined in\nactivation_grants. If not specified when creating the account, the tag is\nset to \"default\".", 
+                    "type": "string"
+                }, 
+                "uniqueId": {
+                    "description": "The unique and stable id of the service identity.", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "V1DefaultIdentity": {
+            "description": "A default identity in the Identity and Access Management API.", 
+            "id": "V1DefaultIdentity", 
+            "properties": {
+                "email": {
+                    "description": "The email address of the default identity.", 
+                    "type": "string"
+                }, 
+                "name": {
+                    "description": "Default identity resource name.\n\nAn example name would be:\n`services/serviceconsumermanagement.googleapis.com/projects/123/defaultIdentity`", 
+                    "type": "string"
+                }, 
+                "uniqueId": {
+                    "description": "The unique and stable id of the default identity.", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
         "V1DisableConsumerResponse": {
             "description": "Response message for the `DisableConsumer` method.\nThis response message is assigned to the `response` field of the returned\nOperation when that operation is done.", 
             "id": "V1DisableConsumerResponse", 
@@ -2537,6 +2679,39 @@
             "description": "Response message for the `EnableConsumer` method.\nThis response message is assigned to the `response` field of the returned\nOperation when that operation is done.", 
             "id": "V1EnableConsumerResponse", 
             "properties": {}, 
+            "type": "object"
+        }, 
+        "V1GenerateDefaultIdentityResponse": {
+            "description": "Response message for the `GenerateDefaultIdentity` method.\n\nThis response message is assigned to the `response` field of the returned\nOperation when that operation is done.", 
+            "id": "V1GenerateDefaultIdentityResponse", 
+            "properties": {
+                "attachStatus": {
+                    "description": "Status of the role attachment. Under development (go/si-attach-role),\ncurrently always return ATTACH_STATUS_UNSPECIFIED)", 
+                    "enum": [
+                        "ATTACH_STATUS_UNSPECIFIED", 
+                        "ATTACHED", 
+                        "ATTACH_SKIPPED", 
+                        "PREVIOUSLY_ATTACHED", 
+                        "ATTACH_DENIED_BY_ORG_POLICY"
+                    ], 
+                    "enumDescriptions": [
+                        "Indicates that the AttachStatus was not set.", 
+                        "The default identity was attached to a role successfully in this request.", 
+                        "The request specified that no attempt should be made to attach the role.", 
+                        "Role was attached to the consumer project at some point in time. Tenant\nmanager doesn't make assertion about the current state of the identity\nwith respect to the consumer.\n\nRole attachment should happen only once after activation and cannot be\nreattached after customer removes it. (go/si-attach-role)", 
+                        "Role attachment was denied in this request by customer set org policy.\n(go/si-attach-role)"
+                    ], 
+                    "type": "string"
+                }, 
+                "identity": {
+                    "$ref": "V1DefaultIdentity", 
+                    "description": "DefaultIdentity that was created or retrieved."
+                }, 
+                "role": {
+                    "description": "Role attached to consumer project. Empty if not attached in this\nrequest. (Under development, currently always return empty.)", 
+                    "type": "string"
+                }
+            }, 
             "type": "object"
         }, 
         "V1GenerateServiceAccountResponse": {
@@ -2579,7 +2754,7 @@
                     "type": "string"
                 }, 
                 "iamAccountName": {
-                    "description": "The IAM resource name of the service account in the following format:\nprojects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}.", 
+                    "description": "Deprecated. See b/136209818.", 
                     "type": "string"
                 }, 
                 "name": {

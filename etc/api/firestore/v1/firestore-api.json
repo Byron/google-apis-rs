@@ -25,6 +25,7 @@
     }, 
     "id": "firestore:v1", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://firestore.mtls.googleapis.com/", 
     "name": "firestore", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -121,7 +122,7 @@
                             ], 
                             "parameters": {
                                 "name": {
-                                    "description": "Database to export. Should be of the form:\n`projects/{project_id}/databases/{database_id}`.", 
+                                    "description": "Required. Database to export. Should be of the form:\n`projects/{project_id}/databases/{database_id}`.", 
                                     "location": "path", 
                                     "pattern": "^projects/[^/]+/databases/[^/]+$", 
                                     "required": true, 
@@ -150,7 +151,7 @@
                             ], 
                             "parameters": {
                                 "name": {
-                                    "description": "Database to import into. Should be of the form:\n`projects/{project_id}/databases/{database_id}`.", 
+                                    "description": "Required. Database to import into. Should be of the form:\n`projects/{project_id}/databases/{database_id}`.", 
                                     "location": "path", 
                                     "pattern": "^projects/[^/]+/databases/[^/]+$", 
                                     "required": true, 
@@ -185,7 +186,7 @@
                                             ], 
                                             "parameters": {
                                                 "name": {
-                                                    "description": "A name of the form\n`projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/fields/{field_id}`", 
+                                                    "description": "Required. A name of the form\n`projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/fields/{field_id}`", 
                                                     "location": "path", 
                                                     "pattern": "^projects/[^/]+/databases/[^/]+/collectionGroups/[^/]+/fields/[^/]+$", 
                                                     "required": true, 
@@ -227,7 +228,7 @@
                                                     "type": "string"
                                                 }, 
                                                 "parent": {
-                                                    "description": "A parent name of the form\n`projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}`", 
+                                                    "description": "Required. A parent name of the form\n`projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}`", 
                                                     "location": "path", 
                                                     "pattern": "^projects/[^/]+/databases/[^/]+/collectionGroups/[^/]+$", 
                                                     "required": true, 
@@ -292,7 +293,7 @@
                                             ], 
                                             "parameters": {
                                                 "parent": {
-                                                    "description": "A parent name of the form\n`projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}`", 
+                                                    "description": "Required. A parent name of the form\n`projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}`", 
                                                     "location": "path", 
                                                     "pattern": "^projects/[^/]+/databases/[^/]+/collectionGroups/[^/]+$", 
                                                     "required": true, 
@@ -321,7 +322,7 @@
                                             ], 
                                             "parameters": {
                                                 "name": {
-                                                    "description": "A name of the form\n`projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/indexes/{index_id}`", 
+                                                    "description": "Required. A name of the form\n`projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/indexes/{index_id}`", 
                                                     "location": "path", 
                                                     "pattern": "^projects/[^/]+/databases/[^/]+/collectionGroups/[^/]+/indexes/[^/]+$", 
                                                     "required": true, 
@@ -347,7 +348,7 @@
                                             ], 
                                             "parameters": {
                                                 "name": {
-                                                    "description": "A name of the form\n`projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/indexes/{index_id}`", 
+                                                    "description": "Required. A name of the form\n`projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/indexes/{index_id}`", 
                                                     "location": "path", 
                                                     "pattern": "^projects/[^/]+/databases/[^/]+/collectionGroups/[^/]+/indexes/[^/]+$", 
                                                     "required": true, 
@@ -389,7 +390,7 @@
                                                     "type": "string"
                                                 }, 
                                                 "parent": {
-                                                    "description": "A parent name of the form\n`projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}`", 
+                                                    "description": "Required. A parent name of the form\n`projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}`", 
                                                     "location": "path", 
                                                     "pattern": "^projects/[^/]+/databases/[^/]+/collectionGroups/[^/]+$", 
                                                     "required": true, 
@@ -421,7 +422,7 @@
                                     ], 
                                     "parameters": {
                                         "database": {
-                                            "description": "The database name. In the format:\n`projects/{project_id}/databases/{database_id}`.", 
+                                            "description": "Required. The database name. In the format:\n`projects/{project_id}/databases/{database_id}`.", 
                                             "location": "path", 
                                             "pattern": "^projects/[^/]+/databases/[^/]+$", 
                                             "required": true, 
@@ -450,7 +451,7 @@
                                     ], 
                                     "parameters": {
                                         "database": {
-                                            "description": "The database name. In the format:\n`projects/{project_id}/databases/{database_id}`.", 
+                                            "description": "Required. The database name. In the format:\n`projects/{project_id}/databases/{database_id}`.", 
                                             "location": "path", 
                                             "pattern": "^projects/[^/]+/databases/[^/]+$", 
                                             "required": true, 
@@ -479,7 +480,7 @@
                                     ], 
                                     "parameters": {
                                         "database": {
-                                            "description": "The database name. In the format:\n`projects/{project_id}/databases/{database_id}`.", 
+                                            "description": "Required. The database name. In the format:\n`projects/{project_id}/databases/{database_id}`.", 
                                             "location": "path", 
                                             "pattern": "^projects/[^/]+/databases/[^/]+$", 
                                             "required": true, 
@@ -509,7 +510,7 @@
                                     ], 
                                     "parameters": {
                                         "collectionId": {
-                                            "description": "The collection ID, relative to `parent`, to list. For example: `chatrooms`.", 
+                                            "description": "Required. The collection ID, relative to `parent`, to list. For example: `chatrooms`.", 
                                             "location": "path", 
                                             "required": true, 
                                             "type": "string"
@@ -526,9 +527,9 @@
                                             "type": "string"
                                         }, 
                                         "parent": {
-                                            "description": "The parent resource. For example:\n`projects/{project_id}/databases/{database_id}/documents` or\n`projects/{project_id}/databases/{database_id}/documents/chatrooms/{chatroom_id}`", 
+                                            "description": "Required. The parent resource. For example:\n`projects/{project_id}/databases/{database_id}/documents` or\n`projects/{project_id}/databases/{database_id}/documents/chatrooms/{chatroom_id}`", 
                                             "location": "path", 
-                                            "pattern": "^projects/[^/]+/databases/[^/]+/documents/.+$", 
+                                            "pattern": "^projects/[^/]+/databases/[^/]+/documents/.*$", 
                                             "required": true, 
                                             "type": "string"
                                         }
@@ -566,9 +567,9 @@
                                             "type": "string"
                                         }, 
                                         "name": {
-                                            "description": "The resource name of the Document to delete. In the format:\n`projects/{project_id}/databases/{database_id}/documents/{document_path}`.", 
+                                            "description": "Required. The resource name of the Document to delete. In the format:\n`projects/{project_id}/databases/{database_id}/documents/{document_path}`.", 
                                             "location": "path", 
-                                            "pattern": "^projects/[^/]+/databases/[^/]+/documents/[^/]+/.+$", 
+                                            "pattern": "^projects/[^/]+/databases/[^/]+/documents/[^/]+/.*$", 
                                             "required": true, 
                                             "type": "string"
                                         }
@@ -598,14 +599,14 @@
                                             "type": "string"
                                         }, 
                                         "name": {
-                                            "description": "The resource name of the Document to get. In the format:\n`projects/{project_id}/databases/{database_id}/documents/{document_path}`.", 
+                                            "description": "Required. The resource name of the Document to get. In the format:\n`projects/{project_id}/databases/{database_id}/documents/{document_path}`.", 
                                             "location": "path", 
-                                            "pattern": "^projects/[^/]+/databases/[^/]+/documents/[^/]+/.+$", 
+                                            "pattern": "^projects/[^/]+/databases/[^/]+/documents/[^/]+/.*$", 
                                             "required": true, 
                                             "type": "string"
                                         }, 
                                         "readTime": {
-                                            "description": "Reads the version of the document at the given time.\nThis may not be older than 60 seconds.", 
+                                            "description": "Reads the version of the document at the given time.\nThis may not be older than 270 seconds.", 
                                             "format": "google-datetime", 
                                             "location": "query", 
                                             "type": "string"
@@ -637,7 +638,7 @@
                                     ], 
                                     "parameters": {
                                         "collectionId": {
-                                            "description": "The collection ID, relative to `parent`, to list. For example: `chatrooms`\nor `messages`.", 
+                                            "description": "Required. The collection ID, relative to `parent`, to list. For example: `chatrooms`\nor `messages`.", 
                                             "location": "path", 
                                             "required": true, 
                                             "type": "string"
@@ -665,14 +666,14 @@
                                             "type": "string"
                                         }, 
                                         "parent": {
-                                            "description": "The parent resource name. In the format:\n`projects/{project_id}/databases/{database_id}/documents` or\n`projects/{project_id}/databases/{database_id}/documents/{document_path}`.\nFor example:\n`projects/my-project/databases/my-database/documents` or\n`projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`", 
+                                            "description": "Required. The parent resource name. In the format:\n`projects/{project_id}/databases/{database_id}/documents` or\n`projects/{project_id}/databases/{database_id}/documents/{document_path}`.\nFor example:\n`projects/my-project/databases/my-database/documents` or\n`projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`", 
                                             "location": "path", 
-                                            "pattern": "^projects/[^/]+/databases/[^/]+/documents/[^/]+/.+$", 
+                                            "pattern": "^projects/[^/]+/databases/[^/]+/documents/[^/]+/.*$", 
                                             "required": true, 
                                             "type": "string"
                                         }, 
                                         "readTime": {
-                                            "description": "Reads documents as they were at the given time.\nThis may not be older than 60 seconds.", 
+                                            "description": "Reads documents as they were at the given time.\nThis may not be older than 270 seconds.", 
                                             "format": "google-datetime", 
                                             "location": "query", 
                                             "type": "string"
@@ -708,9 +709,9 @@
                                     ], 
                                     "parameters": {
                                         "parent": {
-                                            "description": "The parent document. In the format:\n`projects/{project_id}/databases/{database_id}/documents/{document_path}`.\nFor example:\n`projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`", 
+                                            "description": "Required. The parent document. In the format:\n`projects/{project_id}/databases/{database_id}/documents/{document_path}`.\nFor example:\n`projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`", 
                                             "location": "path", 
-                                            "pattern": "^projects/[^/]+/databases/[^/]+/documents/[^/]+/.+$", 
+                                            "pattern": "^projects/[^/]+/databases/[^/]+/documents/[^/]+/.*$", 
                                             "required": true, 
                                             "type": "string"
                                         }
@@ -737,7 +738,7 @@
                                     ], 
                                     "parameters": {
                                         "database": {
-                                            "description": "The database name. In the format:\n`projects/{project_id}/databases/{database_id}`.", 
+                                            "description": "Required. The database name. In the format:\n`projects/{project_id}/databases/{database_id}`.", 
                                             "location": "path", 
                                             "pattern": "^projects/[^/]+/databases/[^/]+$", 
                                             "required": true, 
@@ -785,7 +786,7 @@
                                         "name": {
                                             "description": "The resource name of the document, for example\n`projects/{project_id}/databases/{database_id}/documents/{document_path}`.", 
                                             "location": "path", 
-                                            "pattern": "^projects/[^/]+/databases/[^/]+/documents/[^/]+/.+$", 
+                                            "pattern": "^projects/[^/]+/databases/[^/]+/documents/[^/]+/.*$", 
                                             "required": true, 
                                             "type": "string"
                                         }, 
@@ -818,7 +819,7 @@
                                     ], 
                                     "parameters": {
                                         "database": {
-                                            "description": "The database name. In the format:\n`projects/{project_id}/databases/{database_id}`.", 
+                                            "description": "Required. The database name. In the format:\n`projects/{project_id}/databases/{database_id}`.", 
                                             "location": "path", 
                                             "pattern": "^projects/[^/]+/databases/[^/]+$", 
                                             "required": true, 
@@ -847,9 +848,9 @@
                                     ], 
                                     "parameters": {
                                         "parent": {
-                                            "description": "The parent resource name. In the format:\n`projects/{project_id}/databases/{database_id}/documents` or\n`projects/{project_id}/databases/{database_id}/documents/{document_path}`.\nFor example:\n`projects/my-project/databases/my-database/documents` or\n`projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`", 
+                                            "description": "Required. The parent resource name. In the format:\n`projects/{project_id}/databases/{database_id}/documents` or\n`projects/{project_id}/databases/{database_id}/documents/{document_path}`.\nFor example:\n`projects/my-project/databases/my-database/documents` or\n`projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`", 
                                             "location": "path", 
-                                            "pattern": "^projects/[^/]+/databases/[^/]+/documents/[^/]+/.+$", 
+                                            "pattern": "^projects/[^/]+/databases/[^/]+/documents/[^/]+/.*$", 
                                             "required": true, 
                                             "type": "string"
                                         }
@@ -876,7 +877,7 @@
                                     ], 
                                     "parameters": {
                                         "database": {
-                                            "description": "The database name. In the format:\n`projects/{project_id}/databases/{database_id}`.\nThis is only required in the first message.", 
+                                            "description": "Required. The database name. In the format:\n`projects/{project_id}/databases/{database_id}`.\nThis is only required in the first message.", 
                                             "location": "path", 
                                             "pattern": "^projects/[^/]+/databases/[^/]+$", 
                                             "required": true, 
@@ -1101,7 +1102,7 @@
             }
         }
     }, 
-    "revision": "20190419", 
+    "revision": "20200311", 
     "rootUrl": "https://firestore.googleapis.com/", 
     "schemas": {
         "ArrayValue": {
@@ -1138,7 +1139,7 @@
                     "description": "Starts a new transaction and reads the documents.\nDefaults to a read-only transaction.\nThe new transaction ID will be returned as the first response in the\nstream."
                 }, 
                 "readTime": {
-                    "description": "Reads documents as they were at the given time.\nThis may not be older than 60 seconds.", 
+                    "description": "Reads documents as they were at the given time.\nThis may not be older than 270 seconds.", 
                     "format": "google-datetime", 
                     "type": "string"
                 }, 
@@ -1237,7 +1238,7 @@
             "id": "CommitResponse", 
             "properties": {
                 "commitTime": {
-                    "description": "The time at which the commit occurred.", 
+                    "description": "The time at which the commit occurred. Any read with an equal or greater\n`read_time` is guaranteed to see the effects of the commit.", 
                     "format": "google-datetime", 
                     "type": "string"
                 }, 
@@ -1484,7 +1485,9 @@
                         "GREATER_THAN", 
                         "GREATER_THAN_OR_EQUAL", 
                         "EQUAL", 
-                        "ARRAY_CONTAINS"
+                        "ARRAY_CONTAINS", 
+                        "IN", 
+                        "ARRAY_CONTAINS_ANY"
                     ], 
                     "enumDescriptions": [
                         "Unspecified. This value must not be used.", 
@@ -1493,7 +1496,9 @@
                         "Greater than. Requires that the field come first in `order_by`.", 
                         "Greater than or equal. Requires that the field come first in\n`order_by`.", 
                         "Equal.", 
-                        "Contains. Requires that the field is an array."
+                        "Contains. Requires that the field is an array.", 
+                        "In. Requires that `value` is a non-empty ArrayValue with at most 10\nvalues.", 
+                        "Contains any. Requires that the field is an array and\n`value` is a non-empty ArrayValue with at most 10 values."
                     ], 
                     "type": "string"
                 }, 
@@ -1830,23 +1835,25 @@
                     "type": "array"
                 }, 
                 "name": {
-                    "description": "Output only.\nA server defined name for this index.\nThe form of this name for composite indexes will be:\n`projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/indexes/{composite_index_id}`\nFor single field indexes, this field will be empty.", 
+                    "description": "Output only. A server defined name for this index.\nThe form of this name for composite indexes will be:\n`projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/indexes/{composite_index_id}`\nFor single field indexes, this field will be empty.", 
                     "type": "string"
                 }, 
                 "queryScope": {
                     "description": "Indexes with a collection query scope specified allow queries\nagainst a collection that is the child of a specific document, specified at\nquery time, and that has the same collection id.\n\nIndexes with a collection group query scope specified allow queries against\nall collections descended from a specific document, specified at query\ntime, and that have the same collection id as this index.", 
                     "enum": [
                         "QUERY_SCOPE_UNSPECIFIED", 
-                        "COLLECTION"
+                        "COLLECTION", 
+                        "COLLECTION_GROUP"
                     ], 
                     "enumDescriptions": [
                         "The query scope is unspecified. Not a valid option.", 
-                        "Indexes with a collection query scope specified allow queries\nagainst a collection that is the child of a specific document, specified\nat query time, and that has the collection id specified by the index."
+                        "Indexes with a collection query scope specified allow queries\nagainst a collection that is the child of a specific document, specified\nat query time, and that has the collection id specified by the index.", 
+                        "Indexes with a collection group query scope specified allow queries\nagainst all collections that has the collection id specified by the\nindex."
                     ], 
                     "type": "string"
                 }, 
                 "state": {
-                    "description": "Output only.\nThe serving state of the index.", 
+                    "description": "Output only. The serving state of the index.", 
                     "enum": [
                         "STATE_UNSPECIFIED", 
                         "CREATING", 
@@ -1869,7 +1876,7 @@
             "id": "GoogleFirestoreAdminV1IndexConfig", 
             "properties": {
                 "ancestorField": {
-                    "description": "Output only.\nSpecifies the resource name of the `Field` from which this field's\nindex configuration is set (when `uses_ancestor_config` is true),\nor from which it *would* be set if this field had no index configuration\n(when `uses_ancestor_config` is false).", 
+                    "description": "Output only. Specifies the resource name of the `Field` from which this field's\nindex configuration is set (when `uses_ancestor_config` is true),\nor from which it *would* be set if this field had no index configuration\n(when `uses_ancestor_config` is false).", 
                     "type": "string"
                 }, 
                 "indexes": {
@@ -1884,7 +1891,7 @@
                     "type": "boolean"
                 }, 
                 "usesAncestorConfig": {
-                    "description": "Output only.\nWhen true, the `Field`'s index configuration is set from the\nconfiguration specified by the `ancestor_field`.\nWhen false, the `Field`'s index configuration is defined explicitly.", 
+                    "description": "Output only. When true, the `Field`'s index configuration is set from the\nconfiguration specified by the `ancestor_field`.\nWhen false, the `Field`'s index configuration is defined explicitly.", 
                     "type": "boolean"
                 }
             }, 
@@ -2109,7 +2116,7 @@
                     "type": "object"
                 }, 
                 "name": {
-                    "description": "The server-assigned name, which is only unique within the same service that\noriginally returns it. If you use the default HTTP mapping, the\n`name` should have the format of `operations/some/unique/name`.", 
+                    "description": "The server-assigned name, which is only unique within the same service that\noriginally returns it. If you use the default HTTP mapping, the\n`name` should be a resource name ending with `operations/{unique_id}`.", 
                     "type": "string"
                 }, 
                 "response": {
@@ -2407,7 +2414,7 @@
             "id": "RollbackRequest", 
             "properties": {
                 "transaction": {
-                    "description": "The transaction to roll back.", 
+                    "description": "Required. The transaction to roll back.", 
                     "format": "byte", 
                     "type": "string"
                 }
@@ -2423,7 +2430,7 @@
                     "description": "Starts a new transaction and reads the documents.\nDefaults to a read-only transaction.\nThe new transaction ID will be returned as the first response in the\nstream."
                 }, 
                 "readTime": {
-                    "description": "Reads documents as they were at the given time.\nThis may not be older than 60 seconds.", 
+                    "description": "Reads documents as they were at the given time.\nThis may not be older than 270 seconds.", 
                     "format": "google-datetime", 
                     "type": "string"
                 }, 
@@ -2466,7 +2473,7 @@
             "type": "object"
         }, 
         "Status": {
-            "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users\n- Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error\nmessage, and error details. The error code should be an enum value of\ngoogle.rpc.Code, but it may accept additional error codes if needed.  The\nerror message should be a developer-facing English message that helps\ndevelopers *understand* and *resolve* the error. If a localized user-facing\nerror message is needed, put the localized message in the error details or\nlocalize it in the client. The optional error details may contain arbitrary\ninformation about the error. There is a predefined set of error detail types\nin the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it\nis not necessarily the actual wire format. When the `Status` message is\nexposed in different client libraries and different wire protocols, it can be\nmapped differently. For example, it will likely be mapped to some exceptions\nin Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of\nenvironments, either with or without APIs, to provide a\nconsistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client,\n    it may embed the `Status` in the normal response to indicate the partial\n    errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may\n    have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the\n    `Status` message should be used directly inside batch response, one for\n    each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation\n    results in its response, the status of those operations should be\n    represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could\n    be used directly after any stripping needed for security/privacy reasons.", 
+            "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors).", 
             "id": "Status", 
             "properties": {
                 "code": {
@@ -2566,7 +2573,7 @@
                     "type": "string"
                 }, 
                 "targetId": {
-                    "description": "A client provided target ID.\n\nIf not set, the server will assign an ID for the target.\n\nUsed for resuming a target without changing IDs. The IDs can either be\nclient-assigned or be server-assigned in a previous stream. All targets\nwith client provided IDs must be added before adding a target that needs\na server-assigned id.", 
+                    "description": "The target ID that identifies the target on the stream. Must be a positive\nnumber and non-zero.", 
                     "format": "int32", 
                     "type": "integer"
                 }
@@ -2610,7 +2617,7 @@
                     "type": "string"
                 }, 
                 "targetIds": {
-                    "description": "The target IDs of targets that have changed.\n\nIf empty, the change applies to all targets.\n\nFor `target_change_type=ADD`, the order of the target IDs matches the order\nof the requests to add the targets. This allows clients to unambiguously\nassociate server-assigned target IDs with added targets.\n\nFor other states, the order of the target IDs is not defined.", 
+                    "description": "The target IDs of targets that have changed.\n\nIf empty, the change applies to all targets.\n\nThe order of the target IDs is not defined.", 
                     "items": {
                         "format": "int32", 
                         "type": "integer"
@@ -2653,7 +2660,7 @@
                     "enumDescriptions": [
                         "Unspecified. This value must not be used.", 
                         "Test if a field is equal to NaN.", 
-                        "Test if an exprestion evaluates to Null."
+                        "Test if an expression evaluates to Null."
                     ], 
                     "type": "string"
                 }
@@ -2735,7 +2742,7 @@
                 }, 
                 "transform": {
                     "$ref": "DocumentTransform", 
-                    "description": "Applies a transformation to a document.\nAt most one `transform` per document is allowed in a given request.\nAn `update` cannot follow a `transform` on the same document in a given\nrequest."
+                    "description": "Applies a transformation to a document."
                 }, 
                 "update": {
                     "$ref": "Document", 
@@ -2744,6 +2751,13 @@
                 "updateMask": {
                     "$ref": "DocumentMask", 
                     "description": "The fields to update in this write.\n\nThis field can be set only when the operation is `update`.\nIf the mask is not set for an `update` and the document exists, any\nexisting data will be overwritten.\nIf the mask is set and the document on the server has fields not covered by\nthe mask, they are left unchanged.\nFields referenced in the mask, but not present in the input document, are\ndeleted from the document on the server.\nThe field paths in this mask must not contain a reserved field name."
+                }, 
+                "updateTransforms": {
+                    "description": "The transforms to perform after update.\n\nThis field can be set only when the operation is `update`. If present, this\nwrite is equivalent to performing `update` and `transform` to the same\ndocument atomically and in order.", 
+                    "items": {
+                        "$ref": "FieldTransform"
+                    }, 
+                    "type": "array"
                 }
             }, 
             "type": "object"
@@ -2783,7 +2797,7 @@
             "id": "WriteResponse", 
             "properties": {
                 "commitTime": {
-                    "description": "The time at which the commit occurred.", 
+                    "description": "The time at which the commit occurred. Any read with an equal or greater\n`read_time` is guaranteed to see the effects of the write.", 
                     "format": "google-datetime", 
                     "type": "string"
                 }, 

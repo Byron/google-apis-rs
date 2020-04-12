@@ -22,6 +22,7 @@
     }, 
     "id": "cloudtasks:v2beta2", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://cloudtasks.mtls.googleapis.com/", 
     "name": "cloudtasks", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -188,7 +189,7 @@
                                     ], 
                                     "parameters": {
                                         "parent": {
-                                            "description": "Required.\n\nThe location name in which the queue will be created.\nFor example: `projects/PROJECT_ID/locations/LOCATION_ID`\n\nThe list of allowed locations can be obtained by calling Cloud\nTasks' implementation of\nListLocations.", 
+                                            "description": "Required. The location name in which the queue will be created.\nFor example: `projects/PROJECT_ID/locations/LOCATION_ID`\n\nThe list of allowed locations can be obtained by calling Cloud\nTasks' implementation of\nListLocations.", 
                                             "location": "path", 
                                             "pattern": "^projects/[^/]+/locations/[^/]+$", 
                                             "required": true, 
@@ -216,7 +217,7 @@
                                     ], 
                                     "parameters": {
                                         "name": {
-                                            "description": "Required.\n\nThe queue name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`", 
+                                            "description": "Required. The queue name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`", 
                                             "location": "path", 
                                             "pattern": "^projects/[^/]+/locations/[^/]+/queues/[^/]+$", 
                                             "required": true, 
@@ -241,10 +242,16 @@
                                     ], 
                                     "parameters": {
                                         "name": {
-                                            "description": "Required.\n\nThe resource name of the queue. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`", 
+                                            "description": "Required. The resource name of the queue. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`", 
                                             "location": "path", 
                                             "pattern": "^projects/[^/]+/locations/[^/]+/queues/[^/]+$", 
                                             "required": true, 
+                                            "type": "string"
+                                        }, 
+                                        "readMask": {
+                                            "description": "Optional. Read mask is used for a more granular control over what the API returns. By\nit includes all fields in Queue except for stats.", 
+                                            "format": "google-fieldmask", 
+                                            "location": "query", 
                                             "type": "string"
                                         }
                                     }, 
@@ -310,7 +317,7 @@
                                             "type": "string"
                                         }, 
                                         "parent": {
-                                            "description": "Required.\n\nThe location name.\nFor example: `projects/PROJECT_ID/locations/LOCATION_ID`", 
+                                            "description": "Required. The location name.\nFor example: `projects/PROJECT_ID/locations/LOCATION_ID`", 
                                             "location": "path", 
                                             "pattern": "^projects/[^/]+/locations/[^/]+$", 
                                             "required": true, 
@@ -369,7 +376,7 @@
                                     ], 
                                     "parameters": {
                                         "name": {
-                                            "description": "Required.\n\nThe queue name. For example:\n`projects/PROJECT_ID/location/LOCATION_ID/queues/QUEUE_ID`", 
+                                            "description": "Required. The queue name. For example:\n`projects/PROJECT_ID/location/LOCATION_ID/queues/QUEUE_ID`", 
                                             "location": "path", 
                                             "pattern": "^projects/[^/]+/locations/[^/]+/queues/[^/]+$", 
                                             "required": true, 
@@ -397,7 +404,7 @@
                                     ], 
                                     "parameters": {
                                         "name": {
-                                            "description": "Required.\n\nThe queue name. For example:\n`projects/PROJECT_ID/location/LOCATION_ID/queues/QUEUE_ID`", 
+                                            "description": "Required. The queue name. For example:\n`projects/PROJECT_ID/location/LOCATION_ID/queues/QUEUE_ID`", 
                                             "location": "path", 
                                             "pattern": "^projects/[^/]+/locations/[^/]+/queues/[^/]+$", 
                                             "required": true, 
@@ -425,7 +432,7 @@
                                     ], 
                                     "parameters": {
                                         "name": {
-                                            "description": "Required.\n\nThe queue name. For example:\n`projects/PROJECT_ID/location/LOCATION_ID/queues/QUEUE_ID`", 
+                                            "description": "Required. The queue name. For example:\n`projects/PROJECT_ID/location/LOCATION_ID/queues/QUEUE_ID`", 
                                             "location": "path", 
                                             "pattern": "^projects/[^/]+/locations/[^/]+/queues/[^/]+$", 
                                             "required": true, 
@@ -513,7 +520,7 @@
                                             ], 
                                             "parameters": {
                                                 "name": {
-                                                    "description": "Required.\n\nThe task name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`", 
+                                                    "description": "Required. The task name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`", 
                                                     "location": "path", 
                                                     "pattern": "^projects/[^/]+/locations/[^/]+/queues/[^/]+/tasks/[^/]+$", 
                                                     "required": true, 
@@ -541,7 +548,7 @@
                                             ], 
                                             "parameters": {
                                                 "name": {
-                                                    "description": "Required.\n\nThe task name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`", 
+                                                    "description": "Required. The task name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`", 
                                                     "location": "path", 
                                                     "pattern": "^projects/[^/]+/locations/[^/]+/queues/[^/]+/tasks/[^/]+$", 
                                                     "required": true, 
@@ -569,7 +576,7 @@
                                             ], 
                                             "parameters": {
                                                 "parent": {
-                                                    "description": "Required.\n\nThe queue name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`\n\nThe queue must already exist.", 
+                                                    "description": "Required. The queue name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`\n\nThe queue must already exist.", 
                                                     "location": "path", 
                                                     "pattern": "^projects/[^/]+/locations/[^/]+/queues/[^/]+$", 
                                                     "required": true, 
@@ -597,7 +604,7 @@
                                             ], 
                                             "parameters": {
                                                 "name": {
-                                                    "description": "Required.\n\nThe task name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`", 
+                                                    "description": "Required. The task name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`", 
                                                     "location": "path", 
                                                     "pattern": "^projects/[^/]+/locations/[^/]+/queues/[^/]+/tasks/[^/]+$", 
                                                     "required": true, 
@@ -622,7 +629,7 @@
                                             ], 
                                             "parameters": {
                                                 "name": {
-                                                    "description": "Required.\n\nThe task name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`", 
+                                                    "description": "Required. The task name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`", 
                                                     "location": "path", 
                                                     "pattern": "^projects/[^/]+/locations/[^/]+/queues/[^/]+/tasks/[^/]+$", 
                                                     "required": true, 
@@ -657,7 +664,7 @@
                                             ], 
                                             "parameters": {
                                                 "parent": {
-                                                    "description": "Required.\n\nThe queue name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`", 
+                                                    "description": "Required. The queue name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`", 
                                                     "location": "path", 
                                                     "pattern": "^projects/[^/]+/locations/[^/]+/queues/[^/]+$", 
                                                     "required": true, 
@@ -696,7 +703,7 @@
                                                     "type": "string"
                                                 }, 
                                                 "parent": {
-                                                    "description": "Required.\n\nThe queue name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`", 
+                                                    "description": "Required. The queue name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`", 
                                                     "location": "path", 
                                                     "pattern": "^projects/[^/]+/locations/[^/]+/queues/[^/]+$", 
                                                     "required": true, 
@@ -731,7 +738,7 @@
                                             ], 
                                             "parameters": {
                                                 "name": {
-                                                    "description": "Required.\n\nThe task name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`", 
+                                                    "description": "Required. The task name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`", 
                                                     "location": "path", 
                                                     "pattern": "^projects/[^/]+/locations/[^/]+/queues/[^/]+/tasks/[^/]+$", 
                                                     "required": true, 
@@ -759,7 +766,7 @@
                                             ], 
                                             "parameters": {
                                                 "name": {
-                                                    "description": "Required.\n\nThe task name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`", 
+                                                    "description": "Required. The task name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`", 
                                                     "location": "path", 
                                                     "pattern": "^projects/[^/]+/locations/[^/]+/queues/[^/]+/tasks/[^/]+$", 
                                                     "required": true, 
@@ -786,7 +793,7 @@
             }
         }
     }, 
-    "revision": "20190618", 
+    "revision": "20200331", 
     "rootUrl": "https://cloudtasks.googleapis.com/", 
     "schemas": {
         "AcknowledgeTaskRequest": {
@@ -794,7 +801,7 @@
             "id": "AcknowledgeTaskRequest", 
             "properties": {
                 "scheduleTime": {
-                    "description": "Required.\n\nThe task's current schedule time, available in the\nschedule_time returned by\nLeaseTasks response or\nRenewLease response. This restriction is\nto ensure that your worker currently holds the lease.", 
+                    "description": "Required. The task's current schedule time, available in the\nschedule_time returned by\nLeaseTasks response or\nRenewLease response. This restriction is\nto ensure that your worker currently holds the lease.", 
                     "format": "google-datetime", 
                     "type": "string"
                 }
@@ -917,7 +924,7 @@
                     "description": "The condition that is associated with this binding.\nNOTE: An unsatisfied condition will not allow user access via current\nbinding. Different bindings, including their conditions, are examined\nindependently."
                 }, 
                 "members": {
-                    "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@gmail.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n", 
+                    "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@example.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n* `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique\n   identifier) representing a user that has been recently deleted. For\n   example, `alice@example.com?uid=123456789012345678901`. If the user is\n   recovered, this value reverts to `user:{emailid}` and the recovered user\n   retains the role in the binding.\n\n* `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus\n   unique identifier) representing a service account that has been recently\n   deleted. For example,\n   `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.\n   If the service account is undeleted, this value reverts to\n   `serviceAccount:{emailid}` and the undeleted service account retains the\n   role in the binding.\n\n* `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique\n   identifier) representing a Google group that has been recently\n   deleted. For example, `admins@example.com?uid=123456789012345678901`. If\n   the group is recovered, this value reverts to `group:{emailid}` and the\n   recovered group retains the role in the binding.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n", 
                     "items": {
                         "type": "string"
                     }, 
@@ -949,7 +956,7 @@
                     "type": "string"
                 }, 
                 "scheduleTime": {
-                    "description": "Required.\n\nThe task's current schedule time, available in the\nschedule_time returned by\nLeaseTasks response or\nRenewLease response. This restriction is\nto ensure that your worker currently holds the lease.", 
+                    "description": "Required. The task's current schedule time, available in the\nschedule_time returned by\nLeaseTasks response or\nRenewLease response. This restriction is\nto ensure that your worker currently holds the lease.", 
                     "format": "google-datetime", 
                     "type": "string"
                 }
@@ -976,7 +983,7 @@
                 }, 
                 "task": {
                     "$ref": "Task", 
-                    "description": "Required.\n\nThe task to add.\n\nTask names have the following format:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`.\nThe user can optionally specify a task name. If a\nname is not specified then the system will generate a random\nunique task id, which will be set in the task returned in the\nresponse.\n\nIf schedule_time is not set or is in the\npast then Cloud Tasks will set it to the current time.\n\nTask De-duplication:\n\nExplicitly specifying a task ID enables task de-duplication.  If\na task's ID is identical to that of an existing task or a task\nthat was deleted or completed recently then the call will fail\nwith ALREADY_EXISTS.\nIf the task's queue was created using Cloud Tasks, then another task with\nthe same name can't be created for ~1hour after the original task was\ndeleted or completed. If the task's queue was created using queue.yaml or\nqueue.xml, then another task with the same name can't be created\nfor ~9days after the original task was deleted or completed.\n\nBecause there is an extra lookup cost to identify duplicate task\nnames, these CreateTask calls have significantly\nincreased latency. Using hashed strings for the task id or for\nthe prefix of the task id is recommended. Choosing task ids that\nare sequential or have sequential prefixes, for example using a\ntimestamp, causes an increase in latency and error rates in all\ntask commands. The infrastructure relies on an approximately\nuniform distribution of task ids to store and serve tasks\nefficiently."
+                    "description": "Required. The task to add.\n\nTask names have the following format:\n`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`.\nThe user can optionally specify a task name. If a\nname is not specified then the system will generate a random\nunique task id, which will be set in the task returned in the\nresponse.\n\nIf schedule_time is not set or is in the\npast then Cloud Tasks will set it to the current time.\n\nTask De-duplication:\n\nExplicitly specifying a task ID enables task de-duplication.  If\na task's ID is identical to that of an existing task or a task\nthat was deleted or completed recently then the call will fail\nwith ALREADY_EXISTS.\nIf the task's queue was created using Cloud Tasks, then another task with\nthe same name can't be created for ~1hour after the original task was\ndeleted or completed. If the task's queue was created using queue.yaml or\nqueue.xml, then another task with the same name can't be created\nfor ~9days after the original task was deleted or completed.\n\nBecause there is an extra lookup cost to identify duplicate task\nnames, these CreateTask calls have significantly\nincreased latency. Using hashed strings for the task id or for\nthe prefix of the task id is recommended. Choosing task ids that\nare sequential or have sequential prefixes, for example using a\ntimestamp, causes an increase in latency and error rates in all\ntask commands. The infrastructure relies on an approximately\nuniform distribution of task ids to store and serve tasks\nefficiently."
                 }
             }, 
             "type": "object"
@@ -988,23 +995,23 @@
             "type": "object"
         }, 
         "Expr": {
-            "description": "Represents an expression text. Example:\n\n    title: \"User account presence\"\n    description: \"Determines whether the request has a user account\"\n    expression: \"size(request.user) > 0\"", 
+            "description": "Represents a textual expression in the Common Expression Language (CEL)\nsyntax. CEL is a C-like expression language. The syntax and semantics of CEL\nare documented at https://github.com/google/cel-spec.\n\nExample (Comparison):\n\n    title: \"Summary size limit\"\n    description: \"Determines if a summary is less than 100 chars\"\n    expression: \"document.summary.size() < 100\"\n\nExample (Equality):\n\n    title: \"Requestor is owner\"\n    description: \"Determines if requestor is the document owner\"\n    expression: \"document.owner == request.auth.claims.email\"\n\nExample (Logic):\n\n    title: \"Public documents\"\n    description: \"Determine whether the document should be publicly visible\"\n    expression: \"document.type != 'private' && document.type != 'internal'\"\n\nExample (Data Manipulation):\n\n    title: \"Notification string\"\n    description: \"Create a notification string with a timestamp.\"\n    expression: \"'New message received at ' + string(document.create_time)\"\n\nThe exact variables and functions that may be referenced within an expression\nare determined by the service that evaluates it. See the service\ndocumentation for additional information.", 
             "id": "Expr", 
             "properties": {
                 "description": {
-                    "description": "An optional description of the expression. This is a longer text which\ndescribes the expression, e.g. when hovered over it in a UI.", 
+                    "description": "Optional. Description of the expression. This is a longer text which\ndescribes the expression, e.g. when hovered over it in a UI.", 
                     "type": "string"
                 }, 
                 "expression": {
-                    "description": "Textual representation of an expression in\nCommon Expression Language syntax.\n\nThe application context of the containing message determines which\nwell-known feature set of CEL is supported.", 
+                    "description": "Textual representation of an expression in Common Expression Language\nsyntax.", 
                     "type": "string"
                 }, 
                 "location": {
-                    "description": "An optional string indicating the location of the expression for error\nreporting, e.g. a file name and a position in the file.", 
+                    "description": "Optional. String indicating the location of the expression for error\nreporting, e.g. a file name and a position in the file.", 
                     "type": "string"
                 }, 
                 "title": {
-                    "description": "An optional title for the expression, i.e. a short string describing\nits purpose. This can be used e.g. in UIs which allow to enter the\nexpression.", 
+                    "description": "Optional. Title for the expression, i.e. a short string describing\nits purpose. This can be used e.g. in UIs which allow to enter the\nexpression.", 
                     "type": "string"
                 }
             }, 
@@ -1013,7 +1020,24 @@
         "GetIamPolicyRequest": {
             "description": "Request message for `GetIamPolicy` method.", 
             "id": "GetIamPolicyRequest", 
-            "properties": {}, 
+            "properties": {
+                "options": {
+                    "$ref": "GetPolicyOptions", 
+                    "description": "OPTIONAL: A `GetPolicyOptions` object for specifying options to\n`GetIamPolicy`. This field is only used by Cloud IAM."
+                }
+            }, 
+            "type": "object"
+        }, 
+        "GetPolicyOptions": {
+            "description": "Encapsulates settings provided to GetIamPolicy.", 
+            "id": "GetPolicyOptions", 
+            "properties": {
+                "requestedPolicyVersion": {
+                    "description": "Optional. The policy format version to be returned.\n\nValid values are 0, 1, and 3. Requests specifying an invalid value will be\nrejected.\n\nRequests for policies with any conditional bindings must specify version 3.\nPolicies without any conditional bindings may specify any valid value or\nleave the field unset.", 
+                    "format": "int32", 
+                    "type": "integer"
+                }
+            }, 
             "type": "object"
         }, 
         "LeaseTasksRequest": {
@@ -1025,7 +1049,7 @@
                     "type": "string"
                 }, 
                 "leaseDuration": {
-                    "description": "Required.\n\nThe duration of the lease.\n\nEach task returned in the response will\nhave its schedule_time set to the current\ntime plus the `lease_duration`. The task is leased until its\nschedule_time; thus, the task will not be\nreturned to another LeaseTasks call\nbefore its schedule_time.\n\n\nAfter the worker has successfully finished the work associated\nwith the task, the worker must call via\nAcknowledgeTask before the\nschedule_time. Otherwise the task will be\nreturned to a later LeaseTasks call so\nthat another worker can retry it.\n\nThe maximum lease duration is 1 week.\n`lease_duration` will be truncated to the nearest second.", 
+                    "description": "Required. The duration of the lease.\n\nEach task returned in the response will\nhave its schedule_time set to the current\ntime plus the `lease_duration`. The task is leased until its\nschedule_time; thus, the task will not be\nreturned to another LeaseTasks call\nbefore its schedule_time.\n\n\nAfter the worker has successfully finished the work associated\nwith the task, the worker must call via\nAcknowledgeTask before the\nschedule_time. Otherwise the task will be\nreturned to a later LeaseTasks call so\nthat another worker can retry it.\n\nThe maximum lease duration is 1 week.\n`lease_duration` will be truncated to the nearest second.", 
                     "format": "google-duration", 
                     "type": "string"
                 }, 
@@ -1160,23 +1184,23 @@
             "type": "object"
         }, 
         "Policy": {
-            "description": "Defines an Identity and Access Management (IAM) policy. It is used to\nspecify access control policies for Cloud Platform resources.\n\n\nA `Policy` consists of a list of `bindings`. A `binding` binds a list of\n`members` to a `role`, where the members can be user accounts, Google groups,\nGoogle domains, and service accounts. A `role` is a named list of permissions\ndefined by IAM.\n\n**JSON Example**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles/owner\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-other-app@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles/viewer\",\n          \"members\": [\"user:sean@example.com\"]\n        }\n      ]\n    }\n\n**YAML Example**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-other-app@appspot.gserviceaccount.com\n      role: roles/owner\n    - members:\n      - user:sean@example.com\n      role: roles/viewer\n\n\nFor a description of IAM and its features, see the\n[IAM developer's guide](https://cloud.google.com/iam/docs).", 
+            "description": "An Identity and Access Management (IAM) policy, which specifies access\ncontrols for Google Cloud resources.\n\n\nA `Policy` is a collection of `bindings`. A `binding` binds one or more\n`members` to a single `role`. Members can be user accounts, service accounts,\nGoogle groups, and domains (such as G Suite). A `role` is a named list of\npermissions; each `role` can be an IAM predefined role or a user-created\ncustom role.\n\nOptionally, a `binding` can specify a `condition`, which is a logical\nexpression that allows access to a resource only if the expression evaluates\nto `true`. A condition can add constraints based on attributes of the\nrequest, the resource, or both.\n\n**JSON example:**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles/resourcemanager.organizationAdmin\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-project-id@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles/resourcemanager.organizationViewer\",\n          \"members\": [\"user:eve@example.com\"],\n          \"condition\": {\n            \"title\": \"expirable access\",\n            \"description\": \"Does not grant access after Sep 2020\",\n            \"expression\": \"request.time < timestamp('2020-10-01T00:00:00.000Z')\",\n          }\n        }\n      ],\n      \"etag\": \"BwWWja0YfJA=\",\n      \"version\": 3\n    }\n\n**YAML example:**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-project-id@appspot.gserviceaccount.com\n      role: roles/resourcemanager.organizationAdmin\n    - members:\n      - user:eve@example.com\n      role: roles/resourcemanager.organizationViewer\n      condition:\n        title: expirable access\n        description: Does not grant access after Sep 2020\n        expression: request.time < timestamp('2020-10-01T00:00:00.000Z')\n    - etag: BwWWja0YfJA=\n    - version: 3\n\nFor a description of IAM and its features, see the\n[IAM documentation](https://cloud.google.com/iam/docs/).", 
             "id": "Policy", 
             "properties": {
                 "bindings": {
-                    "description": "Associates a list of `members` to a `role`.\n`bindings` with no members will result in an error.", 
+                    "description": "Associates a list of `members` to a `role`. Optionally, may specify a\n`condition` that determines how and when the `bindings` are applied. Each\nof the `bindings` must contain at least one member.", 
                     "items": {
                         "$ref": "Binding"
                     }, 
                     "type": "array"
                 }, 
                 "etag": {
-                    "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\nIf no `etag` is provided in the call to `setIamPolicy`, then the existing\npolicy is overwritten blindly.", 
+                    "description": "`etag` is used for optimistic concurrency control as a way to help\nprevent simultaneous updates of a policy from overwriting each other.\nIt is strongly suggested that systems make use of the `etag` in the\nread-modify-write cycle to perform policy updates in order to avoid race\nconditions: An `etag` is returned in the response to `getIamPolicy`, and\nsystems are expected to put that etag in the request to `setIamPolicy` to\nensure that their change will be applied to the same version of the policy.\n\n**Important:** If you use IAM Conditions, you must include the `etag` field\nwhenever you call `setIamPolicy`. If you omit this field, then IAM allows\nyou to overwrite a version `3` policy with a version `1` policy, and all of\nthe conditions in the version `3` policy are lost.", 
                     "format": "byte", 
                     "type": "string"
                 }, 
                 "version": {
-                    "description": "Deprecated.", 
+                    "description": "Specifies the format of the policy.\n\nValid values are `0`, `1`, and `3`. Requests that specify an invalid value\nare rejected.\n\nAny operation that affects conditional role bindings must specify version\n`3`. This requirement applies to the following operations:\n\n* Getting a policy that includes a conditional role binding\n* Adding a conditional role binding to a policy\n* Changing a conditional role binding in a policy\n* Removing any role binding, with or without a condition, from a policy\n  that includes conditions\n\n**Important:** If you use IAM Conditions, you must include the `etag` field\nwhenever you call `setIamPolicy`. If you omit this field, then IAM allows\nyou to overwrite a version `3` policy with a version `1` policy, and all of\nthe conditions in the version `3` policy are lost.\n\nIf a policy does not include any conditions, operations on that policy may\nspecify any valid version or leave the field unset.", 
                     "format": "int32", 
                     "type": "integer"
                 }
@@ -1286,7 +1310,7 @@
             "id": "RenewLeaseRequest", 
             "properties": {
                 "leaseDuration": {
-                    "description": "Required.\n\nThe desired new lease duration, starting from now.\n\n\nThe maximum lease duration is 1 week.\n`lease_duration` will be truncated to the nearest second.", 
+                    "description": "Required. The desired new lease duration, starting from now.\n\n\nThe maximum lease duration is 1 week.\n`lease_duration` will be truncated to the nearest second.", 
                     "format": "google-duration", 
                     "type": "string"
                 }, 
@@ -1305,7 +1329,7 @@
                     "type": "string"
                 }, 
                 "scheduleTime": {
-                    "description": "Required.\n\nThe task's current schedule time, available in the\nschedule_time returned by\nLeaseTasks response or\nRenewLease response. This restriction is\nto ensure that your worker currently holds the lease.", 
+                    "description": "Required. The task's current schedule time, available in the\nschedule_time returned by\nLeaseTasks response or\nRenewLease response. This restriction is\nto ensure that your worker currently holds the lease.", 
                     "format": "google-datetime", 
                     "type": "string"
                 }

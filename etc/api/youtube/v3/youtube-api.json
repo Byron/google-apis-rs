@@ -5,6 +5,9 @@
                 "https://www.googleapis.com/auth/youtube": {
                     "description": "Manage your YouTube account"
                 }, 
+                "https://www.googleapis.com/auth/youtube.channel-memberships.creator": {
+                    "description": "See a list of your current active channel members, their current level, and when they became a member"
+                }, 
                 "https://www.googleapis.com/auth/youtube.force-ssl": {
                     "description": "See, edit, and permanently delete your YouTube videos, ratings, comments and captions"
                 }, 
@@ -30,7 +33,7 @@
     "description": "Supports core YouTube features, such as uploading videos, creating and managing playlists, searching for content, and much more.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/youtube/v3", 
-    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/iJCWgcHgub352FxdGhLwKx-bej4\"", 
+    "etag": "\"u9GIe6H63LSGq-9_t39K2Zx_EAc/VfSXoeTZJSDEPlJ9LkqjGCjn5wo\"", 
     "icons": {
         "x16": "https://www.google.com/images/icons/product/youtube-16.png", 
         "x32": "https://www.google.com/images/icons/product/youtube-32.png"
@@ -2043,6 +2046,106 @@
                 }
             }
         }, 
+        "members": {
+            "methods": {
+                "list": {
+                    "description": "Lists members for a channel.", 
+                    "httpMethod": "GET", 
+                    "id": "youtube.members.list", 
+                    "parameterOrder": [
+                        "part"
+                    ], 
+                    "parameters": {
+                        "filterByMemberChannelId": {
+                            "description": "The filterByMemberChannelId parameter represents a comma separated list of channel IDs. Only data about members that are part of this list will be included in the response. It can be used to efficiently check whether specific users are entitled to perks offered via third parties.", 
+                            "location": "query", 
+                            "type": "string"
+                        }, 
+                        "hasAccessToLevel": {
+                            "description": "The hasAccessToLevel parameter specifies, when set, the ID of a pricing level that members from the results set should have access to. When not set, all members will be considered, regardless of their active pricing level.", 
+                            "location": "query", 
+                            "type": "string"
+                        }, 
+                        "maxResults": {
+                            "default": "5", 
+                            "description": "The maxResults parameter specifies the maximum number of items that should be returned in the result set.", 
+                            "format": "uint32", 
+                            "location": "query", 
+                            "maximum": "1000", 
+                            "minimum": "0", 
+                            "type": "integer"
+                        }, 
+                        "mode": {
+                            "default": "LIST_MEMBERS_MODE_ALL_CURRENT", 
+                            "description": "The mode parameter specifies which channel members to return.", 
+                            "enum": [
+                                "all_current", 
+                                "updates"
+                            ], 
+                            "enumDescriptions": [
+                                "Return all current members, from newest to oldest.", 
+                                "Return only members that joined after the first call with this mode was made."
+                            ], 
+                            "location": "query", 
+                            "type": "string"
+                        }, 
+                        "pageToken": {
+                            "description": "The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.", 
+                            "location": "query", 
+                            "type": "string"
+                        }, 
+                        "part": {
+                            "description": "The part parameter specifies the member resource parts that the API response will include. Set the parameter value to snippet.", 
+                            "location": "query", 
+                            "required": true, 
+                            "type": "string"
+                        }
+                    }, 
+                    "path": "members", 
+                    "response": {
+                        "$ref": "MemberListResponse"
+                    }, 
+                    "scopes": [
+                        "https://www.googleapis.com/auth/youtube", 
+                        "https://www.googleapis.com/auth/youtube.channel-memberships.creator", 
+                        "https://www.googleapis.com/auth/youtube.force-ssl", 
+                        "https://www.googleapis.com/auth/youtube.readonly", 
+                        "https://www.googleapis.com/auth/youtubepartner"
+                    ]
+                }
+            }
+        }, 
+        "membershipsLevels": {
+            "methods": {
+                "list": {
+                    "description": "Lists pricing levels for a channel.", 
+                    "httpMethod": "GET", 
+                    "id": "youtube.membershipsLevels.list", 
+                    "parameterOrder": [
+                        "part"
+                    ], 
+                    "parameters": {
+                        "part": {
+                            "description": "The part parameter specifies the membershipsLevel resource parts that the API response will include. Supported values are id and snippet.", 
+                            "location": "query", 
+                            "required": true, 
+                            "type": "string"
+                        }
+                    }, 
+                    "path": "membershipsLevels", 
+                    "response": {
+                        "$ref": "MembershipsLevelListResponse"
+                    }, 
+                    "scopes": [
+                        "https://www.googleapis.com/auth/youtube", 
+                        "https://www.googleapis.com/auth/youtube.channel-memberships.creator", 
+                        "https://www.googleapis.com/auth/youtube.force-ssl", 
+                        "https://www.googleapis.com/auth/youtube.readonly", 
+                        "https://www.googleapis.com/auth/youtubepartner"
+                    ]
+                }
+            }
+        }, 
         "playlistItems": {
             "methods": {
                 "delete": {
@@ -2521,6 +2624,7 @@
                             "type": "string"
                         }, 
                         "safeSearch": {
+                            "default": "SAFE_SEARCH_MODERATE_FILTERING", 
                             "description": "The safeSearch parameter indicates whether the search results should include restricted content as well as standard content.", 
                             "enum": [
                                 "moderate", 
@@ -3141,7 +3245,7 @@
                             "application/octet-stream", 
                             "video/*"
                         ], 
-                        "maxSize": "64GB", 
+                        "maxSize": "128GB", 
                         "protocols": {
                             "resumable": {
                                 "multipart": true, 
@@ -3493,7 +3597,7 @@
             }
         }
     }, 
-    "revision": "20190513", 
+    "revision": "20200402", 
     "rootUrl": "https://www.googleapis.com/", 
     "schemas": {
         "AccessPolicy": {
@@ -4154,9 +4258,11 @@
                     "enum": [
                         "dash", 
                         "hls", 
-                        "rtmp"
+                        "rtmp", 
+                        "webrtc"
                     ], 
                     "enumDescriptions": [
+                        "", 
                         "", 
                         "", 
                         ""
@@ -4864,21 +4970,25 @@
                     ], 
                     "type": "string"
                 }, 
+                "madeForKids": {
+                    "type": "boolean"
+                }, 
                 "privacyStatus": {
                     "description": "Privacy status of the channel.", 
                     "enum": [
                         "private", 
                         "public", 
-                        "unlisted", 
-                        "unlisted_new"
+                        "unlisted"
                     ], 
                     "enumDescriptions": [
-                        "", 
                         "", 
                         "", 
                         ""
                     ], 
                     "type": "string"
+                }, 
+                "selfDeclaredMadeForKids": {
+                    "type": "boolean"
                 }
             }, 
             "type": "object"
@@ -5177,7 +5287,7 @@
             "type": "object"
         }, 
         "ContentRating": {
-            "description": "Ratings schemes. The country-specific ratings are mostly for movies and shows. NEXT_ID: 71", 
+            "description": "Ratings schemes. The country-specific ratings are mostly for movies and shows. NEXT_ID: 72", 
             "id": "ContentRating", 
             "properties": {
                 "acbRating": {
@@ -6484,12 +6594,37 @@
                     "description": "The video's rating from the Nacion\u00e3lais Kino centrs (National Film Centre of Latvia).", 
                     "enum": [
                         "nkclv12plus", 
+                        "nkclv16plus", 
                         "nkclv18plus", 
                         "nkclv7plus", 
                         "nkclvU", 
                         "nkclvUnrated"
                     ], 
                     "enumDescriptions": [
+                        "", 
+                        "", 
+                        "", 
+                        "", 
+                        "", 
+                        ""
+                    ], 
+                    "type": "string"
+                }, 
+                "nmcRating": {
+                    "enum": [
+                        "nmc15plus", 
+                        "nmc18plus", 
+                        "nmc18tc", 
+                        "nmcG", 
+                        "nmcPg", 
+                        "nmcPg13", 
+                        "nmcPg15", 
+                        "nmcUnrated"
+                    ], 
+                    "enumDescriptions": [
+                        "", 
+                        "", 
+                        "", 
                         "", 
                         "", 
                         "", 
@@ -7219,6 +7354,15 @@
             }, 
             "type": "object"
         }, 
+        "LevelDetails": {
+            "id": "LevelDetails", 
+            "properties": {
+                "displayName": {
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
         "LiveBroadcast": {
             "description": "A liveBroadcast resource represents an event that will be streamed, via live video, on YouTube.", 
             "id": "LiveBroadcast", 
@@ -7290,6 +7434,9 @@
                     "description": "This setting indicates whether auto start is enabled for this broadcast.", 
                     "type": "boolean"
                 }, 
+                "enableAutoStop": {
+                    "type": "boolean"
+                }, 
                 "enableClosedCaptions": {
                     "description": "This setting indicates whether HTTP POST closed captioning is enabled for this broadcast. The ingestion URL of the closed captions is returned through the liveStreams API. This is mutually exclusive with using the closed_captions_type property, and is equivalent to setting closed_captions_type to CLOSED_CAPTIONS_HTTP_POST.", 
                     "type": "boolean"
@@ -7340,6 +7487,7 @@
                     "type": "string"
                 }, 
                 "mesh": {
+                    "description": "The mesh for projecting the video if projection is mesh. The mesh value must be a UTF-8 string containing the base-64 encoding of 3D mesh data that follows the  Spherical Video V2 RFC specification for an mshp box, excluding the box size and type but including the following four reserved zero bytes for the version and flags.", 
                     "format": "byte", 
                     "type": "string"
                 }, 
@@ -7450,6 +7598,33 @@
                 "actualStartTime": {
                     "description": "The date and time that the broadcast actually started. This information is only available once the broadcast's state is live. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.", 
                     "format": "date-time", 
+                    "type": "string"
+                }, 
+                "broadcastType": {
+                    "enum": [
+                        "fludd", 
+                        "fluddArchive", 
+                        "gplusHoa", 
+                        "lcrEncoder", 
+                        "mobile", 
+                        "persistent", 
+                        "premiere", 
+                        "unspecified", 
+                        "webcam", 
+                        "ytHoa"
+                    ], 
+                    "enumDescriptions": [
+                        "", 
+                        "", 
+                        "", 
+                        "", 
+                        "", 
+                        "", 
+                        "", 
+                        "", 
+                        "", 
+                        ""
+                    ], 
                     "type": "string"
                 }, 
                 "channelId": {
@@ -7563,6 +7738,9 @@
                     ], 
                     "type": "string"
                 }, 
+                "madeForKids": {
+                    "type": "boolean"
+                }, 
                 "privacyStatus": {
                     "annotations": {
                         "required": [
@@ -7574,11 +7752,9 @@
                     "enum": [
                         "private", 
                         "public", 
-                        "unlisted", 
-                        "unlisted_new"
+                        "unlisted"
                     ], 
                     "enumDescriptions": [
-                        "", 
                         "", 
                         "", 
                         ""
@@ -7598,6 +7774,9 @@
                         ""
                     ], 
                     "type": "string"
+                }, 
+                "selfDeclaredMadeForKids": {
+                    "type": "boolean"
                 }
             }, 
             "type": "object"
@@ -8495,6 +8674,217 @@
             }, 
             "type": "object"
         }, 
+        "Member": {
+            "description": "A member resource represents a member for a YouTube channel. A member provides recurring monetary support to a creator and receives special benefits.", 
+            "id": "Member", 
+            "properties": {
+                "etag": {
+                    "description": "Etag of this resource.", 
+                    "type": "string"
+                }, 
+                "kind": {
+                    "default": "youtube#member", 
+                    "description": "Identifies what kind of resource this is. Value: the fixed string \"youtube#member\".", 
+                    "type": "string"
+                }, 
+                "snippet": {
+                    "$ref": "MemberSnippet", 
+                    "description": "The snippet object contains basic details about the member."
+                }
+            }, 
+            "type": "object"
+        }, 
+        "MemberListResponse": {
+            "id": "MemberListResponse", 
+            "properties": {
+                "etag": {
+                    "description": "Etag of this resource.", 
+                    "type": "string"
+                }, 
+                "eventId": {
+                    "description": "Serialized EventId of the request which produced this response.", 
+                    "type": "string"
+                }, 
+                "items": {
+                    "description": "A list of members that match the request criteria.", 
+                    "items": {
+                        "$ref": "Member"
+                    }, 
+                    "type": "array"
+                }, 
+                "kind": {
+                    "default": "youtube#memberListResponse", 
+                    "description": "Identifies what kind of resource this is. Value: the fixed string \"youtube#memberListResponse\".", 
+                    "type": "string"
+                }, 
+                "nextPageToken": {
+                    "description": "The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.", 
+                    "type": "string"
+                }, 
+                "pageInfo": {
+                    "$ref": "PageInfo"
+                }, 
+                "tokenPagination": {
+                    "$ref": "TokenPagination"
+                }, 
+                "visitorId": {
+                    "description": "The visitorId identifies the visitor.", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "MemberSnippet": {
+            "id": "MemberSnippet", 
+            "properties": {
+                "creatorChannelId": {
+                    "description": "The id of the channel that's offering memberships.", 
+                    "type": "string"
+                }, 
+                "memberDetails": {
+                    "$ref": "ChannelProfileDetails", 
+                    "description": "Details about the member."
+                }, 
+                "membershipsDetails": {
+                    "$ref": "MembershipsDetails", 
+                    "description": "Details about the user's membership."
+                }
+            }, 
+            "type": "object"
+        }, 
+        "MembershipsDetails": {
+            "id": "MembershipsDetails", 
+            "properties": {
+                "accessibleLevels": {
+                    "description": "Ids of all levels that the user has access to. This includes the currently active level and all other levels that are included because of a higher purchase.", 
+                    "items": {
+                        "type": "string"
+                    }, 
+                    "type": "array"
+                }, 
+                "highestAccessibleLevel": {
+                    "description": "Id of the highest level that the user has access to at the moment.", 
+                    "type": "string"
+                }, 
+                "highestAccessibleLevelDisplayName": {
+                    "description": "Display name of the highest level that the user has access to at the moment.", 
+                    "type": "string"
+                }, 
+                "membershipsDuration": {
+                    "$ref": "MembershipsDuration", 
+                    "description": "Data about memberships duration without taking into consideration pricing levels."
+                }, 
+                "membershipsDurationAtLevels": {
+                    "description": "Data about memberships duration on particular pricing levels.", 
+                    "items": {
+                        "$ref": "MembershipsDurationAtLevel"
+                    }, 
+                    "type": "array"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "MembershipsDuration": {
+            "id": "MembershipsDuration", 
+            "properties": {
+                "memberSince": {
+                    "description": "The date and time when the user became a continuous member across all levels.", 
+                    "type": "string"
+                }, 
+                "memberTotalDurationMonths": {
+                    "description": "The cumulative time the user has been a member across all levels in complete months (the time is rounded down to the nearest integer).", 
+                    "format": "int32", 
+                    "type": "integer"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "MembershipsDurationAtLevel": {
+            "id": "MembershipsDurationAtLevel", 
+            "properties": {
+                "level": {
+                    "description": "Pricing level id.", 
+                    "type": "string"
+                }, 
+                "memberSince": {
+                    "description": "The date and time when the user became a continuous member for the given level.", 
+                    "type": "string"
+                }, 
+                "memberTotalDurationMonths": {
+                    "description": "The cumulative time the user has been a member for the given level in complete months (the time is rounded down to the nearest integer).", 
+                    "format": "int32", 
+                    "type": "integer"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "MembershipsLevel": {
+            "description": "A membershipsLevel resource represents an offer made by YouTube creators for their fans. Users can become members of the channel by joining one of the available levels. They will provide recurring monetary support and receives special benefits.", 
+            "id": "MembershipsLevel", 
+            "properties": {
+                "etag": {
+                    "description": "Etag of this resource.", 
+                    "type": "string"
+                }, 
+                "id": {
+                    "description": "The ID that YouTube assigns to uniquely identify the memberships level.", 
+                    "type": "string"
+                }, 
+                "kind": {
+                    "default": "youtube#membershipsLevel", 
+                    "description": "Identifies what kind of resource this is. Value: the fixed string \"youtube#membershipsLevel\".", 
+                    "type": "string"
+                }, 
+                "snippet": {
+                    "$ref": "MembershipsLevelSnippet", 
+                    "description": "The snippet object contains basic details about the level."
+                }
+            }, 
+            "type": "object"
+        }, 
+        "MembershipsLevelListResponse": {
+            "id": "MembershipsLevelListResponse", 
+            "properties": {
+                "etag": {
+                    "description": "Etag of this resource.", 
+                    "type": "string"
+                }, 
+                "eventId": {
+                    "description": "Serialized EventId of the request which produced this response.", 
+                    "type": "string"
+                }, 
+                "items": {
+                    "description": "A list of pricing levels offered by a creator to the fans.", 
+                    "items": {
+                        "$ref": "MembershipsLevel"
+                    }, 
+                    "type": "array"
+                }, 
+                "kind": {
+                    "default": "youtube#membershipsLevelListResponse", 
+                    "description": "Identifies what kind of resource this is. Value: the fixed string \"youtube#membershipsLevelListResponse\".", 
+                    "type": "string"
+                }, 
+                "visitorId": {
+                    "description": "The visitorId identifies the visitor.", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "MembershipsLevelSnippet": {
+            "id": "MembershipsLevelSnippet", 
+            "properties": {
+                "creatorChannelId": {
+                    "description": "The id of the channel that's offering channel memberships.", 
+                    "type": "string"
+                }, 
+                "levelDetails": {
+                    "$ref": "LevelDetails"
+                }
+            }, 
+            "type": "object"
+        }, 
         "MonitorStreamInfo": {
             "description": "Settings and Info of the monitor stream", 
             "id": "MonitorStreamInfo", 
@@ -8790,11 +9180,9 @@
                     "enum": [
                         "private", 
                         "public", 
-                        "unlisted", 
-                        "unlisted_new"
+                        "unlisted"
                     ], 
                     "enumDescriptions": [
-                        "", 
                         "", 
                         "", 
                         ""
@@ -8934,11 +9322,9 @@
                     "enum": [
                         "private", 
                         "public", 
-                        "unlisted", 
-                        "unlisted_new"
+                        "unlisted"
                     ], 
                     "enumDescriptions": [
-                        "", 
                         "", 
                         "", 
                         ""
@@ -10637,16 +11023,17 @@
                     ], 
                     "type": "string"
                 }, 
+                "madeForKids": {
+                    "type": "boolean"
+                }, 
                 "privacyStatus": {
                     "description": "The video's privacy status.", 
                     "enum": [
                         "private", 
                         "public", 
-                        "unlisted", 
-                        "unlisted_new"
+                        "unlisted"
                     ], 
                     "enumDescriptions": [
-                        "", 
                         "", 
                         "", 
                         ""
@@ -10689,6 +11076,9 @@
                         ""
                     ], 
                     "type": "string"
+                }, 
+                "selfDeclaredMadeForKids": {
+                    "type": "boolean"
                 }, 
                 "uploadStatus": {
                     "description": "The status of the uploaded video.", 

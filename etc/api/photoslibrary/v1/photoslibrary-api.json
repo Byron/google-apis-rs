@@ -34,6 +34,7 @@
     }, 
     "id": "photoslibrary:v1", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://photoslibrary.mtls.googleapis.com/", 
     "name": "photoslibrary", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -266,7 +267,7 @@
                             "type": "boolean"
                         }, 
                         "pageSize": {
-                            "description": "Maximum number of albums to return in the response. The default number of\nalbums to return at a time is 20. The maximum `pageSize` is 50.", 
+                            "description": "Maximum number of albums to return in the response. Fewer albums might be\nreturned than the specified number. The default `pageSize` is 20, the\nmaximum is 50.", 
                             "format": "int32", 
                             "location": "query", 
                             "type": "integer"
@@ -426,7 +427,7 @@
                     "parameterOrder": [], 
                     "parameters": {
                         "pageSize": {
-                            "description": "Maximum number of media items to return in the response. The default number\nof media items to return at a time is 25. The maximum `pageSize` is 100.", 
+                            "description": "Maximum number of media items to return in the response. Fewer media items\nmight be returned than the specified number. The default `pageSize` is 25,\nthe maximum is 100.", 
                             "format": "int32", 
                             "location": "query", 
                             "type": "integer"
@@ -545,7 +546,7 @@
                             "type": "boolean"
                         }, 
                         "pageSize": {
-                            "description": "Maximum number of albums to return in the response. The default number of\nalbums to return at a time is 20. The maximum `pageSize` is 50.", 
+                            "description": "Maximum number of albums to return in the response. Fewer albums might be\nreturned than the specified number. The default `pageSize` is 20, the\nmaximum is 50.", 
                             "format": "int32", 
                             "location": "query", 
                             "type": "integer"
@@ -569,7 +570,7 @@
             }
         }
     }, 
-    "revision": "20190702", 
+    "revision": "20200329", 
     "rootUrl": "https://photoslibrary.googleapis.com/", 
     "schemas": {
         "AddEnrichmentToAlbumRequest": {
@@ -607,7 +608,7 @@
                     "type": "string"
                 }, 
                 "coverPhotoMediaItemId": {
-                    "description": "[Output only] Identifier for the media item associated with the cover\nphoto.", 
+                    "description": "Identifier for the media item associated with the cover photo.", 
                     "type": "string"
                 }, 
                 "id": {
@@ -925,7 +926,7 @@
             "type": "object"
         }, 
         "Date": {
-            "description": "Represents a whole calendar date. The day may be 0 to represent a year and month where the day isn't significant, such as a whole calendar month. The month may be 0 to represent a a day and a year where the month isn't signficant, like when you want to specify the same day in every month of a year or a specific year. The year may be 0 to represent a month and day independent of year, like an anniversary date.", 
+            "description": "Represents a whole calendar date. Set `day` to 0 when only the month and year are significant, for example, all of December 2018. Set `day` and `month` to 0 if only the year is significant, for example, the entire of 2018. Set `year` to 0 when only the day and month are significant, for example, an anniversary or birthday.\n\nUnsupported: Setting all values to 0, only `month` to 0, or both `day` and `year` to 0 at the same time.", 
             "id": "Date", 
             "properties": {
                 "day": {
@@ -968,7 +969,7 @@
             "type": "object"
         }, 
         "DateRange": {
-            "description": "Defines a range of dates. Both dates must be of the same format. For more\ninformation, see <a href=\"#Date\">Date</a>", 
+            "description": "Defines a range of dates. Both dates must be of the same format. For more\ninformation, see Date.", 
             "id": "DateRange", 
             "properties": {
                 "endDate": {
@@ -1406,7 +1407,7 @@
                     "description": "Filters to apply to the request. Can't be set in conjunction with an\n`albumId`."
                 }, 
                 "pageSize": {
-                    "description": "Maximum number of media items to return in the response. The default number\nof media items to return at a time is 25. The maximum\n`pageSize` is 100.", 
+                    "description": "Maximum number of media items to return in the response. Fewer media items\nmight be returned than the specified number. The default `pageSize` is 25,\nthe maximum is 100.", 
                     "format": "int32", 
                     "type": "integer"
                 }, 
@@ -1465,8 +1466,12 @@
                     "description": "True if the user has joined the album. This is always true for the owner\nof the shared album.", 
                     "type": "boolean"
                 }, 
+                "isOwned": {
+                    "description": "True if the user owns the album.", 
+                    "type": "boolean"
+                }, 
                 "shareToken": {
-                    "description": "A token that can be used by other users to join this shared album via the\nAPI.", 
+                    "description": "A token that can be used by other users to join or leave this shared album\nvia the API.", 
                     "type": "string"
                 }, 
                 "shareableUrl": {
@@ -1499,6 +1504,10 @@
             "description": "A simple media item to be created in Google Photos via an upload token.", 
             "id": "SimpleMediaItem", 
             "properties": {
+                "fileName": {
+                    "description": "File name with extension of the media item. This is shown to the user in\nGoogle Photos. The file name specified during the <a\nhref=\"https://developers.google.com/photos/library/guides/upload-media\">byte\nupload process</a> is ignored if this field is set. The file name,\nincluding the file extension, shouldn't be more than 255 characters. This\nis an optional field.", 
+                    "type": "string"
+                }, 
                 "uploadToken": {
                     "description": "Token identifying the media bytes that have been uploaded to Google.", 
                     "type": "string"

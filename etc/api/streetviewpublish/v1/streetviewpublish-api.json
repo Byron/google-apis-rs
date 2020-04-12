@@ -22,6 +22,7 @@
     }, 
     "id": "streetviewpublish:v1", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://streetviewpublish.mtls.googleapis.com/", 
     "name": "streetviewpublish", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -169,7 +170,7 @@
                             "type": "string"
                         }, 
                         "view": {
-                            "description": "Specifies if a download URL for the photo bytes should be returned in the\nPhoto response.", 
+                            "description": "Required. Specifies if a download URL for the photo bytes should be returned in the\nPhoto response.", 
                             "enum": [
                                 "BASIC", 
                                 "INCLUDE_DOWNLOAD_URL"
@@ -187,7 +188,7 @@
                     ]
                 }, 
                 "startUpload": {
-                    "description": "Creates an upload session to start uploading photo bytes.  The method uses\nthe upload URL of the returned\nUploadRef to upload the bytes for\nthe Photo.\n\nIn addition to the photo requirements shown in\nhttps://support.google.com/maps/answer/7012050?hl=en&ref_topic=6275604,\nthe photo must meet the following requirements:\n\n* Photo Sphere XMP metadata must be included in the photo medadata. See\nhttps://developers.google.com/streetview/spherical-metadata for the\nrequired fields.\n* The pixel size of the photo must meet the size requirements listed in\nhttps://support.google.com/maps/answer/7012050?hl=en&ref_topic=6275604, and\nthe photo must be a full 360 horizontally.\n\nAfter the upload completes, the method uses\nUploadRef with\nCreatePhoto\nto create the Photo object entry.", 
+                    "description": "Creates an upload session to start uploading photo bytes.  The method uses\nthe upload URL of the returned\nUploadRef to upload the bytes for\nthe Photo.\n\nIn addition to the photo requirements shown in\nhttps://support.google.com/maps/answer/7012050?hl=en&ref_topic=6275604,\nthe photo must meet the following requirements:\n\n* Photo Sphere XMP metadata must be included in the photo metadata. See\nhttps://developers.google.com/streetview/spherical-metadata for the\nrequired fields.\n* The pixel size of the photo must meet the size requirements listed in\nhttps://support.google.com/maps/answer/7012050?hl=en&ref_topic=6275604, and\nthe photo must be a full 360 horizontally.\n\nAfter the upload completes, the method uses\nUploadRef with\nCreatePhoto\nto create the Photo object entry.", 
                     "flatPath": "v1/photo:startUpload", 
                     "httpMethod": "POST", 
                     "id": "streetviewpublish.photo.startUpload", 
@@ -220,7 +221,7 @@
                             "type": "string"
                         }, 
                         "updateMask": {
-                            "description": "Mask that identifies fields on the photo metadata to update.\nIf not present, the old Photo\nmetadata is entirely replaced with the\nnew Photo metadata in this request.\nThe update fails if invalid fields are specified. Multiple fields can be\nspecified in a comma-delimited list.\n\nThe following fields are valid:\n\n* `pose.heading`\n* `pose.latLngPair`\n* `pose.pitch`\n* `pose.roll`\n* `pose.level`\n* `pose.altitude`\n* `connections`\n* `places`\n\n\n<aside class=\"note\"><b>Note:</b> When\nupdateMask\ncontains repeated fields, the entire set of repeated values get replaced\nwith the new contents. For example, if\nupdateMask\ncontains `connections` and `UpdatePhotoRequest.photo.connections` is empty,\nall connections are removed.</aside>", 
+                            "description": "Required. Mask that identifies fields on the photo metadata to update.\nIf not present, the old Photo\nmetadata is entirely replaced with the\nnew Photo metadata in this request.\nThe update fails if invalid fields are specified. Multiple fields can be\nspecified in a comma-delimited list.\n\nThe following fields are valid:\n\n* `pose.heading`\n* `pose.latLngPair`\n* `pose.pitch`\n* `pose.roll`\n* `pose.level`\n* `pose.altitude`\n* `connections`\n* `places`\n\n\n<aside class=\"note\"><b>Note:</b> When\nupdateMask\ncontains repeated fields, the entire set of repeated values get replaced\nwith the new contents. For example, if\nupdateMask\ncontains `connections` and `UpdatePhotoRequest.photo.connections` is empty,\nall connections are removed.</aside>", 
                             "format": "google-fieldmask", 
                             "location": "query", 
                             "type": "string"
@@ -278,7 +279,7 @@
                             "type": "string"
                         }, 
                         "view": {
-                            "description": "Specifies if a download URL for the photo bytes should be returned in the\nPhoto response.", 
+                            "description": "Required. Specifies if a download URL for the photo bytes should be returned in the\nPhoto response.", 
                             "enum": [
                                 "BASIC", 
                                 "INCLUDE_DOWNLOAD_URL"
@@ -321,7 +322,7 @@
                     "parameterOrder": [], 
                     "parameters": {
                         "filter": {
-                            "description": "The filter expression. For example: `placeId=ChIJj61dQgK6j4AR4GeTYWZsKWw`.\n\nThe only filter supported at the moment is `placeId`.", 
+                            "description": "Required. The filter expression. For example: `placeId=ChIJj61dQgK6j4AR4GeTYWZsKWw`.\n\nThe only filter supported at the moment is `placeId`.", 
                             "location": "query", 
                             "type": "string"
                         }, 
@@ -342,7 +343,7 @@
                             "type": "string"
                         }, 
                         "view": {
-                            "description": "Specifies if a download URL for the photos bytes should be returned in the\nPhotos response.", 
+                            "description": "Required. Specifies if a download URL for the photos bytes should be returned in the\nPhotos response.", 
                             "enum": [
                                 "BASIC", 
                                 "INCLUDE_DOWNLOAD_URL"
@@ -362,7 +363,7 @@
             }
         }
     }, 
-    "revision": "20190703", 
+    "revision": "20200409", 
     "rootUrl": "https://streetviewpublish.googleapis.com/", 
     "schemas": {
         "BatchDeletePhotosRequest": {
@@ -559,7 +560,7 @@
                     "type": "string"
                 }, 
                 "mapsPublishStatus": {
-                    "description": "Output only. Status in Google Maps, whether this photo was published or\nrejected.", 
+                    "description": "Output only. Status in Google Maps, whether this photo was published or\nrejected. Not currently populated.", 
                     "enum": [
                         "UNSPECIFIED_MAPS_PUBLISH_STATUS", 
                         "PUBLISHED", 
@@ -752,7 +753,7 @@
                     "description": "Required. Photo object containing the\nnew metadata."
                 }, 
                 "updateMask": {
-                    "description": "Mask that identifies fields on the photo metadata to update.\nIf not present, the old Photo\nmetadata is entirely replaced with the\nnew Photo metadata in this request.\nThe update fails if invalid fields are specified. Multiple fields can be\nspecified in a comma-delimited list.\n\nThe following fields are valid:\n\n* `pose.heading`\n* `pose.latLngPair`\n* `pose.pitch`\n* `pose.roll`\n* `pose.level`\n* `pose.altitude`\n* `connections`\n* `places`\n\n\n<aside class=\"note\"><b>Note:</b> When\nupdateMask\ncontains repeated fields, the entire set of repeated values get replaced\nwith the new contents. For example, if\nupdateMask\ncontains `connections` and `UpdatePhotoRequest.photo.connections` is empty,\nall connections are removed.</aside>", 
+                    "description": "Required. Mask that identifies fields on the photo metadata to update.\nIf not present, the old Photo\nmetadata is entirely replaced with the\nnew Photo metadata in this request.\nThe update fails if invalid fields are specified. Multiple fields can be\nspecified in a comma-delimited list.\n\nThe following fields are valid:\n\n* `pose.heading`\n* `pose.latLngPair`\n* `pose.pitch`\n* `pose.roll`\n* `pose.level`\n* `pose.altitude`\n* `connections`\n* `places`\n\n\n<aside class=\"note\"><b>Note:</b> When\nupdateMask\ncontains repeated fields, the entire set of repeated values get replaced\nwith the new contents. For example, if\nupdateMask\ncontains `connections` and `UpdatePhotoRequest.photo.connections` is empty,\nall connections are removed.</aside>", 
                     "format": "google-fieldmask", 
                     "type": "string"
                 }

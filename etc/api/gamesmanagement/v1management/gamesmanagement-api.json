@@ -15,7 +15,7 @@
     "description": "The Management API for Google Play Game Services.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/games/services", 
-    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/PeI8pHLCi9WE8e-r-CurvFzseTA\"", 
+    "etag": "\"u9GIe6H63LSGq-9_t39K2Zx_EAc/6aLuoaZac1pdM_CUSJsS-zYRIHE\"", 
     "icons": {
         "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png", 
         "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
@@ -195,7 +195,7 @@
         "events": {
             "methods": {
                 "reset": {
-                    "description": "Resets all player progress on the event with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application. All quests for this player that use the event will also be reset.", 
+                    "description": "Resets all player progress on the event with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.", 
                     "httpMethod": "POST", 
                     "id": "gamesManagement.events.reset", 
                     "parameterOrder": [
@@ -215,7 +215,7 @@
                     ]
                 }, 
                 "resetAll": {
-                    "description": "Resets all player progress on all events for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application. All quests for this player will also be reset.", 
+                    "description": "Resets all player progress on all events for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.", 
                     "httpMethod": "POST", 
                     "id": "gamesManagement.events.resetAll", 
                     "path": "events/reset", 
@@ -224,7 +224,7 @@
                     ]
                 }, 
                 "resetAllForAllPlayers": {
-                    "description": "Resets all draft events for all players. This method is only available to user accounts for your developer console. All quests that use any of these events will also be reset.", 
+                    "description": "Resets all draft events for all players. This method is only available to user accounts for your developer console.", 
                     "httpMethod": "POST", 
                     "id": "gamesManagement.events.resetAllForAllPlayers", 
                     "path": "events/resetAllForAllPlayers", 
@@ -233,7 +233,7 @@
                     ]
                 }, 
                 "resetForAllPlayers": {
-                    "description": "Resets the event with the given ID for all players. This method is only available to user accounts for your developer console. Only draft events can be reset. All quests that use the event will also be reset.", 
+                    "description": "Resets the event with the given ID for all players. This method is only available to user accounts for your developer console. Only draft events can be reset.", 
                     "httpMethod": "POST", 
                     "id": "gamesManagement.events.resetForAllPlayers", 
                     "parameterOrder": [
@@ -253,7 +253,7 @@
                     ]
                 }, 
                 "resetMultipleForAllPlayers": {
-                    "description": "Resets events with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft events may be reset. All quests that use any of the events will also be reset.", 
+                    "description": "Resets events with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft events may be reset.", 
                     "httpMethod": "POST", 
                     "id": "gamesManagement.events.resetMultipleForAllPlayers", 
                     "path": "events/resetMultipleForAllPlayers", 
@@ -318,80 +318,6 @@
                         }
                     }, 
                     "path": "applications/{applicationId}/players/hidden/{playerId}", 
-                    "scopes": [
-                        "https://www.googleapis.com/auth/games"
-                    ]
-                }
-            }
-        }, 
-        "quests": {
-            "methods": {
-                "reset": {
-                    "description": "Resets all player progress on the quest with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.", 
-                    "httpMethod": "POST", 
-                    "id": "gamesManagement.quests.reset", 
-                    "parameterOrder": [
-                        "questId"
-                    ], 
-                    "parameters": {
-                        "questId": {
-                            "description": "The ID of the quest.", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }
-                    }, 
-                    "path": "quests/{questId}/reset", 
-                    "scopes": [
-                        "https://www.googleapis.com/auth/games"
-                    ]
-                }, 
-                "resetAll": {
-                    "description": "Resets all player progress on all quests for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.", 
-                    "httpMethod": "POST", 
-                    "id": "gamesManagement.quests.resetAll", 
-                    "path": "quests/reset", 
-                    "scopes": [
-                        "https://www.googleapis.com/auth/games"
-                    ]
-                }, 
-                "resetAllForAllPlayers": {
-                    "description": "Resets all draft quests for all players. This method is only available to user accounts for your developer console.", 
-                    "httpMethod": "POST", 
-                    "id": "gamesManagement.quests.resetAllForAllPlayers", 
-                    "path": "quests/resetAllForAllPlayers", 
-                    "scopes": [
-                        "https://www.googleapis.com/auth/games"
-                    ]
-                }, 
-                "resetForAllPlayers": {
-                    "description": "Resets all player progress on the quest with the given ID for all players. This method is only available to user accounts for your developer console. Only draft quests can be reset.", 
-                    "httpMethod": "POST", 
-                    "id": "gamesManagement.quests.resetForAllPlayers", 
-                    "parameterOrder": [
-                        "questId"
-                    ], 
-                    "parameters": {
-                        "questId": {
-                            "description": "The ID of the quest.", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }
-                    }, 
-                    "path": "quests/{questId}/resetForAllPlayers", 
-                    "scopes": [
-                        "https://www.googleapis.com/auth/games"
-                    ]
-                }, 
-                "resetMultipleForAllPlayers": {
-                    "description": "Resets quests with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft quests may be reset.", 
-                    "httpMethod": "POST", 
-                    "id": "gamesManagement.quests.resetMultipleForAllPlayers", 
-                    "path": "quests/resetMultipleForAllPlayers", 
-                    "request": {
-                        "$ref": "QuestsResetMultipleForAllRequest"
-                    }, 
                     "scopes": [
                         "https://www.googleapis.com/auth/games"
                     ]
@@ -523,7 +449,7 @@
             }
         }
     }, 
-    "revision": "20190627", 
+    "revision": "20200402", 
     "rootUrl": "https://www.googleapis.com/", 
     "schemas": {
         "AchievementResetAllResponse": {
@@ -738,6 +664,10 @@
                     "$ref": "GamesPlayerExperienceInfoResource", 
                     "description": "An object to represent Play Game experience information for the player."
                 }, 
+                "friendStatus": {
+                    "description": "The friend status of the given player, relative to the requester. This is unset if the player is not sharing their friends list with the game.", 
+                    "type": "string"
+                }, 
                 "kind": {
                     "default": "gamesManagement#player", 
                     "description": "Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#player.", 
@@ -767,6 +697,9 @@
                 }, 
                 "playerId": {
                     "description": "The ID of the player.", 
+                    "type": "string"
+                }, 
+                "playerStattus": {
                     "type": "string"
                 }, 
                 "profileSettings": {
@@ -832,27 +765,7 @@
                     "type": "string"
                 }, 
                 "profileVisible": {
-                    "description": "The player's current profile visibility. This field is visible to both 1P and 3P APIs.", 
                     "type": "boolean"
-                }
-            }, 
-            "type": "object"
-        }, 
-        "QuestsResetMultipleForAllRequest": {
-            "description": "This is a JSON template for multiple quests reset all request.", 
-            "id": "QuestsResetMultipleForAllRequest", 
-            "properties": {
-                "kind": {
-                    "default": "gamesManagement#questsResetMultipleForAllRequest", 
-                    "description": "Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#questsResetMultipleForAllRequest.", 
-                    "type": "string"
-                }, 
-                "quest_ids": {
-                    "description": "The IDs of quests to reset.", 
-                    "items": {
-                        "type": "string"
-                    }, 
-                    "type": "array"
                 }
             }, 
             "type": "object"

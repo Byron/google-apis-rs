@@ -24,6 +24,7 @@
     }, 
     "id": "genomics:v2alpha1", 
     "kind": "discovery#restDescription", 
+    "mtlsRootUrl": "https://genomics.mtls.googleapis.com/", 
     "name": "genomics", 
     "ownerDomain": "google.com", 
     "ownerName": "Google", 
@@ -109,7 +110,7 @@
         "pipelines": {
             "methods": {
                 "run": {
-                    "description": "Runs a pipeline.\n\n**Note:** Before you can use this method, the Genomics Service Agent\nmust have access to your project. This is done automatically when the\nCloud Genomics API is first enabled, but if you delete this permission,\nor if you enabled the Cloud Genomics API before the v2alpha1 API\nlaunch, you must disable and re-enable the API to grant the Genomics\nService Agent the required permissions.\nAuthorization requires the following [Google\nIAM](https://cloud.google.com/iam/) permission:\n\n* `genomics.operations.create`\n\n[1]: /genomics/gsa", 
+                    "description": "Runs a pipeline.  The returned Operation's metadata field will contain a\ngoogle.genomics.v2alpha1.Metadata object describing the status of the\npipeline execution.  The [response] field will contain a\ngoogle.genomics.v2alpha1.RunPipelineResponse object if the pipeline\ncompletes successfully.\n\n**Note:** Before you can use this method, the Genomics Service Agent\nmust have access to your project. This is done automatically when the\nCloud Genomics API is first enabled, but if you delete this permission,\nor if you enabled the Cloud Genomics API before the v2alpha1 API\nlaunch, you must disable and re-enable the API to grant the Genomics\nService Agent the required permissions.\nAuthorization requires the following [Google\nIAM](https://cloud.google.com/iam/) permission:\n\n* `genomics.operations.create`\n\n[1]: /genomics/gsa", 
                     "flatPath": "v2alpha1/pipelines:run", 
                     "httpMethod": "POST", 
                     "id": "genomics.pipelines.run", 
@@ -267,7 +268,7 @@
             }
         }
     }, 
-    "revision": "20190704", 
+    "revision": "20200316", 
     "rootUrl": "https://genomics.googleapis.com/", 
     "schemas": {
         "Accelerator": {
@@ -309,7 +310,7 @@
                     "additionalProperties": {
                         "type": "string"
                     }, 
-                    "description": "The environment to pass into the container. This environment is merged\nwith any values specified in the `Pipeline` message. These values\noverwrite any in the `Pipeline` message.\n\nIn addition to the values passed here, a few other values are\nautomatically injected into the environment. These cannot be hidden or\noverwritten.\n\n`GOOGLE_PIPELINE_FAILED` will be set to \"1\" if the pipeline failed\nbecause an action has exited with a non-zero status (and did not have the\n`IGNORE_EXIT_STATUS` flag set). This can be used to determine if additional\ndebug or logging actions should execute.\n\n`GOOGLE_LAST_EXIT_STATUS` will be set to the exit status of the last\nnon-background action that executed. This can be used by workflow engine\nauthors to determine whether an individual action has succeeded or failed.", 
+                    "description": "The environment to pass into the container. This environment is merged\nwith values specified in the google.genomics.v2alpha1.Pipeline\nmessage, overwriting any duplicate values.\n\nIn addition to the values passed here, a few other values are\nautomatically injected into the environment. These cannot be hidden or\noverwritten.\n\n`GOOGLE_PIPELINE_FAILED` will be set to \"1\" if the pipeline failed\nbecause an action has exited with a non-zero status (and did not have the\n`IGNORE_EXIT_STATUS` flag set). This can be used to determine if additional\ndebug or logging actions should execute.\n\n`GOOGLE_LAST_EXIT_STATUS` will be set to the exit status of the last\nnon-background action that executed. This can be used by workflow engine\nauthors to determine whether an individual action has succeeded or failed.", 
                     "type": "object"
                 }, 
                 "flags": {
@@ -318,7 +319,7 @@
                         "Unspecified flag.", 
                         "Normally, a non-zero exit status causes the pipeline to fail. This flag\nallows execution of other actions to continue instead.", 
                         "This flag allows an action to continue running in the background while\nexecuting subsequent actions. This is useful to provide services to\nother actions (or to provide debugging support tools like SSH servers).", 
-                        "By default, after an action fails, no further actions are run. This flag\nindicates that this action must be run even if the pipeline has already\nfailed. This is useful for actions that copy output files off of the VM\nor for debugging.", 
+                        "By default, after an action fails, no further actions are run. This flag\nindicates that this action must be run even if the pipeline has already\nfailed. This is useful for actions that copy output files off of the VM\nor for debugging. Note that no actions will be run if image\nprefetching fails.", 
                         "Enable access to the FUSE device for this action. Filesystems can then\nbe mounted into disks shared with other actions. The other actions do\nnot need the `ENABLE_FUSE` flag to access the mounted filesystem.\n\nThis has the effect of causing the container to be executed with\n`CAP_SYS_ADMIN` and exposes `/dev/fuse` to the container, so use it only\nfor containers you trust.", 
                         "Exposes all ports specified by `EXPOSE` statements in the container. To\ndiscover the host side port numbers, consult the `ACTION_STARTED` event\nin the operation metadata.", 
                         "All container images are typically downloaded before any actions are\nexecuted. This helps prevent typos in URIs or issues like lack of disk\nspace from wasting large amounts of compute resources.\n\nIf set, this flag prevents the worker from downloading the image until\njust before the action is executed.", 
@@ -340,7 +341,7 @@
                     "type": "array"
                 }, 
                 "imageUri": {
-                    "description": "The URI to pull the container image from. Note that all images referenced\nby actions in the pipeline are pulled before the first action runs. If\nmultiple actions reference the same image, it is only pulled once,\nensuring that the same image is used for all actions in a single pipeline.", 
+                    "description": "Required. The URI to pull the container image from. Note that all images referenced\nby actions in the pipeline are pulled before the first action runs. If\nmultiple actions reference the same image, it is only pulled once,\nensuring that the same image is used for all actions in a single pipeline.\n\nThe image URI can be either a complete host and image specification (e.g.,\nquay.io/biocontainers/samtools), a library and image name (e.g.,\ngoogle/cloud-sdk) or a bare image name ('bash') to pull from the default\nlibrary.  No schema is required in any of these cases.\n\nIf the specified image is not public, the service account specified for\nthe Virtual Machine must have access to pull the images from GCR, or\nappropriate credentials must be specified in the\ngoogle.genomics.v2alpha1.Action.credentials field.", 
                     "type": "string"
                 }, 
                 "labels": {
@@ -402,6 +403,13 @@
                     }, 
                     "description": "A workflow specific event occurred.", 
                     "type": "object"
+                }, 
+                "events": {
+                    "description": "A list of timestamped events.", 
+                    "items": {
+                        "$ref": "TimestampedEvent"
+                    }, 
+                    "type": "array"
                 }, 
                 "result": {
                     "$ref": "Status", 
@@ -965,7 +973,7 @@
                 }, 
                 "pipeline": {
                     "$ref": "Pipeline", 
-                    "description": "The description of the pipeline to run."
+                    "description": "Required. The description of the pipeline to run."
                 }
             }, 
             "type": "object"
@@ -1011,7 +1019,7 @@
                     "type": "string"
                 }, 
                 "scopes": {
-                    "description": "List of scopes to be enabled for this service account on the VM, in\naddition to the Cloud Genomics API scope.", 
+                    "description": "List of scopes to be enabled for this service account on the VM, in\naddition to the cloud-platform API scope that will be added by default.", 
                     "items": {
                         "type": "string"
                     }, 
@@ -1042,6 +1050,26 @@
                 }, 
                 "message": {
                     "description": "A developer-facing error message, which should be in English. Any\nuser-facing error message should be localized and sent in the\ngoogle.rpc.Status.details field, or localized by the client.", 
+                    "type": "string"
+                }
+            }, 
+            "type": "object"
+        }, 
+        "TimestampedEvent": {
+            "description": "An event that occured in the operation assigned to the\nworker and the time of occurance.", 
+            "id": "TimestampedEvent", 
+            "properties": {
+                "data": {
+                    "additionalProperties": {
+                        "description": "Properties of the object. Contains field @type with type URL.", 
+                        "type": "any"
+                    }, 
+                    "description": "The event data.", 
+                    "type": "object"
+                }, 
+                "timestamp": {
+                    "description": "The time when the event happened.", 
+                    "format": "google-datetime", 
                     "type": "string"
                 }
             }, 
@@ -1103,11 +1131,11 @@
                     "additionalProperties": {
                         "type": "string"
                     }, 
-                    "description": "Optional set of labels to apply to the VM and any attached disk resources.\nThese labels must adhere to the name and value restrictions on VM labels\nimposed by Compute Engine.\n\nLabels keys with the prefix 'google-' are reserved for use by Google.\n\nLabels applied at creation time to the VM. Applied on a best-effort basis\nto attached disk resources shortly after VM creation.", 
+                    "description": "Optional set of labels to apply to the VM and any attached disk resources.\nThese labels must adhere to the [name and value\nrestrictions](https://cloud.google.com/compute/docs/labeling-resources) on\nVM labels imposed by Compute Engine.\n\nLabels keys with the prefix 'google-' are reserved for use by Google.\n\nLabels applied at creation time to the VM. Applied on a best-effort basis\nto attached disk resources shortly after VM creation.", 
                     "type": "object"
                 }, 
                 "machineType": {
-                    "description": "The machine type of the virtual machine to create. Must be the short name\nof a standard machine type (such as \"n1-standard-1\") or a custom machine\ntype (such as \"custom-1-4096\", where \"1\" indicates the number of vCPUs and\n\"4096\" indicates the memory in MB). See\n[Creating an instance with a custom machine\ntype](https://cloud.google.com/compute/docs/instances/creating-instance-with-custom-machine-type#create)\nfor more specifications on creating a custom machine type.", 
+                    "description": "Required. The machine type of the virtual machine to create. Must be the short name\nof a standard machine type (such as \"n1-standard-1\") or a custom machine\ntype (such as \"custom-1-4096\", where \"1\" indicates the number of vCPUs and\n\"4096\" indicates the memory in MB). See\n[Creating an instance with a custom machine\ntype](https://cloud.google.com/compute/docs/instances/creating-instance-with-custom-machine-type#create)\nfor more specifications on creating a custom machine type.", 
                     "type": "string"
                 }, 
                 "network": {
@@ -1135,6 +1163,10 @@
             "properties": {
                 "instance": {
                     "description": "The worker's instance name.", 
+                    "type": "string"
+                }, 
+                "machineType": {
+                    "description": "The machine type that was assigned for the worker.", 
                     "type": "string"
                 }, 
                 "zone": {

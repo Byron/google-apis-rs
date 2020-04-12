@@ -38,7 +38,7 @@
     "description": "Manages files in Drive including uploading, downloading, searching, detecting changes, and updating sharing permissions.", 
     "discoveryVersion": "v1", 
     "documentationLink": "https://developers.google.com/drive/", 
-    "etag": "\"9eZ1uxVRThTDhLJCZHhqs3eQWz4/bzjWBZSIb8SwDXXw1rx-RVKTulk\"", 
+    "etag": "\"u9GIe6H63LSGq-9_t39K2Zx_EAc/UEl2PHBvsMjh3TSXQxSnNlF4wSs\"", 
     "icons": {
         "x16": "https://ssl.gstatic.com/docs/doclist/images/drive_icon_16.png", 
         "x32": "https://ssl.gstatic.com/docs/doclist/images/drive_icon_32.png"
@@ -542,6 +542,12 @@
                             "required": true, 
                             "type": "string"
                         }, 
+                        "enforceSingleParent": {
+                            "default": "false", 
+                            "description": "Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the item's last parent is removed, the item will be placed under its owner's root.", 
+                            "location": "query", 
+                            "type": "boolean"
+                        }, 
                         "folderId": {
                             "description": "The ID of the folder.", 
                             "location": "path", 
@@ -599,6 +605,12 @@
                         "folderId"
                     ], 
                     "parameters": {
+                        "enforceSingleParent": {
+                            "default": "false", 
+                            "description": "Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the child's owner makes the request, the child will be removed from all current folders and placed in the requested folder. Any other requests that increase the number of the child's parents will fail, except when the canAddMyDriveParent file capability is true and a single parent is being added.", 
+                            "location": "query", 
+                            "type": "boolean"
+                        }, 
                         "folderId": {
                             "description": "The ID of the folder.", 
                             "location": "path", 
@@ -831,7 +843,7 @@
                     ]
                 }, 
                 "patch": {
-                    "description": "Updates an existing comment. This method supports patch semantics.", 
+                    "description": "Updates an existing comment.", 
                     "httpMethod": "PATCH", 
                     "id": "drive.comments.patch", 
                     "parameterOrder": [
@@ -1111,6 +1123,12 @@
                         "convert": {
                             "default": "false", 
                             "description": "Whether to convert this file to the corresponding Google Docs format.", 
+                            "location": "query", 
+                            "type": "boolean"
+                        }, 
+                        "enforceSingleParent": {
+                            "default": "false", 
+                            "description": "Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. Requests that specify more than one parent will fail.", 
                             "location": "query", 
                             "type": "boolean"
                         }, 
@@ -1394,6 +1412,12 @@
                             "location": "query", 
                             "type": "boolean"
                         }, 
+                        "enforceSingleParent": {
+                            "default": "false", 
+                            "description": "Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. Requests that specify more than one parent will fail.", 
+                            "location": "query", 
+                            "type": "boolean"
+                        }, 
                         "ocr": {
                             "default": "false", 
                             "description": "Whether to attempt OCR on .jpg, .png, .gif, or .pdf uploads.", 
@@ -1600,6 +1624,12 @@
                         "convert": {
                             "default": "false", 
                             "description": "This parameter is deprecated and has no function.", 
+                            "location": "query", 
+                            "type": "boolean"
+                        }, 
+                        "enforceSingleParent": {
+                            "default": "false", 
+                            "description": "Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the item's owner makes a request to add a single parent, the item will be removed from all current folders and placed in the requested folder. Other requests that increase the number of parents will fail, except when the canAddMyDriveParent file capability is true and a single parent is being added.", 
                             "location": "query", 
                             "type": "boolean"
                         }, 
@@ -1865,6 +1895,12 @@
                             "location": "query", 
                             "type": "boolean"
                         }, 
+                        "enforceSingleParent": {
+                            "default": "false", 
+                            "description": "Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the item's owner makes a request to add a single parent, the item will be removed from all current folders and placed in the requested folder. Other requests that increase the number of parents will fail, except when the canAddMyDriveParent file capability is true and a single parent is being added.", 
+                            "location": "query", 
+                            "type": "boolean"
+                        }, 
                         "fileId": {
                             "description": "The ID of the file to update.", 
                             "location": "path", 
@@ -2069,6 +2105,12 @@
                         "parentId"
                     ], 
                     "parameters": {
+                        "enforceSingleParent": {
+                            "default": "false", 
+                            "description": "Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the item's last parent is removed, the item will be placed under its owner's root.", 
+                            "location": "query", 
+                            "type": "boolean"
+                        }, 
                         "fileId": {
                             "description": "The ID of the file.", 
                             "location": "path", 
@@ -2132,6 +2174,12 @@
                         "fileId"
                     ], 
                     "parameters": {
+                        "enforceSingleParent": {
+                            "default": "false", 
+                            "description": "Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the child's owner makes the request, the child will be removed from all current folders and placed in the requested folder. Any other requests that increase the number of the child's parents will fail, except when the canAddMyDriveParent file capability is true and a single parent is being added.", 
+                            "location": "query", 
+                            "type": "boolean"
+                        }, 
                         "fileId": {
                             "description": "The ID of the file.", 
                             "location": "path", 
@@ -2339,11 +2387,23 @@
                             "location": "query", 
                             "type": "string"
                         }, 
+                        "enforceSingleParent": {
+                            "default": "false", 
+                            "description": "Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. See moveToNewOwnersRoot for details.", 
+                            "location": "query", 
+                            "type": "boolean"
+                        }, 
                         "fileId": {
                             "description": "The ID for the file or shared drive.", 
                             "location": "path", 
                             "required": true, 
                             "type": "string"
+                        }, 
+                        "moveToNewOwnersRoot": {
+                            "default": "false", 
+                            "description": "This parameter will only take effect if the item is not in a shared drive and the request is attempting to transfer the ownership of the item. When set to true, the item will be moved to the new owner's My Drive root folder and all prior parents removed. If set to false, when enforceSingleParent=true, parents are not changed. If set to false, when enforceSingleParent=false, existing parents are not changed; however, the file will be added to the new owner's My Drive root folder, unless it is already in the new owner's My Drive.", 
+                            "location": "query", 
+                            "type": "boolean"
                         }, 
                         "sendNotificationEmails": {
                             "default": "true", 
@@ -2795,83 +2855,6 @@
                 }
             }
         }, 
-        "realtime": {
-            "methods": {
-                "get": {
-                    "description": "Exports the contents of the Realtime API data model associated with this file as JSON.", 
-                    "httpMethod": "GET", 
-                    "id": "drive.realtime.get", 
-                    "parameterOrder": [
-                        "fileId"
-                    ], 
-                    "parameters": {
-                        "fileId": {
-                            "description": "The ID of the file that the Realtime API data model is associated with.", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }, 
-                        "revision": {
-                            "description": "The revision of the Realtime API data model to export. Revisions start at 1 (the initial empty data model) and are incremented with each change. If this parameter is excluded, the most recent data model will be returned.", 
-                            "format": "int32", 
-                            "location": "query", 
-                            "minimum": "1", 
-                            "type": "integer"
-                        }
-                    }, 
-                    "path": "files/{fileId}/realtime", 
-                    "scopes": [
-                        "https://www.googleapis.com/auth/drive", 
-                        "https://www.googleapis.com/auth/drive.file", 
-                        "https://www.googleapis.com/auth/drive.readonly"
-                    ], 
-                    "supportsMediaDownload": true
-                }, 
-                "update": {
-                    "description": "Overwrites the Realtime API data model associated with this file with the provided JSON data model.", 
-                    "httpMethod": "PUT", 
-                    "id": "drive.realtime.update", 
-                    "mediaUpload": {
-                        "accept": [
-                            "*/*"
-                        ], 
-                        "maxSize": "10MB", 
-                        "protocols": {
-                            "resumable": {
-                                "multipart": true, 
-                                "path": "/resumable/upload/drive/v2/files/{fileId}/realtime"
-                            }, 
-                            "simple": {
-                                "multipart": true, 
-                                "path": "/upload/drive/v2/files/{fileId}/realtime"
-                            }
-                        }
-                    }, 
-                    "parameterOrder": [
-                        "fileId"
-                    ], 
-                    "parameters": {
-                        "baseRevision": {
-                            "description": "The revision of the model to diff the uploaded model against. If set, the uploaded model is diffed against the provided revision and those differences are merged with any changes made to the model after the provided revision. If not set, the uploaded model replaces the current model on the server.", 
-                            "location": "query", 
-                            "type": "string"
-                        }, 
-                        "fileId": {
-                            "description": "The ID of the file that the Realtime API data model is associated with.", 
-                            "location": "path", 
-                            "required": true, 
-                            "type": "string"
-                        }
-                    }, 
-                    "path": "files/{fileId}/realtime", 
-                    "scopes": [
-                        "https://www.googleapis.com/auth/drive", 
-                        "https://www.googleapis.com/auth/drive.file"
-                    ], 
-                    "supportsMediaUpload": true
-                }
-            }
-        }, 
         "replies": {
             "methods": {
                 "delete": {
@@ -3041,7 +3024,7 @@
                     ]
                 }, 
                 "patch": {
-                    "description": "Updates an existing reply. This method supports patch semantics.", 
+                    "description": "Updates an existing reply.", 
                     "httpMethod": "PATCH", 
                     "id": "drive.replies.patch", 
                     "parameterOrder": [
@@ -3235,7 +3218,7 @@
                     ]
                 }, 
                 "patch": {
-                    "description": "Updates a revision. This method supports patch semantics.", 
+                    "description": "Updates a revision.", 
                     "httpMethod": "PATCH", 
                     "id": "drive.revisions.patch", 
                     "parameterOrder": [
@@ -3459,7 +3442,7 @@
             }
         }
     }, 
-    "revision": "20190620", 
+    "revision": "20200326", 
     "rootUrl": "https://www.googleapis.com/", 
     "schemas": {
         "About": {
@@ -3664,7 +3647,7 @@
                     "type": "array"
                 }, 
                 "quotaBytesTotal": {
-                    "description": "The total number of quota bytes.", 
+                    "description": "The total number of quota bytes. This is only relevant when quotaType is LIMITED.", 
                     "format": "int64", 
                     "type": "string"
                 }, 
@@ -4129,7 +4112,7 @@
                 }, 
                 "author": {
                     "$ref": "User", 
-                    "description": "The user who wrote this comment."
+                    "description": "The author of the comment. The author's email address and permission ID will not be populated."
                 }, 
                 "commentId": {
                     "description": "The ID of the comment.", 
@@ -4246,7 +4229,7 @@
             "properties": {
                 "author": {
                     "$ref": "User", 
-                    "description": "The user who wrote this reply."
+                    "description": "The author of the reply. The author's email address and permission ID will not be populated."
                 }, 
                 "content": {
                     "annotations": {
@@ -4544,6 +4527,10 @@
                             "description": "Whether the current user can add children to this folder. This is always false when the item is not a folder.", 
                             "type": "boolean"
                         }, 
+                        "canAddMyDriveParent": {
+                            "description": "Whether the current user can add a parent for the item without removing an existing parent in the same request. Not populated for shared drive files.", 
+                            "type": "boolean"
+                        }, 
                         "canChangeCopyRequiresWriterPermission": {
                             "description": "Whether the current user can change the copyRequiresWriterPermission restriction of this file.", 
                             "type": "boolean"
@@ -4573,11 +4560,15 @@
                             "type": "boolean"
                         }, 
                         "canEdit": {
-                            "description": "Whether the current user can edit this file.", 
+                            "description": "Whether the current user can edit this file. Other factors may limit the type of changes a user can make to a file. For example, see canChangeCopyRequiresWriterPermission or canModifyContent.", 
                             "type": "boolean"
                         }, 
                         "canListChildren": {
                             "description": "Whether the current user can list the children of this folder. This is always false when the item is not a folder.", 
+                            "type": "boolean"
+                        }, 
+                        "canModifyContent": {
+                            "description": "Whether the current user can modify the content of this file.", 
                             "type": "boolean"
                         }, 
                         "canMoveChildrenOutOfDrive": {
@@ -4634,6 +4625,10 @@
                         }, 
                         "canRemoveChildren": {
                             "description": "Whether the current user can remove children from this folder. This is always false when the item is not a folder. For a folder in a shared drive, use canDeleteChildren or canTrashChildren instead.", 
+                            "type": "boolean"
+                        }, 
+                        "canRemoveMyDriveParent": {
+                            "description": "Whether the current user can remove a parent from the item without adding another parent in the same request. Not populated for shared drive files.", 
                             "type": "boolean"
                         }, 
                         "canRename": {
@@ -4730,7 +4725,7 @@
                     "type": "string"
                 }, 
                 "hasAugmentedPermissions": {
-                    "description": "Whether any users are granted file access directly on this file. This field is only populated for items in shared drives.", 
+                    "description": "Whether there are permissions directly on this file. This field is only populated for items in shared drives.", 
                     "type": "boolean"
                 }, 
                 "hasThumbnail": {
@@ -4841,7 +4836,7 @@
                             "type": "string"
                         }, 
                         "rotation": {
-                            "description": "The rotation in clockwise degrees from the image's original orientation.", 
+                            "description": "The number of clockwise 90 degree rotations applied from the image's original orientation.", 
                             "format": "int32", 
                             "type": "integer"
                         }, 
@@ -5033,6 +5028,20 @@
                 "sharingUser": {
                     "$ref": "User", 
                     "description": "User that shared the item with the current user, if available."
+                }, 
+                "shortcutDetails": {
+                    "description": "Shortcut file details. Only populated for shortcut files, which have the mimeType field set to application/vnd.google-apps.shortcut.", 
+                    "properties": {
+                        "targetId": {
+                            "description": "The ID of the file that this shortcut points to.", 
+                            "type": "string"
+                        }, 
+                        "targetMimeType": {
+                            "description": "The MIME type of the file that this shortcut points to. The value of this field is a snapshot of the target's MIME type, captured when the shortcut is created.", 
+                            "type": "string"
+                        }
+                    }, 
+                    "type": "object"
                 }, 
                 "spaces": {
                     "description": "The list of spaces which contain the file. Supported values are 'drive', 'appDataFolder' and 'photos'.", 
@@ -5314,7 +5323,7 @@
                                 "type": "boolean"
                             }, 
                             "inheritedFrom": {
-                                "description": "The ID of the item from which this permission is inherited. This is an output-only field and is only populated for members of the shared drive.", 
+                                "description": "The ID of the item from which this permission is inherited. This is an output-only field.", 
                                 "type": "string"
                             }, 
                             "permissionType": {
@@ -5515,7 +5524,6 @@
             "id": "Revision", 
             "properties": {
                 "downloadUrl": {
-                    "description": "Short term download URL for the file. This will only be populated on files with content stored in Drive.", 
                     "type": "string"
                 }, 
                 "etag": {
@@ -5570,7 +5578,7 @@
                     "type": "string"
                 }, 
                 "pinned": {
-                    "description": "Whether this revision is pinned to prevent automatic purging. This will only be populated and can only be modified on files with content stored in Drive which are not Google Docs. Revisions can also be pinned when they are created through the drive.files.insert/update/copy by using the pinned query parameter.", 
+                    "description": "Whether this revision is pinned to prevent automatic purging. This will only be populated and can only be modified on files with content stored in Drive which are not Google Docs. Revisions can also be pinned when they are created through the drive.files.insert/update/copy by using the pinned query parameter. Pinned revisions are stored indefinitely using additional storage quota, up to a maximum of 200 revisions.", 
                     "type": "boolean"
                 }, 
                 "publishAuto": {
