@@ -10,9 +10,19 @@ jobs:
   build-and-test:
 
     runs-on: ubuntu-latest
+    env:
+      PYENV_VERSION: "2.7.13"
+      PYENV_ROOT: $HOME/.pyenv
 
     steps:
     - uses: actions/checkout@v2
+    - name: Prepare python
+      run |
+        pyenv versions
+        pyenv install --skip-existing "${PYENV_VERSION}"
+        pyenv versions
+        pyenv global "${PYENV_VERSION}"
+        pyenv version
     - name: Run tests
       run: |
         make test-gen
