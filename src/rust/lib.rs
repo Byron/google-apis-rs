@@ -76,7 +76,7 @@ bar\r\n\
         mpr.add_part(&mut r1, 50, "application/json".parse().unwrap())
            .add_part(&mut r2, 25, "application/plain".parse().unwrap());
 
-        let mut buf = &mut [0u8];
+        let buf = &mut [0u8];
         let mut v = Vec::<u8>::new();
         while let Ok(br) = mpr.read(buf) {
             if br == 0 {
