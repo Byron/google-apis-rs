@@ -20,6 +20,7 @@ jobs:
       run: |
         curl https://pyenv.run | bash
         echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+        source ~/.bashrc
         pyenv versions
         pyenv install --skip-existing "${PYENV_VERSION}"
         pyenv versions
