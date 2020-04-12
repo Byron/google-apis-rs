@@ -9,19 +9,13 @@ on:
 jobs:
   build-and-test:
 
-    runs-on: macOS-latest
+    runs-on: ubuntu-latest
     env:
-      PYENV_VERSION: "2.7.13"
+      PYENV_VERSION: "2.7.17"
       PYENV_ROOT: $HOME/.pyenv
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install stable toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
-        override: true
     - name: Prepare python
       run: |
         curl https://pyenv.run | bash
