@@ -14,10 +14,6 @@ jobs:
       TRAVIS: true # emulate CI, some code depends on it to do less work
     steps:
     - uses: actions/checkout@v2
-    - name: setup pyenv
-      uses: "gabrielfalcao/pyenv-action@v5"
-      with:
-        default: 2.7.17
     - name: Run tests
       run: |
         source ~/.profile
