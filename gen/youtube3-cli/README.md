@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *YouTube* API at revision *20190513*. The CLI is at version *1.0.12*.
+This documentation was generated from the *YouTube* API at revision *20200402*. The CLI is at version *1.0.13*.
 
 ```bash
 youtube3 [options]
@@ -89,6 +89,10 @@ youtube3 [options]
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
                 list <part> [-p <v>]... [-o <out>]
                 update (-r <kv>)... [-p <v>]... [-o <out>]
+        members
+                list <part> [-p <v>]... [-o <out>]
+        memberships-levels
+                list <part> [-p <v>]... [-o <out>]
         playlist-items
                 delete <id> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]

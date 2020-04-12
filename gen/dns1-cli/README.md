@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *dns* API at revision *20190625*. The CLI is at version *1.0.12*.
+This documentation was generated from the *dns* API at revision *20191205*. The CLI is at version *1.0.13*.
 
 ```bash
 dns1 [options]
@@ -46,6 +46,13 @@ dns1 [options]
                 list <project> [-p <v>]... [-o <out>]
                 patch <project> <managed-zone> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <project> <managed-zone> (-r <kv>)... [-p <v>]... [-o <out>]
+        policies
+                create <project> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <project> <policy> [-p <v>]...
+                get <project> <policy> [-p <v>]... [-o <out>]
+                list <project> [-p <v>]... [-o <out>]
+                patch <project> <policy> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <project> <policy> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
                 get <project> [-p <v>]... [-o <out>]
         resource-record-sets

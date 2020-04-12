@@ -25,12 +25,61 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Run* API at revision *20190624*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Cloud Run* API at revision *20200407*. The CLI is at version *1.0.13*.
 
 ```bash
 run1 [options]
+        api
+                v1-namespaces-get <name> [-p <v>]... [-o <out>]
+                v1-namespaces-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                v1-namespaces-secrets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                v1-namespaces-secrets-get <name> [-p <v>]... [-o <out>]
+                v1-namespaces-secrets-replace-secret <name> (-r <kv>)... [-p <v>]... [-o <out>]
+        namespaces
+                authorizeddomains-list <parent> [-p <v>]... [-o <out>]
+                configurations-get <name> [-p <v>]... [-o <out>]
+                configurations-list <parent> [-p <v>]... [-o <out>]
+                domainmappings-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                domainmappings-delete <name> [-p <v>]... [-o <out>]
+                domainmappings-get <name> [-p <v>]... [-o <out>]
+                domainmappings-list <parent> [-p <v>]... [-o <out>]
+                revisions-delete <name> [-p <v>]... [-o <out>]
+                revisions-get <name> [-p <v>]... [-o <out>]
+                revisions-list <parent> [-p <v>]... [-o <out>]
+                routes-get <name> [-p <v>]... [-o <out>]
+                routes-list <parent> [-p <v>]... [-o <out>]
+                services-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                services-delete <name> [-p <v>]... [-o <out>]
+                services-get <name> [-p <v>]... [-o <out>]
+                services-list <parent> [-p <v>]... [-o <out>]
+                services-replace-service <name> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
-                locations-get <name> [-p <v>]... [-o <out>]
+                locations-authorizeddomains-list <parent> [-p <v>]... [-o <out>]
+                locations-configurations-get <name> [-p <v>]... [-o <out>]
+                locations-configurations-list <parent> [-p <v>]... [-o <out>]
+                locations-domainmappings-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-domainmappings-delete <name> [-p <v>]... [-o <out>]
+                locations-domainmappings-get <name> [-p <v>]... [-o <out>]
+                locations-domainmappings-list <parent> [-p <v>]... [-o <out>]
+                locations-list <name> [-p <v>]... [-o <out>]
+                locations-namespaces-get <name> [-p <v>]... [-o <out>]
+                locations-namespaces-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-revisions-delete <name> [-p <v>]... [-o <out>]
+                locations-revisions-get <name> [-p <v>]... [-o <out>]
+                locations-revisions-list <parent> [-p <v>]... [-o <out>]
+                locations-routes-get <name> [-p <v>]... [-o <out>]
+                locations-routes-list <parent> [-p <v>]... [-o <out>]
+                locations-secrets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-secrets-get <name> [-p <v>]... [-o <out>]
+                locations-secrets-replace-secret <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-services-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-services-delete <name> [-p <v>]... [-o <out>]
+                locations-services-get <name> [-p <v>]... [-o <out>]
+                locations-services-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-services-list <parent> [-p <v>]... [-o <out>]
+                locations-services-replace-service <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-services-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-services-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
   run1 --help
 
 Configuration:

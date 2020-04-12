@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *testing* crate version *1.0.12+20190627*, where *20190627* is the exact revision of the *testing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *testing* crate version *1.0.13+20200408*, where *20200408* is the exact revision of the *testing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *testing* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-test-lab/).
@@ -340,7 +340,7 @@ impl<'a, C, A> Testing<C, A>
         Testing {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://testing.googleapis.com/".to_string(),
             _root_url: "https://testing.googleapis.com/".to_string(),
         }
@@ -357,7 +357,7 @@ impl<'a, C, A> Testing<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -385,102 +385,22 @@ impl<'a, C, A> Testing<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// A single Android device.
+/// Test targets for a shard.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AndroidDevice {
-    /// Required. The locale the test device used for testing.
-    /// Use the TestEnvironmentDiscoveryService to get supported options.
-    pub locale: Option<String>,
-    /// Required. The id of the Android OS version to be used.
-    /// Use the TestEnvironmentDiscoveryService to get supported options.
-    #[serde(rename="androidVersionId")]
-    pub android_version_id: Option<String>,
-    /// Required. The id of the Android device to be used.
-    /// Use the TestEnvironmentDiscoveryService to get supported options.
-    #[serde(rename="androidModelId")]
-    pub android_model_id: Option<String>,
-    /// Required. How the device is oriented during the test.
-    /// Use the TestEnvironmentDiscoveryService to get supported options.
-    pub orientation: Option<String>,
-}
-
-impl Part for AndroidDevice {}
-
-
-/// Locations where the results of running the test are stored.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ResultStorage {
-    /// The tool results history that contains the tool results execution that
-    /// results are written to.
+pub struct TestTargetsForShard {
+    /// Group of packages, classes, and/or test methods to be run for each shard.
+    /// The targets need to be specified in AndroidJUnitRunner argument format. For
+    /// example, “package com.my.packages” “class com.my.package.MyClass”.
     /// 
-    /// If not provided, the service will choose an appropriate value.
-    #[serde(rename="toolResultsHistory")]
-    pub tool_results_history: Option<ToolResultsHistory>,
-    /// Required.
-    #[serde(rename="googleCloudStorage")]
-    pub google_cloud_storage: Option<GoogleCloudStorage>,
-    /// Output only. The tool results execution that results are written to.
-    #[serde(rename="toolResultsExecution")]
-    pub tool_results_execution: Option<ToolResultsExecution>,
-    /// Output only. URL to the results in the Firebase Web Console.
-    #[serde(rename="resultsUrl")]
-    pub results_url: Option<String>,
+    /// The number of shard_test_targets must be greater than 0.
+    #[serde(rename="testTargets")]
+    pub test_targets: Option<Vec<String>>,
 }
 
-impl Part for ResultStorage {}
-
-
-/// Represents a tool results execution resource.
-/// 
-/// This has the results of a TestMatrix.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ToolResultsExecution {
-    /// Output only. The cloud project that owns the tool results execution.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// Output only. A tool results execution ID.
-    #[serde(rename="executionId")]
-    pub execution_id: Option<String>,
-    /// Output only. A tool results history ID.
-    #[serde(rename="historyId")]
-    pub history_id: Option<String>,
-}
-
-impl Part for ToolResultsExecution {}
-
-
-/// A single iOS device.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IosDevice {
-    /// Required. The locale the test device used for testing.
-    /// Use the TestEnvironmentDiscoveryService to get supported options.
-    pub locale: Option<String>,
-    /// Required. The id of the iOS major software version to be used.
-    /// Use the TestEnvironmentDiscoveryService to get supported options.
-    #[serde(rename="iosVersionId")]
-    pub ios_version_id: Option<String>,
-    /// Required. How the device is oriented during the test.
-    /// Use the TestEnvironmentDiscoveryService to get supported options.
-    pub orientation: Option<String>,
-    /// Required. The id of the iOS device to be used.
-    /// Use the TestEnvironmentDiscoveryService to get supported options.
-    #[serde(rename="iosModelId")]
-    pub ios_model_id: Option<String>,
-}
-
-impl Part for IosDevice {}
+impl Part for TestTargetsForShard {}
 
 
 /// The <intent-filter> section of an <activity> tag.
@@ -521,73 +441,19 @@ pub struct Environment {
 impl Part for Environment {}
 
 
-/// A set of Android device configuration permutations is defined by the
-/// the cross-product of the given axes. Internally, the given AndroidMatrix
-/// will be expanded into a set of AndroidDevices.
-/// 
-/// Only supported permutations will be instantiated.  Invalid permutations
-/// (e.g., incompatible models/versions) are ignored.
+/// Android application details based on application manifest and apk archive
+/// contents.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AndroidMatrix {
-    /// Required. The ids of the set of Android OS version to be used.
-    /// Use the TestEnvironmentDiscoveryService to get supported options.
-    #[serde(rename="androidVersionIds")]
-    pub android_version_ids: Option<Vec<String>>,
-    /// Required. The ids of the set of Android device to be used.
-    /// Use the TestEnvironmentDiscoveryService to get supported options.
-    #[serde(rename="androidModelIds")]
-    pub android_model_ids: Option<Vec<String>>,
-    /// Required. The set of locales the test device will enable for testing.
-    /// Use the TestEnvironmentDiscoveryService to get supported options.
-    pub locales: Option<Vec<String>>,
-    /// Required. The set of orientations to test with.
-    /// Use the TestEnvironmentDiscoveryService to get supported options.
-    pub orientations: Option<Vec<String>>,
+pub struct ApkDetail {
+    /// no description provided
+    #[serde(rename="apkManifest")]
+    pub apk_manifest: Option<ApkManifest>,
 }
 
-impl Part for AndroidMatrix {}
-
-
-/// Response containing the current state of the specified test matrix.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [test matrices cancel projects](struct.ProjectTestMatriceCancelCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CancelTestMatrixResponse {
-    /// The current rolled-up state of the test matrix.
-    /// If this state is already final, then the cancelation request will
-    /// have no effect.
-    #[serde(rename="testState")]
-    pub test_state: Option<String>,
-}
-
-impl ResponseResult for CancelTestMatrixResponse {}
-
-
-/// A starting intent specified by an action, uri, and categories.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct StartActivityIntent {
-    /// Action name.
-    /// Required for START_ACTIVITY.
-    pub action: Option<String>,
-    /// URI for the action.
-    pub uri: Option<String>,
-    /// Intent categories to set on the intent.
-    pub categories: Option<Vec<String>>,
-}
-
-impl Part for StartActivityIntent {}
+impl Part for ApkDetail {}
 
 
 /// An Xcode version that an iOS version is compatible with.
@@ -605,50 +471,6 @@ pub struct XcodeVersion {
 }
 
 impl Part for XcodeVersion {}
-
-
-/// Represents a tool results step resource.
-/// 
-/// This has the results of a TestExecution.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ToolResultsStep {
-    /// Output only. The cloud project that owns the tool results step.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// Output only. A tool results execution ID.
-    #[serde(rename="executionId")]
-    pub execution_id: Option<String>,
-    /// Output only. A tool results step ID.
-    #[serde(rename="stepId")]
-    pub step_id: Option<String>,
-    /// Output only. A tool results history ID.
-    #[serde(rename="historyId")]
-    pub history_id: Option<String>,
-}
-
-impl Part for ToolResultsStep {}
-
-
-/// Data about the relative number of devices running a
-/// given configuration of the Android platform.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Distribution {
-    /// Output only. The time this distribution was measured.
-    #[serde(rename="measurementTime")]
-    pub measurement_time: Option<String>,
-    /// Output only. The estimated fraction (0-1) of the total market with this
-    /// configuration.
-    #[serde(rename="marketShare")]
-    pub market_share: Option<f64>,
-}
-
-impl Part for Distribution {}
 
 
 /// Network emulation parameters.
@@ -674,66 +496,6 @@ pub struct TrafficRule {
 impl Part for TrafficRule {}
 
 
-/// A description of an Android device tests may be run on.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AndroidModel {
-    /// Whether this device is a phone, tablet, wearable, etc.
-    #[serde(rename="formFactor")]
-    pub form_factor: Option<String>,
-    /// The human-readable marketing name for this device model.
-    /// Examples: "Nexus 5", "Galaxy S5".
-    pub name: Option<String>,
-    /// Whether this device is virtual or physical.
-    pub form: Option<String>,
-    /// Tags for this dimension.
-    /// Examples: "default", "preview", "deprecated".
-    pub tags: Option<Vec<String>>,
-    /// True if and only if tests with this model are recorded by stitching
-    /// together screenshots. See use_low_spec_video_recording in device config.
-    #[serde(rename="lowFpsVideoRecording")]
-    pub low_fps_video_recording: Option<bool>,
-    /// The company that this device is branded with.
-    /// Example: "Google", "Samsung".
-    pub brand: Option<String>,
-    /// The unique opaque id for this model.
-    /// Use this for invoking the TestExecutionService.
-    pub id: Option<String>,
-    /// The set of Android versions this device supports.
-    #[serde(rename="supportedVersionIds")]
-    pub supported_version_ids: Option<Vec<String>>,
-    /// Screen density in DPI.
-    /// This corresponds to ro.sf.lcd_density
-    #[serde(rename="screenDensity")]
-    pub screen_density: Option<i32>,
-    /// The list of supported ABIs for this device.
-    /// This corresponds to either android.os.Build.SUPPORTED_ABIS (for API level
-    /// 21 and above) or android.os.Build.CPU_ABI/CPU_ABI2.
-    /// The most preferred ABI is the first element in the list.
-    /// 
-    /// Elements are optionally prefixed by "version_id:" (where version_id is
-    /// the id of an AndroidVersion), denoting an ABI that is supported only on
-    /// a particular version.
-    #[serde(rename="supportedAbis")]
-    pub supported_abis: Option<Vec<String>>,
-    /// Screen size in the horizontal (X) dimension measured in pixels.
-    #[serde(rename="screenX")]
-    pub screen_x: Option<i32>,
-    /// Screen size in the vertical (Y) dimension measured in pixels.
-    #[serde(rename="screenY")]
-    pub screen_y: Option<i32>,
-    /// The manufacturer of this device.
-    pub manufacturer: Option<String>,
-    /// The name of the industrial design.
-    /// This corresponds to android.os.Build.DEVICE.
-    pub codename: Option<String>,
-}
-
-impl Part for AndroidModel {}
-
-
 /// A list of Android device configurations in which the test is to be executed.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -748,37 +510,26 @@ pub struct AndroidDeviceList {
 impl Part for AndroidDeviceList {}
 
 
-/// Information about the client which invoked the test.
+/// Represents a tool results execution resource.
+/// 
+/// This has the results of a TestMatrix.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ClientInfo {
-    /// The list of detailed information about client.
-    #[serde(rename="clientInfoDetails")]
-    pub client_info_details: Option<Vec<ClientInfoDetail>>,
-    /// Required. Client name, such as gcloud.
-    pub name: Option<String>,
+pub struct ToolResultsExecution {
+    /// Output only. The cloud project that owns the tool results execution.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Output only. A tool results execution ID.
+    #[serde(rename="executionId")]
+    pub execution_id: Option<String>,
+    /// Output only. A tool results history ID.
+    #[serde(rename="historyId")]
+    pub history_id: Option<String>,
 }
 
-impl Part for ClientInfo {}
-
-
-/// A description of how to set up an iOS device prior to running the test.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IosTestSetup {
-    /// The network traffic profile used for running the test.
-    /// Available network profiles can be queried by using the
-    /// NETWORK_CONFIGURATION environment type when calling
-    /// TestEnvironmentDiscoveryService.GetTestEnvironmentCatalog.
-    #[serde(rename="networkProfile")]
-    pub network_profile: Option<String>,
-}
-
-impl Part for IosTestSetup {}
+impl Part for ToolResultsExecution {}
 
 
 /// Response containing the details of the specified Android application APK.
@@ -800,56 +551,21 @@ pub struct GetApkDetailsResponse {
 impl ResponseResult for GetApkDetailsResponse {}
 
 
-/// A test of an iOS application that uses the XCTest framework.
-/// Xcode supports the option to "build for testing", which generates an
-/// .xctestrun file that contains a test specification (arguments, test methods,
-/// etc). This test type accepts a zip file containing the .xctestrun file and
-/// the corresponding contents of the Build/Products directory that contains all
-/// the binaries needed to run the tests.
+/// An Android App Bundle file format, containing a BundleConfig.pb file,
+/// a base module directory, zero or more dynamic feature module directories.
+/// <p>See https://developer.android.com/guide/app-bundle/build for guidance on
+/// building App Bundles.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IosXcTest {
-    /// Output only. The bundle id for the application under test.
-    #[serde(rename="appBundleId")]
-    pub app_bundle_id: Option<String>,
-    /// An .xctestrun file that will override the .xctestrun file in the
-    /// tests zip. Because the .xctestrun file contains environment variables along
-    /// with test methods to run and/or ignore, this can be useful for sharding
-    /// tests. Default is taken from the tests zip.
-    pub xctestrun: Option<FileReference>,
-    /// Required. The .zip containing the .xctestrun file and the contents of the
-    /// DerivedData/Build/Products directory.
-    /// The .xctestrun file in this zip is ignored if the xctestrun field is
-    /// specified.
-    #[serde(rename="testsZip")]
-    pub tests_zip: Option<FileReference>,
-    /// The Xcode version that should be used for the test.
-    /// Use the TestEnvironmentDiscoveryService to get supported options.
-    /// Defaults to the latest Xcode version Firebase Test Lab supports.
-    #[serde(rename="xcodeVersion")]
-    pub xcode_version: Option<String>,
+pub struct AppBundle {
+    /// .aab file representing the app bundle under test.
+    #[serde(rename="bundleLocation")]
+    pub bundle_location: Option<FileReference>,
 }
 
-impl Part for IosXcTest {}
-
-
-/// Represents a tool results history resource.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ToolResultsHistory {
-    /// Required. The cloud project that owns the tool results history.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// Required. A tool results history ID.
-    #[serde(rename="historyId")]
-    pub history_id: Option<String>,
-}
-
-impl Part for ToolResultsHistory {}
+impl Part for AppBundle {}
 
 
 /// A single test executed in a single environment.
@@ -864,13 +580,15 @@ pub struct TestExecution {
     /// Output only. Id of the containing TestMatrix.
     #[serde(rename="matrixId")]
     pub matrix_id: Option<String>,
-    /// Output only. Indicates the current progress of the test execution
-    /// (e.g., FINISHED).
-    pub state: Option<String>,
+    /// Output only. Details about the shard.
+    pub shard: Option<Shard>,
     /// Output only. Unique id set by the service.
     pub id: Option<String>,
     /// Output only. How the host machine(s) are configured.
     pub environment: Option<Environment>,
+    /// Output only. Indicates the current progress of the test execution
+    /// (e.g., FINISHED).
+    pub state: Option<String>,
     /// Output only. How to run the test.
     #[serde(rename="testSpecification")]
     pub test_specification: Option<TestSpecification>,
@@ -926,20 +644,6 @@ impl Part for ApkManifest {}
 pub struct TestSetup {
     /// The device will be logged in on this account for the duration of the test.
     pub account: Option<Account>,
-    /// Environment variables to set for the test (only applicable for
-    /// instrumentation tests).
-    #[serde(rename="environmentVariables")]
-    pub environment_variables: Option<Vec<EnvironmentVariable>>,
-    /// The network traffic profile used for running the test.
-    /// Available network profiles can be queried by using the
-    /// NETWORK_CONFIGURATION environment type when calling
-    /// TestEnvironmentDiscoveryService.GetTestEnvironmentCatalog.
-    #[serde(rename="networkProfile")]
-    pub network_profile: Option<String>,
-    /// APKs to install in addition to those being directly tested.
-    /// Currently capped at 100.
-    #[serde(rename="additionalApks")]
-    pub additional_apks: Option<Vec<Apk>>,
     /// List of directories on the device to upload to GCS at the end of the test;
     /// they must be absolute paths under /sdcard or /data/local/tmp.
     /// Path names are restricted to characters a-z A-Z 0-9 _ - . + and /
@@ -950,81 +654,31 @@ pub struct TestSetup {
     /// storage path prefix for that device.
     #[serde(rename="directoriesToPull")]
     pub directories_to_pull: Option<Vec<String>>,
+    /// Systrace configuration for the run.
+    /// If set a systrace will be taken, starting on test start and lasting for the
+    /// configured duration. The systrace file thus obtained is put in the results
+    /// bucket together with the other artifacts from the run.
+    pub systrace: Option<SystraceSetup>,
+    /// The network traffic profile used for running the test.
+    /// Available network profiles can be queried by using the
+    /// NETWORK_CONFIGURATION environment type when calling
+    /// TestEnvironmentDiscoveryService.GetTestEnvironmentCatalog.
+    #[serde(rename="networkProfile")]
+    pub network_profile: Option<String>,
+    /// APKs to install in addition to those being directly tested.
+    /// Currently capped at 100.
+    #[serde(rename="additionalApks")]
+    pub additional_apks: Option<Vec<Apk>>,
+    /// Environment variables to set for the test (only applicable for
+    /// instrumentation tests).
+    #[serde(rename="environmentVariables")]
+    pub environment_variables: Option<Vec<EnvironmentVariable>>,
     /// List of files to push to the device before starting the test.
     #[serde(rename="filesToPush")]
     pub files_to_push: Option<Vec<DeviceFile>>,
 }
 
 impl Part for TestSetup {}
-
-
-/// The currently supported Android devices.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AndroidDeviceCatalog {
-    /// The set of supported Android device models.
-    pub models: Option<Vec<AndroidModel>>,
-    /// The set of supported runtime configurations.
-    #[serde(rename="runtimeConfiguration")]
-    pub runtime_configuration: Option<AndroidRuntimeConfiguration>,
-    /// The set of supported Android OS versions.
-    pub versions: Option<Vec<AndroidVersion>>,
-}
-
-impl Part for AndroidDeviceCatalog {}
-
-
-/// An opaque binary blob file to install on the device before the test starts.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ObbFile {
-    /// Required. OBB file name which must conform to the format as specified by
-    /// Android
-    /// e.g. [main|patch].0300110.com.example.android.obb
-    /// which will be installed into
-    ///   \<shared-storage\>/Android/obb/\<package-name\>/
-    /// on the device.
-    #[serde(rename="obbFileName")]
-    pub obb_file_name: Option<String>,
-    /// Required. Opaque Binary Blob (OBB) file(s) to install on the device.
-    pub obb: Option<FileReference>,
-}
-
-impl Part for ObbFile {}
-
-
-/// Represents a whole or partial calendar date, e.g. a birthday. The time of day
-/// and time zone are either specified elsewhere or are not significant. The date
-/// is relative to the Proleptic Gregorian Calendar. This can represent:
-/// 
-/// * A full date, with non-zero year, month and day values
-/// * A month and day value, with a zero year, e.g. an anniversary
-/// * A year on its own, with zero month and day values
-/// * A year and month value, with a zero day, e.g. a credit card expiration date
-/// 
-/// Related types are google.type.TimeOfDay and `google.protobuf.Timestamp`.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Date {
-    /// Month of year. Must be from 1 to 12, or 0 if specifying a year without a
-    /// month and day.
-    pub month: Option<i32>,
-    /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
-    /// if specifying a year by itself or a year and month where the day is not
-    /// significant.
-    pub day: Option<i32>,
-    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
-    /// a year.
-    pub year: Option<i32>,
-}
-
-impl Part for Date {}
 
 
 /// A test of an Android Application with a Test Loop.
@@ -1063,83 +717,67 @@ pub struct AndroidTestLoop {
 impl Part for AndroidTestLoop {}
 
 
-/// A test of an Android application that can control an Android component
-/// independently of its normal lifecycle.
-/// Android instrumentation tests run an application APK and test APK inside the
-/// same process on a virtual or physical AndroidDevice.  They also specify
-/// a test runner class, such as com.google.GoogleTestRunner, which can vary
-/// on the specific instrumentation framework chosen.
-/// 
-/// See <http://developer.android.com/tools/testing/testing_android.html> for
-/// more information on types of Android tests.
+/// iOS configuration that can be selected at the time a test is run.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AndroidInstrumentationTest {
-    /// A multi-apk app bundle for the application under test.
-    #[serde(rename="appBundle")]
-    pub app_bundle: Option<AppBundle>,
-    /// Required. The APK containing the test code to be executed.
-    #[serde(rename="testApk")]
-    pub test_apk: Option<FileReference>,
-    /// The InstrumentationTestRunner class.
-    /// The default value is determined by examining the application's manifest.
-    #[serde(rename="testRunnerClass")]
-    pub test_runner_class: Option<String>,
-    /// The java package for the test to be executed.
-    /// The default value is determined by examining the application's manifest.
-    #[serde(rename="testPackageId")]
-    pub test_package_id: Option<String>,
-    /// The APK for the application under test.
-    #[serde(rename="appApk")]
-    pub app_apk: Option<FileReference>,
-    /// The java package for the application under test.
-    /// The default value is determined by examining the application's manifest.
-    #[serde(rename="appPackageId")]
-    pub app_package_id: Option<String>,
-    /// The option of whether running each test within its own invocation of
-    /// instrumentation with Android Test Orchestrator or not.
-    /// ** Orchestrator is only compatible with AndroidJUnitRunner version 1.0 or
-    /// higher! **
-    /// Orchestrator offers the following benefits:
-    ///  - No shared state
-    ///  - Crashes are isolated
-    ///  - Logs are scoped per test
-    /// 
-    /// See
-    /// <https://developer.android.com/training/testing/junit-runner.html#using-android-test-orchestrator>
-    /// for more information about Android Test Orchestrator.
-    /// 
-    /// If not set, the test will be run without the orchestrator.
-    #[serde(rename="orchestratorOption")]
-    pub orchestrator_option: Option<String>,
-    /// Each target must be fully qualified with the package name or class name,
-    /// in one of these formats:
-    ///  - "package package_name"
-    ///  - "class package_name.class_name"
-    ///  - "class package_name.class_name#method_name"
-    /// 
-    /// If empty, all targets in the module will be run.
-    #[serde(rename="testTargets")]
-    pub test_targets: Option<Vec<String>>,
+pub struct IosRuntimeConfiguration {
+    /// The set of available orientations.
+    pub orientations: Option<Vec<Orientation>>,
+    /// The set of available locales.
+    pub locales: Option<Vec<Locale>>,
 }
 
-impl Part for AndroidInstrumentationTest {}
+impl Part for IosRuntimeConfiguration {}
 
 
-/// A list of iOS device configurations in which the test is to be executed.
+/// Represents a whole or partial calendar date, e.g. a birthday. The time of day
+/// and time zone are either specified elsewhere or are not significant. The date
+/// is relative to the Proleptic Gregorian Calendar. This can represent:
+/// 
+/// * A full date, with non-zero year, month and day values
+/// * A month and day value, with a zero year, e.g. an anniversary
+/// * A year on its own, with zero month and day values
+/// * A year and month value, with a zero day, e.g. a credit card expiration date
+/// 
+/// Related types are google.type.TimeOfDay and `google.protobuf.Timestamp`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IosDeviceList {
-    /// Required. A list of iOS devices.
-    #[serde(rename="iosDevices")]
-    pub ios_devices: Option<Vec<IosDevice>>,
+pub struct Date {
+    /// Month of year. Must be from 1 to 12, or 0 if specifying a year without a
+    /// month and day.
+    pub month: Option<i32>,
+    /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
+    /// if specifying a year by itself or a year and month where the day is not
+    /// significant.
+    pub day: Option<i32>,
+    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
+    /// a year.
+    pub year: Option<i32>,
 }
 
-impl Part for IosDeviceList {}
+impl Part for Date {}
+
+
+/// The currently supported Android devices.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AndroidDeviceCatalog {
+    /// The set of supported Android device models.
+    pub models: Option<Vec<AndroidModel>>,
+    /// The set of supported runtime configurations.
+    #[serde(rename="runtimeConfiguration")]
+    pub runtime_configuration: Option<AndroidRuntimeConfiguration>,
+    /// The set of supported Android OS versions.
+    pub versions: Option<Vec<AndroidVersion>>,
+}
+
+impl Part for AndroidDeviceCatalog {}
 
 
 /// Additional details about the progress of the running test.
@@ -1164,54 +802,70 @@ pub struct TestDetails {
 impl Part for TestDetails {}
 
 
-/// Key-value pair of detailed information about the client which invoked the
-/// test. Examples: {'Version', '1.0'}, {'Release Track', 'BETA'}.
+/// A description of an iOS device tests may be run on.
+/// Next tag: 12
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ClientInfoDetail {
-    /// Required. The key of detailed client information.
-    pub key: Option<String>,
-    /// Required. The value of detailed client information.
-    pub value: Option<String>,
+pub struct IosModel {
+    /// Whether this device is a phone, tablet, wearable, etc.
+    #[serde(rename="formFactor")]
+    pub form_factor: Option<String>,
+    /// The human-readable name for this device model.
+    /// Examples: "iPhone 4s", "iPad Mini 2".
+    pub name: Option<String>,
+    /// Tags for this dimension.
+    /// Examples: "default", "preview", "deprecated".
+    pub tags: Option<Vec<String>>,
+    /// Screen density in DPI.
+    #[serde(rename="screenDensity")]
+    pub screen_density: Option<i32>,
+    /// The set of iOS major software versions this device supports.
+    #[serde(rename="supportedVersionIds")]
+    pub supported_version_ids: Option<Vec<String>>,
+    /// Screen size in the vertical (Y) dimension measured in pixels.
+    #[serde(rename="screenY")]
+    pub screen_y: Option<i32>,
+    /// Screen size in the horizontal (X) dimension measured in pixels.
+    #[serde(rename="screenX")]
+    pub screen_x: Option<i32>,
+    /// The unique opaque id for this model.
+    /// Use this for invoking the TestExecutionService.
+    pub id: Option<String>,
+    /// Device capabilities.
+    /// Copied from
+    /// https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/DeviceCompatibilityMatrix/DeviceCompatibilityMatrix.html
+    #[serde(rename="deviceCapabilities")]
+    pub device_capabilities: Option<Vec<String>>,
 }
 
-impl Part for ClientInfoDetail {}
+impl Part for IosModel {}
 
 
-/// A storage location within Google cloud storage (GCS).
+/// A single iOS device.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudStorage {
-    /// Required. The path to a directory in GCS that will
-    /// eventually contain the results for this test.
-    /// The requesting user must have write access on the bucket in the supplied
-    /// path.
-    #[serde(rename="gcsPath")]
-    pub gcs_path: Option<String>,
+pub struct IosDevice {
+    /// Required. The locale the test device used for testing.
+    /// Use the TestEnvironmentDiscoveryService to get supported options.
+    pub locale: Option<String>,
+    /// Required. The id of the iOS major software version to be used.
+    /// Use the TestEnvironmentDiscoveryService to get supported options.
+    #[serde(rename="iosVersionId")]
+    pub ios_version_id: Option<String>,
+    /// Required. How the device is oriented during the test.
+    /// Use the TestEnvironmentDiscoveryService to get supported options.
+    pub orientation: Option<String>,
+    /// Required. The id of the iOS device to be used.
+    /// Use the TestEnvironmentDiscoveryService to get supported options.
+    #[serde(rename="iosModelId")]
+    pub ios_model_id: Option<String>,
 }
 
-impl Part for GoogleCloudStorage {}
-
-
-/// An Android App Bundle file format, containing a BundleConfig.pb file,
-/// a base module directory, zero or more dynamic feature module directories.
-/// <p>See https://developer.android.com/guide/app-bundle/build for guidance on
-/// building App Bundles.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AppBundle {
-    /// .aab file representing the app bundle under test.
-    #[serde(rename="bundleLocation")]
-    pub bundle_location: Option<FileReference>,
-}
-
-impl Part for AppBundle {}
+impl Part for IosDevice {}
 
 
 /// Identifies an account and how to log into it.
@@ -1228,35 +882,26 @@ pub struct Account {
 impl Part for Account {}
 
 
-/// A description of an iOS device tests may be run on.
+/// A test of an iOS application that implements one or more game loop scenarios.
+/// This test type accepts an archived application (.ipa file) and a list of
+/// integer scenarios that will be executed on the app sequentially.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IosModel {
-    /// Whether this device is a phone, tablet, wearable, etc.
-    #[serde(rename="formFactor")]
-    pub form_factor: Option<String>,
-    /// The human-readable name for this device model.
-    /// Examples: "iPhone 4s", "iPad Mini 2".
-    pub name: Option<String>,
-    /// Tags for this dimension.
-    /// Examples: "default", "preview", "deprecated".
-    pub tags: Option<Vec<String>>,
-    /// The set of iOS major software versions this device supports.
-    #[serde(rename="supportedVersionIds")]
-    pub supported_version_ids: Option<Vec<String>>,
-    /// The unique opaque id for this model.
-    /// Use this for invoking the TestExecutionService.
-    pub id: Option<String>,
-    /// Device capabilities.
-    /// Copied from
-    /// https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/DeviceCompatibilityMatrix/DeviceCompatibilityMatrix.html
-    #[serde(rename="deviceCapabilities")]
-    pub device_capabilities: Option<Vec<String>>,
+pub struct IosTestLoop {
+    /// The list of scenarios that should be run during the test. Defaults to the
+    /// single scenario 0 if unspecified.
+    pub scenarios: Option<Vec<i32>>,
+    /// Output only. The bundle id for the application under test.
+    #[serde(rename="appBundleId")]
+    pub app_bundle_id: Option<String>,
+    /// Required. The .ipa of the application to test.
+    #[serde(rename="appIpa")]
+    pub app_ipa: Option<FileReference>,
 }
 
-impl Part for IosModel {}
+impl Part for IosTestLoop {}
 
 
 /// The currently provided software environment on the devices under test.
@@ -1273,87 +918,6 @@ pub struct ProvidedSoftwareCatalog {
 }
 
 impl Part for ProvidedSoftwareCatalog {}
-
-
-/// A description of how to run the test.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TestSpecification {
-    /// Test setup requirements for iOS.
-    #[serde(rename="iosTestSetup")]
-    pub ios_test_setup: Option<IosTestSetup>,
-    /// An iOS XCTest, via an .xctestrun file.
-    #[serde(rename="iosXcTest")]
-    pub ios_xc_test: Option<IosXcTest>,
-    /// Max time a test execution is allowed to run before it is
-    /// automatically cancelled.
-    /// The default value is 5 min.
-    #[serde(rename="testTimeout")]
-    pub test_timeout: Option<String>,
-    /// Test setup requirements for Android e.g. files to install, bootstrap
-    /// scripts.
-    #[serde(rename="testSetup")]
-    pub test_setup: Option<TestSetup>,
-    /// Disables video recording. May reduce test latency.
-    #[serde(rename="disableVideoRecording")]
-    pub disable_video_recording: Option<bool>,
-    /// Disables performance metrics recording. May reduce test latency.
-    #[serde(rename="disablePerformanceMetrics")]
-    pub disable_performance_metrics: Option<bool>,
-    /// An Android Application with a Test Loop.
-    #[serde(rename="androidTestLoop")]
-    pub android_test_loop: Option<AndroidTestLoop>,
-    /// An Android robo test.
-    #[serde(rename="androidRoboTest")]
-    pub android_robo_test: Option<AndroidRoboTest>,
-    /// An Android instrumentation test.
-    #[serde(rename="androidInstrumentationTest")]
-    pub android_instrumentation_test: Option<AndroidInstrumentationTest>,
-}
-
-impl Part for TestSpecification {}
-
-
-/// The matrix of environments in which the test is to be executed.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EnvironmentMatrix {
-    /// A list of Android devices; the test will be run only on the specified
-    /// devices.
-    #[serde(rename="androidDeviceList")]
-    pub android_device_list: Option<AndroidDeviceList>,
-    /// A matrix of Android devices.
-    #[serde(rename="androidMatrix")]
-    pub android_matrix: Option<AndroidMatrix>,
-    /// A list of iOS devices.
-    #[serde(rename="iosDeviceList")]
-    pub ios_device_list: Option<IosDeviceList>,
-}
-
-impl Part for EnvironmentMatrix {}
-
-
-/// Message for specifying the start activities to crawl.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RoboStartingIntent {
-    /// An intent that starts an activity with specific details.
-    #[serde(rename="startActivity")]
-    pub start_activity: Option<StartActivityIntent>,
-    /// Timeout in seconds for each intent.
-    pub timeout: Option<String>,
-    /// An intent that starts the main launcher activity.
-    #[serde(rename="launcherActivity")]
-    pub launcher_activity: Option<LauncherActivityIntent>,
-}
-
-impl Part for RoboStartingIntent {}
 
 
 /// A test of an android application that explores the application on a virtual
@@ -1425,38 +989,22 @@ pub struct FileReference {
 impl RequestValue for FileReference {}
 
 
-/// A version of the Android OS.
+/// Options for enabling sharding.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AndroidVersion {
-    /// The date this Android version became available in the market.
-    #[serde(rename="releaseDate")]
-    pub release_date: Option<Date>,
-    /// A string representing this version of the Android OS.
-    /// Examples: "4.3", "4.4".
-    #[serde(rename="versionString")]
-    pub version_string: Option<String>,
-    /// Tags for this dimension.
-    /// Examples: "default", "preview", "deprecated".
-    pub tags: Option<Vec<String>>,
-    /// Market share for this version.
-    pub distribution: Option<Distribution>,
-    /// The API level for this Android version.
-    /// Examples: 18, 19.
-    #[serde(rename="apiLevel")]
-    pub api_level: Option<i32>,
-    /// The code name for this Android version.
-    /// Examples: "JellyBean", "KitKat".
-    #[serde(rename="codeName")]
-    pub code_name: Option<String>,
-    /// An opaque id for this Android version.
-    /// Use this id to invoke the TestExecutionService.
-    pub id: Option<String>,
+pub struct ShardingOption {
+    /// Shards test cases into the specified groups of packages, classes, and/or
+    /// methods.
+    #[serde(rename="manualSharding")]
+    pub manual_sharding: Option<ManualSharding>,
+    /// Uniformly shards test cases given a total number of shards.
+    #[serde(rename="uniformSharding")]
+    pub uniform_sharding: Option<UniformSharding>,
 }
 
-impl Part for AndroidVersion {}
+impl Part for ShardingOption {}
 
 
 /// Directs Robo to interact with a specific UI element if it is encountered
@@ -1488,32 +1036,72 @@ pub struct RoboDirective {
 impl Part for RoboDirective {}
 
 
-/// An iOS version.
+/// A test of an Android application that can control an Android component
+/// independently of its normal lifecycle.
+/// Android instrumentation tests run an application APK and test APK inside the
+/// same process on a virtual or physical AndroidDevice.  They also specify
+/// a test runner class, such as com.google.GoogleTestRunner, which can vary
+/// on the specific instrumentation framework chosen.
+/// 
+/// See <http://developer.android.com/tools/testing/testing_android.html> for
+/// more information on types of Android tests.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IosVersion {
-    /// An integer representing the major iOS version.
-    /// Examples: "8", "9".
-    #[serde(rename="majorVersion")]
-    pub major_version: Option<i32>,
-    /// Tags for this dimension.
-    /// Examples: "default", "preview", "deprecated".
-    pub tags: Option<Vec<String>>,
-    /// An integer representing the minor iOS version.
-    /// Examples: "1", "2".
-    #[serde(rename="minorVersion")]
-    pub minor_version: Option<i32>,
-    /// An opaque id for this iOS version.
-    /// Use this id to invoke the TestExecutionService.
-    pub id: Option<String>,
-    /// The available Xcode versions for this version.
-    #[serde(rename="supportedXcodeVersionIds")]
-    pub supported_xcode_version_ids: Option<Vec<String>>,
+pub struct AndroidInstrumentationTest {
+    /// A multi-apk app bundle for the application under test.
+    #[serde(rename="appBundle")]
+    pub app_bundle: Option<AppBundle>,
+    /// Required. The APK containing the test code to be executed.
+    #[serde(rename="testApk")]
+    pub test_apk: Option<FileReference>,
+    /// The InstrumentationTestRunner class.
+    /// The default value is determined by examining the application's manifest.
+    #[serde(rename="testRunnerClass")]
+    pub test_runner_class: Option<String>,
+    /// The java package for the test to be executed.
+    /// The default value is determined by examining the application's manifest.
+    #[serde(rename="testPackageId")]
+    pub test_package_id: Option<String>,
+    /// The APK for the application under test.
+    #[serde(rename="appApk")]
+    pub app_apk: Option<FileReference>,
+    /// The java package for the application under test.
+    /// The default value is determined by examining the application's manifest.
+    #[serde(rename="appPackageId")]
+    pub app_package_id: Option<String>,
+    /// The option of whether running each test within its own invocation of
+    /// instrumentation with Android Test Orchestrator or not.
+    /// ** Orchestrator is only compatible with AndroidJUnitRunner version 1.0 or
+    /// higher! **
+    /// Orchestrator offers the following benefits:
+    ///  - No shared state
+    ///  - Crashes are isolated
+    ///  - Logs are scoped per test
+    /// 
+    /// See
+    /// <https://developer.android.com/training/testing/junit-runner.html#using-android-test-orchestrator>
+    /// for more information about Android Test Orchestrator.
+    /// 
+    /// If not set, the test will be run without the orchestrator.
+    #[serde(rename="orchestratorOption")]
+    pub orchestrator_option: Option<String>,
+    /// The option to run tests in multiple shards in parallel.
+    #[serde(rename="shardingOption")]
+    pub sharding_option: Option<ShardingOption>,
+    /// Each target must be fully qualified with the package name or class name,
+    /// in one of these formats:
+    ///  - "package package_name"
+    ///  - "class package_name.class_name"
+    ///  - "class package_name.class_name#method_name"
+    /// 
+    /// If empty, all targets in the module will be run.
+    #[serde(rename="testTargets")]
+    pub test_targets: Option<Vec<String>>,
 }
 
-impl Part for IosVersion {}
+impl Part for AndroidInstrumentationTest {}
 
 
 /// There is no detailed description.
@@ -1553,6 +1141,679 @@ pub struct Orientation {
 }
 
 impl Part for Orientation {}
+
+
+/// Output only. Details about the shard.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Shard {
+    /// Output only. The total number of shards.
+    #[serde(rename="numShards")]
+    pub num_shards: Option<i32>,
+    /// Output only. The index of the shard among all the shards.
+    #[serde(rename="shardIndex")]
+    pub shard_index: Option<i32>,
+    /// Output only. Test targets for each shard.
+    #[serde(rename="testTargetsForShard")]
+    pub test_targets_for_shard: Option<TestTargetsForShard>,
+}
+
+impl Part for Shard {}
+
+
+/// A key-value pair passed as an environment variable to the test.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EnvironmentVariable {
+    /// Key for the environment variable.
+    pub key: Option<String>,
+    /// Value for the environment variable.
+    pub value: Option<String>,
+}
+
+impl Part for EnvironmentVariable {}
+
+
+/// A storage location within Google cloud storage (GCS).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudStorage {
+    /// Required. The path to a directory in GCS that will
+    /// eventually contain the results for this test.
+    /// The requesting user must have write access on the bucket in the supplied
+    /// path.
+    #[serde(rename="gcsPath")]
+    pub gcs_path: Option<String>,
+}
+
+impl Part for GoogleCloudStorage {}
+
+
+/// Response containing the current state of the specified test matrix.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [test matrices cancel projects](struct.ProjectTestMatriceCancelCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CancelTestMatrixResponse {
+    /// The current rolled-up state of the test matrix.
+    /// If this state is already final, then the cancelation request will
+    /// have no effect.
+    #[serde(rename="testState")]
+    pub test_state: Option<String>,
+}
+
+impl ResponseResult for CancelTestMatrixResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NetworkConfigurationCatalog {
+    /// no description provided
+    pub configurations: Option<Vec<NetworkConfiguration>>,
+}
+
+impl Part for NetworkConfigurationCatalog {}
+
+
+/// A single Android device.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AndroidDevice {
+    /// Required. The locale the test device used for testing.
+    /// Use the TestEnvironmentDiscoveryService to get supported options.
+    pub locale: Option<String>,
+    /// Required. The id of the Android OS version to be used.
+    /// Use the TestEnvironmentDiscoveryService to get supported options.
+    #[serde(rename="androidVersionId")]
+    pub android_version_id: Option<String>,
+    /// Required. The id of the Android device to be used.
+    /// Use the TestEnvironmentDiscoveryService to get supported options.
+    #[serde(rename="androidModelId")]
+    pub android_model_id: Option<String>,
+    /// Required. How the device is oriented during the test.
+    /// Use the TestEnvironmentDiscoveryService to get supported options.
+    pub orientation: Option<String>,
+}
+
+impl Part for AndroidDevice {}
+
+
+/// A description of how to set up an iOS device prior to running the test.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IosTestSetup {
+    /// The network traffic profile used for running the test.
+    /// Available network profiles can be queried by using the
+    /// NETWORK_CONFIGURATION environment type when calling
+    /// TestEnvironmentDiscoveryService.GetTestEnvironmentCatalog.
+    #[serde(rename="networkProfile")]
+    pub network_profile: Option<String>,
+}
+
+impl Part for IosTestSetup {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SystraceSetup {
+    /// Systrace duration in seconds.
+    /// Should be between 1 and 30 seconds. 0 disables systrace.
+    #[serde(rename="durationSeconds")]
+    pub duration_seconds: Option<i32>,
+}
+
+impl Part for SystraceSetup {}
+
+
+/// A set of Android device configuration permutations is defined by the
+/// the cross-product of the given axes. Internally, the given AndroidMatrix
+/// will be expanded into a set of AndroidDevices.
+/// 
+/// Only supported permutations will be instantiated.  Invalid permutations
+/// (e.g., incompatible models/versions) are ignored.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AndroidMatrix {
+    /// Required. The ids of the set of Android OS version to be used.
+    /// Use the TestEnvironmentDiscoveryService to get supported options.
+    #[serde(rename="androidVersionIds")]
+    pub android_version_ids: Option<Vec<String>>,
+    /// Required. The ids of the set of Android device to be used.
+    /// Use the TestEnvironmentDiscoveryService to get supported options.
+    #[serde(rename="androidModelIds")]
+    pub android_model_ids: Option<Vec<String>>,
+    /// Required. The set of locales the test device will enable for testing.
+    /// Use the TestEnvironmentDiscoveryService to get supported options.
+    pub locales: Option<Vec<String>>,
+    /// Required. The set of orientations to test with.
+    /// Use the TestEnvironmentDiscoveryService to get supported options.
+    pub orientations: Option<Vec<String>>,
+}
+
+impl Part for AndroidMatrix {}
+
+
+/// Shards test cases into the specified groups of packages, classes, and/or
+/// methods.
+/// 
+/// With manual sharding enabled, specifying test targets via
+/// environment_variables or in InstrumentationTest is invalid.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ManualSharding {
+    /// Required. Group of packages, classes, and/or test methods to be run for
+    /// each shard. The number of shard_test_targets must be >= 1 and <= 50.
+    #[serde(rename="testTargetsForShard")]
+    pub test_targets_for_shard: Option<Vec<TestTargetsForShard>>,
+}
+
+impl Part for ManualSharding {}
+
+
+/// A starting intent specified by an action, uri, and categories.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StartActivityIntent {
+    /// Action name.
+    /// Required for START_ACTIVITY.
+    pub action: Option<String>,
+    /// URI for the action.
+    pub uri: Option<String>,
+    /// Intent categories to set on the intent.
+    pub categories: Option<Vec<String>>,
+}
+
+impl Part for StartActivityIntent {}
+
+
+/// Represents a tool results step resource.
+/// 
+/// This has the results of a TestExecution.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ToolResultsStep {
+    /// Output only. The cloud project that owns the tool results step.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Output only. A tool results execution ID.
+    #[serde(rename="executionId")]
+    pub execution_id: Option<String>,
+    /// Output only. A tool results step ID.
+    #[serde(rename="stepId")]
+    pub step_id: Option<String>,
+    /// Output only. A tool results history ID.
+    #[serde(rename="historyId")]
+    pub history_id: Option<String>,
+}
+
+impl Part for ToolResultsStep {}
+
+
+/// An opaque binary blob file to install on the device before the test starts.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ObbFile {
+    /// Required. OBB file name which must conform to the format as specified by
+    /// Android
+    /// e.g. [main|patch].0300110.com.example.android.obb
+    /// which will be installed into
+    ///   \<shared-storage\>/Android/obb/\<package-name\>/
+    /// on the device.
+    #[serde(rename="obbFileName")]
+    pub obb_file_name: Option<String>,
+    /// Required. Opaque Binary Blob (OBB) file(s) to install on the device.
+    pub obb: Option<FileReference>,
+}
+
+impl Part for ObbFile {}
+
+
+/// Information about the client which invoked the test.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ClientInfo {
+    /// The list of detailed information about client.
+    #[serde(rename="clientInfoDetails")]
+    pub client_info_details: Option<Vec<ClientInfoDetail>>,
+    /// Required. Client name, such as gcloud.
+    pub name: Option<String>,
+}
+
+impl Part for ClientInfo {}
+
+
+/// A test of an iOS application that uses the XCTest framework.
+/// Xcode supports the option to "build for testing", which generates an
+/// .xctestrun file that contains a test specification (arguments, test methods,
+/// etc). This test type accepts a zip file containing the .xctestrun file and
+/// the corresponding contents of the Build/Products directory that contains all
+/// the binaries needed to run the tests.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IosXcTest {
+    /// Output only. The bundle id for the application under test.
+    #[serde(rename="appBundleId")]
+    pub app_bundle_id: Option<String>,
+    /// An .xctestrun file that will override the .xctestrun file in the
+    /// tests zip. Because the .xctestrun file contains environment variables along
+    /// with test methods to run and/or ignore, this can be useful for sharding
+    /// tests. Default is taken from the tests zip.
+    pub xctestrun: Option<FileReference>,
+    /// Required. The .zip containing the .xctestrun file and the contents of the
+    /// DerivedData/Build/Products directory.
+    /// The .xctestrun file in this zip is ignored if the xctestrun field is
+    /// specified.
+    #[serde(rename="testsZip")]
+    pub tests_zip: Option<FileReference>,
+    /// The Xcode version that should be used for the test.
+    /// Use the TestEnvironmentDiscoveryService to get supported options.
+    /// Defaults to the latest Xcode version Firebase Test Lab supports.
+    #[serde(rename="xcodeVersion")]
+    pub xcode_version: Option<String>,
+}
+
+impl Part for IosXcTest {}
+
+
+/// Represents a tool results history resource.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ToolResultsHistory {
+    /// Required. The cloud project that owns the tool results history.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Required. A tool results history ID.
+    #[serde(rename="historyId")]
+    pub history_id: Option<String>,
+}
+
+impl Part for ToolResultsHistory {}
+
+
+/// Locations where the results of running the test are stored.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ResultStorage {
+    /// The tool results history that contains the tool results execution that
+    /// results are written to.
+    /// 
+    /// If not provided, the service will choose an appropriate value.
+    #[serde(rename="toolResultsHistory")]
+    pub tool_results_history: Option<ToolResultsHistory>,
+    /// Required.
+    #[serde(rename="googleCloudStorage")]
+    pub google_cloud_storage: Option<GoogleCloudStorage>,
+    /// Output only. The tool results execution that results are written to.
+    #[serde(rename="toolResultsExecution")]
+    pub tool_results_execution: Option<ToolResultsExecution>,
+    /// Output only. URL to the results in the Firebase Web Console.
+    #[serde(rename="resultsUrl")]
+    pub results_url: Option<String>,
+}
+
+impl Part for ResultStorage {}
+
+
+/// The matrix of environments in which the test is to be executed.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EnvironmentMatrix {
+    /// A list of Android devices; the test will be run only on the specified
+    /// devices.
+    #[serde(rename="androidDeviceList")]
+    pub android_device_list: Option<AndroidDeviceList>,
+    /// A matrix of Android devices.
+    #[serde(rename="androidMatrix")]
+    pub android_matrix: Option<AndroidMatrix>,
+    /// A list of iOS devices.
+    #[serde(rename="iosDeviceList")]
+    pub ios_device_list: Option<IosDeviceList>,
+}
+
+impl Part for EnvironmentMatrix {}
+
+
+/// A list of iOS device configurations in which the test is to be executed.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IosDeviceList {
+    /// Required. A list of iOS devices.
+    #[serde(rename="iosDevices")]
+    pub ios_devices: Option<Vec<IosDevice>>,
+}
+
+impl Part for IosDeviceList {}
+
+
+/// Key-value pair of detailed information about the client which invoked the
+/// test. Examples: {'Version', '1.0'}, {'Release Track', 'BETA'}.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ClientInfoDetail {
+    /// Required. The key of detailed client information.
+    pub key: Option<String>,
+    /// Required. The value of detailed client information.
+    pub value: Option<String>,
+}
+
+impl Part for ClientInfoDetail {}
+
+
+/// TestMatrix captures all details about a test. It contains the environment
+/// configuration, test specification, test executions and overall state and
+/// outcome.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [test matrices create projects](struct.ProjectTestMatriceCreateCall.html) (request|response)
+/// * [test matrices get projects](struct.ProjectTestMatriceGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TestMatrix {
+    /// Information about the client which invoked the test.
+    #[serde(rename="clientInfo")]
+    pub client_info: Option<ClientInfo>,
+    /// The cloud project that owns the test matrix.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Required. Where the results for the matrix are written.
+    #[serde(rename="resultStorage")]
+    pub result_storage: Option<ResultStorage>,
+    /// The number of times a TestExecution should be re-attempted if one or more
+    /// of its test cases fail for any reason.
+    /// The maximum number of reruns allowed is 10.
+    /// 
+    /// Default is 0, which implies no reruns.
+    #[serde(rename="flakyTestAttempts")]
+    pub flaky_test_attempts: Option<i32>,
+    /// Output only. Indicates the current progress of the test matrix.
+    pub state: Option<String>,
+    /// Output only. The list of test executions that the service creates for
+    /// this matrix.
+    #[serde(rename="testExecutions")]
+    pub test_executions: Option<Vec<TestExecution>>,
+    /// Required. How to run the test.
+    #[serde(rename="testSpecification")]
+    pub test_specification: Option<TestSpecification>,
+    /// Output only. Unique id set by the service.
+    #[serde(rename="testMatrixId")]
+    pub test_matrix_id: Option<String>,
+    /// Output only. The time this test matrix was initially created.
+    pub timestamp: Option<String>,
+    /// Output only. Describes why the matrix is considered invalid.
+    /// Only useful for matrices in the INVALID state.
+    #[serde(rename="invalidMatrixDetails")]
+    pub invalid_matrix_details: Option<String>,
+    /// Required. The devices the tests are being executed on.
+    #[serde(rename="environmentMatrix")]
+    pub environment_matrix: Option<EnvironmentMatrix>,
+    /// Output Only. The overall outcome of the test.
+    /// Only set when the test matrix state is FINISHED.
+    #[serde(rename="outcomeSummary")]
+    pub outcome_summary: Option<String>,
+}
+
+impl RequestValue for TestMatrix {}
+impl ResponseResult for TestMatrix {}
+
+
+/// A description of how to run the test.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TestSpecification {
+    /// Test setup requirements for iOS.
+    #[serde(rename="iosTestSetup")]
+    pub ios_test_setup: Option<IosTestSetup>,
+    /// An iOS XCTest, via an .xctestrun file.
+    #[serde(rename="iosXcTest")]
+    pub ios_xc_test: Option<IosXcTest>,
+    /// An iOS application with a test loop.
+    #[serde(rename="iosTestLoop")]
+    pub ios_test_loop: Option<IosTestLoop>,
+    /// Max time a test execution is allowed to run before it is
+    /// automatically cancelled.
+    /// The default value is 5 min.
+    #[serde(rename="testTimeout")]
+    pub test_timeout: Option<String>,
+    /// Test setup requirements for Android e.g. files to install, bootstrap
+    /// scripts.
+    #[serde(rename="testSetup")]
+    pub test_setup: Option<TestSetup>,
+    /// Disables video recording. May reduce test latency.
+    #[serde(rename="disableVideoRecording")]
+    pub disable_video_recording: Option<bool>,
+    /// Disables performance metrics recording. May reduce test latency.
+    #[serde(rename="disablePerformanceMetrics")]
+    pub disable_performance_metrics: Option<bool>,
+    /// An Android Application with a Test Loop.
+    #[serde(rename="androidTestLoop")]
+    pub android_test_loop: Option<AndroidTestLoop>,
+    /// An Android robo test.
+    #[serde(rename="androidRoboTest")]
+    pub android_robo_test: Option<AndroidRoboTest>,
+    /// An Android instrumentation test.
+    #[serde(rename="androidInstrumentationTest")]
+    pub android_instrumentation_test: Option<AndroidInstrumentationTest>,
+}
+
+impl Part for TestSpecification {}
+
+
+/// Message for specifying the start activities to crawl.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RoboStartingIntent {
+    /// An intent that starts an activity with specific details.
+    #[serde(rename="startActivity")]
+    pub start_activity: Option<StartActivityIntent>,
+    /// Timeout in seconds for each intent.
+    pub timeout: Option<String>,
+    /// An intent that starts the main launcher activity.
+    #[serde(rename="launcherActivity")]
+    pub launcher_activity: Option<LauncherActivityIntent>,
+}
+
+impl Part for RoboStartingIntent {}
+
+
+/// Data about the relative number of devices running a
+/// given configuration of the Android platform.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Distribution {
+    /// Output only. The time this distribution was measured.
+    #[serde(rename="measurementTime")]
+    pub measurement_time: Option<String>,
+    /// Output only. The estimated fraction (0-1) of the total market with this
+    /// configuration.
+    #[serde(rename="marketShare")]
+    pub market_share: Option<f64>,
+}
+
+impl Part for Distribution {}
+
+
+/// A version of the Android OS.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AndroidVersion {
+    /// The date this Android version became available in the market.
+    #[serde(rename="releaseDate")]
+    pub release_date: Option<Date>,
+    /// A string representing this version of the Android OS.
+    /// Examples: "4.3", "4.4".
+    #[serde(rename="versionString")]
+    pub version_string: Option<String>,
+    /// Tags for this dimension.
+    /// Examples: "default", "preview", "deprecated".
+    pub tags: Option<Vec<String>>,
+    /// Market share for this version.
+    pub distribution: Option<Distribution>,
+    /// The API level for this Android version.
+    /// Examples: 18, 19.
+    #[serde(rename="apiLevel")]
+    pub api_level: Option<i32>,
+    /// The code name for this Android version.
+    /// Examples: "JellyBean", "KitKat".
+    #[serde(rename="codeName")]
+    pub code_name: Option<String>,
+    /// An opaque id for this Android version.
+    /// Use this id to invoke the TestExecutionService.
+    pub id: Option<String>,
+}
+
+impl Part for AndroidVersion {}
+
+
+/// A single device file description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeviceFile {
+    /// A reference to a regular file.
+    #[serde(rename="regularFile")]
+    pub regular_file: Option<RegularFile>,
+    /// A reference to an opaque binary blob file.
+    #[serde(rename="obbFile")]
+    pub obb_file: Option<ObbFile>,
+}
+
+impl Part for DeviceFile {}
+
+
+/// An iOS version.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IosVersion {
+    /// An integer representing the major iOS version.
+    /// Examples: "8", "9".
+    #[serde(rename="majorVersion")]
+    pub major_version: Option<i32>,
+    /// Tags for this dimension.
+    /// Examples: "default", "preview", "deprecated".
+    pub tags: Option<Vec<String>>,
+    /// An integer representing the minor iOS version.
+    /// Examples: "1", "2".
+    #[serde(rename="minorVersion")]
+    pub minor_version: Option<i32>,
+    /// An opaque id for this iOS version.
+    /// Use this id to invoke the TestExecutionService.
+    pub id: Option<String>,
+    /// The available Xcode versions for this version.
+    #[serde(rename="supportedXcodeVersionIds")]
+    pub supported_xcode_version_ids: Option<Vec<String>>,
+}
+
+impl Part for IosVersion {}
+
+
+/// A file or directory to install on the device before the test starts.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RegularFile {
+    /// Required. The source file.
+    pub content: Option<FileReference>,
+    /// Required. Where to put the content on the device. Must be an absolute,
+    /// whitelisted path. If the file exists, it will be replaced.
+    /// The following device-side directories and any of their subdirectories are
+    /// whitelisted:
+    /// <p>${EXTERNAL_STORAGE}, or /sdcard</p>
+    /// <p>${ANDROID_DATA}/local/tmp, or /data/local/tmp</p>
+    /// <p>Specifying a path outside of these directory trees is invalid.
+    /// 
+    /// <p> The paths /sdcard and /data will be made available and treated as
+    /// implicit path substitutions. E.g. if /sdcard on a particular device does
+    /// not map to external storage, the system will replace it with the external
+    /// storage path prefix for that device and copy the file there.
+    /// 
+    /// <p> It is strongly advised to use the <a href=
+    /// "http://developer.android.com/reference/android/os/Environment.html">
+    /// Environment API</a> in app and test code to access files on the device in a
+    /// portable way.
+    #[serde(rename="devicePath")]
+    pub device_path: Option<String>,
+}
+
+impl Part for RegularFile {}
+
+
+/// Uniformly shards test cases given a total number of shards.
+/// 
+/// For Instrumentation test, it will be translated to “-e numShard” “-e
+/// shardIndex” AndroidJUnitRunner arguments. With uniform sharding enabled,
+/// specifying these sharding arguments via environment_variables is invalid.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UniformSharding {
+    /// Required. Total number of shards. The number must be >= 1 and <= 50.
+    #[serde(rename="numShards")]
+    pub num_shards: Option<i32>,
+}
+
+impl Part for UniformSharding {}
 
 
 /// A location/region designation for language.
@@ -1621,19 +1882,67 @@ pub struct TestEnvironmentCatalog {
 impl ResponseResult for TestEnvironmentCatalog {}
 
 
-/// A key-value pair passed as an environment variable to the test.
+/// A description of an Android device tests may be run on.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EnvironmentVariable {
-    /// Key for the environment variable.
-    pub key: Option<String>,
-    /// Value for the environment variable.
-    pub value: Option<String>,
+pub struct AndroidModel {
+    /// Whether this device is a phone, tablet, wearable, etc.
+    #[serde(rename="formFactor")]
+    pub form_factor: Option<String>,
+    /// Screen size in the horizontal (X) dimension measured in pixels.
+    #[serde(rename="screenX")]
+    pub screen_x: Option<i32>,
+    /// The human-readable marketing name for this device model.
+    /// Examples: "Nexus 5", "Galaxy S5".
+    pub name: Option<String>,
+    /// Whether this device is virtual or physical.
+    pub form: Option<String>,
+    /// Tags for this dimension.
+    /// Examples: "default", "preview", "deprecated".
+    pub tags: Option<Vec<String>>,
+    /// True if and only if tests with this model are recorded by stitching
+    /// together screenshots. See use_low_spec_video_recording in device config.
+    #[serde(rename="lowFpsVideoRecording")]
+    pub low_fps_video_recording: Option<bool>,
+    /// The company that this device is branded with.
+    /// Example: "Google", "Samsung".
+    pub brand: Option<String>,
+    /// The unique opaque id for this model.
+    /// Use this for invoking the TestExecutionService.
+    pub id: Option<String>,
+    /// The set of Android versions this device supports.
+    #[serde(rename="supportedVersionIds")]
+    pub supported_version_ids: Option<Vec<String>>,
+    /// Screen density in DPI.
+    /// This corresponds to ro.sf.lcd_density
+    #[serde(rename="screenDensity")]
+    pub screen_density: Option<i32>,
+    /// Screen size in the vertical (Y) dimension measured in pixels.
+    #[serde(rename="screenY")]
+    pub screen_y: Option<i32>,
+    /// URL of a thumbnail image of the device.
+    #[serde(rename="thumbnailUrl")]
+    pub thumbnail_url: Option<String>,
+    /// The list of supported ABIs for this device.
+    /// This corresponds to either android.os.Build.SUPPORTED_ABIS (for API level
+    /// 21 and above) or android.os.Build.CPU_ABI/CPU_ABI2.
+    /// The most preferred ABI is the first element in the list.
+    /// 
+    /// Elements are optionally prefixed by "version_id:" (where version_id is
+    /// the id of an AndroidVersion), denoting an ABI that is supported only on
+    /// a particular version.
+    #[serde(rename="supportedAbis")]
+    pub supported_abis: Option<Vec<String>>,
+    /// The manufacturer of this device.
+    pub manufacturer: Option<String>,
+    /// The name of the industrial design.
+    /// This corresponds to android.os.Build.DEVICE.
+    pub codename: Option<String>,
 }
 
-impl Part for EnvironmentVariable {}
+impl Part for AndroidModel {}
 
 
 /// An Android package file to install.
@@ -1674,67 +1983,6 @@ pub struct IosDeviceCatalog {
 impl Part for IosDeviceCatalog {}
 
 
-/// TestMatrix captures all details about a test. It contains the environment
-/// configuration, test specification, test executions and overall state and
-/// outcome.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [test matrices create projects](struct.ProjectTestMatriceCreateCall.html) (request|response)
-/// * [test matrices get projects](struct.ProjectTestMatriceGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TestMatrix {
-    /// Information about the client which invoked the test.
-    #[serde(rename="clientInfo")]
-    pub client_info: Option<ClientInfo>,
-    /// The cloud project that owns the test matrix.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// Required. Where the results for the matrix are written.
-    #[serde(rename="resultStorage")]
-    pub result_storage: Option<ResultStorage>,
-    /// The number of times a TestExecution should be re-attempted if one or more
-    /// of its test cases fail for any reason.
-    /// The maximum number of reruns allowed is 10.
-    /// 
-    /// Default is 0, which implies no reruns.
-    #[serde(rename="flakyTestAttempts")]
-    pub flaky_test_attempts: Option<i32>,
-    /// Output only. Indicates the current progress of the test matrix.
-    pub state: Option<String>,
-    /// Output only. The list of test executions that the service creates for
-    /// this matrix.
-    #[serde(rename="testExecutions")]
-    pub test_executions: Option<Vec<TestExecution>>,
-    /// Required. How to run the test.
-    #[serde(rename="testSpecification")]
-    pub test_specification: Option<TestSpecification>,
-    /// Output only. Unique id set by the service.
-    #[serde(rename="testMatrixId")]
-    pub test_matrix_id: Option<String>,
-    /// Output only. The time this test matrix was initially created.
-    pub timestamp: Option<String>,
-    /// Output only. Describes why the matrix is considered invalid.
-    /// Only useful for matrices in the INVALID state.
-    #[serde(rename="invalidMatrixDetails")]
-    pub invalid_matrix_details: Option<String>,
-    /// Required. The devices the tests are being executed on.
-    #[serde(rename="environmentMatrix")]
-    pub environment_matrix: Option<EnvironmentMatrix>,
-    /// Output Only. The overall outcome of the test.
-    /// Only set when the test matrix state is FINISHED.
-    #[serde(rename="outcomeSummary")]
-    pub outcome_summary: Option<String>,
-}
-
-impl RequestValue for TestMatrix {}
-impl ResponseResult for TestMatrix {}
-
-
 /// Specifies an intent that starts the main launcher activity.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1743,98 +1991,6 @@ impl ResponseResult for TestMatrix {}
 pub struct LauncherActivityIntent { _never_set: Option<bool> }
 
 impl Part for LauncherActivityIntent {}
-
-
-/// A single device file description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeviceFile {
-    /// A reference to a regular file.
-    #[serde(rename="regularFile")]
-    pub regular_file: Option<RegularFile>,
-    /// A reference to an opaque binary blob file.
-    #[serde(rename="obbFile")]
-    pub obb_file: Option<ObbFile>,
-}
-
-impl Part for DeviceFile {}
-
-
-/// Android application details based on application manifest and apk archive
-/// contents.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ApkDetail {
-    /// no description provided
-    #[serde(rename="apkManifest")]
-    pub apk_manifest: Option<ApkManifest>,
-}
-
-impl Part for ApkDetail {}
-
-
-/// iOS configuration that can be selected at the time a test is run.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IosRuntimeConfiguration {
-    /// The set of available orientations.
-    pub orientations: Option<Vec<Orientation>>,
-    /// The set of available locales.
-    pub locales: Option<Vec<Locale>>,
-}
-
-impl Part for IosRuntimeConfiguration {}
-
-
-/// A file or directory to install on the device before the test starts.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RegularFile {
-    /// Required. The source file.
-    pub content: Option<FileReference>,
-    /// Required. Where to put the content on the device. Must be an absolute,
-    /// whitelisted path. If the file exists, it will be replaced.
-    /// The following device-side directories and any of their subdirectories are
-    /// whitelisted:
-    /// <p>${EXTERNAL_STORAGE}, or /sdcard</p>
-    /// <p>${ANDROID_DATA}/local/tmp, or /data/local/tmp</p>
-    /// <p>Specifying a path outside of these directory trees is invalid.
-    /// 
-    /// <p> The paths /sdcard and /data will be made available and treated as
-    /// implicit path substitutions. E.g. if /sdcard on a particular device does
-    /// not map to external storage, the system will replace it with the external
-    /// storage path prefix for that device and copy the file there.
-    /// 
-    /// <p> It is strongly advised to use the <a href=
-    /// "http://developer.android.com/reference/android/os/Environment.html">
-    /// Environment API</a> in app and test code to access files on the device in a
-    /// portable way.
-    #[serde(rename="devicePath")]
-    pub device_path: Option<String>,
-}
-
-impl Part for RegularFile {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NetworkConfigurationCatalog {
-    /// no description provided
-    pub configurations: Option<Vec<NetworkConfiguration>>,
-}
-
-impl Part for NetworkConfigurationCatalog {}
 
 
 /// Enables automatic Google account login.

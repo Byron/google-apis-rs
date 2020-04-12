@@ -39,7 +39,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Pagespeedonline<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    hub: api::PagespeedInsights<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -48,7 +48,7 @@ struct Engine<'n> {
 impl<'n> Engine<'n> {
     fn _pagespeedapi_runpagespeed(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.pagespeedapi().runpagespeed(opt.value_of("url").unwrap_or(""));
+        let mut call = self.hub.pagespeedapi().runpagespeed();
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -58,6 +58,9 @@ impl<'n> Engine<'n> {
                 "utm-campaign" => {
                     call = call.utm_campaign(value.unwrap_or(""));
                 },
+                "url" => {
+                    call = call.url(value.unwrap_or(""));
+                },
                 "strategy" => {
                     call = call.strategy(value.unwrap_or(""));
                 },
@@ -66,6 +69,9 @@ impl<'n> Engine<'n> {
                 },
                 "category" => {
                     call = call.add_category(value.unwrap_or(""));
+                },
+                "captcha-token" => {
+                    call = call.captcha_token(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -80,7 +86,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["locale", "utm-campaign", "category", "utm-source", "strategy"].iter().map(|v|*v));
+                                                                           v.extend(["category", "utm-campaign", "captcha-token", "url", "utm-source", "strategy", "locale"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -91,6 +97,9 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -181,13 +190,16 @@ impl<'n> Engine<'n> {
             };
         let engine = Engine {
             opt: opt,
-            hub: api::Pagespeedonline::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            hub: api::PagespeedInsights::new(client, auth),
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
+                    ("upload-type", "uploadType"),
+                    ("upload-protocol", "upload_protocol"),
                 ]
         };
 
@@ -211,15 +223,11 @@ fn main() {
     let arg_data = [
         ("pagespeedapi", "methods: 'runpagespeed'", vec![
             ("runpagespeed",
-                    Some(r##"Runs PageSpeed analysis on the page at the specified URL, and returns PageSpeed scores, a list of suggestions to make that page faster, and other information."##),
+                    Some(r##"Runs PageSpeed analysis on the page at the specified URL, and returns
+        PageSpeed scores, a list of suggestions to make that page faster, and other
+        information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pagespeedonline5_cli/pagespeedapi_runpagespeed",
                   vec![
-                    (Some(r##"url"##),
-                     None,
-                     Some(r##"The URL to fetch and analyze"##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -238,9 +246,15 @@ fn main() {
     
     let mut app = App::new("pagespeedonline5")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190507")
-           .about("Analyzes the performance of a web page and provides tailored suggestions to make that page faster.")
+           .version("1.0.13+20200318")
+           .about("The PageSpeed Insights API lets you analyze the performance of your website with a simple API.  It offers tailored suggestions for how you can optimize your site, and lets you easily integrate PageSpeed Insights analysis into your development tools and workflow.
+           ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pagespeedonline5_cli")
+           .arg(Arg::with_name("url")
+                   .long("scope")
+                   .help("Specify the authentication a method should be executed in. Each scope requires the user to grant this application permission to use it.If unset, it defaults to the shortest scope url for a particular method.")
+                   .multiple(true)
+                   .takes_value(true))
            .arg(Arg::with_name("folder")
                    .long("config-dir")
                    .help("A directory into which we will store our persistent data. Defaults to a user-writable directory that we will create during the first invocation.[default: ~/.google-service-cli")

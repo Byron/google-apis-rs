@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Games Configuration* API can be found at the
-[official documentation site](https://developers.google.com/games/services).
+[official documentation site](https://developers.google.com/games/).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Games Configuration* API at revision *20190627*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Games Configuration* API at revision *20200402*. The CLI is at version *1.0.13*.
 
 ```bash
 gamesconfiguration1-configuration [options]
@@ -34,16 +34,14 @@ gamesconfiguration1-configuration [options]
                 get <achievement-id> [-p <v>]... [-o <out>]
                 insert <application-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <application-id> [-p <v>]... [-o <out>]
-                patch <achievement-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <achievement-id> (-r <kv>)... [-p <v>]... [-o <out>]
         image-configurations
-                upload <resource-id> <image-type> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                upload <resource-id> <image-type> (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
         leaderboard-configurations
                 delete <leaderboard-id> [-p <v>]...
                 get <leaderboard-id> [-p <v>]... [-o <out>]
                 insert <application-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <application-id> [-p <v>]... [-o <out>]
-                patch <leaderboard-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <leaderboard-id> (-r <kv>)... [-p <v>]... [-o <out>]
   gamesconfiguration1-configuration --help
 

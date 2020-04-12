@@ -3684,12 +3684,15 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::TagManager::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
+                    ("upload-type", "uploadType"),
+                    ("upload-protocol", "upload_protocol"),
                 ]
         };
 
@@ -4854,7 +4857,8 @@ fn main() {
         
                     (Some(r##"container-version-id"##),
                      None,
-                     Some(r##"The GTM Container Version ID. Specify published to retrieve the currently published version."##),
+                     Some(r##"The GTM Container Version ID. Specify <code>published</code> to retrieve
+        the currently published version."##),
                      Some(true),
                      Some(false)),
         
@@ -4933,7 +4937,10 @@ fn main() {
                      Some(false)),
                   ]),
             ("containers-versions-restore",
-                    Some(r##"Restores a Container Version. This will overwrite the container's current configuration (including its variables, triggers and tags). The operation will not have any effect on the version that is being served (i.e. the published version)."##),
+                    Some(r##"Restores a Container Version. This will overwrite the container's current
+        configuration (including its variables, triggers and tags). The operation
+        will not have any effect on the version that is being served (i.e. the
+        published version)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tagmanager1_cli/accounts_containers-versions-restore",
                   vec![
                     (Some(r##"account-id"##),
@@ -5107,7 +5114,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("permissions-delete",
-                    Some(r##"Removes a user from the account, revoking access to it and all of its containers."##),
+                    Some(r##"Removes a user from the account, revoking access to it and all of its
+        containers."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tagmanager1_cli/accounts_permissions-delete",
                   vec![
                     (Some(r##"account-id"##),
@@ -5157,12 +5165,13 @@ fn main() {
                      Some(false)),
                   ]),
             ("permissions-list",
-                    Some(r##"List all users that have access to the account along with Account and Container Permissions granted to each of them."##),
+                    Some(r##"List all users that have access to the account along with Account and
+        Container Permissions granted to each of them."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tagmanager1_cli/accounts_permissions-list",
                   vec![
                     (Some(r##"account-id"##),
                      None,
-                     Some(r##"The GTM Account ID. @required tagmanager.accounts.permissions.list"##),
+                     Some(r##"The GTM Account ID."##),
                      Some(true),
                      Some(false)),
         
@@ -5246,8 +5255,9 @@ fn main() {
     
     let mut app = App::new("tagmanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190516")
-           .about("Accesses Tag Manager accounts and containers.")
+           .version("1.0.13+20200408")
+           .about("This API allows clients to access and modify container and tag
+                configuration.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_tagmanager1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

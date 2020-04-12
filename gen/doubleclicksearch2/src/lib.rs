@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *doubleclicksearch* crate version *1.0.12+20190625*, where *20190625* is the exact revision of the *doubleclicksearch:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *doubleclicksearch* crate version *1.0.13+20200331*, where *20200331* is the exact revision of the *doubleclicksearch:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *doubleclicksearch* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/doubleclick-search/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Doubleclicksearch.html) ... 
 //! 
 //! * [conversion](struct.Conversion.html)
-//!  * [*get*](struct.ConversionGetCall.html), [*insert*](struct.ConversionInsertCall.html), [*patch*](struct.ConversionPatchCall.html), [*update*](struct.ConversionUpdateCall.html) and [*update availability*](struct.ConversionUpdateAvailabilityCall.html)
+//!  * [*get*](struct.ConversionGetCall.html), [*insert*](struct.ConversionInsertCall.html), [*update*](struct.ConversionUpdateCall.html) and [*update availability*](struct.ConversionUpdateAvailabilityCall.html)
 //! * [reports](struct.Report.html)
 //!  * [*generate*](struct.ReportGenerateCall.html), [*get*](struct.ReportGetCall.html), [*get file*](struct.ReportGetFileCall.html) and [*request*](struct.ReportRequestCall.html)
 //! * [saved columns](struct.SavedColumn.html)
@@ -328,7 +328,7 @@ impl<'a, C, A> Doubleclicksearch<C, A>
         Doubleclicksearch {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://www.googleapis.com/doubleclicksearch/v2/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -345,7 +345,7 @@ impl<'a, C, A> Doubleclicksearch<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -524,7 +524,7 @@ pub struct ReportRow(Option<HashMap<String, String>>);
 impl Part for ReportRow {}
 
 
-/// Asynchronous report only. Contains a list of generated report files once the report has succesfully completed.
+/// Asynchronous report only. Contains a list of generated report files once the report has successfully completed.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -759,7 +759,7 @@ impl RequestValue for ReportRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Report {
-    /// Asynchronous report only. Contains a list of generated report files once the report has succesfully completed.
+    /// Asynchronous report only. Contains a list of generated report files once the report has successfully completed.
     pub files: Option<Vec<ReportFiles>>,
     /// Identifies this as a Report resource. Value: the fixed string doubleclicksearch#report.
     pub kind: Option<String>,
@@ -900,7 +900,6 @@ impl ResponseResult for UpdateAvailabilityResponse {}
 /// 
 /// * [insert conversion](struct.ConversionInsertCall.html) (request|response)
 /// * [get conversion](struct.ConversionGetCall.html) (response)
-/// * [patch conversion](struct.ConversionPatchCall.html) (request|response)
 /// * [update conversion](struct.ConversionUpdateCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -944,7 +943,7 @@ impl ResponseResult for ConversionList {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Doubleclicksearch::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get(...)`, `insert(...)`, `patch(...)`, `update(...)` and `update_availability(...)`
+/// // like `get(...)`, `insert(...)`, `update(...)` and `update_availability(...)`
 /// // to build up your call.
 /// let rb = hub.conversion();
 /// # }
@@ -1020,37 +1019,6 @@ impl<'a, C, A> ConversionMethods<'a, C, A> {
         ConversionUpdateAvailabilityCall {
             hub: self.hub,
             _request: request,
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Updates a batch of conversions in DoubleClick Search. This method supports patch semantics.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `advertiserId` - Numeric ID of the advertiser.
-    /// * `agencyId` - Numeric ID of the agency.
-    /// * `endDate` - Last date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
-    /// * `engineAccountId` - Numeric ID of the engine account.
-    /// * `rowCount` - The number of conversions to return per call.
-    /// * `startDate` - First date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
-    /// * `startRow` - The 0-based starting index for retrieving conversions results.
-    pub fn patch(&self, request: ConversionList, advertiser_id: &str, agency_id: &str, end_date: i32, engine_account_id: &str, row_count: i32, start_date: i32, start_row: u32) -> ConversionPatchCall<'a, C, A> {
-        ConversionPatchCall {
-            hub: self.hub,
-            _request: request,
-            _advertiser_id: advertiser_id.to_string(),
-            _agency_id: agency_id.to_string(),
-            _end_date: end_date,
-            _engine_account_id: engine_account_id.to_string(),
-            _row_count: row_count,
-            _start_date: start_date,
-            _start_row: start_row,
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2092,328 +2060,6 @@ impl<'a, C, A> ConversionUpdateAvailabilityCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Updates a batch of conversions in DoubleClick Search. This method supports patch semantics.
-///
-/// A builder for the *patch* method supported by a *conversion* resource.
-/// It is not used directly, but through a `ConversionMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_doubleclicksearch2 as doubleclicksearch2;
-/// use doubleclicksearch2::ConversionList;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use doubleclicksearch2::Doubleclicksearch;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Doubleclicksearch::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = ConversionList::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.conversion().patch(req, "advertiserId", "agencyId", -66, "engineAccountId", -21, -21, 67)
-///              .doit();
-/// # }
-/// ```
-pub struct ConversionPatchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Doubleclicksearch<C, A>,
-    _request: ConversionList,
-    _advertiser_id: String,
-    _agency_id: String,
-    _end_date: i32,
-    _engine_account_id: String,
-    _row_count: i32,
-    _start_date: i32,
-    _start_row: u32,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ConversionPatchCall<'a, C, A> {}
-
-impl<'a, C, A> ConversionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ConversionList)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "doubleclicksearch.conversion.patch",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
-        params.push(("advertiserId", self._advertiser_id.to_string()));
-        params.push(("agencyId", self._agency_id.to_string()));
-        params.push(("endDate", self._end_date.to_string()));
-        params.push(("engineAccountId", self._engine_account_id.to_string()));
-        params.push(("rowCount", self._row_count.to_string()));
-        params.push(("startDate", self._start_date.to_string()));
-        params.push(("startRow", self._start_row.to_string()));
-        for &field in ["alt", "advertiserId", "agencyId", "endDate", "engineAccountId", "rowCount", "startDate", "startRow"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "conversion";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ConversionList) -> ConversionPatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Numeric ID of the advertiser.
-    ///
-    /// Sets the *advertiser id* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> ConversionPatchCall<'a, C, A> {
-        self._advertiser_id = new_value.to_string();
-        self
-    }
-    /// Numeric ID of the agency.
-    ///
-    /// Sets the *agency id* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn agency_id(mut self, new_value: &str) -> ConversionPatchCall<'a, C, A> {
-        self._agency_id = new_value.to_string();
-        self
-    }
-    /// Last date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
-    ///
-    /// Sets the *end date* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn end_date(mut self, new_value: i32) -> ConversionPatchCall<'a, C, A> {
-        self._end_date = new_value;
-        self
-    }
-    /// Numeric ID of the engine account.
-    ///
-    /// Sets the *engine account id* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn engine_account_id(mut self, new_value: &str) -> ConversionPatchCall<'a, C, A> {
-        self._engine_account_id = new_value.to_string();
-        self
-    }
-    /// The number of conversions to return per call.
-    ///
-    /// Sets the *row count* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn row_count(mut self, new_value: i32) -> ConversionPatchCall<'a, C, A> {
-        self._row_count = new_value;
-        self
-    }
-    /// First date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
-    ///
-    /// Sets the *start date* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn start_date(mut self, new_value: i32) -> ConversionPatchCall<'a, C, A> {
-        self._start_date = new_value;
-        self
-    }
-    /// The 0-based starting index for retrieving conversions results.
-    ///
-    /// Sets the *start row* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn start_row(mut self, new_value: u32) -> ConversionPatchCall<'a, C, A> {
-        self._start_row = new_value;
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ConversionPatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ConversionPatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ConversionPatchCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Updates a batch of conversions in DoubleClick Search.
 ///
 /// A builder for the *update* method supported by a *conversion* resource.
@@ -2934,7 +2580,7 @@ impl<'a, C, A> SavedColumnListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.reports().get_file("reportId", -5)
+/// let result = hub.reports().get_file("reportId", -61)
 ///              .doit();
 /// # }
 /// ```

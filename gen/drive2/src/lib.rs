@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *1.0.12+20190620*, where *20190620* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *drive* crate version *1.0.13+20200326*, where *20200326* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *drive* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
@@ -33,8 +33,6 @@
 //!  * [*delete*](struct.PermissionDeleteCall.html), [*get*](struct.PermissionGetCall.html), [*get id for email*](struct.PermissionGetIdForEmailCall.html), [*insert*](struct.PermissionInsertCall.html), [*list*](struct.PermissionListCall.html), [*patch*](struct.PermissionPatchCall.html) and [*update*](struct.PermissionUpdateCall.html)
 //! * [properties](struct.Property.html)
 //!  * [*delete*](struct.PropertyDeleteCall.html), [*get*](struct.PropertyGetCall.html), [*insert*](struct.PropertyInsertCall.html), [*list*](struct.PropertyListCall.html), [*patch*](struct.PropertyPatchCall.html) and [*update*](struct.PropertyUpdateCall.html)
-//! * realtime
-//!  * [*get*](struct.RealtimeGetCall.html) and [*update*](struct.RealtimeUpdateCall.html)
 //! * replies
 //!  * [*delete*](struct.ReplyDeleteCall.html), [*get*](struct.ReplyGetCall.html), [*insert*](struct.ReplyInsertCall.html), [*list*](struct.ReplyListCall.html), [*patch*](struct.ReplyPatchCall.html) and [*update*](struct.ReplyUpdateCall.html)
 //! * [revisions](struct.Revision.html)
@@ -47,12 +45,10 @@
 //! 
 //! * [*update files*](struct.FileUpdateCall.html)
 //! * [*insert files*](struct.FileInsertCall.html)
-//! * [*update realtime*](struct.RealtimeUpdateCall.html)
 //! 
 //! Download supported by ...
 //! 
 //! * [*watch files*](struct.FileWatchCall.html)
-//! * [*get realtime*](struct.RealtimeGetCall.html)
 //! * [*get files*](struct.FileGetCall.html)
 //! * [*export files*](struct.FileExportCall.html)
 //! 
@@ -171,21 +167,22 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.files().patch(req, "fileId")
-//!              .use_content_as_indexable_text(false)
-//!              .update_viewed_date(true)
-//!              .timed_text_track_name("ea")
-//!              .timed_text_language("no")
+//!              .use_content_as_indexable_text(true)
+//!              .update_viewed_date(false)
+//!              .timed_text_track_name("no")
+//!              .timed_text_language("justo")
 //!              .supports_team_drives(true)
 //!              .supports_all_drives(true)
 //!              .set_modified_date(true)
-//!              .remove_parents("et")
-//!              .pinned(true)
-//!              .ocr_language("ipsum")
+//!              .remove_parents("diam")
+//!              .pinned(false)
+//!              .ocr_language("Lorem")
 //!              .ocr(true)
-//!              .new_revision(true)
-//!              .modified_date_behavior("duo")
-//!              .convert(true)
-//!              .add_parents("sea")
+//!              .new_revision(false)
+//!              .modified_date_behavior("aliquyam")
+//!              .enforce_single_parent(true)
+//!              .convert(false)
+//!              .add_parents("eos")
 //!              .doit();
 //! 
 //! match result {
@@ -402,20 +399,21 @@ impl Default for Scope {
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().patch(req, "fileId")
 ///              .use_content_as_indexable_text(false)
-///              .update_viewed_date(false)
-///              .timed_text_track_name("sadipscing")
-///              .timed_text_language("dolor")
-///              .supports_team_drives(true)
-///              .supports_all_drives(true)
-///              .set_modified_date(false)
-///              .remove_parents("no")
+///              .update_viewed_date(true)
+///              .timed_text_track_name("eirmod")
+///              .timed_text_language("elitr")
+///              .supports_team_drives(false)
+///              .supports_all_drives(false)
+///              .set_modified_date(true)
+///              .remove_parents("eirmod")
 ///              .pinned(true)
-///              .ocr_language("eirmod")
-///              .ocr(true)
-///              .new_revision(true)
-///              .modified_date_behavior("aliquyam")
-///              .convert(false)
-///              .add_parents("Lorem")
+///              .ocr_language("invidunt")
+///              .ocr(false)
+///              .new_revision(false)
+///              .modified_date_behavior("Lorem")
+///              .enforce_single_parent(true)
+///              .convert(true)
+///              .add_parents("duo")
 ///              .doit();
 /// 
 /// match result {
@@ -453,7 +451,7 @@ impl<'a, C, A> DriveHub<C, A>
         DriveHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://www.googleapis.com/drive/v2/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -492,9 +490,6 @@ impl<'a, C, A> DriveHub<C, A>
     pub fn properties(&'a self) -> PropertyMethods<'a, C, A> {
         PropertyMethods { hub: &self }
     }
-    pub fn realtime(&'a self) -> RealtimeMethods<'a, C, A> {
-        RealtimeMethods { hub: &self }
-    }
     pub fn replies(&'a self) -> ReplyMethods<'a, C, A> {
         ReplyMethods { hub: &self }
     }
@@ -506,7 +501,7 @@ impl<'a, C, A> DriveHub<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -778,7 +773,7 @@ pub struct PermissionPermissionDetails {
     /// Additional roles for this user. Only commenter is currently possible, though more may be supported in the future.
     #[serde(rename="additionalRoles")]
     pub additional_roles: Option<Vec<String>>,
-    /// The ID of the item from which this permission is inherited. This is an output-only field and is only populated for members of the shared drive.
+    /// The ID of the item from which this permission is inherited. This is an output-only field.
     #[serde(rename="inheritedFrom")]
     pub inherited_from: Option<String>,
 }
@@ -813,7 +808,7 @@ pub struct FileImageMediaMetadata {
     pub aperture: Option<f32>,
     /// The date and time the photo was taken (EXIF format timestamp).
     pub date: Option<String>,
-    /// The rotation in clockwise degrees from the image's original orientation.
+    /// The number of clockwise 90 degree rotations applied from the image's original orientation.
     pub rotation: Option<i32>,
     /// The white balance mode used to create the photo.
     #[serde(rename="whiteBalance")]
@@ -1154,6 +1149,24 @@ pub struct RevisionList {
 impl ResponseResult for RevisionList {}
 
 
+/// Shortcut file details. Only populated for shortcut files, which have the mimeType field set to application/vnd.google-apps.shortcut.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FileShortcutDetails {
+    /// The ID of the file that this shortcut points to.
+    #[serde(rename="targetId")]
+    pub target_id: Option<String>,
+    /// The MIME type of the file that this shortcut points to. The value of this field is a snapshot of the target's MIME type, captured when the shortcut is created.
+    #[serde(rename="targetMimeType")]
+    pub target_mime_type: Option<String>,
+}
+
+impl NestedType for FileShortcutDetails {}
+impl Part for FileShortcutDetails {}
+
+
 /// A revision of a file.
 /// 
 /// # Activities
@@ -1192,7 +1205,7 @@ pub struct Revision {
     /// An MD5 checksum for the content of this revision. This will only be populated on files with content stored in Drive.
     #[serde(rename="md5Checksum")]
     pub md5_checksum: Option<String>,
-    /// Short term download URL for the file. This will only be populated on files with content stored in Drive.
+    /// no description provided
     #[serde(rename="downloadUrl")]
     pub download_url: Option<String>,
     /// This is always drive#revision.
@@ -1200,7 +1213,7 @@ pub struct Revision {
     /// The last user to modify this revision.
     #[serde(rename="lastModifyingUser")]
     pub last_modifying_user: Option<User>,
-    /// Whether this revision is pinned to prevent automatic purging. This will only be populated and can only be modified on files with content stored in Drive which are not Google Docs. Revisions can also be pinned when they are created through the drive.files.insert/update/copy by using the pinned query parameter.
+    /// Whether this revision is pinned to prevent automatic purging. This will only be populated and can only be modified on files with content stored in Drive which are not Google Docs. Revisions can also be pinned when they are created through the drive.files.insert/update/copy by using the pinned query parameter. Pinned revisions are stored indefinitely using additional storage quota, up to a maximum of 200 revisions.
     pub pinned: Option<bool>,
     /// The ETag of the revision.
     pub etag: Option<String>,
@@ -1708,57 +1721,27 @@ pub struct FileCapabilities {
     /// Whether the current user can restore this file from trash.
     #[serde(rename="canUntrash")]
     pub can_untrash: Option<bool>,
-    /// Whether the current user can copy this file. For an item in a shared drive, whether the current user can copy non-folder descendants of this item, or this item itself if it is not a folder.
-    #[serde(rename="canCopy")]
-    pub can_copy: Option<bool>,
-    /// Whether the current user can move this item within this shared drive. Note that a request to change the parent of the item may still fail depending on the new parent that is being added. Only populated for items in shared drives.
-    #[serde(rename="canMoveItemWithinDrive")]
-    pub can_move_item_within_drive: Option<bool>,
-    /// Whether the current user can read the revisions resource of this file. For a shared drive item, whether revisions of non-folder descendants of this item, or this item itself if it is not a folder, can be read.
-    #[serde(rename="canReadRevisions")]
-    pub can_read_revisions: Option<bool>,
-    /// Deprecated - use canMoveItemOutOfDrive instead.
-    #[serde(rename="canMoveItemIntoTeamDrive")]
-    pub can_move_item_into_team_drive: Option<bool>,
     /// Deprecated - use canMoveItemWithinDrive instead.
     #[serde(rename="canMoveItemWithinTeamDrive")]
     pub can_move_item_within_team_drive: Option<bool>,
-    /// Deprecated - use canMoveItemOutOfDrive instead.
-    #[serde(rename="canMoveItemOutOfTeamDrive")]
-    pub can_move_item_out_of_team_drive: Option<bool>,
     /// Whether the current user can delete children of this folder. This is false when the item is not a folder. Only populated for items in shared drives.
     #[serde(rename="canDeleteChildren")]
     pub can_delete_children: Option<bool>,
-    /// Whether the current user can change the copyRequiresWriterPermission restriction of this file.
-    #[serde(rename="canChangeCopyRequiresWriterPermission")]
-    pub can_change_copy_requires_writer_permission: Option<bool>,
-    /// Whether the current user can download this file.
-    #[serde(rename="canDownload")]
-    pub can_download: Option<bool>,
     /// Deprecated - use canMoveChildrenWithinDrive instead.
     #[serde(rename="canMoveChildrenWithinTeamDrive")]
     pub can_move_children_within_team_drive: Option<bool>,
-    /// Whether the current user can comment on this file.
-    #[serde(rename="canComment")]
-    pub can_comment: Option<bool>,
     /// Whether the current user can list the children of this folder. This is always false when the item is not a folder.
     #[serde(rename="canListChildren")]
     pub can_list_children: Option<bool>,
     /// Whether the current user can rename this file.
     #[serde(rename="canRename")]
     pub can_rename: Option<bool>,
-    /// Whether the current user can move this file to trash.
-    #[serde(rename="canTrash")]
-    pub can_trash: Option<bool>,
-    /// Whether the current user can delete this file.
-    #[serde(rename="canDelete")]
-    pub can_delete: Option<bool>,
+    /// Whether the current user can modify the content of this file.
+    #[serde(rename="canModifyContent")]
+    pub can_modify_content: Option<bool>,
     /// Whether the current user can read the shared drive to which this file belongs. Only populated for items in shared drives.
     #[serde(rename="canReadDrive")]
     pub can_read_drive: Option<bool>,
-    /// Deprecated - use canMoveItemWithinDrive or canMoveItemOutOfDrive instead.
-    #[serde(rename="canMoveTeamDriveItem")]
-    pub can_move_team_drive_item: Option<bool>,
     /// Whether the current user can add children to this folder. This is always false when the item is not a folder.
     #[serde(rename="canAddChildren")]
     pub can_add_children: Option<bool>,
@@ -1771,12 +1754,51 @@ pub struct FileCapabilities {
     /// Whether the current user can trash children of this folder. This is false when the item is not a folder. Only populated for items in shared drives.
     #[serde(rename="canTrashChildren")]
     pub can_trash_children: Option<bool>,
-    /// Whether the current user can edit this file.
-    #[serde(rename="canEdit")]
-    pub can_edit: Option<bool>,
+    /// Whether the current user can add a parent for the item without removing an existing parent in the same request. Not populated for shared drive files.
+    #[serde(rename="canAddMyDriveParent")]
+    pub can_add_my_drive_parent: Option<bool>,
+    /// Whether the current user can move children of this folder within the shared drive. This is false when the item is not a folder. Only populated for items in shared drives.
+    #[serde(rename="canMoveChildrenWithinDrive")]
+    pub can_move_children_within_drive: Option<bool>,
+    /// Whether the current user can read the revisions resource of this file. For a shared drive item, whether revisions of non-folder descendants of this item, or this item itself if it is not a folder, can be read.
+    #[serde(rename="canReadRevisions")]
+    pub can_read_revisions: Option<bool>,
+    /// Whether the current user can move this item within this shared drive. Note that a request to change the parent of the item may still fail depending on the new parent that is being added. Only populated for items in shared drives.
+    #[serde(rename="canMoveItemWithinDrive")]
+    pub can_move_item_within_drive: Option<bool>,
+    /// Whether the current user can copy this file. For an item in a shared drive, whether the current user can copy non-folder descendants of this item, or this item itself if it is not a folder.
+    #[serde(rename="canCopy")]
+    pub can_copy: Option<bool>,
+    /// Deprecated - use canMoveItemOutOfDrive instead.
+    #[serde(rename="canMoveItemIntoTeamDrive")]
+    pub can_move_item_into_team_drive: Option<bool>,
+    /// Deprecated - use canMoveItemOutOfDrive instead.
+    #[serde(rename="canMoveItemOutOfTeamDrive")]
+    pub can_move_item_out_of_team_drive: Option<bool>,
+    /// Whether the current user can comment on this file.
+    #[serde(rename="canComment")]
+    pub can_comment: Option<bool>,
     /// Whether the current user can move children of this folder outside of the shared drive. This is false when the item is not a folder. Only populated for items in shared drives.
     #[serde(rename="canMoveChildrenOutOfDrive")]
     pub can_move_children_out_of_drive: Option<bool>,
+    /// Whether the current user can move this file to trash.
+    #[serde(rename="canTrash")]
+    pub can_trash: Option<bool>,
+    /// Whether the current user can delete this file.
+    #[serde(rename="canDelete")]
+    pub can_delete: Option<bool>,
+    /// Whether the current user can remove a parent from the item without adding another parent in the same request. Not populated for shared drive files.
+    #[serde(rename="canRemoveMyDriveParent")]
+    pub can_remove_my_drive_parent: Option<bool>,
+    /// Deprecated - use canMoveItemWithinDrive or canMoveItemOutOfDrive instead.
+    #[serde(rename="canMoveTeamDriveItem")]
+    pub can_move_team_drive_item: Option<bool>,
+    /// Whether the current user can download this file.
+    #[serde(rename="canDownload")]
+    pub can_download: Option<bool>,
+    /// Whether the current user can change the copyRequiresWriterPermission restriction of this file.
+    #[serde(rename="canChangeCopyRequiresWriterPermission")]
+    pub can_change_copy_requires_writer_permission: Option<bool>,
     /// Deprecated - use canMoveChildrenOutOfDrive instead.
     #[serde(rename="canMoveChildrenOutOfTeamDrive")]
     pub can_move_children_out_of_team_drive: Option<bool>,
@@ -1786,9 +1808,9 @@ pub struct FileCapabilities {
     /// Deprecated - use canReadDrive instead.
     #[serde(rename="canReadTeamDrive")]
     pub can_read_team_drive: Option<bool>,
-    /// Whether the current user can move children of this folder within the shared drive. This is false when the item is not a folder. Only populated for items in shared drives.
-    #[serde(rename="canMoveChildrenWithinDrive")]
-    pub can_move_children_within_drive: Option<bool>,
+    /// Whether the current user can edit this file. Other factors may limit the type of changes a user can make to a file. For example, see canChangeCopyRequiresWriterPermission or canModifyContent.
+    #[serde(rename="canEdit")]
+    pub can_edit: Option<bool>,
 }
 
 impl NestedType for FileCapabilities {}
@@ -1894,7 +1916,7 @@ impl ResponseResult for FileList {}
 pub struct CommentReply {
     /// This is always drive#commentReply.
     pub kind: Option<String>,
-    /// The user who wrote this reply.
+    /// The author of the reply. The author's email address and permission ID will not be populated.
     pub author: Option<User>,
     /// Whether this reply has been deleted. If a reply has been deleted the content will be cleared and this will only represent a reply that once existed.
     pub deleted: Option<bool>,
@@ -2049,7 +2071,7 @@ pub struct About {
     /// Deprecated - use driveThemes instead.
     #[serde(rename="teamDriveThemes")]
     pub team_drive_themes: Option<Vec<AboutTeamDriveThemes>>,
-    /// The total number of quota bytes.
+    /// The total number of quota bytes. This is only relevant when quotaType is LIMITED.
     #[serde(rename="quotaBytesTotal")]
     pub quota_bytes_total: Option<String>,
     /// The number of remaining change ids, limited to no more than 2500.
@@ -2251,7 +2273,7 @@ pub struct Comment {
     pub self_link: Option<String>,
     /// This is always drive#comment.
     pub kind: Option<String>,
-    /// The user who wrote this comment.
+    /// The author of the comment. The author's email address and permission ID will not be populated.
     pub author: Option<User>,
     /// Whether this comment has been deleted. If a comment has been deleted the content will be cleared and this will only represent a comment that once existed.
     pub deleted: Option<bool>,
@@ -2528,7 +2550,7 @@ pub struct File {
     /// The final component of fullFileExtension with trailing text that does not appear to be part of the extension removed. This field is only populated for files with content stored in Google Drive; it is not populated for Google Docs or shortcut files.
     #[serde(rename="fileExtension")]
     pub file_extension: Option<String>,
-    /// Whether any users are granted file access directly on this file. This field is only populated for items in shared drives.
+    /// Whether there are permissions directly on this file. This field is only populated for items in shared drives.
     #[serde(rename="hasAugmentedPermissions")]
     pub has_augmented_permissions: Option<bool>,
     /// The list of permissions for users with access to this file. Not populated for items in shared drives.
@@ -2555,6 +2577,9 @@ pub struct File {
     pub owned_by_me: Option<bool>,
     /// The ID of the file.
     pub id: Option<String>,
+    /// Shortcut file details. Only populated for shortcut files, which have the mimeType field set to application/vnd.google-apps.shortcut.
+    #[serde(rename="shortcutDetails")]
+    pub shortcut_details: Option<FileShortcutDetails>,
     /// Short lived download URL for the file. This field is only populated for files with content stored in Google Drive; it is not populated for Google Docs or shortcut files.
     #[serde(rename="downloadUrl")]
     pub download_url: Option<String>,
@@ -2761,6 +2786,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             _pinned: Default::default(),
             _ocr_language: Default::default(),
             _ocr: Default::default(),
+            _enforce_single_parent: Default::default(),
             _convert: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2827,6 +2853,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             _pinned: Default::default(),
             _ocr_language: Default::default(),
             _ocr: Default::default(),
+            _enforce_single_parent: Default::default(),
             _convert: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2969,6 +2996,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             _ocr: Default::default(),
             _new_revision: Default::default(),
             _modified_date_behavior: Default::default(),
+            _enforce_single_parent: Default::default(),
             _convert: Default::default(),
             _add_parents: Default::default(),
             _delegate: Default::default(),
@@ -3003,6 +3031,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             _ocr: Default::default(),
             _new_revision: Default::default(),
             _modified_date_behavior: Default::default(),
+            _enforce_single_parent: Default::default(),
             _convert: Default::default(),
             _add_parents: Default::default(),
             _delegate: Default::default(),
@@ -3160,84 +3189,6 @@ impl<'a, C, A> TeamdriveMethods<'a, C, A> {
             _request: request,
             _team_drive_id: team_drive_id.to_string(),
             _use_domain_admin_access: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-}
-
-
-
-/// A builder providing access to all methods supported on *realtime* resources.
-/// It is not used directly, but through the `DriveHub` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_drive2 as drive2;
-/// 
-/// # #[test] fn egal() {
-/// use std::default::Default;
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use drive2::DriveHub;
-/// 
-/// let secret: ApplicationSecret = Default::default();
-/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get(...)` and `update(...)`
-/// // to build up your call.
-/// let rb = hub.realtime();
-/// # }
-/// ```
-pub struct RealtimeMethods<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a DriveHub<C, A>,
-}
-
-impl<'a, C, A> MethodsBuilder for RealtimeMethods<'a, C, A> {}
-
-impl<'a, C, A> RealtimeMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Overwrites the Realtime API data model associated with this file with the provided JSON data model.
-    /// 
-    /// # Arguments
-    ///
-    /// * `fileId` - The ID of the file that the Realtime API data model is associated with.
-    pub fn update(&self, file_id: &str) -> RealtimeUpdateCall<'a, C, A> {
-        RealtimeUpdateCall {
-            hub: self.hub,
-            _file_id: file_id.to_string(),
-            _base_revision: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Exports the contents of the Realtime API data model associated with this file as JSON.
-    /// 
-    /// # Arguments
-    ///
-    /// * `fileId` - The ID of the file that the Realtime API data model is associated with.
-    pub fn get(&self, file_id: &str) -> RealtimeGetCall<'a, C, A> {
-        RealtimeGetCall {
-            hub: self.hub,
-            _file_id: file_id.to_string(),
-            _revision: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3586,7 +3537,7 @@ impl<'a, C, A> CommentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing comment. This method supports patch semantics.
+    /// Updates an existing comment.
     /// 
     /// # Arguments
     ///
@@ -3742,6 +3693,7 @@ impl<'a, C, A> ChildrenMethods<'a, C, A> {
             hub: self.hub,
             _folder_id: folder_id.to_string(),
             _child_id: child_id.to_string(),
+            _enforce_single_parent: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3763,6 +3715,7 @@ impl<'a, C, A> ChildrenMethods<'a, C, A> {
             _folder_id: folder_id.to_string(),
             _supports_team_drives: Default::default(),
             _supports_all_drives: Default::default(),
+            _enforce_single_parent: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3900,6 +3853,7 @@ impl<'a, C, A> ParentMethods<'a, C, A> {
             hub: self.hub,
             _file_id: file_id.to_string(),
             _parent_id: parent_id.to_string(),
+            _enforce_single_parent: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3921,6 +3875,7 @@ impl<'a, C, A> ParentMethods<'a, C, A> {
             _file_id: file_id.to_string(),
             _supports_team_drives: Default::default(),
             _supports_all_drives: Default::default(),
+            _enforce_single_parent: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3990,7 +3945,7 @@ impl<'a, C, A> ReplyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing reply. This method supports patch semantics.
+    /// Updates an existing reply.
     /// 
     /// # Arguments
     ///
@@ -4243,6 +4198,32 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Inserts a permission for a file or shared drive.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID for the file or shared drive.
+    pub fn insert(&self, request: Permission, file_id: &str) -> PermissionInsertCall<'a, C, A> {
+        PermissionInsertCall {
+            hub: self.hub,
+            _request: request,
+            _file_id: file_id.to_string(),
+            _use_domain_admin_access: Default::default(),
+            _supports_team_drives: Default::default(),
+            _supports_all_drives: Default::default(),
+            _send_notification_emails: Default::default(),
+            _move_to_new_owners_root: Default::default(),
+            _enforce_single_parent: Default::default(),
+            _email_message: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Updates a permission using patch semantics.
     /// 
     /// # Arguments
@@ -4331,30 +4312,6 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
             _use_domain_admin_access: Default::default(),
             _supports_team_drives: Default::default(),
             _supports_all_drives: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Inserts a permission for a file or shared drive.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `fileId` - The ID for the file or shared drive.
-    pub fn insert(&self, request: Permission, file_id: &str) -> PermissionInsertCall<'a, C, A> {
-        PermissionInsertCall {
-            hub: self.hub,
-            _request: request,
-            _file_id: file_id.to_string(),
-            _use_domain_admin_access: Default::default(),
-            _supports_team_drives: Default::default(),
-            _supports_all_drives: Default::default(),
-            _send_notification_emails: Default::default(),
-            _email_message: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4556,6 +4513,25 @@ impl<'a, C, A> PropertyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Adds a property to a file, or updates it if it already exists.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID of the file.
+    pub fn insert(&self, request: Property, file_id: &str) -> PropertyInsertCall<'a, C, A> {
+        PropertyInsertCall {
+            hub: self.hub,
+            _request: request,
+            _file_id: file_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Deletes a property.
     /// 
     /// # Arguments
@@ -4568,25 +4544,6 @@ impl<'a, C, A> PropertyMethods<'a, C, A> {
             _file_id: file_id.to_string(),
             _property_key: property_key.to_string(),
             _visibility: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Adds a property to a file, or updates it if it already exists.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `fileId` - The ID of the file.
-    pub fn insert(&self, request: Property, file_id: &str) -> PropertyInsertCall<'a, C, A> {
-        PropertyInsertCall {
-            hub: self.hub,
-            _request: request,
-            _file_id: file_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4718,27 +4675,6 @@ impl<'a, C, A> RevisionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a revision. This method supports patch semantics.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `fileId` - The ID for the file.
-    /// * `revisionId` - The ID for the revision.
-    pub fn patch(&self, request: Revision, file_id: &str, revision_id: &str) -> RevisionPatchCall<'a, C, A> {
-        RevisionPatchCall {
-            hub: self.hub,
-            _request: request,
-            _file_id: file_id.to_string(),
-            _revision_id: revision_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Gets a specific revision.
     /// 
     /// # Arguments
@@ -4767,6 +4703,27 @@ impl<'a, C, A> RevisionMethods<'a, C, A> {
     pub fn delete(&self, file_id: &str, revision_id: &str) -> RevisionDeleteCall<'a, C, A> {
         RevisionDeleteCall {
             hub: self.hub,
+            _file_id: file_id.to_string(),
+            _revision_id: revision_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a revision.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID for the file.
+    /// * `revisionId` - The ID for the revision.
+    pub fn patch(&self, request: Revision, file_id: &str, revision_id: &str) -> RevisionPatchCall<'a, C, A> {
+        RevisionPatchCall {
+            hub: self.hub,
+            _request: request,
             _file_id: file_id.to_string(),
             _revision_id: revision_id.to_string(),
             _delegate: Default::default(),
@@ -4866,8 +4823,8 @@ impl<'a, C, A> RevisionMethods<'a, C, A> {
 ///              .update_viewed_date(true)
 ///              .supports_team_drives(false)
 ///              .supports_all_drives(true)
-///              .revision_id("eirmod")
-///              .projection("sanctus")
+///              .revision_id("amet")
+///              .projection("et")
 ///              .acknowledge_abuse(true)
 ///              .doit();
 /// # }
@@ -5223,16 +5180,17 @@ impl<'a, C, A> FileWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().insert(req)
-///              .visibility("amet")
+///              .visibility("ut")
 ///              .use_content_as_indexable_text(true)
-///              .timed_text_track_name("consetetur")
-///              .timed_text_language("ut")
+///              .timed_text_track_name("sed")
+///              .timed_text_language("dolor")
 ///              .supports_team_drives(true)
-///              .supports_all_drives(false)
+///              .supports_all_drives(true)
 ///              .pinned(true)
-///              .ocr_language("dolor")
-///              .ocr(true)
-///              .convert(true)
+///              .ocr_language("consetetur")
+///              .ocr(false)
+///              .enforce_single_parent(true)
+///              .convert(false)
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -5250,6 +5208,7 @@ pub struct FileInsertCall<'a, C, A>
     _pinned: Option<bool>,
     _ocr_language: Option<String>,
     _ocr: Option<bool>,
+    _enforce_single_parent: Option<bool>,
     _convert: Option<bool>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
@@ -5273,7 +5232,7 @@ impl<'a, C, A> FileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "drive.files.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(14 + self._additional_params.len());
         if let Some(value) = self._visibility {
             params.push(("visibility", value.to_string()));
         }
@@ -5301,10 +5260,13 @@ impl<'a, C, A> FileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._ocr {
             params.push(("ocr", value.to_string()));
         }
+        if let Some(value) = self._enforce_single_parent {
+            params.push(("enforceSingleParent", value.to_string()));
+        }
         if let Some(value) = self._convert {
             params.push(("convert", value.to_string()));
         }
-        for &field in ["alt", "visibility", "useContentAsIndexableText", "timedTextTrackName", "timedTextLanguage", "supportsTeamDrives", "supportsAllDrives", "pinned", "ocrLanguage", "ocr", "convert"].iter() {
+        for &field in ["alt", "visibility", "useContentAsIndexableText", "timedTextTrackName", "timedTextLanguage", "supportsTeamDrives", "supportsAllDrives", "pinned", "ocrLanguage", "ocr", "enforceSingleParent", "convert"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5594,6 +5556,13 @@ impl<'a, C, A> FileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._ocr = Some(new_value);
         self
     }
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. Requests that specify more than one parent will fail.
+    ///
+    /// Sets the *enforce single parent* query property to the given value.
+    pub fn enforce_single_parent(mut self, new_value: bool) -> FileInsertCall<'a, C, A> {
+        self._enforce_single_parent = Some(new_value);
+        self
+    }
     /// Whether to convert this file to the corresponding Google Docs format.
     ///
     /// Sets the *convert* query property to the given value.
@@ -5688,8 +5657,8 @@ impl<'a, C, A> FileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().untrash("fileId")
-///              .supports_team_drives(false)
-///              .supports_all_drives(true)
+///              .supports_team_drives(true)
+///              .supports_all_drives(false)
 ///              .doit();
 /// # }
 /// ```
@@ -5953,7 +5922,7 @@ impl<'a, C, A> FileUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().delete("fileId")
 ///              .supports_team_drives(true)
-///              .supports_all_drives(true)
+///              .supports_all_drives(false)
 ///              .doit();
 /// # }
 /// ```
@@ -6211,15 +6180,16 @@ impl<'a, C, A> FileDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().copy(req, "fileId")
-///              .visibility("vero")
-///              .timed_text_track_name("diam")
-///              .timed_text_language("rebum.")
-///              .supports_team_drives(true)
-///              .supports_all_drives(true)
+///              .visibility("sadipscing")
+///              .timed_text_track_name("vero")
+///              .timed_text_language("sadipscing")
+///              .supports_team_drives(false)
+///              .supports_all_drives(false)
 ///              .pinned(false)
-///              .ocr_language("sadipscing")
+///              .ocr_language("duo")
 ///              .ocr(false)
-///              .convert(false)
+///              .enforce_single_parent(true)
+///              .convert(true)
 ///              .doit();
 /// # }
 /// ```
@@ -6237,6 +6207,7 @@ pub struct FileCopyCall<'a, C, A>
     _pinned: Option<bool>,
     _ocr_language: Option<String>,
     _ocr: Option<bool>,
+    _enforce_single_parent: Option<bool>,
     _convert: Option<bool>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
@@ -6259,7 +6230,7 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "drive.files.copy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(14 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._visibility {
             params.push(("visibility", value.to_string()));
@@ -6285,10 +6256,13 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         if let Some(value) = self._ocr {
             params.push(("ocr", value.to_string()));
         }
+        if let Some(value) = self._enforce_single_parent {
+            params.push(("enforceSingleParent", value.to_string()));
+        }
         if let Some(value) = self._convert {
             params.push(("convert", value.to_string()));
         }
-        for &field in ["alt", "fileId", "visibility", "timedTextTrackName", "timedTextLanguage", "supportsTeamDrives", "supportsAllDrives", "pinned", "ocrLanguage", "ocr", "convert"].iter() {
+        for &field in ["alt", "fileId", "visibility", "timedTextTrackName", "timedTextLanguage", "supportsTeamDrives", "supportsAllDrives", "pinned", "ocrLanguage", "ocr", "enforceSingleParent", "convert"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6488,6 +6462,13 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// Sets the *ocr* query property to the given value.
     pub fn ocr(mut self, new_value: bool) -> FileCopyCall<'a, C, A> {
         self._ocr = Some(new_value);
+        self
+    }
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. Requests that specify more than one parent will fail.
+    ///
+    /// Sets the *enforce single parent* query property to the given value.
+    pub fn enforce_single_parent(mut self, new_value: bool) -> FileCopyCall<'a, C, A> {
+        self._enforce_single_parent = Some(new_value);
         self
     }
     /// Whether to convert this file to the corresponding Google Docs format.
@@ -7288,20 +7269,20 @@ impl<'a, C, A> FileEmptyTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().list()
-///              .team_drive_id("clita")
-///              .supports_team_drives(true)
-///              .supports_all_drives(false)
-///              .spaces("nonumy")
-///              .q("kasd")
-///              .projection("sanctus")
-///              .page_token("takimata")
-///              .order_by("At")
-///              .max_results(-86)
+///              .team_drive_id("sanctus")
+///              .supports_team_drives(false)
+///              .supports_all_drives(true)
+///              .spaces("labore")
+///              .q("invidunt")
+///              .projection("ea")
+///              .page_token("sadipscing")
+///              .order_by("rebum.")
+///              .max_results(-33)
 ///              .include_team_drive_items(true)
-///              .include_items_from_all_drives(false)
-///              .drive_id("sadipscing")
-///              .corpus("rebum.")
-///              .corpora("dolore")
+///              .include_items_from_all_drives(true)
+///              .drive_id("aliquyam")
+///              .corpus("sit")
+///              .corpora("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -7663,8 +7644,8 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().touch("fileId")
-///              .supports_team_drives(true)
-///              .supports_all_drives(false)
+///              .supports_team_drives(false)
+///              .supports_all_drives(true)
 ///              .doit();
 /// # }
 /// ```
@@ -7927,8 +7908,8 @@ impl<'a, C, A> FileTouchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().generate_ids()
-///              .space("sit")
-///              .max_results(-40)
+///              .space("ea")
+///              .max_results(-62)
 ///              .doit();
 /// # }
 /// ```
@@ -8165,21 +8146,22 @@ impl<'a, C, A> FileGenerateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().update(req, "fileId")
-///              .use_content_as_indexable_text(false)
+///              .use_content_as_indexable_text(true)
 ///              .update_viewed_date(true)
-///              .timed_text_track_name("ea")
-///              .timed_text_language("gubergren")
+///              .timed_text_track_name("sea")
+///              .timed_text_language("labore")
 ///              .supports_team_drives(false)
 ///              .supports_all_drives(true)
-///              .set_modified_date(true)
-///              .remove_parents("sea")
-///              .pinned(false)
-///              .ocr_language("ipsum")
-///              .ocr(true)
-///              .new_revision(false)
-///              .modified_date_behavior("sit")
+///              .set_modified_date(false)
+///              .remove_parents("sit")
+///              .pinned(true)
+///              .ocr_language("ut")
+///              .ocr(false)
+///              .new_revision(true)
+///              .modified_date_behavior("amet")
+///              .enforce_single_parent(true)
 ///              .convert(true)
-///              .add_parents("ut")
+///              .add_parents("diam")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -8202,6 +8184,7 @@ pub struct FileUpdateCall<'a, C, A>
     _ocr: Option<bool>,
     _new_revision: Option<bool>,
     _modified_date_behavior: Option<String>,
+    _enforce_single_parent: Option<bool>,
     _convert: Option<bool>,
     _add_parents: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
@@ -8226,7 +8209,7 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "drive.files.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(19 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(20 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._use_content_as_indexable_text {
             params.push(("useContentAsIndexableText", value.to_string()));
@@ -8267,13 +8250,16 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._modified_date_behavior {
             params.push(("modifiedDateBehavior", value.to_string()));
         }
+        if let Some(value) = self._enforce_single_parent {
+            params.push(("enforceSingleParent", value.to_string()));
+        }
         if let Some(value) = self._convert {
             params.push(("convert", value.to_string()));
         }
         if let Some(value) = self._add_parents {
             params.push(("addParents", value.to_string()));
         }
-        for &field in ["alt", "fileId", "useContentAsIndexableText", "updateViewedDate", "timedTextTrackName", "timedTextLanguage", "supportsTeamDrives", "supportsAllDrives", "setModifiedDate", "removeParents", "pinned", "ocrLanguage", "ocr", "newRevision", "modifiedDateBehavior", "convert", "addParents"].iter() {
+        for &field in ["alt", "fileId", "useContentAsIndexableText", "updateViewedDate", "timedTextTrackName", "timedTextLanguage", "supportsTeamDrives", "supportsAllDrives", "setModifiedDate", "removeParents", "pinned", "ocrLanguage", "ocr", "newRevision", "modifiedDateBehavior", "enforceSingleParent", "convert", "addParents"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8622,6 +8608,13 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._modified_date_behavior = Some(new_value.to_string());
         self
     }
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the item's owner makes a request to add a single parent, the item will be removed from all current folders and placed in the requested folder. Other requests that increase the number of parents will fail, except when the canAddMyDriveParent file capability is true and a single parent is being added.
+    ///
+    /// Sets the *enforce single parent* query property to the given value.
+    pub fn enforce_single_parent(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
+        self._enforce_single_parent = Some(new_value);
+        self
+    }
     /// This parameter is deprecated and has no function.
     ///
     /// Sets the *convert* query property to the given value.
@@ -8729,21 +8722,22 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().patch(req, "fileId")
-///              .use_content_as_indexable_text(true)
-///              .update_viewed_date(true)
-///              .timed_text_track_name("accusam")
-///              .timed_text_language("clita")
-///              .supports_team_drives(false)
-///              .supports_all_drives(false)
+///              .use_content_as_indexable_text(false)
+///              .update_viewed_date(false)
+///              .timed_text_track_name("invidunt")
+///              .timed_text_language("ut")
+///              .supports_team_drives(true)
+///              .supports_all_drives(true)
 ///              .set_modified_date(false)
-///              .remove_parents("clita")
-///              .pinned(true)
-///              .ocr_language("ut")
-///              .ocr(true)
+///              .remove_parents("duo")
+///              .pinned(false)
+///              .ocr_language("aliquyam")
+///              .ocr(false)
 ///              .new_revision(true)
-///              .modified_date_behavior("voluptua.")
+///              .modified_date_behavior("et")
+///              .enforce_single_parent(true)
 ///              .convert(true)
-///              .add_parents("sed")
+///              .add_parents("kasd")
 ///              .doit();
 /// # }
 /// ```
@@ -8766,6 +8760,7 @@ pub struct FilePatchCall<'a, C, A>
     _ocr: Option<bool>,
     _new_revision: Option<bool>,
     _modified_date_behavior: Option<String>,
+    _enforce_single_parent: Option<bool>,
     _convert: Option<bool>,
     _add_parents: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
@@ -8789,7 +8784,7 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "drive.files.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(19 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(20 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._use_content_as_indexable_text {
             params.push(("useContentAsIndexableText", value.to_string()));
@@ -8830,13 +8825,16 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         if let Some(value) = self._modified_date_behavior {
             params.push(("modifiedDateBehavior", value.to_string()));
         }
+        if let Some(value) = self._enforce_single_parent {
+            params.push(("enforceSingleParent", value.to_string()));
+        }
         if let Some(value) = self._convert {
             params.push(("convert", value.to_string()));
         }
         if let Some(value) = self._add_parents {
             params.push(("addParents", value.to_string()));
         }
-        for &field in ["alt", "fileId", "useContentAsIndexableText", "updateViewedDate", "timedTextTrackName", "timedTextLanguage", "supportsTeamDrives", "supportsAllDrives", "setModifiedDate", "removeParents", "pinned", "ocrLanguage", "ocr", "newRevision", "modifiedDateBehavior", "convert", "addParents"].iter() {
+        for &field in ["alt", "fileId", "useContentAsIndexableText", "updateViewedDate", "timedTextTrackName", "timedTextLanguage", "supportsTeamDrives", "supportsAllDrives", "setModifiedDate", "removeParents", "pinned", "ocrLanguage", "ocr", "newRevision", "modifiedDateBehavior", "enforceSingleParent", "convert", "addParents"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9073,6 +9071,13 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._modified_date_behavior = Some(new_value.to_string());
         self
     }
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the item's owner makes a request to add a single parent, the item will be removed from all current folders and placed in the requested folder. Other requests that increase the number of parents will fail, except when the canAddMyDriveParent file capability is true and a single parent is being added.
+    ///
+    /// Sets the *enforce single parent* query property to the given value.
+    pub fn enforce_single_parent(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
+        self._enforce_single_parent = Some(new_value);
+        self
+    }
     /// This parameter is deprecated and has no function.
     ///
     /// Sets the *convert* query property to the given value.
@@ -9179,11 +9184,11 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().get("fileId")
-///              .update_viewed_date(false)
+///              .update_viewed_date(true)
 ///              .supports_team_drives(true)
 ///              .supports_all_drives(false)
-///              .revision_id("dolor")
-///              .projection("diam")
+///              .revision_id("invidunt")
+///              .projection("eirmod")
 ///              .acknowledge_abuse(false)
 ///              .doit();
 /// # }
@@ -9757,7 +9762,7 @@ impl<'a, C, A> TeamdriveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.teamdrives().get("teamDriveId")
-///              .use_domain_admin_access(true)
+///              .use_domain_admin_access(false)
 ///              .doit();
 /// # }
 /// ```
@@ -10009,10 +10014,10 @@ impl<'a, C, A> TeamdriveGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.teamdrives().list()
-///              .use_domain_admin_access(false)
-///              .q("invidunt")
-///              .page_token("eirmod")
-///              .max_results(-77)
+///              .use_domain_admin_access(true)
+///              .q("takimata")
+///              .page_token("elitr")
+///              .max_results(-91)
 ///              .doit();
 /// # }
 /// ```
@@ -10499,7 +10504,7 @@ impl<'a, C, A> TeamdriveDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.teamdrives().update(req, "teamDriveId")
-///              .use_domain_admin_access(false)
+///              .use_domain_admin_access(true)
 ///              .doit();
 /// # }
 /// ```
@@ -10737,600 +10742,6 @@ impl<'a, C, A> TeamdriveUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> TeamdriveUpdateCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Overwrites the Realtime API data model associated with this file with the provided JSON data model.
-///
-/// A builder for the *update* method supported by a *realtime* resource.
-/// It is not used directly, but through a `RealtimeMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_drive2 as drive2;
-/// use std::fs;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::DriveHub;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `upload(...)`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.realtime().update("fileId")
-///              .base_revision("takimata")
-///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
-/// # }
-/// ```
-pub struct RealtimeUpdateCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a DriveHub<C, A>,
-    _file_id: String,
-    _base_revision: Option<String>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for RealtimeUpdateCall<'a, C, A> {}
-
-impl<'a, C, A> RealtimeUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<hyper::client::Response>
-		where RS: ReadSeek {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "drive.realtime.update",
-                               http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._base_revision {
-            params.push(("baseRevision", value.to_string()));
-        }
-        for &field in ["fileId", "baseRevision"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let (mut url, upload_type) =
-            if protocol == "simple" {
-                (self.hub._root_url.clone() + "upload/drive/v2/files/{fileId}/realtime", "multipart")
-            } else if protocol == "resumable" {
-                (self.hub._root_url.clone() + "resumable/upload/drive/v2/files/{fileId}/realtime", "resumable")
-            } else {
-                unreachable!()
-            };
-        params.push(("uploadType", upload_type.to_string()));
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-        let mut should_ask_dlg_for_url = false;
-        let mut upload_url_from_server;
-        let mut upload_url: Option<String> = None;
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
-                    should_ask_dlg_for_url = false;
-                    upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(hyper::Url::parse(s).unwrap())).unwrap();
-                    hyper::client::Response::new(url, Box::new(cmn::DummyNetworkStream)).and_then(|mut res| {
-                        res.status = hyper::status::StatusCode::Ok;
-                        res.headers.set(Location(upload_url.as_ref().unwrap().clone()));
-                        Ok(res)
-                    })
-                } else {
-                    let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
-                        .header(UserAgent(self.hub._user_agent.clone()))
-                        .header(auth_header.clone());
-                    if protocol == "simple" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                    reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    if size > 10485760 {
-                    	return Err(Error::UploadSizeLimitExceeded(size, 10485760))
-                    }
-                        req = req.header(ContentType(reader_mime_type.clone()))
-                                 .header(ContentLength(size))
-                                 .body(&mut reader);
-                    }
-                    upload_url_from_server = true;
-                    if protocol == "resumable" {
-                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
-                    }
-    
-                    dlg.pre_request();
-                    req.send()
-                }
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    if protocol == "resumable" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                        reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 10485760 {
-                        	return Err(Error::UploadSizeLimitExceeded(size, 10485760))
-                        }
-                        let mut client = &mut *self.hub.client.borrow_mut();
-                        let upload_result = {
-                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
-                            if upload_url_from_server {
-                                dlg.store_upload_url(Some(url_str));
-                            }
-
-                            cmn::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
-                                delegate: dlg,
-                                start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
-                                user_agent: &self.hub._user_agent,
-                                auth_header: auth_header.clone(),
-                                url: url_str,
-                                reader: &mut reader,
-                                media_type: reader_mime_type.clone(),
-                                content_length: size
-                            }.upload()
-                        };
-                        match upload_result {
-                            None => {
-                                dlg.finished(false);
-                                return Err(Error::Cancelled)
-                            }
-                            Some(Err(err)) => {
-                                dlg.finished(false);
-                                return Err(Error::HttpError(err))
-                            }
-                            Some(Ok(upload_result)) => {
-                                res = upload_result;
-                                if !res.status.is_success() {
-                                    dlg.store_upload_url(None);
-                                    dlg.finished(false);
-                                    return Err(Error::Failure(res))
-                                }
-                            }
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-    /// Upload media all at once.
-    /// If the upload fails for whichever reason, all progress is lost.
-    ///
-    /// * *max size*: 10MB
-    /// * *multipart*: yes
-    /// * *valid mime types*: '*/*'
-    pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<hyper::client::Response>
-                where RS: ReadSeek {
-        self.doit(stream, mime_type, "simple")
-    }
-    /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a
-    /// certain amount of time as the server maintains state temporarily.
-    /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
-    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
-    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
-    /// `cancel_chunk_upload(...)`.
-    ///
-    /// * *max size*: 10MB
-    /// * *multipart*: yes
-    /// * *valid mime types*: '*/*'
-    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<hyper::client::Response>
-                where RS: ReadSeek {
-        self.doit(resumeable_stream, mime_type, "resumable")
-    }
-
-    /// The ID of the file that the Realtime API data model is associated with.
-    ///
-    /// Sets the *file id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> RealtimeUpdateCall<'a, C, A> {
-        self._file_id = new_value.to_string();
-        self
-    }
-    /// The revision of the model to diff the uploaded model against. If set, the uploaded model is diffed against the provided revision and those differences are merged with any changes made to the model after the provided revision. If not set, the uploaded model replaces the current model on the server.
-    ///
-    /// Sets the *base revision* query property to the given value.
-    pub fn base_revision(mut self, new_value: &str) -> RealtimeUpdateCall<'a, C, A> {
-        self._base_revision = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RealtimeUpdateCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RealtimeUpdateCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RealtimeUpdateCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Exports the contents of the Realtime API data model associated with this file as JSON.
-///
-/// This method supports **media download**. To enable it, adjust the builder like this:
-/// `.param("alt", "media")`.
-///
-/// A builder for the *get* method supported by a *realtime* resource.
-/// It is not used directly, but through a `RealtimeMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_drive2 as drive2;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::DriveHub;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.realtime().get("fileId")
-///              .revision(-91)
-///              .doit();
-/// # }
-/// ```
-pub struct RealtimeGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a DriveHub<C, A>,
-    _file_id: String,
-    _revision: Option<i32>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for RealtimeGetCall<'a, C, A> {}
-
-impl<'a, C, A> RealtimeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "drive.realtime.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._revision {
-            params.push(("revision", value.to_string()));
-        }
-        for &field in ["fileId", "revision"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = self.hub._base_url.clone() + "files/{fileId}/realtime";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the file that the Realtime API data model is associated with.
-    ///
-    /// Sets the *file id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> RealtimeGetCall<'a, C, A> {
-        self._file_id = new_value.to_string();
-        self
-    }
-    /// The revision of the Realtime API data model to export. Revisions start at 1 (the initial empty data model) and are incremented with each change. If this parameter is excluded, the most recent data model will be returned.
-    ///
-    /// Sets the *revision* query property to the given value.
-    pub fn revision(mut self, new_value: i32) -> RealtimeGetCall<'a, C, A> {
-        self._revision = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RealtimeGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RealtimeGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RealtimeGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11610,9 +11021,9 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().list()
-///              .language_code("Lorem")
-///              .app_filter_mime_types("Lorem")
-///              .app_filter_extensions("diam")
+///              .language_code("ut")
+///              .app_filter_mime_types("ut")
+///              .app_filter_extensions("amet.")
 ///              .doit();
 /// # }
 /// ```
@@ -11859,7 +11270,7 @@ impl<'a, C, A> AppListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.drives().update(req, "driveId")
-///              .use_domain_admin_access(true)
+///              .use_domain_admin_access(false)
 ///              .doit();
 /// # }
 /// ```
@@ -12856,9 +12267,9 @@ impl<'a, C, A> DriveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.drives().list()
 ///              .use_domain_admin_access(true)
-///              .q("sea")
-///              .page_token("ut")
-///              .max_results(-39)
+///              .q("sanctus")
+///              .page_token("voluptua.")
+///              .max_results(-99)
 ///              .doit();
 /// # }
 /// ```
@@ -13110,7 +12521,7 @@ impl<'a, C, A> DriveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.drives().get("driveId")
-///              .use_domain_admin_access(true)
+///              .use_domain_admin_access(false)
 ///              .doit();
 /// # }
 /// ```
@@ -14350,7 +13761,7 @@ impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Updates an existing comment. This method supports patch semantics.
+/// Updates an existing comment.
 ///
 /// A builder for the *patch* method supported by a *comment* resource.
 /// It is not used directly, but through a `CommentMethods` instance.
@@ -14944,10 +14355,10 @@ impl<'a, C, A> CommentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().list("fileId")
-///              .updated_min("takimata")
-///              .page_token("et")
-///              .max_results(-91)
-///              .include_deleted(false)
+///              .updated_min("et")
+///              .page_token("sed")
+///              .max_results(-10)
+///              .include_deleted(true)
 ///              .doit();
 /// # }
 /// ```
@@ -15232,10 +14643,10 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.children().list("folderId")
-///              .q("no")
-///              .page_token("invidunt")
-///              .order_by("rebum.")
-///              .max_results(-86)
+///              .q("labore")
+///              .page_token("aliquyam")
+///              .order_by("elitr")
+///              .max_results(-46)
 ///              .doit();
 /// # }
 /// ```
@@ -15772,6 +15183,7 @@ impl<'a, C, A> ChildrenGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.children().delete("folderId", "childId")
+///              .enforce_single_parent(false)
 ///              .doit();
 /// # }
 /// ```
@@ -15781,6 +15193,7 @@ pub struct ChildrenDeleteCall<'a, C, A>
     hub: &'a DriveHub<C, A>,
     _folder_id: String,
     _child_id: String,
+    _enforce_single_parent: Option<bool>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -15802,10 +15215,13 @@ impl<'a, C, A> ChildrenDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "drive.children.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("folderId", self._folder_id.to_string()));
         params.push(("childId", self._child_id.to_string()));
-        for &field in ["folderId", "childId"].iter() {
+        if let Some(value) = self._enforce_single_parent {
+            params.push(("enforceSingleParent", value.to_string()));
+        }
+        for &field in ["folderId", "childId", "enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15926,6 +15342,13 @@ impl<'a, C, A> ChildrenDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._child_id = new_value.to_string();
         self
     }
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the item's last parent is removed, the item will be placed under its owner's root.
+    ///
+    /// Sets the *enforce single parent* query property to the given value.
+    pub fn enforce_single_parent(mut self, new_value: bool) -> ChildrenDeleteCall<'a, C, A> {
+        self._enforce_single_parent = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -16019,8 +15442,9 @@ impl<'a, C, A> ChildrenDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.children().insert(req, "folderId")
-///              .supports_team_drives(false)
-///              .supports_all_drives(true)
+///              .supports_team_drives(true)
+///              .supports_all_drives(false)
+///              .enforce_single_parent(true)
 ///              .doit();
 /// # }
 /// ```
@@ -16032,6 +15456,7 @@ pub struct ChildrenInsertCall<'a, C, A>
     _folder_id: String,
     _supports_team_drives: Option<bool>,
     _supports_all_drives: Option<bool>,
+    _enforce_single_parent: Option<bool>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -16053,7 +15478,7 @@ impl<'a, C, A> ChildrenInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "drive.children.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("folderId", self._folder_id.to_string()));
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
@@ -16061,7 +15486,10 @@ impl<'a, C, A> ChildrenInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         if let Some(value) = self._supports_all_drives {
             params.push(("supportsAllDrives", value.to_string()));
         }
-        for &field in ["alt", "folderId", "supportsTeamDrives", "supportsAllDrives"].iter() {
+        if let Some(value) = self._enforce_single_parent {
+            params.push(("enforceSingleParent", value.to_string()));
+        }
+        for &field in ["alt", "folderId", "supportsTeamDrives", "supportsAllDrives", "enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -16219,6 +15647,13 @@ impl<'a, C, A> ChildrenInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> ChildrenInsertCall<'a, C, A> {
         self._supports_all_drives = Some(new_value);
+        self
+    }
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the child's owner makes the request, the child will be removed from all current folders and placed in the requested folder. Any other requests that increase the number of the child's parents will fail, except when the canAddMyDriveParent file capability is true and a single parent is being added.
+    ///
+    /// Sets the *enforce single parent* query property to the given value.
+    pub fn enforce_single_parent(mut self, new_value: bool) -> ChildrenInsertCall<'a, C, A> {
+        self._enforce_single_parent = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -16775,6 +16210,7 @@ impl<'a, C, A> ParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.parents().delete("fileId", "parentId")
+///              .enforce_single_parent(true)
 ///              .doit();
 /// # }
 /// ```
@@ -16784,6 +16220,7 @@ pub struct ParentDeleteCall<'a, C, A>
     hub: &'a DriveHub<C, A>,
     _file_id: String,
     _parent_id: String,
+    _enforce_single_parent: Option<bool>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -16805,10 +16242,13 @@ impl<'a, C, A> ParentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "drive.parents.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         params.push(("parentId", self._parent_id.to_string()));
-        for &field in ["fileId", "parentId"].iter() {
+        if let Some(value) = self._enforce_single_parent {
+            params.push(("enforceSingleParent", value.to_string()));
+        }
+        for &field in ["fileId", "parentId", "enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -16929,6 +16369,13 @@ impl<'a, C, A> ParentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._parent_id = new_value.to_string();
         self
     }
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the item's last parent is removed, the item will be placed under its owner's root.
+    ///
+    /// Sets the *enforce single parent* query property to the given value.
+    pub fn enforce_single_parent(mut self, new_value: bool) -> ParentDeleteCall<'a, C, A> {
+        self._enforce_single_parent = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -17022,8 +16469,9 @@ impl<'a, C, A> ParentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.parents().insert(req, "fileId")
-///              .supports_team_drives(true)
-///              .supports_all_drives(false)
+///              .supports_team_drives(false)
+///              .supports_all_drives(true)
+///              .enforce_single_parent(false)
 ///              .doit();
 /// # }
 /// ```
@@ -17035,6 +16483,7 @@ pub struct ParentInsertCall<'a, C, A>
     _file_id: String,
     _supports_team_drives: Option<bool>,
     _supports_all_drives: Option<bool>,
+    _enforce_single_parent: Option<bool>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -17056,7 +16505,7 @@ impl<'a, C, A> ParentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "drive.parents.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
@@ -17064,7 +16513,10 @@ impl<'a, C, A> ParentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         if let Some(value) = self._supports_all_drives {
             params.push(("supportsAllDrives", value.to_string()));
         }
-        for &field in ["alt", "fileId", "supportsTeamDrives", "supportsAllDrives"].iter() {
+        if let Some(value) = self._enforce_single_parent {
+            params.push(("enforceSingleParent", value.to_string()));
+        }
+        for &field in ["alt", "fileId", "supportsTeamDrives", "supportsAllDrives", "enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -17222,6 +16674,13 @@ impl<'a, C, A> ParentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> ParentInsertCall<'a, C, A> {
         self._supports_all_drives = Some(new_value);
+        self
+    }
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the child's owner makes the request, the child will be removed from all current folders and placed in the requested folder. Any other requests that increase the number of the child's parents will fail, except when the canAddMyDriveParent file capability is true and a single parent is being added.
+    ///
+    /// Sets the *enforce single parent* query property to the given value.
+    pub fn enforce_single_parent(mut self, new_value: bool) -> ParentInsertCall<'a, C, A> {
+        self._enforce_single_parent = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -17535,7 +16994,7 @@ impl<'a, C, A> ParentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Updates an existing reply. This method supports patch semantics.
+/// Updates an existing reply.
 ///
 /// A builder for the *patch* method supported by a *reply* resource.
 /// It is not used directly, but through a `ReplyMethods` instance.
@@ -18141,8 +17600,8 @@ impl<'a, C, A> ReplyInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.replies().list("fileId", "commentId")
-///              .page_token("Lorem")
-///              .max_results(-96)
+///              .page_token("sadipscing")
+///              .max_results(-73)
 ///              .include_deleted(true)
 ///              .doit();
 /// # }
@@ -19253,9 +18712,9 @@ impl<'a, C, A> ReplyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.about().get()
-///              .start_change_id("clita")
-///              .max_change_id_count("eos")
-///              .include_subscribed(false)
+///              .start_change_id("eos")
+///              .max_change_id_count("justo")
+///              .include_subscribed(true)
 ///              .doit();
 /// # }
 /// ```
@@ -19496,9 +18955,9 @@ impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().delete("fileId", "permissionId")
-///              .use_domain_admin_access(true)
-///              .supports_team_drives(false)
-///              .supports_all_drives(true)
+///              .use_domain_admin_access(false)
+///              .supports_team_drives(true)
+///              .supports_all_drives(false)
 ///              .doit();
 /// # }
 /// ```
@@ -19745,6 +19204,361 @@ impl<'a, C, A> PermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
+/// Inserts a permission for a file or shared drive.
+///
+/// A builder for the *insert* method supported by a *permission* resource.
+/// It is not used directly, but through a `PermissionMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_drive2 as drive2;
+/// use drive2::Permission;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use drive2::DriveHub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Permission::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.permissions().insert(req, "fileId")
+///              .use_domain_admin_access(false)
+///              .supports_team_drives(true)
+///              .supports_all_drives(true)
+///              .send_notification_emails(true)
+///              .move_to_new_owners_root(false)
+///              .enforce_single_parent(false)
+///              .email_message("nonumy")
+///              .doit();
+/// # }
+/// ```
+pub struct PermissionInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DriveHub<C, A>,
+    _request: Permission,
+    _file_id: String,
+    _use_domain_admin_access: Option<bool>,
+    _supports_team_drives: Option<bool>,
+    _supports_all_drives: Option<bool>,
+    _send_notification_emails: Option<bool>,
+    _move_to_new_owners_root: Option<bool>,
+    _enforce_single_parent: Option<bool>,
+    _email_message: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for PermissionInsertCall<'a, C, A> {}
+
+impl<'a, C, A> PermissionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Permission)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "drive.permissions.insert",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
+        params.push(("fileId", self._file_id.to_string()));
+        if let Some(value) = self._use_domain_admin_access {
+            params.push(("useDomainAdminAccess", value.to_string()));
+        }
+        if let Some(value) = self._supports_team_drives {
+            params.push(("supportsTeamDrives", value.to_string()));
+        }
+        if let Some(value) = self._supports_all_drives {
+            params.push(("supportsAllDrives", value.to_string()));
+        }
+        if let Some(value) = self._send_notification_emails {
+            params.push(("sendNotificationEmails", value.to_string()));
+        }
+        if let Some(value) = self._move_to_new_owners_root {
+            params.push(("moveToNewOwnersRoot", value.to_string()));
+        }
+        if let Some(value) = self._enforce_single_parent {
+            params.push(("enforceSingleParent", value.to_string()));
+        }
+        if let Some(value) = self._email_message {
+            params.push(("emailMessage", value.to_string()));
+        }
+        for &field in ["alt", "fileId", "useDomainAdminAccess", "supportsTeamDrives", "supportsAllDrives", "sendNotificationEmails", "moveToNewOwnersRoot", "enforceSingleParent", "emailMessage"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["fileId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Permission) -> PermissionInsertCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID for the file or shared drive.
+    ///
+    /// Sets the *file id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn file_id(mut self, new_value: &str) -> PermissionInsertCall<'a, C, A> {
+        self._file_id = new_value.to_string();
+        self
+    }
+    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
+    ///
+    /// Sets the *use domain admin access* query property to the given value.
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
+        self._use_domain_admin_access = Some(new_value);
+        self
+    }
+    /// Deprecated use supportsAllDrives instead.
+    ///
+    /// Sets the *supports team drives* query property to the given value.
+    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
+        self._supports_team_drives = Some(new_value);
+        self
+    }
+    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
+    ///
+    /// Sets the *supports all drives* query property to the given value.
+    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
+        self._supports_all_drives = Some(new_value);
+        self
+    }
+    /// Whether to send notification emails when sharing to users or groups. This parameter is ignored and an email is sent if the role is owner.
+    ///
+    /// Sets the *send notification emails* query property to the given value.
+    pub fn send_notification_emails(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
+        self._send_notification_emails = Some(new_value);
+        self
+    }
+    /// This parameter will only take effect if the item is not in a shared drive and the request is attempting to transfer the ownership of the item. When set to true, the item will be moved to the new owner's My Drive root folder and all prior parents removed. If set to false, when enforceSingleParent=true, parents are not changed. If set to false, when enforceSingleParent=false, existing parents are not changed; however, the file will be added to the new owner's My Drive root folder, unless it is already in the new owner's My Drive.
+    ///
+    /// Sets the *move to new owners root* query property to the given value.
+    pub fn move_to_new_owners_root(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
+        self._move_to_new_owners_root = Some(new_value);
+        self
+    }
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. See moveToNewOwnersRoot for details.
+    ///
+    /// Sets the *enforce single parent* query property to the given value.
+    pub fn enforce_single_parent(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
+        self._enforce_single_parent = Some(new_value);
+        self
+    }
+    /// A plain text custom message to include in notification emails.
+    ///
+    /// Sets the *email message* query property to the given value.
+    pub fn email_message(mut self, new_value: &str) -> PermissionInsertCall<'a, C, A> {
+        self._email_message = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> PermissionInsertCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionInsertCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionInsertCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Updates a permission using patch semantics.
 ///
 /// A builder for the *patch* method supported by a *permission* resource.
@@ -19781,9 +19595,9 @@ impl<'a, C, A> PermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// let result = hub.permissions().patch(req, "fileId", "permissionId")
 ///              .use_domain_admin_access(false)
 ///              .transfer_ownership(false)
-///              .supports_team_drives(false)
+///              .supports_team_drives(true)
 ///              .supports_all_drives(true)
-///              .remove_expiration(false)
+///              .remove_expiration(true)
 ///              .doit();
 /// # }
 /// ```
@@ -20116,11 +19930,11 @@ impl<'a, C, A> PermissionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().list("fileId")
-///              .use_domain_admin_access(false)
-///              .supports_team_drives(true)
-///              .supports_all_drives(true)
-///              .page_token("accusam")
-///              .max_results(-86)
+///              .use_domain_admin_access(true)
+///              .supports_team_drives(false)
+///              .supports_all_drives(false)
+///              .page_token("erat")
+///              .max_results(-52)
 ///              .doit();
 /// # }
 /// ```
@@ -20422,11 +20236,11 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().update(req, "fileId", "permissionId")
-///              .use_domain_admin_access(false)
-///              .transfer_ownership(false)
+///              .use_domain_admin_access(true)
+///              .transfer_ownership(true)
 ///              .supports_team_drives(false)
-///              .supports_all_drives(false)
-///              .remove_expiration(true)
+///              .supports_all_drives(true)
+///              .remove_expiration(false)
 ///              .doit();
 /// # }
 /// ```
@@ -21019,337 +20833,6 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Inserts a permission for a file or shared drive.
-///
-/// A builder for the *insert* method supported by a *permission* resource.
-/// It is not used directly, but through a `PermissionMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_drive2 as drive2;
-/// use drive2::Permission;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::DriveHub;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Permission::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.permissions().insert(req, "fileId")
-///              .use_domain_admin_access(true)
-///              .supports_team_drives(false)
-///              .supports_all_drives(true)
-///              .send_notification_emails(false)
-///              .email_message("et")
-///              .doit();
-/// # }
-/// ```
-pub struct PermissionInsertCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a DriveHub<C, A>,
-    _request: Permission,
-    _file_id: String,
-    _use_domain_admin_access: Option<bool>,
-    _supports_team_drives: Option<bool>,
-    _supports_all_drives: Option<bool>,
-    _send_notification_emails: Option<bool>,
-    _email_message: Option<String>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for PermissionInsertCall<'a, C, A> {}
-
-impl<'a, C, A> PermissionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Permission)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "drive.permissions.insert",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        if let Some(value) = self._use_domain_admin_access {
-            params.push(("useDomainAdminAccess", value.to_string()));
-        }
-        if let Some(value) = self._supports_team_drives {
-            params.push(("supportsTeamDrives", value.to_string()));
-        }
-        if let Some(value) = self._supports_all_drives {
-            params.push(("supportsAllDrives", value.to_string()));
-        }
-        if let Some(value) = self._send_notification_emails {
-            params.push(("sendNotificationEmails", value.to_string()));
-        }
-        if let Some(value) = self._email_message {
-            params.push(("emailMessage", value.to_string()));
-        }
-        for &field in ["alt", "fileId", "useDomainAdminAccess", "supportsTeamDrives", "supportsAllDrives", "sendNotificationEmails", "emailMessage"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "files/{fileId}/permissions";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Permission) -> PermissionInsertCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID for the file or shared drive.
-    ///
-    /// Sets the *file id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> PermissionInsertCall<'a, C, A> {
-        self._file_id = new_value.to_string();
-        self
-    }
-    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
-    ///
-    /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
-        self._use_domain_admin_access = Some(new_value);
-        self
-    }
-    /// Deprecated use supportsAllDrives instead.
-    ///
-    /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
-        self._supports_team_drives = Some(new_value);
-        self
-    }
-    /// Deprecated - Whether the requesting application supports both My Drives and shared drives. This parameter will only be effective until June 1, 2020. Afterwards all applications are assumed to support shared drives.
-    ///
-    /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
-        self._supports_all_drives = Some(new_value);
-        self
-    }
-    /// Whether to send notification emails when sharing to users or groups. This parameter is ignored and an email is sent if the role is owner.
-    ///
-    /// Sets the *send notification emails* query property to the given value.
-    pub fn send_notification_emails(mut self, new_value: bool) -> PermissionInsertCall<'a, C, A> {
-        self._send_notification_emails = Some(new_value);
-        self
-    }
-    /// A plain text custom message to include in notification emails.
-    ///
-    /// Sets the *email message* query property to the given value.
-    pub fn email_message(mut self, new_value: &str) -> PermissionInsertCall<'a, C, A> {
-        self._email_message = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> PermissionInsertCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionInsertCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionInsertCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Returns the permission ID for an email address.
 ///
 /// A builder for the *getIdForEmail* method supported by a *permission* resource.
@@ -21618,10 +21101,10 @@ impl<'a, C, A> PermissionGetIdForEmailCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().get_start_page_token()
-///              .team_drive_id("et")
+///              .team_drive_id("gubergren")
 ///              .supports_team_drives(true)
 ///              .supports_all_drives(false)
-///              .drive_id("sit")
+///              .drive_id("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -21873,19 +21356,19 @@ impl<'a, C, A> ChangeGetStartPageTokenCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().list()
-///              .team_drive_id("aliquyam")
+///              .team_drive_id("sanctus")
 ///              .supports_team_drives(false)
 ///              .supports_all_drives(true)
-///              .start_change_id("gubergren")
-///              .spaces("sit")
-///              .page_token("gubergren")
-///              .max_results(-2)
+///              .start_change_id("diam")
+///              .spaces("eirmod")
+///              .page_token("sadipscing")
+///              .max_results(-5)
 ///              .include_team_drive_items(false)
 ///              .include_subscribed(true)
-///              .include_items_from_all_drives(false)
-///              .include_deleted(false)
+///              .include_items_from_all_drives(true)
+///              .include_deleted(true)
 ///              .include_corpus_removals(true)
-///              .drive_id("diam")
+///              .drive_id("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -22236,10 +21719,10 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().get("changeId")
-///              .team_drive_id("sadipscing")
+///              .team_drive_id("diam")
 ///              .supports_team_drives(true)
 ///              .supports_all_drives(false)
-///              .drive_id("sit")
+///              .drive_id("erat")
 ///              .doit();
 /// # }
 /// ```
@@ -22530,19 +22013,19 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().watch(req)
-///              .team_drive_id("dolore")
-///              .supports_team_drives(true)
-///              .supports_all_drives(true)
-///              .start_change_id("sit")
-///              .spaces("ut")
-///              .page_token("diam")
-///              .max_results(-39)
+///              .team_drive_id("dolores")
+///              .supports_team_drives(false)
+///              .supports_all_drives(false)
+///              .start_change_id("clita")
+///              .spaces("sed")
+///              .page_token("dolores")
+///              .max_results(-13)
 ///              .include_team_drive_items(false)
-///              .include_subscribed(false)
-///              .include_items_from_all_drives(true)
-///              .include_deleted(false)
+///              .include_subscribed(true)
+///              .include_items_from_all_drives(false)
+///              .include_deleted(true)
 ///              .include_corpus_removals(false)
-///              .drive_id("clita")
+///              .drive_id("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -22890,259 +22373,6 @@ impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Deletes a property.
-///
-/// A builder for the *delete* method supported by a *property* resource.
-/// It is not used directly, but through a `PropertyMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_drive2 as drive2;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::DriveHub;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.properties().delete("fileId", "propertyKey")
-///              .visibility("clita")
-///              .doit();
-/// # }
-/// ```
-pub struct PropertyDeleteCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a DriveHub<C, A>,
-    _file_id: String,
-    _property_key: String,
-    _visibility: Option<String>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for PropertyDeleteCall<'a, C, A> {}
-
-impl<'a, C, A> PropertyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "drive.properties.delete",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("propertyKey", self._property_key.to_string()));
-        if let Some(value) = self._visibility {
-            params.push(("visibility", value.to_string()));
-        }
-        for &field in ["fileId", "propertyKey", "visibility"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = self.hub._base_url.clone() + "files/{fileId}/properties/{propertyKey}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{fileId}", "fileId"), ("{propertyKey}", "propertyKey")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["propertyKey", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the file.
-    ///
-    /// Sets the *file id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> PropertyDeleteCall<'a, C, A> {
-        self._file_id = new_value.to_string();
-        self
-    }
-    /// The key of the property.
-    ///
-    /// Sets the *property key* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn property_key(mut self, new_value: &str) -> PropertyDeleteCall<'a, C, A> {
-        self._property_key = new_value.to_string();
-        self
-    }
-    /// The visibility of the property.
-    ///
-    /// Sets the *visibility* query property to the given value.
-    pub fn visibility(mut self, new_value: &str) -> PropertyDeleteCall<'a, C, A> {
-        self._visibility = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> PropertyDeleteCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDeleteCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDeleteCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Adds a property to a file, or updates it if it already exists.
 ///
 /// A builder for the *insert* method supported by a *property* resource.
@@ -23403,6 +22633,259 @@ impl<'a, C, A> PropertyInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> PropertyInsertCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes a property.
+///
+/// A builder for the *delete* method supported by a *property* resource.
+/// It is not used directly, but through a `PropertyMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_drive2 as drive2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use drive2::DriveHub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.properties().delete("fileId", "propertyKey")
+///              .visibility("erat")
+///              .doit();
+/// # }
+/// ```
+pub struct PropertyDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DriveHub<C, A>,
+    _file_id: String,
+    _property_key: String,
+    _visibility: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for PropertyDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> PropertyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "drive.properties.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("propertyKey", self._property_key.to_string()));
+        if let Some(value) = self._visibility {
+            params.push(("visibility", value.to_string()));
+        }
+        for &field in ["fileId", "propertyKey", "visibility"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/properties/{propertyKey}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{fileId}", "fileId"), ("{propertyKey}", "propertyKey")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["propertyKey", "fileId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the file.
+    ///
+    /// Sets the *file id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn file_id(mut self, new_value: &str) -> PropertyDeleteCall<'a, C, A> {
+        self._file_id = new_value.to_string();
+        self
+    }
+    /// The key of the property.
+    ///
+    /// Sets the *property key* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn property_key(mut self, new_value: &str) -> PropertyDeleteCall<'a, C, A> {
+        self._property_key = new_value.to_string();
+        self
+    }
+    /// The visibility of the property.
+    ///
+    /// Sets the *visibility* query property to the given value.
+    pub fn visibility(mut self, new_value: &str) -> PropertyDeleteCall<'a, C, A> {
+        self._visibility = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> PropertyDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -23688,7 +23171,7 @@ impl<'a, C, A> PropertyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().update(req, "fileId", "propertyKey")
-///              .visibility("sit")
+///              .visibility("voluptua.")
 ///              .doit();
 /// # }
 /// ```
@@ -23983,7 +23466,7 @@ impl<'a, C, A> PropertyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().patch(req, "fileId", "propertyKey")
-///              .visibility("erat")
+///              .visibility("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -24272,7 +23755,7 @@ impl<'a, C, A> PropertyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().get("fileId", "propertyKey")
-///              .visibility("et")
+///              .visibility("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -24497,289 +23980,6 @@ impl<'a, C, A> PropertyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Updates a revision. This method supports patch semantics.
-///
-/// A builder for the *patch* method supported by a *revision* resource.
-/// It is not used directly, but through a `RevisionMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_drive2 as drive2;
-/// use drive2::Revision;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use drive2::DriveHub;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Revision::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.revisions().patch(req, "fileId", "revisionId")
-///              .doit();
-/// # }
-/// ```
-pub struct RevisionPatchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a DriveHub<C, A>,
-    _request: Revision,
-    _file_id: String,
-    _revision_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for RevisionPatchCall<'a, C, A> {}
-
-impl<'a, C, A> RevisionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Revision)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "drive.revisions.patch",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("fileId", self._file_id.to_string()));
-        params.push(("revisionId", self._revision_id.to_string()));
-        for &field in ["alt", "fileId", "revisionId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "files/{fileId}/revisions/{revisionId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{fileId}", "fileId"), ("{revisionId}", "revisionId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["revisionId", "fileId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Revision) -> RevisionPatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID for the file.
-    ///
-    /// Sets the *file id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> RevisionPatchCall<'a, C, A> {
-        self._file_id = new_value.to_string();
-        self
-    }
-    /// The ID for the revision.
-    ///
-    /// Sets the *revision id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn revision_id(mut self, new_value: &str) -> RevisionPatchCall<'a, C, A> {
-        self._revision_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RevisionPatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RevisionPatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -25286,6 +24486,289 @@ impl<'a, C, A> RevisionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
 /// Updates a revision.
 ///
+/// A builder for the *patch* method supported by a *revision* resource.
+/// It is not used directly, but through a `RevisionMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_drive2 as drive2;
+/// use drive2::Revision;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use drive2::DriveHub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = DriveHub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Revision::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.revisions().patch(req, "fileId", "revisionId")
+///              .doit();
+/// # }
+/// ```
+pub struct RevisionPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DriveHub<C, A>,
+    _request: Revision,
+    _file_id: String,
+    _revision_id: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for RevisionPatchCall<'a, C, A> {}
+
+impl<'a, C, A> RevisionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Revision)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "drive.revisions.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("fileId", self._file_id.to_string()));
+        params.push(("revisionId", self._revision_id.to_string()));
+        for &field in ["alt", "fileId", "revisionId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/revisions/{revisionId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{fileId}", "fileId"), ("{revisionId}", "revisionId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["revisionId", "fileId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Revision) -> RevisionPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID for the file.
+    ///
+    /// Sets the *file id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn file_id(mut self, new_value: &str) -> RevisionPatchCall<'a, C, A> {
+        self._file_id = new_value.to_string();
+        self
+    }
+    /// The ID for the revision.
+    ///
+    /// Sets the *revision id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn revision_id(mut self, new_value: &str) -> RevisionPatchCall<'a, C, A> {
+        self._revision_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RevisionPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> RevisionPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionPatchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Updates a revision.
+///
 /// A builder for the *update* method supported by a *revision* resource.
 /// It is not used directly, but through a `RevisionMethods` instance.
 ///
@@ -25595,8 +25078,8 @@ impl<'a, C, A> RevisionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.revisions().list("fileId")
-///              .page_token("takimata")
-///              .max_results(-28)
+///              .page_token("et")
+///              .max_results(-96)
 ///              .doit();
 /// # }
 /// ```

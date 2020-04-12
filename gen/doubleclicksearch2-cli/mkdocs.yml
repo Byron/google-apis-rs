@@ -1,4 +1,4 @@
-site_name: doubleclicksearch v1.0.12+20190625
+site_name: doubleclicksearch v1.0.13+20200331
 site_url: http://byron.github.io/google-apis-rs/google-doubleclicksearch2-cli
 site_description: A complete library to interact with doubleclicksearch (protocol v2)
 
@@ -11,7 +11,6 @@ pages:
 - ['index.md', 'Home']
 - ['conversion_get.md', 'Conversion', 'Get']
 - ['conversion_insert.md', 'Conversion', 'Insert']
-- ['conversion_patch.md', 'Conversion', 'Patch']
 - ['conversion_update.md', 'Conversion', 'Update']
 - ['conversion_update-availability.md', 'Conversion', 'Update Availability']
 - ['reports_generate.md', 'Reports', 'Generate']

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Publisher* API at revision *20190702*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Android Publisher* API at revision *20200331*. The CLI is at version *1.0.13*.
 
 ```bash
 androidpublisher3 [options]
@@ -91,6 +91,11 @@ androidpublisher3 [options]
                 get <package-name> <review-id> [-p <v>]... [-o <out>]
                 list <package-name> [-p <v>]... [-o <out>]
                 reply <package-name> <review-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        systemapks
+                variants-create <package-name> <version-code> (-r <kv>)... [-p <v>]... [-o <out>]
+                variants-download <package-name> <version-code> <variant-id> [-p <v>]... [-o <out>]
+                variants-get <package-name> <version-code> <variant-id> [-p <v>]... [-o <out>]
+                variants-list <package-name> <version-code> [-p <v>]... [-o <out>]
   androidpublisher3 --help
 
 Configuration:

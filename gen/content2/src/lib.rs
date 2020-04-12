@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Shopping Content* crate version *1.0.12+20190702*, where *20190702* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Shopping Content* crate version *1.0.13+20200310*, where *20200310* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Shopping Content* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/shopping-content).
@@ -12,23 +12,21 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.ShoppingContent.html) ... 
 //! 
 //! * [accounts](struct.Account.html)
-//!  * [*authinfo*](struct.AccountAuthinfoCall.html), [*claimwebsite*](struct.AccountClaimwebsiteCall.html), [*custombatch*](struct.AccountCustombatchCall.html), [*delete*](struct.AccountDeleteCall.html), [*get*](struct.AccountGetCall.html), [*insert*](struct.AccountInsertCall.html), [*link*](struct.AccountLinkCall.html), [*list*](struct.AccountListCall.html), [*patch*](struct.AccountPatchCall.html) and [*update*](struct.AccountUpdateCall.html)
+//!  * [*authinfo*](struct.AccountAuthinfoCall.html), [*claimwebsite*](struct.AccountClaimwebsiteCall.html), [*custombatch*](struct.AccountCustombatchCall.html), [*delete*](struct.AccountDeleteCall.html), [*get*](struct.AccountGetCall.html), [*insert*](struct.AccountInsertCall.html), [*link*](struct.AccountLinkCall.html), [*list*](struct.AccountListCall.html) and [*update*](struct.AccountUpdateCall.html)
 //! * accountstatuses
 //!  * [*custombatch*](struct.AccountstatuseCustombatchCall.html), [*get*](struct.AccountstatuseGetCall.html) and [*list*](struct.AccountstatuseListCall.html)
 //! * accounttax
-//!  * [*custombatch*](struct.AccounttaxCustombatchCall.html), [*get*](struct.AccounttaxGetCall.html), [*list*](struct.AccounttaxListCall.html), [*patch*](struct.AccounttaxPatchCall.html) and [*update*](struct.AccounttaxUpdateCall.html)
+//!  * [*custombatch*](struct.AccounttaxCustombatchCall.html), [*get*](struct.AccounttaxGetCall.html), [*list*](struct.AccounttaxListCall.html) and [*update*](struct.AccounttaxUpdateCall.html)
 //! * [datafeeds](struct.Datafeed.html)
-//!  * [*custombatch*](struct.DatafeedCustombatchCall.html), [*delete*](struct.DatafeedDeleteCall.html), [*fetchnow*](struct.DatafeedFetchnowCall.html), [*get*](struct.DatafeedGetCall.html), [*insert*](struct.DatafeedInsertCall.html), [*list*](struct.DatafeedListCall.html), [*patch*](struct.DatafeedPatchCall.html) and [*update*](struct.DatafeedUpdateCall.html)
+//!  * [*custombatch*](struct.DatafeedCustombatchCall.html), [*delete*](struct.DatafeedDeleteCall.html), [*fetchnow*](struct.DatafeedFetchnowCall.html), [*get*](struct.DatafeedGetCall.html), [*insert*](struct.DatafeedInsertCall.html), [*list*](struct.DatafeedListCall.html) and [*update*](struct.DatafeedUpdateCall.html)
 //! * datafeedstatuses
 //!  * [*custombatch*](struct.DatafeedstatuseCustombatchCall.html), [*get*](struct.DatafeedstatuseGetCall.html) and [*list*](struct.DatafeedstatuseListCall.html)
 //! * [inventory](struct.Inventory.html)
 //!  * [*custombatch*](struct.InventoryCustombatchCall.html) and [*set*](struct.InventorySetCall.html)
 //! * liasettings
-//!  * [*custombatch*](struct.LiasettingCustombatchCall.html), [*get*](struct.LiasettingGetCall.html), [*getaccessiblegmbaccounts*](struct.LiasettingGetaccessiblegmbaccountCall.html), [*list*](struct.LiasettingListCall.html), [*listposdataproviders*](struct.LiasettingListposdataproviderCall.html), [*patch*](struct.LiasettingPatchCall.html), [*requestgmbaccess*](struct.LiasettingRequestgmbaccesCall.html), [*requestinventoryverification*](struct.LiasettingRequestinventoryverificationCall.html), [*setinventoryverificationcontact*](struct.LiasettingSetinventoryverificationcontactCall.html), [*setposdataprovider*](struct.LiasettingSetposdataproviderCall.html) and [*update*](struct.LiasettingUpdateCall.html)
+//!  * [*custombatch*](struct.LiasettingCustombatchCall.html), [*get*](struct.LiasettingGetCall.html), [*getaccessiblegmbaccounts*](struct.LiasettingGetaccessiblegmbaccountCall.html), [*list*](struct.LiasettingListCall.html), [*listposdataproviders*](struct.LiasettingListposdataproviderCall.html), [*requestgmbaccess*](struct.LiasettingRequestgmbaccesCall.html), [*requestinventoryverification*](struct.LiasettingRequestinventoryverificationCall.html), [*setinventoryverificationcontact*](struct.LiasettingSetinventoryverificationcontactCall.html), [*setposdataprovider*](struct.LiasettingSetposdataproviderCall.html) and [*update*](struct.LiasettingUpdateCall.html)
 //! * orderinvoices
 //!  * [*createchargeinvoice*](struct.OrderinvoiceCreatechargeinvoiceCall.html) and [*createrefundinvoice*](struct.OrderinvoiceCreaterefundinvoiceCall.html)
-//! * orderpayments
-//!  * [*notifyauthapproved*](struct.OrderpaymentNotifyauthapprovedCall.html), [*notifyauthdeclined*](struct.OrderpaymentNotifyauthdeclinedCall.html), [*notifycharge*](struct.OrderpaymentNotifychargeCall.html) and [*notifyrefund*](struct.OrderpaymentNotifyrefundCall.html)
 //! * orderreports
 //!  * [*listdisbursements*](struct.OrderreportListdisbursementCall.html) and [*listtransactions*](struct.OrderreportListtransactionCall.html)
 //! * orderreturns
@@ -42,7 +40,7 @@
 //! * productstatuses
 //!  * [*custombatch*](struct.ProductstatuseCustombatchCall.html), [*get*](struct.ProductstatuseGetCall.html) and [*list*](struct.ProductstatuseListCall.html)
 //! * shippingsettings
-//!  * [*custombatch*](struct.ShippingsettingCustombatchCall.html), [*get*](struct.ShippingsettingGetCall.html), [*getsupportedcarriers*](struct.ShippingsettingGetsupportedcarrierCall.html), [*getsupportedholidays*](struct.ShippingsettingGetsupportedholidayCall.html), [*list*](struct.ShippingsettingListCall.html), [*patch*](struct.ShippingsettingPatchCall.html) and [*update*](struct.ShippingsettingUpdateCall.html)
+//!  * [*custombatch*](struct.ShippingsettingCustombatchCall.html), [*get*](struct.ShippingsettingGetCall.html), [*getsupportedcarriers*](struct.ShippingsettingGetsupportedcarrierCall.html), [*getsupportedholidays*](struct.ShippingsettingGetsupportedholidayCall.html), [*getsupportedpickupservices*](struct.ShippingsettingGetsupportedpickupserviceCall.html), [*list*](struct.ShippingsettingListCall.html) and [*update*](struct.ShippingsettingUpdateCall.html)
 //! 
 //! 
 //! 
@@ -382,7 +380,7 @@ impl<'a, C, A> ShoppingContent<C, A>
         ShoppingContent {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://www.googleapis.com/content/v2/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -412,9 +410,6 @@ impl<'a, C, A> ShoppingContent<C, A>
     pub fn orderinvoices(&'a self) -> OrderinvoiceMethods<'a, C, A> {
         OrderinvoiceMethods { hub: &self }
     }
-    pub fn orderpayments(&'a self) -> OrderpaymentMethods<'a, C, A> {
-        OrderpaymentMethods { hub: &self }
-    }
     pub fn orderreports(&'a self) -> OrderreportMethods<'a, C, A> {
         OrderreportMethods { hub: &self }
     }
@@ -438,7 +433,7 @@ impl<'a, C, A> ShoppingContent<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -476,6 +471,10 @@ pub struct OrdersCustomBatchRequestEntryUpdateShipment {
     #[serde(rename="deliveryDate")]
     pub delivery_date: Option<String>,
     /// New status for the shipment. Not updated if missing.
+    /// 
+    /// Acceptable values are:  
+    /// - "delivered" 
+    /// - "undeliverable"
     pub status: Option<String>,
     /// The carrier handling the shipment. Not updated if missing. See shipments[].carrier in the  Orders resource representation for a list of acceptable values.
     pub carrier: Option<String>,
@@ -582,8 +581,17 @@ impl Part for AccountUser {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountsCustomBatchRequestEntryLinkRequest {
     /// Action to perform for this link. The "request" action is only available to select merchants.
+    /// 
+    /// Acceptable values are:  
+    /// - "approve" 
+    /// - "remove" 
+    /// - "request"
     pub action: Option<String>,
     /// Type of the link between the two accounts.
+    /// 
+    /// Acceptable values are:  
+    /// - "channelPartner" 
+    /// - "eCommercePlatform"
     #[serde(rename="linkType")]
     pub link_type: Option<String>,
     /// The ID of the linked account.
@@ -740,6 +748,11 @@ pub struct OrderLineItemProduct {
     /// The REST ID of the product.
     pub id: Option<String>,
     /// Condition or state of the item.
+    /// 
+    /// Acceptable values are:  
+    /// - "new" 
+    /// - "refurbished" 
+    /// - "used"
     pub condition: Option<String>,
     /// The CLDR territory code of the target country of the product.
     #[serde(rename="targetCountry")]
@@ -755,6 +768,10 @@ pub struct OrderLineItemProduct {
     /// Price of the item.
     pub price: Option<Price>,
     /// The item's channel (online or local).
+    /// 
+    /// Acceptable values are:  
+    /// - "local" 
+    /// - "online"
     pub channel: Option<String>,
 }
 
@@ -771,8 +788,18 @@ pub struct LiaInventorySettings {
     #[serde(rename="inventoryVerificationContactEmail")]
     pub inventory_verification_contact_email: Option<String>,
     /// The status of the inventory verification process.
+    /// 
+    /// Acceptable values are:  
+    /// - "active" 
+    /// - "inactive" 
+    /// - "pending"
     pub status: Option<String>,
     /// The status of the verification contact.
+    /// 
+    /// Acceptable values are:  
+    /// - "active" 
+    /// - "inactive" 
+    /// - "pending"
     #[serde(rename="inventoryVerificationContactStatus")]
     pub inventory_verification_contact_status: Option<String>,
     /// The name of the contact for the inventory verification process.
@@ -783,28 +810,7 @@ pub struct LiaInventorySettings {
 impl Part for LiaInventorySettings {}
 
 
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [notifyauthdeclined orderpayments](struct.OrderpaymentNotifyauthdeclinedCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrderpaymentsNotifyAuthDeclinedResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#orderpaymentsNotifyAuthDeclinedResponse".
-    pub kind: Option<String>,
-    /// The status of the execution.
-    #[serde(rename="executionStatus")]
-    pub execution_status: Option<String>,
-}
-
-impl ResponseResult for OrderpaymentsNotifyAuthDeclinedResponse {}
-
-
-/// Account data. After the creation of a new account it may take a few minutes before it is fully operational. The methods delete, insert, patch, and update require the admin role.
+/// Account data. After the creation of a new account it may take a few minutes before it is fully operational. The methods delete, insert, and update require the admin role.
 /// 
 /// # Activities
 /// 
@@ -812,7 +818,6 @@ impl ResponseResult for OrderpaymentsNotifyAuthDeclinedResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [custombatch accounts](struct.AccountCustombatchCall.html) (none)
-/// * [patch accounts](struct.AccountPatchCall.html) (request|response)
 /// * [get accounts](struct.AccountGetCall.html) (response)
 /// * [update accounts](struct.AccountUpdateCall.html) (request|response)
 /// * [list accounts](struct.AccountListCall.html) (none)
@@ -829,7 +834,7 @@ pub struct Account {
     pub reviews_url: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#account".
     pub kind: Option<String>,
-    /// Display name for the account.
+    /// Required. Display name for the account.
     pub name: Option<String>,
     /// List of linked YouTube channels that are active or pending approval. To create a new link request, add a new link with status active to the list. It will remain in a pending state until approved or rejected in the YT Creator Studio interface. To delete an active link, or to cancel a link request, remove it from the list.
     #[serde(rename="youtubeChannelLinks")]
@@ -837,7 +842,7 @@ pub struct Account {
     /// Indicates whether the merchant sells adult content.
     #[serde(rename="adultContent")]
     pub adult_content: Option<bool>,
-    /// Merchant Center account ID.
+    /// Required for update. Merchant Center account ID.
     pub id: Option<String>,
     /// The merchant's website.
     #[serde(rename="websiteUrl")]
@@ -893,6 +898,21 @@ impl ResponseResult for LiasettingsListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersCustomBatchRequestEntryReturnLineItem {
     /// The reason for the return.
+    /// 
+    /// Acceptable values are:  
+    /// - "customerDiscretionaryReturn" 
+    /// - "customerInitiatedMerchantCancel" 
+    /// - "deliveredTooLate" 
+    /// - "expiredItem" 
+    /// - "invalidCoupon" 
+    /// - "malformedShippingAddress" 
+    /// - "other" 
+    /// - "productArrivedDamaged" 
+    /// - "productNotAsDescribed" 
+    /// - "qualityNotAsExpected" 
+    /// - "undeliverableShippingAddress" 
+    /// - "unsupportedPoBoxAddress" 
+    /// - "wrongProductShipped"
     pub reason: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -917,6 +937,10 @@ impl Part for OrdersCustomBatchRequestEntryReturnLineItem {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderCustomerMarketingRightsInfo {
     /// Last known customer selection regarding marketing preferences. In certain cases this selection might not be known, so this field would be empty. If a customer selected granted in their most recent order, they can be subscribed to marketing emails. Customers who have chosen denied must not be subscribed, or must be unsubscribed if already opted-in.
+    /// 
+    /// Acceptable values are:  
+    /// - "denied" 
+    /// - "granted"
     #[serde(rename="explicitMarketingPreference")]
     pub explicit_marketing_preference: Option<String>,
     /// Timestamp when last time marketing preference was updated. Could be empty, if user wasn't offered a selection yet.
@@ -1087,6 +1111,24 @@ impl Part for AccountStatusItemLevelIssue {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersCustomBatchRequestEntryRefund {
     /// The reason for the refund.
+    /// 
+    /// Acceptable values are:  
+    /// - "adjustment" 
+    /// - "courtesyAdjustment" 
+    /// - "customerCanceled" 
+    /// - "customerDiscretionaryReturn" 
+    /// - "deliveredLateByCarrier" 
+    /// - "feeAdjustment" 
+    /// - "lateShipmentCredit" 
+    /// - "noInventory" 
+    /// - "other" 
+    /// - "priceError" 
+    /// - "productArrivedDamaged" 
+    /// - "productNotAsDescribed" 
+    /// - "shippingCostAdjustment" 
+    /// - "taxAdjustment" 
+    /// - "undeliverableShippingAddress" 
+    /// - "wrongProductShipped"
     pub reason: Option<String>,
     /// Deprecated. Please use amountPretax and amountTax instead.
     pub amount: Option<Price>,
@@ -1102,6 +1144,27 @@ pub struct OrdersCustomBatchRequestEntryRefund {
 }
 
 impl Part for OrdersCustomBatchRequestEntryRefund {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [getsupportedpickupservices shippingsettings](struct.ShippingsettingGetsupportedpickupserviceCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ShippingsettingsGetSupportedPickupServicesResponse {
+    /// Identifies what kind of resource this is. Value: the fixed string "content#shippingsettingsGetSupportedPickupServicesResponse".
+    pub kind: Option<String>,
+    /// A list of supported pickup services. May be empty.
+    #[serde(rename="pickupServices")]
+    pub pickup_services: Option<Vec<PickupServicesPickupService>>,
+}
+
+impl ResponseResult for ShippingsettingsGetSupportedPickupServicesResponse {}
 
 
 /// There is no detailed description.
@@ -1137,6 +1200,9 @@ pub struct InvoiceSummaryAdditionalChargeSummary {
     #[serde(rename="totalAmount")]
     pub total_amount: Option<Amount>,
     /// [required] Type of the additional charge.
+    /// 
+    /// Acceptable values are:  
+    /// - "shipping"
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
@@ -1160,9 +1226,20 @@ pub struct TestOrderPaymentMethod {
     #[serde(rename="expirationYear")]
     pub expiration_year: Option<i32>,
     /// The type of instrument. Note that real orders might have different values than the four values accepted by createTestOrder.
+    /// 
+    /// Acceptable values are:  
+    /// - "AMEX" 
+    /// - "DISCOVER" 
+    /// - "MASTERCARD" 
+    /// - "VISA"
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// The billing address.
+    /// 
+    /// Acceptable values are:  
+    /// - "dwight" 
+    /// - "jim" 
+    /// - "pam"
     #[serde(rename="predefinedBillingAddress")]
     pub predefined_billing_address: Option<String>,
 }
@@ -1172,35 +1249,32 @@ impl Part for TestOrderPaymentMethod {}
 
 /// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [notifycharge orderpayments](struct.OrderpaymentNotifychargeCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrderpaymentsNotifyChargeResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#orderpaymentsNotifyChargeResponse".
-    pub kind: Option<String>,
-    /// The status of the execution.
-    #[serde(rename="executionStatus")]
-    pub execution_status: Option<String>,
-}
-
-impl ResponseResult for OrderpaymentsNotifyChargeResponse {}
-
-
-/// There is no detailed description.
-/// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InventoryPickup {
     /// Whether store pickup is available for this offer and whether the pickup option should be shown as buy, reserve, or not supported. Only supported for local inventory. Unless the value is "not supported", must be submitted together with pickupSla.
+    /// 
+    /// Acceptable values are:  
+    /// - "buy" 
+    /// - "not supported" 
+    /// - "reserve" 
+    /// - "ship to store"
     #[serde(rename="pickupMethod")]
     pub pickup_method: Option<String>,
     /// The expected date that an order will be ready for pickup, relative to when the order is placed. Only supported for local inventory. Must be submitted together with pickupMethod.
+    /// 
+    /// Acceptable values are:  
+    /// - "five day" 
+    /// - "four day" 
+    /// - "multi day" 
+    /// - "multi week" 
+    /// - "next day" 
+    /// - "same day" 
+    /// - "seven day" 
+    /// - "six day" 
+    /// - "three day" 
+    /// - "two day"
     #[serde(rename="pickupSla")]
     pub pickup_sla: Option<String>,
 }
@@ -1219,22 +1293,22 @@ impl Part for InventoryPickup {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PosSaleResponse {
-    /// A unique identifier for the item.
+    /// Required. A unique identifier for the item.
     #[serde(rename="itemId")]
     pub item_id: Option<String>,
-    /// The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.
+    /// Required. The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.
     #[serde(rename="storeCode")]
     pub store_code: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#posSaleResponse".
     pub kind: Option<String>,
-    /// The two-letter ISO 639-1 language code for the item.
+    /// Required. The two-letter ISO 639-1 language code for the item.
     #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
-    /// The inventory timestamp, in ISO 8601 format.
+    /// Required. The inventory timestamp, in ISO 8601 format.
     pub timestamp: Option<String>,
-    /// The price of the item.
+    /// Required. The price of the item.
     pub price: Option<Price>,
-    /// The CLDR territory code for the item.
+    /// Required. The CLDR territory code for the item.
     #[serde(rename="targetCountry")]
     pub target_country: Option<String>,
     /// Global Trade Item Number.
@@ -1242,7 +1316,7 @@ pub struct PosSaleResponse {
     /// A unique ID to group items from the same sale event.
     #[serde(rename="saleId")]
     pub sale_id: Option<String>,
-    /// The relative change of the available quantity. Negative for items returned.
+    /// Required. The relative change of the available quantity. Negative for items returned.
     pub quantity: Option<String>,
 }
 
@@ -1255,24 +1329,35 @@ impl ResponseResult for PosSaleResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReturnShipment {
-    /// no description provided
+    /// Type of the return method.
+    /// 
+    /// Acceptable values are:  
+    /// - "byMail" 
+    /// - "contactCustomerSupport" 
+    /// - "returnless"
     #[serde(rename="returnMethodType")]
     pub return_method_type: Option<String>,
-    /// no description provided
+    /// State of the shipment.
+    /// 
+    /// Acceptable values are:  
+    /// - "completed" 
+    /// - "new" 
+    /// - "shipped" 
+    /// - "undeliverable"
     pub state: Option<String>,
-    /// no description provided
+    /// Tracking information of the shipment. One return shipment might be handled by several shipping carriers sequentially.
     #[serde(rename="shipmentTrackingInfos")]
     pub shipment_tracking_infos: Option<Vec<ShipmentTrackingInfo>>,
-    /// no description provided
+    /// Shipment ID generated by Google.
     #[serde(rename="shipmentId")]
     pub shipment_id: Option<String>,
-    /// no description provided
+    /// The date of delivery of the shipment, in ISO 8601 format.
     #[serde(rename="deliveryDate")]
     pub delivery_date: Option<String>,
-    /// no description provided
+    /// The date of creation of the shipment, in ISO 8601 format.
     #[serde(rename="creationDate")]
     pub creation_date: Option<String>,
-    /// no description provided
+    /// The date of shipping of the shipment, in ISO 8601 format.
     #[serde(rename="shippingDate")]
     pub shipping_date: Option<String>,
 }
@@ -1301,6 +1386,13 @@ pub struct OrdersCreateTestOrderRequest {
     #[serde(rename="testOrder")]
     pub test_order: Option<TestOrder>,
     /// The test order template to use. Specify as an alternative to testOrder as a shortcut for retrieving a template and then creating an order using that template.
+    /// 
+    /// Acceptable values are:  
+    /// - "template1" 
+    /// - "template1a" 
+    /// - "template1b" 
+    /// - "template2" 
+    /// - "template3"
     #[serde(rename="templateName")]
     pub template_name: Option<String>,
 }
@@ -1320,6 +1412,11 @@ impl RequestValue for OrdersCreateTestOrderRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersCancelTestOrderByCustomerRequest {
     /// The reason for the cancellation.
+    /// 
+    /// Acceptable values are:  
+    /// - "changedMind" 
+    /// - "orderedWrongItem" 
+    /// - "other"
     pub reason: Option<String>,
 }
 
@@ -1366,6 +1463,14 @@ pub struct AccountsCustomBatchRequestEntry {
     #[serde(rename="linkRequest")]
     pub link_request: Option<AccountsCustomBatchRequestEntryLinkRequest>,
     /// The method of the batch entry.
+    /// 
+    /// Acceptable values are:  
+    /// - "claimWebsite" 
+    /// - "delete" 
+    /// - "get" 
+    /// - "insert" 
+    /// - "link" 
+    /// - "update"
     pub method: Option<String>,
     /// Only applicable if the method is claimwebsite. Indicates whether or not to take the claim from another account in case there is a conflict.
     pub overwrite: Option<bool>,
@@ -1434,6 +1539,10 @@ pub struct AccountStatusProducts {
     /// The destination the data applies to.
     pub destination: Option<String>,
     /// The channel the data applies to.
+    /// 
+    /// Acceptable values are:  
+    /// - "local" 
+    /// - "online"
     pub channel: Option<String>,
     /// Aggregated product statistics.
     pub statistics: Option<AccountStatusStatistics>,
@@ -1453,27 +1562,27 @@ impl Part for AccountStatusProducts {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PosInventoryResponse {
-    /// A unique identifier for the item.
+    /// Required. A unique identifier for the item.
     #[serde(rename="itemId")]
     pub item_id: Option<String>,
-    /// The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.
+    /// Required. The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.
     #[serde(rename="storeCode")]
     pub store_code: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#posInventoryResponse".
     pub kind: Option<String>,
-    /// The two-letter ISO 639-1 language code for the item.
+    /// Required. The two-letter ISO 639-1 language code for the item.
     #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
-    /// The inventory timestamp, in ISO 8601 format.
+    /// Required. The inventory timestamp, in ISO 8601 format.
     pub timestamp: Option<String>,
-    /// The current price of the item.
+    /// Required. The current price of the item.
     pub price: Option<Price>,
-    /// The CLDR territory code for the item.
+    /// Required. The CLDR territory code for the item.
     #[serde(rename="targetCountry")]
     pub target_country: Option<String>,
     /// Global Trade Item Number.
     pub gtin: Option<String>,
-    /// The available quantity of the item.
+    /// Required. The available quantity of the item.
     pub quantity: Option<String>,
 }
 
@@ -1494,6 +1603,10 @@ pub struct OrdersReturnRefundLineItemResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#ordersReturnRefundLineItemResponse".
     pub kind: Option<String>,
     /// The status of the execution.
+    /// 
+    /// Acceptable values are:  
+    /// - "duplicate" 
+    /// - "executed"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -1560,6 +1673,11 @@ pub struct Inventory {
     /// Number and amount of installments to pay for an item. Brazil only.
     pub installment: Option<Installment>,
     /// The availability of the product.
+    /// 
+    /// Acceptable values are:  
+    /// - "in stock" 
+    /// - "out of stock" 
+    /// - "preorder"
     pub availability: Option<String>,
     /// Store pickup information. Only supported for local inventory. Not setting pickup means "don't update" while setting it to the empty value ({} in JSON) means "delete". Otherwise, pickupMethod and pickupSla must be set together, unless pickupMethod is "not supported".
     pub pickup: Option<InventoryPickup>,
@@ -1616,15 +1734,15 @@ impl RequestValue for OrdersShipLineItemsRequest {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [setinventoryverificationcontact liasettings](struct.LiasettingSetinventoryverificationcontactCall.html) (response)
+/// * [fetchnow datafeeds](struct.DatafeedFetchnowCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LiasettingsSetInventoryVerificationContactResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#liasettingsSetInventoryVerificationContactResponse".
+pub struct DatafeedsFetchNowResponse {
+    /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedsFetchNowResponse".
     pub kind: Option<String>,
 }
 
-impl ResponseResult for LiasettingsSetInventoryVerificationContactResponse {}
+impl ResponseResult for DatafeedsFetchNowResponse {}
 
 
 /// There is no detailed description.
@@ -1751,12 +1869,50 @@ impl Part for OrderLineItemProductVariantAttribute {}
 pub struct OrderCancellation {
     /// The quantity that was canceled.
     pub quantity: Option<u32>,
-    /// The reason for the cancellation. Orders that are cancelled with a noInventory reason will lead to the removal of the product from Shopping Actions until you make an update to that product. This will not affect your Shopping ads.
+    /// The reason for the cancellation. Orders that are canceled with a noInventory reason will lead to the removal of the product from Shopping Actions until you make an update to that product. This will not affect your Shopping ads.
+    /// 
+    /// Acceptable values are:  
+    /// - "autoPostInternal" 
+    /// - "autoPostInvalidBillingAddress" 
+    /// - "autoPostNoInventory" 
+    /// - "autoPostPriceError" 
+    /// - "autoPostUndeliverableShippingAddress" 
+    /// - "couponAbuse" 
+    /// - "customerCanceled" 
+    /// - "customerInitiatedCancel" 
+    /// - "customerSupportRequested" 
+    /// - "failToPushOrderGoogleError" 
+    /// - "failToPushOrderMerchantError" 
+    /// - "failToPushOrderMerchantFulfillmentError" 
+    /// - "failToPushOrderToMerchant" 
+    /// - "failToPushOrderToMerchantOutOfStock" 
+    /// - "invalidCoupon" 
+    /// - "malformedShippingAddress" 
+    /// - "merchantDidNotShipOnTime" 
+    /// - "noInventory" 
+    /// - "orderTimeout" 
+    /// - "other" 
+    /// - "paymentAbuse" 
+    /// - "paymentDeclined" 
+    /// - "priceError" 
+    /// - "returnRefundAbuse" 
+    /// - "shippingPriceError" 
+    /// - "taxError" 
+    /// - "undeliverableShippingAddress" 
+    /// - "unsupportedPoBoxAddress"
     pub reason: Option<String>,
     /// Date on which the cancellation has been created, in ISO 8601 format.
     #[serde(rename="creationDate")]
     pub creation_date: Option<String>,
     /// The actor that created the cancellation.
+    /// 
+    /// Acceptable values are:  
+    /// - "customer" 
+    /// - "googleBot" 
+    /// - "googleCustomerService" 
+    /// - "googlePayments" 
+    /// - "googleSabre" 
+    /// - "merchant"
     pub actor: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -1815,7 +1971,24 @@ pub struct OrdersCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
     #[serde(rename="batchId")]
     pub batch_id: Option<u32>,
-    /// The method to apply.
+    /// The method of the batch entry.
+    /// 
+    /// Acceptable values are:  
+    /// - "acknowledge" 
+    /// - "cancel" 
+    /// - "cancelLineItem" 
+    /// - "get" 
+    /// - "getByMerchantOrderId" 
+    /// - "inStoreRefundLineItem" 
+    /// - "refund" 
+    /// - "rejectReturnLineItem" 
+    /// - "returnLineItem" 
+    /// - "returnRefundLineItem" 
+    /// - "setLineItemMetadata" 
+    /// - "shipLineItems" 
+    /// - "updateLineItemShippingDetails" 
+    /// - "updateMerchantOrderId" 
+    /// - "updateShipment"
     pub method: Option<String>,
     /// The ID of the operation. Unique across all operations for a given order. Required for all methods beside get and getByMerchantOrderId.
     #[serde(rename="operationId")]
@@ -1868,25 +2041,6 @@ impl ResponseResult for AccountsLinkResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [notifyauthdeclined orderpayments](struct.OrderpaymentNotifyauthdeclinedCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrderpaymentsNotifyAuthDeclinedRequest {
-    /// Reason why payment authorization was declined.
-    #[serde(rename="declineReason")]
-    pub decline_reason: Option<String>,
-}
-
-impl RequestValue for OrderpaymentsNotifyAuthDeclinedRequest {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
 /// * [custombatch inventory](struct.InventoryCustombatchCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1924,6 +2078,18 @@ pub struct OrdersCancelLineItemRequest {
     #[serde(rename="lineItemId")]
     pub line_item_id: Option<String>,
     /// The reason for the cancellation.
+    /// 
+    /// Acceptable values are:  
+    /// - "customerInitiatedCancel" 
+    /// - "invalidCoupon" 
+    /// - "malformedShippingAddress" 
+    /// - "noInventory" 
+    /// - "other" 
+    /// - "priceError" 
+    /// - "shippingPriceError" 
+    /// - "taxError" 
+    /// - "undeliverableShippingAddress" 
+    /// - "unsupportedPoBoxAddress"
     pub reason: Option<String>,
     /// Tax amount that corresponds to cancellation amount in amountPretax. Optional, but if filled, then amountPretax must be set. Calculated automatically if not provided.
     #[serde(rename="amountTax")]
@@ -1949,25 +2115,25 @@ impl RequestValue for OrdersCancelLineItemRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PosInventoryRequest {
-    /// A unique identifier for the item.
+    /// Required. A unique identifier for the item.
     #[serde(rename="itemId")]
     pub item_id: Option<String>,
-    /// The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.
+    /// Required. The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.
     #[serde(rename="storeCode")]
     pub store_code: Option<String>,
-    /// The CLDR territory code for the item.
+    /// Required. The CLDR territory code for the item.
     #[serde(rename="targetCountry")]
     pub target_country: Option<String>,
-    /// The two-letter ISO 639-1 language code for the item.
+    /// Required. The two-letter ISO 639-1 language code for the item.
     #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
-    /// The inventory timestamp, in ISO 8601 format.
+    /// Required. The inventory timestamp, in ISO 8601 format.
     pub timestamp: Option<String>,
-    /// The current price of the item.
+    /// Required. The current price of the item.
     pub price: Option<Price>,
     /// Global Trade Item Number.
     pub gtin: Option<String>,
-    /// The available quantity of the item.
+    /// Required. The available quantity of the item.
     pub quantity: Option<String>,
 }
 
@@ -1981,6 +2147,12 @@ impl RequestValue for PosInventoryRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductDestination {
     /// Whether the destination is required, excluded or should be validated.
+    /// 
+    /// Acceptable values are:  
+    /// - "default" 
+    /// - "excluded" 
+    /// - "optional" 
+    /// - "required"
     pub intention: Option<String>,
     /// The name of the destination.
     #[serde(rename="destinationName")]
@@ -2004,7 +2176,14 @@ pub struct PosCustomBatchRequestEntry {
     pub target_merchant_id: Option<String>,
     /// The sale information to submit. Set this only if the method is sale.
     pub sale: Option<PosSale>,
-    /// no description provided
+    /// The method of the batch entry.
+    /// 
+    /// Acceptable values are:  
+    /// - "delete" 
+    /// - "get" 
+    /// - "insert" 
+    /// - "inventory" 
+    /// - "sale"
     pub method: Option<String>,
     /// An entry ID, unique within the batch request.
     #[serde(rename="batchId")]
@@ -2042,6 +2221,21 @@ pub struct OrdersCustomBatchRequestEntryInStoreRefundLineItem {
     /// The quantity to return and refund.
     pub quantity: Option<u32>,
     /// The reason for the return.
+    /// 
+    /// Acceptable values are:  
+    /// - "customerDiscretionaryReturn" 
+    /// - "customerInitiatedMerchantCancel" 
+    /// - "deliveredTooLate" 
+    /// - "expiredItem" 
+    /// - "invalidCoupon" 
+    /// - "malformedShippingAddress" 
+    /// - "other" 
+    /// - "productArrivedDamaged" 
+    /// - "productNotAsDescribed" 
+    /// - "qualityNotAsExpected" 
+    /// - "undeliverableShippingAddress" 
+    /// - "unsupportedPoBoxAddress" 
+    /// - "wrongProductShipped"
     pub reason: Option<String>,
     /// The ID of the product to return. This is the REST ID used in the products service. Either lineItemId or productId is required.
     #[serde(rename="productId")]
@@ -2084,6 +2278,15 @@ pub struct DatafeedFetchSchedule {
     /// Whether the scheduled fetch is paused or not.
     pub paused: Option<bool>,
     /// The day of the week the feed file should be fetched.
+    /// 
+    /// Acceptable values are:  
+    /// - "monday" 
+    /// - "tuesday" 
+    /// - "wednesday" 
+    /// - "thursday" 
+    /// - "friday" 
+    /// - "saturday" 
+    /// - "sunday"
     pub weekday: Option<String>,
     /// Time zone used for schedule. UTC by default. E.g., "America/Los_Angeles".
     #[serde(rename="timeZone")]
@@ -2109,7 +2312,6 @@ impl Part for DatafeedFetchSchedule {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get liasettings](struct.LiasettingGetCall.html) (response)
-/// * [patch liasettings](struct.LiasettingPatchCall.html) (request|response)
 /// * [update liasettings](struct.LiasettingUpdateCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -2158,12 +2360,32 @@ pub struct OrderLegacyPromotionBenefit {
     /// The discount in the order price when the promotion is applied.
     pub discount: Option<Price>,
     /// Describes whether the promotion applies to products (e.g. 20% off) or to shipping (e.g. Free Shipping).
+    /// 
+    /// Acceptable values are:  
+    /// - "product" 
+    /// - "shipping"
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// The impact on tax when the promotion is applied.
     #[serde(rename="taxImpact")]
     pub tax_impact: Option<Price>,
     /// Further describes the benefit of the promotion. Note that we will expand on this enumeration as we support new promotion sub-types.
+    /// 
+    /// Acceptable values are:  
+    /// - "buyMGetMoneyOff" 
+    /// - "buyMGetNMoneyOff" 
+    /// - "buyMGetNPercentOff" 
+    /// - "buyMGetPercentOff" 
+    /// - "freeGift" 
+    /// - "freeGiftWithItemId" 
+    /// - "freeGiftWithValue" 
+    /// - "freeOvernightShipping" 
+    /// - "freeShipping" 
+    /// - "freeTwoDayShipping" 
+    /// - "moneyOff" 
+    /// - "percentageOff" 
+    /// - "rewardPoints" 
+    /// - "salePrice"
     #[serde(rename="subType")]
     pub sub_type: Option<String>,
 }
@@ -2186,7 +2408,10 @@ pub struct AccountstatusesCustomBatchRequestEntry {
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
     pub merchant_id: Option<String>,
-    /// The method (get).
+    /// The method of the batch entry.
+    /// 
+    /// Acceptable values are:  
+    /// - "get"
     pub method: Option<String>,
     /// If set, only issues for the specified destinations are returned, otherwise only issues for the Shopping destination.
     pub destinations: Option<Vec<String>>,
@@ -2201,22 +2426,22 @@ impl Part for AccountstatusesCustomBatchRequestEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PosSale {
-    /// A unique identifier for the item.
+    /// Required. A unique identifier for the item.
     #[serde(rename="itemId")]
     pub item_id: Option<String>,
-    /// The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.
+    /// Required. The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.
     #[serde(rename="storeCode")]
     pub store_code: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#posSale".
     pub kind: Option<String>,
-    /// The two-letter ISO 639-1 language code for the item.
+    /// Required. The two-letter ISO 639-1 language code for the item.
     #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
-    /// The inventory timestamp, in ISO 8601 format.
+    /// Required. The inventory timestamp, in ISO 8601 format.
     pub timestamp: Option<String>,
-    /// The price of the item.
+    /// Required. The price of the item.
     pub price: Option<Price>,
-    /// The CLDR territory code for the item.
+    /// Required. The CLDR territory code for the item.
     #[serde(rename="targetCountry")]
     pub target_country: Option<String>,
     /// Global Trade Item Number.
@@ -2224,33 +2449,11 @@ pub struct PosSale {
     /// A unique ID to group items from the same sale event.
     #[serde(rename="saleId")]
     pub sale_id: Option<String>,
-    /// The relative change of the available quantity. Negative for items returned.
+    /// Required. The relative change of the available quantity. Negative for items returned.
     pub quantity: Option<String>,
 }
 
 impl Part for PosSale {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [notifyauthapproved orderpayments](struct.OrderpaymentNotifyauthapprovedCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrderpaymentsNotifyAuthApprovedRequest {
-    /// Authorized amount for pre-tax charge on user's credit card.
-    #[serde(rename="authAmountPretax")]
-    pub auth_amount_pretax: Option<Price>,
-    /// Authorized amount for tax charge on user's credit card.
-    #[serde(rename="authAmountTax")]
-    pub auth_amount_tax: Option<Price>,
-}
-
-impl RequestValue for OrderpaymentsNotifyAuthApprovedRequest {}
 
 
 /// There is no detailed description.
@@ -2260,6 +2463,13 @@ impl RequestValue for OrderpaymentsNotifyAuthApprovedRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersCustomBatchRequestEntryRejectReturnLineItem {
     /// The reason for the return.
+    /// 
+    /// Acceptable values are:  
+    /// - "damagedOrUsed" 
+    /// - "missingComponent" 
+    /// - "notEligible" 
+    /// - "other" 
+    /// - "outOfReturnWindow"
     pub reason: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -2275,6 +2485,23 @@ pub struct OrdersCustomBatchRequestEntryRejectReturnLineItem {
 }
 
 impl Part for OrdersCustomBatchRequestEntryRejectReturnLineItem {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PickupCarrierService {
+    /// The name of the pickup service (e.g., "Access point"). Required.
+    #[serde(rename="serviceName")]
+    pub service_name: Option<String>,
+    /// The name of the pickup carrier (e.g., "UPS"). Required.
+    #[serde(rename="carrierName")]
+    pub carrier_name: Option<String>,
+}
+
+impl Part for PickupCarrierService {}
 
 
 /// There is no detailed description.
@@ -2329,8 +2556,62 @@ pub struct OrderRefund {
     #[serde(rename="creationDate")]
     pub creation_date: Option<String>,
     /// The reason for the refund.
+    /// 
+    /// Acceptable values are:  
+    /// - "adjustment" 
+    /// - "autoPostInternal" 
+    /// - "autoPostInvalidBillingAddress" 
+    /// - "autoPostNoInventory" 
+    /// - "autoPostPriceError" 
+    /// - "autoPostUndeliverableShippingAddress" 
+    /// - "couponAbuse" 
+    /// - "courtesyAdjustment" 
+    /// - "customerCanceled" 
+    /// - "customerDiscretionaryReturn" 
+    /// - "customerInitiatedMerchantCancel" 
+    /// - "customerSupportRequested" 
+    /// - "deliveredLateByCarrier" 
+    /// - "deliveredTooLate" 
+    /// - "expiredItem" 
+    /// - "failToPushOrderGoogleError" 
+    /// - "failToPushOrderMerchantError" 
+    /// - "failToPushOrderMerchantFulfillmentError" 
+    /// - "failToPushOrderToMerchant" 
+    /// - "failToPushOrderToMerchantOutOfStock" 
+    /// - "feeAdjustment" 
+    /// - "invalidCoupon" 
+    /// - "lateShipmentCredit" 
+    /// - "malformedShippingAddress" 
+    /// - "merchantDidNotShipOnTime" 
+    /// - "noInventory" 
+    /// - "orderTimeout" 
+    /// - "other" 
+    /// - "paymentAbuse" 
+    /// - "paymentDeclined" 
+    /// - "priceAdjustment" 
+    /// - "priceError" 
+    /// - "productArrivedDamaged" 
+    /// - "productNotAsDescribed" 
+    /// - "promoReallocation" 
+    /// - "qualityNotAsExpected" 
+    /// - "returnRefundAbuse" 
+    /// - "shippingCostAdjustment" 
+    /// - "shippingPriceError" 
+    /// - "taxAdjustment" 
+    /// - "taxError" 
+    /// - "undeliverableShippingAddress" 
+    /// - "unsupportedPoBoxAddress" 
+    /// - "wrongProductShipped"
     pub reason: Option<String>,
     /// The actor that created the refund.
+    /// 
+    /// Acceptable values are:  
+    /// - "customer" 
+    /// - "googleBot" 
+    /// - "googleCustomerService" 
+    /// - "googlePayments" 
+    /// - "googleSabre" 
+    /// - "merchant"
     pub actor: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -2409,6 +2690,12 @@ pub struct DatafeedStatus {
     /// The two-letter ISO 639-1 language for which the status is reported.
     pub language: Option<String>,
     /// The processing status of the feed.
+    /// 
+    /// Acceptable values are:  
+    /// - ""failure": The feed could not be processed or all items had errors." 
+    /// - "in progress": The feed is being processed. 
+    /// - "none": The feed has not yet been processed. For example, a feed that has never been uploaded will have this processing status. 
+    /// - "success": The feed was processed successfully, though some items might have had errors.
     #[serde(rename="processingStatus")]
     pub processing_status: Option<String>,
     /// The number of items in the feed that were processed.
@@ -2439,6 +2726,10 @@ impl ResponseResult for DatafeedStatus {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestOrderCustomerMarketingRightsInfo {
     /// Last know user use selection regards marketing preferences. In certain cases selection might not be known, so this field would be empty.
+    /// 
+    /// Acceptable values are:  
+    /// - "denied" 
+    /// - "granted"
     #[serde(rename="explicitMarketingPreference")]
     pub explicit_marketing_preference: Option<String>,
     /// Timestamp when last time marketing preference was updated. Could be empty, if user wasn't offered a selection yet.
@@ -2456,6 +2747,11 @@ impl Part for TestOrderCustomerMarketingRightsInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UnitInvoiceTaxLine {
     /// [required] Type of the tax.
+    /// 
+    /// Acceptable values are:  
+    /// - "otherFee" 
+    /// - "otherFeeTax" 
+    /// - "sales"
     #[serde(rename="taxType")]
     pub tax_type: Option<String>,
     /// [required] Tax amount for the tax type.
@@ -2519,6 +2815,13 @@ impl Part for Installment {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersRejectReturnLineItemRequest {
     /// The reason for the return.
+    /// 
+    /// Acceptable values are:  
+    /// - "damagedOrUsed" 
+    /// - "missingComponent" 
+    /// - "notEligible" 
+    /// - "other" 
+    /// - "outOfReturnWindow"
     pub reason: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -2551,6 +2854,9 @@ pub struct OrderCustomer {
     /// Full name of the customer.
     #[serde(rename="fullName")]
     pub full_name: Option<String>,
+    /// Email address for the merchant to send value-added tax or invoice documentation of the order. This documentation is made available to the customer.
+    #[serde(rename="invoiceReceivingEmail")]
+    pub invoice_receiving_email: Option<String>,
     /// Deprecated.
     pub email: Option<String>,
     /// Customer's marketing preferences. Contains the marketing opt-in information that is current at the time that the merchant call. User preference selections can change from one order to the next so preferences must be checked with every order.
@@ -2580,7 +2886,7 @@ pub struct AccountstatusesCustomBatchResponseEntry {
 impl Part for AccountstatusesCustomBatchResponseEntry {}
 
 
-/// There is no detailed description.
+/// Order return. Production access (all methods) requires the order manager role. Sandbox access does not.
 /// 
 /// # Activities
 /// 
@@ -2591,22 +2897,22 @@ impl Part for AccountstatusesCustomBatchResponseEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MerchantOrderReturn {
-    /// no description provided
+    /// Google order ID.
     #[serde(rename="orderId")]
     pub order_id: Option<String>,
-    /// no description provided
+    /// Merchant defined order ID.
     #[serde(rename="merchantOrderId")]
     pub merchant_order_id: Option<String>,
-    /// no description provided
+    /// Order return ID generated by Google.
     #[serde(rename="orderReturnId")]
     pub order_return_id: Option<String>,
-    /// no description provided
+    /// The date of creation of the return, in ISO 8601 format.
     #[serde(rename="creationDate")]
     pub creation_date: Option<String>,
-    /// no description provided
+    /// Shipments of the return.
     #[serde(rename="returnShipments")]
     pub return_shipments: Option<Vec<ReturnShipment>>,
-    /// no description provided
+    /// Items of the return.
     #[serde(rename="returnItems")]
     pub return_items: Option<Vec<MerchantOrderReturnItem>>,
 }
@@ -2628,6 +2934,10 @@ pub struct OrdersRejectReturnLineItemResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#ordersRejectReturnLineItemResponse".
     pub kind: Option<String>,
     /// The status of the execution.
+    /// 
+    /// Acceptable values are:  
+    /// - "duplicate" 
+    /// - "executed"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -2649,6 +2959,10 @@ pub struct OrdersInStoreRefundLineItemResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#ordersInStoreRefundLineItemResponse".
     pub kind: Option<String>,
     /// The status of the execution.
+    /// 
+    /// Acceptable values are:  
+    /// - "duplicate" 
+    /// - "executed"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -2705,7 +3019,6 @@ impl ResponseResult for ShippingsettingsGetSupportedHolidaysResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [update accounttax](struct.AccounttaxUpdateCall.html) (request|response)
-/// * [patch accounttax](struct.AccounttaxPatchCall.html) (request|response)
 /// * [get accounttax](struct.AccounttaxGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -2714,7 +3027,7 @@ pub struct AccountTax {
     pub rules: Option<Vec<AccountTaxTaxRule>>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountTax".
     pub kind: Option<String>,
-    /// The ID of the account to which these account tax settings belong.
+    /// Required. The ID of the account to which these account tax settings belong.
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
 }
@@ -2737,6 +3050,10 @@ pub struct OrdersRefundResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#ordersRefundResponse".
     pub kind: Option<String>,
     /// The status of the execution.
+    /// 
+    /// Acceptable values are:  
+    /// - "duplicate" 
+    /// - "executed"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -2774,6 +3091,11 @@ pub struct AccountsCustomBatchResponseEntry {
     /// A list of errors defined if and only if the request failed.
     pub errors: Option<Errors>,
     /// Deprecated. This field is never set.
+    /// 
+    /// Acceptable values are:  
+    /// - "active" 
+    /// - "inactive" 
+    /// - "pending"
     #[serde(rename="linkStatus")]
     pub link_status: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#accountsCustomBatchResponseEntry".
@@ -2790,6 +3112,10 @@ impl Part for AccountsCustomBatchResponseEntry {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountGoogleMyBusinessLink {
     /// Status of the link between this Merchant Center account and the GMB account.
+    /// 
+    /// Acceptable values are:  
+    /// - "active" 
+    /// - "pending"
     pub status: Option<String>,
     /// The GMB email address of which a specific account within a GMB account. A sample account within a GMB account could be a business account with set of locations, managed under the GMB account.
     #[serde(rename="gmbEmail")]
@@ -2809,7 +3135,6 @@ impl Part for AccountGoogleMyBusinessLink {}
 /// * [insert datafeeds](struct.DatafeedInsertCall.html) (request|response)
 /// * [custombatch datafeeds](struct.DatafeedCustombatchCall.html) (none)
 /// * [fetchnow datafeeds](struct.DatafeedFetchnowCall.html) (none)
-/// * [patch datafeeds](struct.DatafeedPatchCall.html) (request|response)
 /// * [list datafeeds](struct.DatafeedListCall.html) (none)
 /// * [delete datafeeds](struct.DatafeedDeleteCall.html) (none)
 /// * [get datafeeds](struct.DatafeedGetCall.html) (response)
@@ -2819,10 +3144,15 @@ impl Part for AccountGoogleMyBusinessLink {}
 pub struct Datafeed {
     /// Identifies what kind of resource this is. Value: the fixed string "content#datafeed".
     pub kind: Option<String>,
-    /// The type of data feed. For product inventory feeds, only feeds for local stores, not online stores, are supported.
+    /// Required. The type of data feed. For product inventory feeds, only feeds for local stores, not online stores, are supported.
+    /// 
+    /// Acceptable values are:  
+    /// - "local products" 
+    /// - "product inventory" 
+    /// - "products"
     #[serde(rename="contentType")]
     pub content_type: Option<String>,
-    /// A descriptive name of the data feed.
+    /// Required for insert. A descriptive name of the data feed.
     pub name: Option<String>,
     /// [DEPRECATED] Please use targets[].language instead. The two-letter ISO 639-1 language of the items in the feed. Must be a valid language for targetCountry.
     #[serde(rename="contentLanguage")]
@@ -2835,13 +3165,13 @@ pub struct Datafeed {
     /// [DEPRECATED] Please use targets[].country instead. The country where the items in the feed will be included in the search index, represented as a CLDR territory code.
     #[serde(rename="targetCountry")]
     pub target_country: Option<String>,
-    /// The filename of the feed. All feeds must have a unique file name.
+    /// Required. The filename of the feed. All feeds must have a unique file name.
     #[serde(rename="fileName")]
     pub file_name: Option<String>,
     /// [DEPRECATED] Please use targets[].includedDestinations instead. The list of intended destinations (corresponds to checked check boxes in Merchant Center).
     #[serde(rename="intendedDestinations")]
     pub intended_destinations: Option<Vec<String>>,
-    /// The ID of the data feed.
+    /// Required for update. The ID of the data feed.
     pub id: Option<String>,
     /// The targets this feed should apply to (country, language, destinations).
     pub targets: Option<Vec<DatafeedTarget>>,
@@ -2877,25 +3207,42 @@ impl Part for OrdersCustomBatchRequestEntryCreateTestReturnReturnItem {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestOrder {
-    /// The details of the customer who placed the order.
+    /// Required. The details of the customer who placed the order.
     pub customer: Option<TestOrderCustomer>,
     /// Deprecated. Ignored if provided.
     pub promotions: Option<Vec<OrderLegacyPromotion>>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#testOrder".
     pub kind: Option<String>,
-    /// Line items that are ordered. At least one line item must be provided.
+    /// Required. Line items that are ordered. At least one line item must be provided.
     #[serde(rename="lineItems")]
     pub line_items: Option<Vec<TestOrderLineItem>>,
     /// Determines if test order must be pulled by merchant or pushed to merchant via push integration.
+    /// 
+    /// Acceptable values are:  
+    /// - "checkoutIntegration" 
+    /// - "merchantPull"
     #[serde(rename="notificationMode")]
     pub notification_mode: Option<String>,
-    /// Identifier of one of the predefined delivery addresses for the delivery.
+    /// Required. Identifier of one of the predefined delivery addresses for the delivery.
+    /// 
+    /// Acceptable values are:  
+    /// - "dwight" 
+    /// - "jim" 
+    /// - "pam"
     #[serde(rename="predefinedDeliveryAddress")]
     pub predefined_delivery_address: Option<String>,
-    /// The price of shipping for all items. Shipping tax is automatically calculated for MFL orders. For non-MFL orders, tax settings from Merchant Center are applied. Note that shipping is not taxed in certain states.
+    /// Required. The price of shipping for all items. Shipping tax is automatically calculated for orders where marketplace facilitator tax laws are applicable. Otherwise, tax settings from Merchant Center are applied. Note that shipping is not taxed in certain states.
     #[serde(rename="shippingCost")]
     pub shipping_cost: Option<Price>,
-    /// The requested shipping option.
+    /// Required. The requested shipping option.
+    /// 
+    /// Acceptable values are:  
+    /// - "economy" 
+    /// - "expedited" 
+    /// - "oneDay" 
+    /// - "sameDay" 
+    /// - "standard" 
+    /// - "twoDay"
     #[serde(rename="shippingOption")]
     pub shipping_option: Option<String>,
     /// Whether the orderinvoices service should support this order.
@@ -2907,6 +3254,14 @@ pub struct TestOrder {
     /// The details of the payment method.
     #[serde(rename="paymentMethod")]
     pub payment_method: Option<TestOrderPaymentMethod>,
+    /// Identifier of one of the predefined pickup details. Required for orders containing line items with shipping type pickup.
+    /// 
+    /// Acceptable values are:  
+    /// - "dwight" 
+    /// - "jim" 
+    /// - "pam"
+    #[serde(rename="predefinedPickupDetails")]
+    pub predefined_pickup_details: Option<String>,
 }
 
 impl Part for TestOrder {}
@@ -2918,15 +3273,15 @@ impl Part for TestOrder {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderLineItemShippingDetailsMethod {
-    /// Minimum transit time.
+    /// Required. Minimum transit time.
     #[serde(rename="minDaysInTransit")]
     pub min_days_in_transit: Option<u32>,
     /// The carrier for the shipping. Optional. See shipments[].carrier for a list of acceptable values.
     pub carrier: Option<String>,
-    /// The name of the shipping method.
+    /// Required. The name of the shipping method.
     #[serde(rename="methodName")]
     pub method_name: Option<String>,
-    /// Maximum transit time.
+    /// Required. Maximum transit time.
     #[serde(rename="maxDaysInTransit")]
     pub max_days_in_transit: Option<u32>,
 }
@@ -3046,28 +3401,28 @@ impl RequestValue for OrdersCustomBatchRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PosSaleRequest {
-    /// A unique identifier for the item.
+    /// Required. A unique identifier for the item.
     #[serde(rename="itemId")]
     pub item_id: Option<String>,
-    /// The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.
+    /// Required. The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.
     #[serde(rename="storeCode")]
     pub store_code: Option<String>,
-    /// The CLDR territory code for the item.
+    /// Required. The CLDR territory code for the item.
     #[serde(rename="targetCountry")]
     pub target_country: Option<String>,
-    /// The two-letter ISO 639-1 language code for the item.
+    /// Required. The two-letter ISO 639-1 language code for the item.
     #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
-    /// The inventory timestamp, in ISO 8601 format.
+    /// Required. The inventory timestamp, in ISO 8601 format.
     pub timestamp: Option<String>,
-    /// The price of the item.
+    /// Required. The price of the item.
     pub price: Option<Price>,
     /// A unique ID to group items from the same sale event.
     #[serde(rename="saleId")]
     pub sale_id: Option<String>,
     /// Global Trade Item Number.
     pub gtin: Option<String>,
-    /// The relative change of the available quantity. Negative for items returned.
+    /// Required. The relative change of the available quantity. Negative for items returned.
     pub quantity: Option<String>,
 }
 
@@ -3091,6 +3446,21 @@ pub struct OrdersReturnRefundLineItemRequest {
     #[serde(rename="amountPretax")]
     pub amount_pretax: Option<Price>,
     /// The reason for the return.
+    /// 
+    /// Acceptable values are:  
+    /// - "customerDiscretionaryReturn" 
+    /// - "customerInitiatedMerchantCancel" 
+    /// - "deliveredTooLate" 
+    /// - "expiredItem" 
+    /// - "invalidCoupon" 
+    /// - "malformedShippingAddress" 
+    /// - "other" 
+    /// - "productArrivedDamaged" 
+    /// - "productNotAsDescribed" 
+    /// - "qualityNotAsExpected" 
+    /// - "undeliverableShippingAddress" 
+    /// - "unsupportedPoBoxAddress" 
+    /// - "wrongProductShipped"
     pub reason: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -3118,10 +3488,56 @@ impl RequestValue for OrdersReturnRefundLineItemRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RefundReason {
-    /// no description provided
+    /// Code of the refund reason.
+    /// 
+    /// Acceptable values are:  
+    /// - "adjustment" 
+    /// - "autoPostInternal" 
+    /// - "autoPostInvalidBillingAddress" 
+    /// - "autoPostNoInventory" 
+    /// - "autoPostPriceError" 
+    /// - "autoPostUndeliverableShippingAddress" 
+    /// - "couponAbuse" 
+    /// - "courtesyAdjustment" 
+    /// - "customerCanceled" 
+    /// - "customerDiscretionaryReturn" 
+    /// - "customerInitiatedMerchantCancel" 
+    /// - "customerSupportRequested" 
+    /// - "deliveredLateByCarrier" 
+    /// - "deliveredTooLate" 
+    /// - "expiredItem" 
+    /// - "failToPushOrderGoogleError" 
+    /// - "failToPushOrderMerchantError" 
+    /// - "failToPushOrderMerchantFulfillmentError" 
+    /// - "failToPushOrderToMerchant" 
+    /// - "failToPushOrderToMerchantOutOfStock" 
+    /// - "feeAdjustment" 
+    /// - "invalidCoupon" 
+    /// - "lateShipmentCredit" 
+    /// - "malformedShippingAddress" 
+    /// - "merchantDidNotShipOnTime" 
+    /// - "noInventory" 
+    /// - "orderTimeout" 
+    /// - "other" 
+    /// - "paymentAbuse" 
+    /// - "paymentDeclined" 
+    /// - "priceAdjustment" 
+    /// - "priceError" 
+    /// - "productArrivedDamaged" 
+    /// - "productNotAsDescribed" 
+    /// - "promoReallocation" 
+    /// - "qualityNotAsExpected" 
+    /// - "returnRefundAbuse" 
+    /// - "shippingCostAdjustment" 
+    /// - "shippingPriceError" 
+    /// - "taxAdjustment" 
+    /// - "taxError" 
+    /// - "undeliverableShippingAddress" 
+    /// - "unsupportedPoBoxAddress" 
+    /// - "wrongProductShipped"
     #[serde(rename="reasonCode")]
     pub reason_code: Option<String>,
-    /// no description provided
+    /// Description of the reason.
     pub description: Option<String>,
 }
 
@@ -3209,12 +3625,19 @@ impl Part for CarrierRate {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderLineItemShippingDetails {
-    /// The delivery by date, in ISO 8601 format.
+    /// Required. The delivery by date, in ISO 8601 format.
     #[serde(rename="deliverByDate")]
     pub deliver_by_date: Option<String>,
-    /// Details of the shipping method.
+    /// Type of shipment. Indicates whether deliveryDetails or pickupDetails is applicable for this shipment.
+    /// 
+    /// Acceptable values are:  
+    /// - "delivery" 
+    /// - "pickup"
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Required. Details of the shipping method.
     pub method: Option<OrderLineItemShippingDetailsMethod>,
-    /// The ship by date, in ISO 8601 format.
+    /// Required. The ship by date, in ISO 8601 format.
     #[serde(rename="shipByDate")]
     pub ship_by_date: Option<String>,
 }
@@ -3230,7 +3653,6 @@ impl Part for OrderLineItemShippingDetails {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [update shippingsettings](struct.ShippingsettingUpdateCall.html) (request|response)
-/// * [patch shippingsettings](struct.ShippingsettingPatchCall.html) (request|response)
 /// * [get shippingsettings](struct.ShippingsettingGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -3286,7 +3708,7 @@ pub struct OrdersCustomBatchRequestEntryShipLineItemsShipmentInfo {
     /// The tracking ID for the shipment.
     #[serde(rename="trackingId")]
     pub tracking_id: Option<String>,
-    /// The ID of the shipment. This is assigned by the merchant and is unique to each shipment.
+    /// Required. The ID of the shipment. This is assigned by the merchant and is unique to each shipment.
     #[serde(rename="shipmentId")]
     pub shipment_id: Option<String>,
 }
@@ -3306,6 +3728,21 @@ impl Part for OrdersCustomBatchRequestEntryShipLineItemsShipmentInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersReturnLineItemRequest {
     /// The reason for the return.
+    /// 
+    /// Acceptable values are:  
+    /// - "customerDiscretionaryReturn" 
+    /// - "customerInitiatedMerchantCancel" 
+    /// - "deliveredTooLate" 
+    /// - "expiredItem" 
+    /// - "invalidCoupon" 
+    /// - "malformedShippingAddress" 
+    /// - "other" 
+    /// - "productArrivedDamaged" 
+    /// - "productNotAsDescribed" 
+    /// - "qualityNotAsExpected" 
+    /// - "undeliverableShippingAddress" 
+    /// - "unsupportedPoBoxAddress" 
+    /// - "wrongProductShipped"
     pub reason: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -3355,7 +3792,7 @@ pub struct AccountTaxTaxRule {
     /// If true, shipping charges are also taxed.
     #[serde(rename="shippingTaxed")]
     pub shipping_taxed: Option<bool>,
-    /// State (or province) is which the tax is applicable, described by its location ID (also called criteria ID).
+    /// Required. State (or province) is which the tax is applicable, described by its location ID (also called criteria ID).
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
     /// Whether the tax rate is taken from a global tax table or specified explicitly.
@@ -3405,27 +3842,6 @@ pub struct OrdersCustomBatchRequestEntrySetLineItemMetadata {
 impl Part for OrdersCustomBatchRequestEntrySetLineItemMetadata {}
 
 
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [notifyauthapproved orderpayments](struct.OrderpaymentNotifyauthapprovedCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrderpaymentsNotifyAuthApprovedResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#orderpaymentsNotifyAuthApprovedResponse".
-    pub kind: Option<String>,
-    /// The status of the execution.
-    #[serde(rename="executionStatus")]
-    pub execution_status: Option<String>,
-}
-
-impl ResponseResult for OrderpaymentsNotifyAuthApprovedResponse {}
-
-
 /// The single value of a rate group or the value of a rate group table's cell. Exactly one of noShipping, flatRate, pricePercentage, carrierRateName, subtableName must be set.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3466,6 +3882,16 @@ pub struct HolidaysHoliday {
     /// Unique identifier for the holiday to be used when configuring holiday cutoffs. Always present.
     pub id: Option<String>,
     /// The holiday type. Always present.
+    /// 
+    /// Acceptable values are:  
+    /// - "Christmas" 
+    /// - "Easter" 
+    /// - "Father's Day" 
+    /// - "Halloween" 
+    /// - "Independence Day (USA)" 
+    /// - "Mother's Day" 
+    /// - "Thanksgiving" 
+    /// - "Valentine's Day"
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Hour of the day in the delivery location's timezone on the guaranteed delivery date by which the order has to arrive at the customer's. Possible values are: 0 (midnight), 1, ..., 12 (noon), 13, ..., 23. Always present.
@@ -3485,10 +3911,26 @@ impl Part for HolidaysHoliday {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomerReturnReason {
-    /// no description provided
+    /// Code of the return reason.
+    /// 
+    /// Acceptable values are:  
+    /// - "betterPriceFound" 
+    /// - "changedMind" 
+    /// - "damagedOrDefectiveItem" 
+    /// - "didNotMatchDescription" 
+    /// - "doesNotFit" 
+    /// - "expiredItem" 
+    /// - "incorrectItemReceived" 
+    /// - "noLongerNeeded" 
+    /// - "notSpecified" 
+    /// - "orderedWrongItem" 
+    /// - "other" 
+    /// - "qualityNotExpected" 
+    /// - "receivedTooLate" 
+    /// - "undeliverable"
     #[serde(rename="reasonCode")]
     pub reason_code: Option<String>,
-    /// no description provided
+    /// Description of the reason.
     pub description: Option<String>,
 }
 
@@ -3512,7 +3954,14 @@ pub struct DatafeedsCustomBatchRequestEntry {
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
     pub merchant_id: Option<String>,
-    /// no description provided
+    /// The method of the batch entry.
+    /// 
+    /// Acceptable values are:  
+    /// - "delete" 
+    /// - "fetchNow" 
+    /// - "get" 
+    /// - "insert" 
+    /// - "update"
     pub method: Option<String>,
 }
 
@@ -3542,7 +3991,7 @@ pub struct OrderreturnsListResponse {
 impl ResponseResult for OrderreturnsListResponse {}
 
 
-/// Order. All methods require the order manager role.
+/// Order. Production access (all methods) requires the order manager role. Sandbox access does not.
 /// 
 /// # Activities
 /// 
@@ -3576,15 +4025,40 @@ impl ResponseResult for OrderreturnsListResponse {}
 pub struct Order {
     /// Shipments of the order.
     pub shipments: Option<Vec<OrderShipment>>,
-    /// The details of the customer who placed the order.
-    pub customer: Option<OrderCustomer>,
+    /// The status of the order.
+    /// 
+    /// Acceptable values are:  
+    /// - "canceled" 
+    /// - "delivered" 
+    /// - "inProgress" 
+    /// - "partiallyDelivered" 
+    /// - "partiallyReturned" 
+    /// - "partiallyShipped" 
+    /// - "pendingShipment" 
+    /// - "returned" 
+    /// - "shipped"
+    pub status: Option<String>,
     /// The party responsible for collecting and remitting taxes.
+    /// 
+    /// Acceptable values are:  
+    /// - "marketplaceFacilitator" 
+    /// - "merchant"
     #[serde(rename="taxCollector")]
     pub tax_collector: Option<String>,
-    /// The total cost of shipping for all items.
-    #[serde(rename="shippingCost")]
-    pub shipping_cost: Option<Price>,
+    /// The status of the payment.
+    /// 
+    /// Acceptable values are:  
+    /// - "paymentCaptured" 
+    /// - "paymentRejected" 
+    /// - "paymentSecured" 
+    /// - "pendingAuthorization"
+    #[serde(rename="paymentStatus")]
+    pub payment_status: Option<String>,
     /// Deprecated.
+    /// 
+    /// Acceptable values are:  
+    /// - "googleExpress" 
+    /// - "purchasesOnGoogle"
     #[serde(rename="channelType")]
     pub channel_type: Option<String>,
     /// The net amount for the order. For example, if an order was originally for a grand total of $100 and a refund was issued for $20, the net amount will be $80.
@@ -3592,32 +4066,53 @@ pub struct Order {
     pub net_amount: Option<Price>,
     /// The REST ID of the order. Globally unique.
     pub id: Option<String>,
-    /// The details of the merchant provided promotions applied to the order. More details about the program are here.
-    pub promotions: Option<Vec<OrderLegacyPromotion>>,
+    /// The details of the customer who placed the order.
+    pub customer: Option<OrderCustomer>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#order".
     pub kind: Option<String>,
     /// Line items that are ordered.
     #[serde(rename="lineItems")]
     pub line_items: Option<Vec<OrderLineItem>>,
+    /// The details of the merchant provided promotions applied to the order.
+    /// 
+    /// To determine which promotions apply to which products, check the Promotions[].Benefits[].OfferIds field against the LineItems[].Product.OfferId field for each promotion. If a promotion is applied to more than 1 offerId, divide the discount value by the number of affected offers to determine how much discount to apply to each offerId.
+    /// 
+    /// Examples:  
+    /// - To calculate the line item level discount for a single specific item: For each promotion, subtract the Promotions[].Benefits[].Discount.value amount from the LineItems[].Price.value. 
+    /// - To calculate the line item level discount for multiple quantity of a specific item: For each promotion, divide the Promotions[].Benefits[].Discount.value by the quantity of products and substract it from LineItems[].Product.Price.value for each quantity item.  
+    /// 
+    /// Only 1 promotion can be applied to an offerId in a given order. To refund an item which had a promotion applied to it, make sure to refund the amount after first subtracting the promotion discount from the item price.
+    /// 
+    /// More details about the program are here.
+    pub promotions: Option<Vec<OrderLegacyPromotion>>,
     /// Refunds for the order.
     pub refunds: Option<Vec<OrderRefund>>,
+    /// Deprecated. Shipping details are provided with line items instead.
+    /// 
+    /// Acceptable values are:  
+    /// - "economy" 
+    /// - "expedited" 
+    /// - "oneDay" 
+    /// - "sameDay" 
+    /// - "standard" 
+    /// - "twoDay"
+    #[serde(rename="shippingOption")]
+    pub shipping_option: Option<String>,
     /// Whether the order was acknowledged.
     pub acknowledged: Option<bool>,
-    /// The status of the payment.
-    #[serde(rename="paymentStatus")]
-    pub payment_status: Option<String>,
+    /// The total cost of shipping for all items.
+    #[serde(rename="shippingCost")]
+    pub shipping_cost: Option<Price>,
     /// no description provided
     #[serde(rename="merchantId")]
     pub merchant_id: Option<String>,
     /// Merchant-provided ID of the order.
     #[serde(rename="merchantOrderId")]
     pub merchant_order_id: Option<String>,
-    /// Deprecated. Shipping details are provided with line items instead.
-    #[serde(rename="shippingOption")]
-    pub shipping_option: Option<String>,
-    /// The status of the order.
-    pub status: Option<String>,
-    /// Delivery details for shipments.
+    /// Pickup details for shipments of type pickup.
+    #[serde(rename="pickupDetails")]
+    pub pickup_details: Option<OrderPickupDetails>,
+    /// Delivery details for shipments of type delivery.
     #[serde(rename="deliveryDetails")]
     pub delivery_details: Option<OrderDeliveryDetails>,
     /// The date when the order was placed, in ISO 8601 format.
@@ -3649,6 +4144,10 @@ pub struct OrdersCancelResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#ordersCancelResponse".
     pub kind: Option<String>,
     /// The status of the execution.
+    /// 
+    /// Acceptable values are:  
+    /// - "duplicate" 
+    /// - "executed"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -3670,32 +4169,15 @@ pub struct OrdersReturnLineItemResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#ordersReturnLineItemResponse".
     pub kind: Option<String>,
     /// The status of the execution.
+    /// 
+    /// Acceptable values are:  
+    /// - "duplicate" 
+    /// - "executed"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
 
 impl ResponseResult for OrdersReturnLineItemResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [notifyrefund orderpayments](struct.OrderpaymentNotifyrefundCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrderpaymentsNotifyRefundResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#orderpaymentsNotifyRefundResponse".
-    pub kind: Option<String>,
-    /// The status of the execution.
-    #[serde(rename="executionStatus")]
-    pub execution_status: Option<String>,
-}
-
-impl ResponseResult for OrderpaymentsNotifyRefundResponse {}
 
 
 /// There is no detailed description.
@@ -3712,6 +4194,10 @@ pub struct OrdersAcknowledgeResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#ordersAcknowledgeResponse".
     pub kind: Option<String>,
     /// The status of the execution.
+    /// 
+    /// Acceptable values are:  
+    /// - "duplicate" 
+    /// - "executed"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -3776,7 +4262,7 @@ pub struct OrderShipmentLineItemShipment {
     /// The ID of the product to ship. This is the REST ID used in the products service. Either lineItemId or productId is required.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
-    /// The ID of the line item that is shipped. Either lineItemId or productId is required.
+    /// The ID of the line item that is shipped. This value is assigned by Google when an order is created. Either lineItemId or productId is required.
     #[serde(rename="lineItemId")]
     pub line_item_id: Option<String>,
     /// The quantity that is shipped.
@@ -3819,6 +4305,18 @@ impl Part for AccounttaxCustomBatchResponseEntry {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersCancelRequest {
     /// The reason for the cancellation.
+    /// 
+    /// Acceptable values are:  
+    /// - "customerInitiatedCancel" 
+    /// - "invalidCoupon" 
+    /// - "malformedShippingAddress" 
+    /// - "noInventory" 
+    /// - "other" 
+    /// - "priceError" 
+    /// - "shippingPriceError" 
+    /// - "taxError" 
+    /// - "undeliverableShippingAddress" 
+    /// - "unsupportedPoBoxAddress"
     pub reason: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -3858,6 +4356,10 @@ impl Part for ProductUnitPricingBaseMeasure {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersUpdateShipmentRequest {
     /// New status for the shipment. Not updated if missing.
+    /// 
+    /// Acceptable values are:  
+    /// - "delivered" 
+    /// - "undeliverable"
     pub status: Option<String>,
     /// The carrier handling the shipment. Not updated if missing. See shipments[].carrier in the  Orders resource representation for a list of acceptable values.
     pub carrier: Option<String>,
@@ -3905,13 +4407,13 @@ impl Part for Table {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderLineItemReturnInfo {
-    /// URL of the item return policy.
+    /// Required. URL of the item return policy.
     #[serde(rename="policyUrl")]
     pub policy_url: Option<String>,
-    /// Whether the item is returnable.
+    /// Required. Whether the item is returnable.
     #[serde(rename="isReturnable")]
     pub is_returnable: Option<bool>,
-    /// How many days later the item can be returned.
+    /// Required. How many days later the item can be returned.
     #[serde(rename="daysToReturn")]
     pub days_to_return: Option<i32>,
 }
@@ -3977,6 +4479,11 @@ pub struct Service {
     #[serde(rename="deliveryTime")]
     pub delivery_time: Option<DeliveryTime>,
     /// Eligibility for this service.
+    /// 
+    /// Acceptable values are:  
+    /// - "All scenarios" 
+    /// - "All scenarios except Shopping Actions" 
+    /// - "Shopping Actions"
     pub eligibility: Option<String>,
     /// The CLDR territory code of the country to which the service applies. Required.
     #[serde(rename="deliveryCountry")]
@@ -3986,6 +4493,16 @@ pub struct Service {
     pub rate_groups: Option<Vec<RateGroup>>,
     /// The CLDR code of the currency to which this service applies. Must match that of the prices in rate groups.
     pub currency: Option<String>,
+    /// Type of locations this service ships orders to.
+    /// 
+    /// Acceptable values are:  
+    /// - "delivery" 
+    /// - "pickup"
+    #[serde(rename="shipmentType")]
+    pub shipment_type: Option<String>,
+    /// The carrier-service pair delivering items to collection points. The list of supported pickup services can be retrieved via the getSupportedPickupServices method. Required if and only if the service delivery type is pickup.
+    #[serde(rename="pickupService")]
+    pub pickup_service: Option<PickupCarrierService>,
     /// A boolean exposing the active status of the shipping service. Required.
     pub active: Option<bool>,
     /// Minimum order value for this service. If set, indicates that customers will have to spend at least this amount. All prices within a service must have the same currency.
@@ -4050,7 +4567,7 @@ pub struct LiaCountrySettings {
     /// The status of the "Store pickup" feature.
     #[serde(rename="storePickupActive")]
     pub store_pickup_active: Option<bool>,
-    /// CLDR country code (e.g. "US").
+    /// Required. CLDR country code (e.g. "US").
     pub country: Option<String>,
     /// The POS data provider linked with this country.
     #[serde(rename="posDataProvider")]
@@ -4092,6 +4609,10 @@ pub struct OrderinvoicesCreateRefundInvoiceResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#orderinvoicesCreateRefundInvoiceResponse".
     pub kind: Option<String>,
     /// The status of the execution.
+    /// 
+    /// Acceptable values are:  
+    /// - "duplicate" 
+    /// - "executed"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -4265,6 +4786,17 @@ pub struct CustomAttribute {
     /// Free-form unit of the attribute. Unit can only be used for values of type int, float, or price.
     pub unit: Option<String>,
     /// The type of the attribute.
+    /// 
+    /// Acceptable values are:  
+    /// - "boolean" 
+    /// - "datetimerange" 
+    /// - "float" 
+    /// - "group" 
+    /// - "int" 
+    /// - "price" 
+    /// - "text" 
+    /// - "time" 
+    /// - "url"
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// The name of the attribute. Underscores will be replaced by spaces upon insertion.
@@ -4288,7 +4820,12 @@ pub struct TestOrderCustomer {
     /// Full name of the customer.
     #[serde(rename="fullName")]
     pub full_name: Option<String>,
-    /// Email address of the customer.
+    /// Required. Email address of the customer.
+    /// 
+    /// Acceptable values are:  
+    /// - "pog.dwight.schrute@gmail.com" 
+    /// - "pog.jim.halpert@gmail.com" 
+    /// - "penpog.pam.beesly@gmail.comding"
     pub email: Option<String>,
     /// Customer's marketing preferences.
     #[serde(rename="marketingRightsInfo")]
@@ -4424,6 +4961,10 @@ pub struct OrdersSetLineItemMetadataResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#ordersSetLineItemMetadataResponse".
     pub kind: Option<String>,
     /// The status of the execution.
+    /// 
+    /// Acceptable values are:  
+    /// - "duplicate" 
+    /// - "executed"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -4440,19 +4981,21 @@ pub struct ProductsCustomBatchRequestEntry {
     /// An entry ID, unique within the batch request.
     #[serde(rename="batchId")]
     pub batch_id: Option<u32>,
-    /// no description provided
-    pub method: Option<String>,
     /// The product to insert. Only required if the method is insert.
     pub product: Option<Product>,
-    /// The ID of the product to get or delete. Only defined if the method is get or delete.
-    #[serde(rename="productId")]
-    pub product_id: Option<String>,
-    /// The ContentAPI feed id.
-    #[serde(rename="feedId")]
-    pub feed_id: Option<String>,
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
     pub merchant_id: Option<String>,
+    /// The method of the batch entry.
+    /// 
+    /// Acceptable values are:  
+    /// - "delete" 
+    /// - "get" 
+    /// - "insert"
+    pub method: Option<String>,
+    /// The ID of the product to get or delete. Only defined if the method is get or delete.
+    #[serde(rename="productId")]
+    pub product_id: Option<String>,
 }
 
 impl Part for ProductsCustomBatchRequestEntry {}
@@ -4510,6 +5053,10 @@ pub struct OrdersShipLineItemsResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#ordersShipLineItemsResponse".
     pub kind: Option<String>,
     /// The status of the execution.
+    /// 
+    /// Acceptable values are:  
+    /// - "duplicate" 
+    /// - "executed"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -4522,15 +5069,56 @@ impl ResponseResult for OrdersShipLineItemsResponse {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OrderPickupDetails {
+    /// ID of the pickup location.
+    #[serde(rename="locationId")]
+    pub location_id: Option<String>,
+    /// Collectors authorized to pick up shipment from the pickup location.
+    pub collectors: Option<Vec<OrderPickupDetailsCollector>>,
+    /// Address of the pickup location where the shipment should be sent. Note that recipientName in the address is the name of the business at the pickup location.
+    pub address: Option<OrderAddress>,
+}
+
+impl Part for OrderPickupDetails {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderReturn {
     /// Quantity that is returned.
     pub quantity: Option<u32>,
     /// The reason for the return.
+    /// 
+    /// Acceptable values are:  
+    /// - "customerDiscretionaryReturn" 
+    /// - "customerInitiatedMerchantCancel" 
+    /// - "deliveredTooLate" 
+    /// - "expiredItem" 
+    /// - "invalidCoupon" 
+    /// - "malformedShippingAddress" 
+    /// - "other" 
+    /// - "productArrivedDamaged" 
+    /// - "productNotAsDescribed" 
+    /// - "qualityNotAsExpected" 
+    /// - "undeliverableShippingAddress" 
+    /// - "unsupportedPoBoxAddress" 
+    /// - "wrongProductShipped"
     pub reason: Option<String>,
     /// Date on which the item has been created, in ISO 8601 format.
     #[serde(rename="creationDate")]
     pub creation_date: Option<String>,
     /// The actor that created the refund.
+    /// 
+    /// Acceptable values are:  
+    /// - "customer" 
+    /// - "googleBot" 
+    /// - "googleCustomerService" 
+    /// - "googlePayments" 
+    /// - "googleSabre" 
+    /// - "merchant"
     pub actor: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -4591,6 +5179,19 @@ impl ResponseResult for DatafeedstatusesCustomBatchResponse {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TransitTableTransitTimeRow {
+    /// no description provided
+    pub values: Option<Vec<TransitTableTransitTimeRowTransitTimeValue>>,
+}
+
+impl Part for TransitTableTransitTimeRow {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostalCodeGroup {
     /// A range of postal codes. Required.
     #[serde(rename="postalCodeRanges")]
@@ -4614,6 +5215,9 @@ pub struct UnitInvoiceAdditionalCharge {
     #[serde(rename="additionalChargeAmount")]
     pub additional_charge_amount: Option<Amount>,
     /// [required] Type of the additional charge.
+    /// 
+    /// Acceptable values are:  
+    /// - "shipping"
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Deprecated.
@@ -4638,6 +5242,10 @@ pub struct OrdersUpdateLineItemShippingDetailsResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#ordersUpdateLineItemShippingDetailsResponse".
     pub kind: Option<String>,
     /// The status of the execution.
+    /// 
+    /// Acceptable values are:  
+    /// - "duplicate" 
+    /// - "executed"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -4654,6 +5262,11 @@ pub struct AccountStatusAccountLevelIssue {
     /// The URL of a web page to help resolving this issue.
     pub documentation: Option<String>,
     /// Severity of the issue.
+    /// 
+    /// Acceptable values are:  
+    /// - "critical" 
+    /// - "error" 
+    /// - "suggestion"
     pub severity: Option<String>,
     /// Short description of the issue.
     pub title: Option<String>,
@@ -4702,6 +5315,10 @@ pub struct OrdersUpdateMerchantOrderIdResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#ordersUpdateMerchantOrderIdResponse".
     pub kind: Option<String>,
     /// The status of the execution.
+    /// 
+    /// Acceptable values are:  
+    /// - "duplicate" 
+    /// - "executed"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -4771,6 +5388,18 @@ impl RequestValue for DatafeedsCustomBatchRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersCustomBatchRequestEntryCancel {
     /// The reason for the cancellation.
+    /// 
+    /// Acceptable values are:  
+    /// - "customerInitiatedCancel" 
+    /// - "invalidCoupon" 
+    /// - "malformedShippingAddress" 
+    /// - "noInventory" 
+    /// - "other" 
+    /// - "priceError" 
+    /// - "shippingPriceError" 
+    /// - "taxError" 
+    /// - "undeliverableShippingAddress" 
+    /// - "unsupportedPoBoxAddress"
     pub reason: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -4786,10 +5415,42 @@ impl Part for OrdersCustomBatchRequestEntryCancel {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ShipmentTrackingInfo {
-    /// no description provided
+    /// The tracking number for the package.
     #[serde(rename="trackingNumber")]
     pub tracking_number: Option<String>,
-    /// no description provided
+    /// The shipping carrier that handles the package.
+    /// 
+    /// Acceptable values are:  
+    /// - "boxtal" 
+    /// - "bpost" 
+    /// - "chronopost" 
+    /// - "colisPrive" 
+    /// - "colissimo" 
+    /// - "cxt" 
+    /// - "deliv" 
+    /// - "dhl" 
+    /// - "dpd" 
+    /// - "dynamex" 
+    /// - "eCourier" 
+    /// - "easypost" 
+    /// - "efw" 
+    /// - "fedex" 
+    /// - "fedexSmartpost" 
+    /// - "geodis" 
+    /// - "gls" 
+    /// - "googleCourier" 
+    /// - "gsx" 
+    /// - "jdLogistics" 
+    /// - "laPoste" 
+    /// - "lasership" 
+    /// - "manual" 
+    /// - "mpx" 
+    /// - "onTrac" 
+    /// - "other" 
+    /// - "tnt" 
+    /// - "uds" 
+    /// - "ups" 
+    /// - "usps"
     pub carrier: Option<String>,
 }
 
@@ -4855,6 +5516,21 @@ impl Part for ProductStatusDataQualityIssue {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderinvoicesCustomBatchRequestEntryCreateRefundInvoiceReturnOption {
     /// [required] Reason for the return.
+    /// 
+    /// Acceptable values are:  
+    /// - "customerDiscretionaryReturn" 
+    /// - "customerInitiatedMerchantCancel" 
+    /// - "deliveredTooLate" 
+    /// - "expiredItem" 
+    /// - "invalidCoupon" 
+    /// - "malformedShippingAddress" 
+    /// - "other" 
+    /// - "productArrivedDamaged" 
+    /// - "productNotAsDescribed" 
+    /// - "qualityNotAsExpected" 
+    /// - "undeliverableShippingAddress" 
+    /// - "unsupportedPoBoxAddress" 
+    /// - "wrongProductShipped"
     pub reason: Option<String>,
     /// Optional description of the return reason.
     pub description: Option<String>,
@@ -4906,6 +5582,22 @@ impl ResponseResult for OrdersGetTestOrderTemplateResponse {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OrderPickupDetailsCollector {
+    /// Phone number of the person picking up the shipment.
+    #[serde(rename="phoneNumber")]
+    pub phone_number: Option<String>,
+    /// Name of the person picking up the shipment.
+    pub name: Option<String>,
+}
+
+impl Part for OrderPickupDetailsCollector {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Promotion {
     /// [required] Amount of the promotion. The values here are the promotion applied to the unit price pretax and to the total of the tax amounts.
     #[serde(rename="promotionAmount")]
@@ -4925,6 +5617,11 @@ impl Part for Promotion {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiaAboutPageSettings {
     /// The status of the verification process for the About page.
+    /// 
+    /// Acceptable values are:  
+    /// - "active" 
+    /// - "inactive" 
+    /// - "pending"
     pub status: Option<String>,
     /// The URL for the About page.
     pub url: Option<String>,
@@ -4941,12 +5638,6 @@ impl Part for LiaAboutPageSettings {}
 pub struct OrderLineItem {
     /// Product data as seen by customer from the time of the order placement. Note that certain attributes values (e.g. title or gtin) might be reformatted and no longer match values submitted via product feed.
     pub product: Option<OrderLineItemProduct>,
-    /// Number of items delivered.
-    #[serde(rename="quantityDelivered")]
-    pub quantity_delivered: Option<u32>,
-    /// Details of the return policy for the line item.
-    #[serde(rename="returnInfo")]
-    pub return_info: Option<OrderLineItemReturnInfo>,
     /// Total price for the line item. For example, if two items for $10 are purchased, the total price will be $20.
     pub price: Option<Price>,
     /// Number of items pending.
@@ -4954,29 +5645,38 @@ pub struct OrderLineItem {
     pub quantity_pending: Option<u32>,
     /// Total tax amount for the line item. For example, if two items are purchased, and each have a cost tax of $2, the total tax amount will be $4.
     pub tax: Option<Price>,
+    /// Number of items ready for pickup.
+    #[serde(rename="quantityReadyForPickup")]
+    pub quantity_ready_for_pickup: Option<u32>,
+    /// Number of items returned.
+    #[serde(rename="quantityReturned")]
+    pub quantity_returned: Option<u32>,
+    /// The ID of the line item.
+    pub id: Option<String>,
+    /// Details of the requested shipping for the line item.
+    #[serde(rename="shippingDetails")]
+    pub shipping_details: Option<OrderLineItemShippingDetails>,
+    /// Number of items delivered.
+    #[serde(rename="quantityDelivered")]
+    pub quantity_delivered: Option<u32>,
+    /// Details of the return policy for the line item.
+    #[serde(rename="returnInfo")]
+    pub return_info: Option<OrderLineItemReturnInfo>,
     /// Cancellations of the line item.
     pub cancellations: Option<Vec<OrderCancellation>>,
     /// Number of items canceled.
     #[serde(rename="quantityCanceled")]
     pub quantity_canceled: Option<u32>,
-    /// The ID of the line item.
-    pub id: Option<String>,
+    /// Annotations that are attached to the line item.
+    pub annotations: Option<Vec<OrderMerchantProvidedAnnotation>>,
     /// Returns of the line item.
     pub returns: Option<Vec<OrderReturn>>,
     /// Number of items shipped.
     #[serde(rename="quantityShipped")]
     pub quantity_shipped: Option<u32>,
-    /// Annotations that are attached to the line item.
-    pub annotations: Option<Vec<OrderMerchantProvidedAnnotation>>,
-    /// Number of items returned.
-    #[serde(rename="quantityReturned")]
-    pub quantity_returned: Option<u32>,
     /// Number of items ordered.
     #[serde(rename="quantityOrdered")]
     pub quantity_ordered: Option<u32>,
-    /// Details of the requested shipping for the line item.
-    #[serde(rename="shippingDetails")]
-    pub shipping_details: Option<OrderLineItemShippingDetails>,
 }
 
 impl Part for OrderLineItem {}
@@ -5000,6 +5700,18 @@ pub struct OrdersCustomBatchRequestEntryCancelLineItem {
     #[serde(rename="lineItemId")]
     pub line_item_id: Option<String>,
     /// The reason for the cancellation.
+    /// 
+    /// Acceptable values are:  
+    /// - "customerInitiatedCancel" 
+    /// - "invalidCoupon" 
+    /// - "malformedShippingAddress" 
+    /// - "noInventory" 
+    /// - "other" 
+    /// - "priceError" 
+    /// - "shippingPriceError" 
+    /// - "taxError" 
+    /// - "undeliverableShippingAddress" 
+    /// - "unsupportedPoBoxAddress"
     pub reason: Option<String>,
     /// Tax amount that corresponds to cancellation amount in amountPretax. Optional, but if filled, then amountPretax must be set. Calculated automatically if not provided.
     #[serde(rename="amountTax")]
@@ -5020,9 +5732,13 @@ impl Part for OrdersCustomBatchRequestEntryCancelLineItem {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Weight {
-    /// The weight unit.
+    /// Required. The weight unit.
+    /// 
+    /// Acceptable values are:  
+    /// - "kg" 
+    /// - "lb"
     pub unit: Option<String>,
-    /// The weight represented as a number.
+    /// Required. The weight represented as a number.
     pub value: Option<String>,
 }
 
@@ -5101,6 +5817,21 @@ pub struct OrdersCustomBatchRequestEntryReturnRefundLineItem {
     /// The quantity to return and refund.
     pub quantity: Option<u32>,
     /// The reason for the return.
+    /// 
+    /// Acceptable values are:  
+    /// - "customerDiscretionaryReturn" 
+    /// - "customerInitiatedMerchantCancel" 
+    /// - "deliveredTooLate" 
+    /// - "expiredItem" 
+    /// - "invalidCoupon" 
+    /// - "malformedShippingAddress" 
+    /// - "other" 
+    /// - "productArrivedDamaged" 
+    /// - "productNotAsDescribed" 
+    /// - "qualityNotAsExpected" 
+    /// - "undeliverableShippingAddress" 
+    /// - "unsupportedPoBoxAddress" 
+    /// - "wrongProductShipped"
     pub reason: Option<String>,
     /// The ID of the product to return. This is the REST ID used in the products service. Either lineItemId or productId is required.
     #[serde(rename="productId")]
@@ -5236,12 +5967,28 @@ impl Part for AccountIdentifier {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatafeedFormat {
     /// Character encoding scheme of the data feed. If not specified, the encoding will be auto-detected.
+    /// 
+    /// Acceptable values are:  
+    /// - "latin-1" 
+    /// - "utf-16be" 
+    /// - "utf-16le" 
+    /// - "utf-8" 
+    /// - "windows-1252"
     #[serde(rename="fileEncoding")]
     pub file_encoding: Option<String>,
     /// Specifies how double quotes are interpreted. If not specified, the mode will be auto-detected. Ignored for non-DSV data feeds.
+    /// 
+    /// Acceptable values are:  
+    /// - "normal character" 
+    /// - "value quoting"
     #[serde(rename="quotingMode")]
     pub quoting_mode: Option<String>,
     /// Delimiter for the separation of values in a delimiter-separated values feed. If not specified, the delimiter will be auto-detected. Ignored for non-DSV data feeds.
+    /// 
+    /// Acceptable values are:  
+    /// - "pipe" 
+    /// - "tab" 
+    /// - "tilde"
     #[serde(rename="columnDelimiter")]
     pub column_delimiter: Option<String>,
 }
@@ -5320,6 +6067,10 @@ pub struct OrdersUpdateShipmentResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#ordersUpdateShipmentResponse".
     pub kind: Option<String>,
     /// The status of the execution.
+    /// 
+    /// Acceptable values are:  
+    /// - "duplicate" 
+    /// - "executed"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -5344,6 +6095,21 @@ pub struct OrdersInStoreRefundLineItemRequest {
     #[serde(rename="amountPretax")]
     pub amount_pretax: Option<Price>,
     /// The reason for the return.
+    /// 
+    /// Acceptable values are:  
+    /// - "customerDiscretionaryReturn" 
+    /// - "customerInitiatedMerchantCancel" 
+    /// - "deliveredTooLate" 
+    /// - "expiredItem" 
+    /// - "invalidCoupon" 
+    /// - "malformedShippingAddress" 
+    /// - "other" 
+    /// - "productArrivedDamaged" 
+    /// - "productNotAsDescribed" 
+    /// - "qualityNotAsExpected" 
+    /// - "undeliverableShippingAddress" 
+    /// - "unsupportedPoBoxAddress" 
+    /// - "wrongProductShipped"
     pub reason: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
@@ -5377,8 +6143,17 @@ impl RequestValue for OrdersInStoreRefundLineItemRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountsLinkRequest {
     /// Action to perform for this link. The "request" action is only available to select merchants.
+    /// 
+    /// Acceptable values are:  
+    /// - "approve" 
+    /// - "remove" 
+    /// - "request"
     pub action: Option<String>,
     /// Type of the link between the two accounts.
+    /// 
+    /// Acceptable values are:  
+    /// - "channelPartner" 
+    /// - "eCommercePlatform"
     #[serde(rename="linkType")]
     pub link_type: Option<String>,
     /// The ID of the linked account.
@@ -5406,7 +6181,10 @@ pub struct ProductstatusesCustomBatchRequestEntry {
     pub merchant_id: Option<String>,
     /// If set, only issues for the specified destinations are returned, otherwise only issues for the Shopping destination.
     pub destinations: Option<Vec<String>>,
-    /// no description provided
+    /// The method of the batch entry.
+    /// 
+    /// Acceptable values are:  
+    /// - "get"
     pub method: Option<String>,
     /// The ID of the product whose status to get.
     #[serde(rename="productId")]
@@ -5448,7 +6226,15 @@ pub struct LiasettingsCustomBatchRequestEntry {
     /// The account ID by which this merchant is known to the POS provider.
     #[serde(rename="posExternalAccountId")]
     pub pos_external_account_id: Option<String>,
-    /// no description provided
+    /// The method of the batch entry.
+    /// 
+    /// Acceptable values are:  
+    /// - "get" 
+    /// - "getAccessibleGmbAccounts" 
+    /// - "requestGmbAccess" 
+    /// - "requestInventoryVerification" 
+    /// - "setInventoryVerificationContact" 
+    /// - "update"
     pub method: Option<String>,
     /// The ID of the account for which to get/update account shipping settings.
     #[serde(rename="accountId")]
@@ -5477,7 +6263,10 @@ pub struct DatafeedstatusesCustomBatchRequestEntry {
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
     pub merchant_id: Option<String>,
-    /// no description provided
+    /// The method of the batch entry.
+    /// 
+    /// Acceptable values are:  
+    /// - "get"
     pub method: Option<String>,
 }
 
@@ -5629,6 +6418,10 @@ pub struct OrdersCancelLineItemResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#ordersCancelLineItemResponse".
     pub kind: Option<String>,
     /// The status of the execution.
+    /// 
+    /// Acceptable values are:  
+    /// - "duplicate" 
+    /// - "executed"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -5674,9 +6467,16 @@ pub struct OrderLegacyPromotion {
     /// no description provided
     pub benefits: Option<Vec<OrderLegacyPromotionBenefit>>,
     /// Indicates that the promotion is valid online.
+    /// 
+    /// Acceptable values are:  
+    /// - "online"
     #[serde(rename="redemptionChannel")]
     pub redemption_channel: Option<String>,
     /// Whether the promotion is applicable to all products or only specific products.
+    /// 
+    /// Acceptable values are:  
+    /// - "allProducts" 
+    /// - "specificProducts"
     #[serde(rename="productApplicability")]
     pub product_applicability: Option<String>,
     /// The date and time frame when the promotion is active and ready for validation review. Note that the promotion live time may be delayed for a few hours due to the validation review.
@@ -5726,6 +6526,24 @@ pub struct OrdersRefundRequest {
     #[serde(rename="reasonText")]
     pub reason_text: Option<String>,
     /// The reason for the refund.
+    /// 
+    /// Acceptable values are:  
+    /// - "adjustment" 
+    /// - "courtesyAdjustment" 
+    /// - "customerCanceled" 
+    /// - "customerDiscretionaryReturn" 
+    /// - "deliveredLateByCarrier" 
+    /// - "feeAdjustment" 
+    /// - "lateShipmentCredit" 
+    /// - "noInventory" 
+    /// - "other" 
+    /// - "priceError" 
+    /// - "productArrivedDamaged" 
+    /// - "productNotAsDescribed" 
+    /// - "shippingCostAdjustment" 
+    /// - "taxAdjustment" 
+    /// - "undeliverableShippingAddress" 
+    /// - "wrongProductShipped"
     pub reason: Option<String>,
     /// Tax amount that corresponds to refund amount in amountPretax. Optional, but if filled, amountPretax must be set. Calculated automatically if not provided.
     #[serde(rename="amountTax")]
@@ -5909,6 +6727,11 @@ impl Part for PosDataProviders {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiaOnDisplayToOrderSettings {
     /// The status of the ?On display to order? feature.
+    /// 
+    /// Acceptable values are:  
+    /// - "active" 
+    /// - "inactive" 
+    /// - "pending"
     pub status: Option<String>,
     /// Shipping cost and policy URL.
     #[serde(rename="shippingCostPolicyUrl")]
@@ -5924,27 +6747,27 @@ impl Part for LiaOnDisplayToOrderSettings {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PosInventory {
-    /// A unique identifier for the item.
+    /// Required. A unique identifier for the item.
     #[serde(rename="itemId")]
     pub item_id: Option<String>,
-    /// The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.
+    /// Required. The identifier of the merchant's store. Either a storeCode inserted via the API or the code of the store in Google My Business.
     #[serde(rename="storeCode")]
     pub store_code: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#posInventory".
     pub kind: Option<String>,
-    /// The two-letter ISO 639-1 language code for the item.
+    /// Required. The two-letter ISO 639-1 language code for the item.
     #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
-    /// The inventory timestamp, in ISO 8601 format.
+    /// Required. The inventory timestamp, in ISO 8601 format.
     pub timestamp: Option<String>,
-    /// The current price of the item.
+    /// Required. The current price of the item.
     pub price: Option<Price>,
-    /// The CLDR territory code for the item.
+    /// Required. The CLDR territory code for the item.
     #[serde(rename="targetCountry")]
     pub target_country: Option<String>,
     /// Global Trade Item Number.
     pub gtin: Option<String>,
-    /// The available quantity of the item.
+    /// Required. The available quantity of the item.
     pub quantity: Option<String>,
 }
 
@@ -6043,7 +6866,10 @@ pub struct AccountStatusDataQualityIssue {
     /// no description provided
     #[serde(rename="displayedValue")]
     pub displayed_value: Option<String>,
-    /// no description provided
+    /// Acceptable values are:  
+    /// - "critical" 
+    /// - "error" 
+    /// - "suggestion"
     pub severity: Option<String>,
     /// no description provided
     #[serde(rename="lastChecked")]
@@ -6084,9 +6910,19 @@ pub struct ProductStatusDestinationStatus {
     /// The name of the destination
     pub destination: Option<String>,
     /// The destination's approval status.
+    /// 
+    /// Acceptable values are:  
+    /// - "approved" 
+    /// - "disapproved"
     #[serde(rename="approvalStatus")]
     pub approval_status: Option<String>,
     /// Provided for backward compatibility only. Always set to "required".
+    /// 
+    /// Acceptable values are:  
+    /// - "default" 
+    /// - "excluded" 
+    /// - "optional" 
+    /// - "required"
     pub intention: Option<String>,
 }
 
@@ -6125,37 +6961,56 @@ impl Part for InventoryCustomBatchRequestEntry {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderShipment {
     /// The status of the shipment.
+    /// 
+    /// Acceptable values are:  
+    /// - "delivered" 
+    /// - "readyForPickup" 
+    /// - "shipped" 
+    /// - "undeliverable"
     pub status: Option<String>,
     /// Date on which the shipment has been created, in ISO 8601 format.
     #[serde(rename="creationDate")]
     pub creation_date: Option<String>,
     /// The carrier handling the shipment.
     /// 
-    /// Acceptable values for US are:  
-    /// - "gsx" 
-    /// - "ups" 
-    /// - "usps" 
-    /// - "fedex" 
-    /// - "dhl" 
-    /// - "ecourier" 
-    /// - "cxt" 
-    /// - "google" 
-    /// - "ontrac" 
-    /// - "emsy" 
-    /// - "ont" 
-    /// - "deliv" 
-    /// - "dynamex" 
-    /// - "lasership" 
-    /// - "mpx" 
-    /// - "uds" 
-    /// - "efw"  
-    /// 
-    /// Acceptable values for FR are:  
-    /// - "colissimo" 
-    /// - "chronopost" 
-    /// - "gls" 
-    /// - "dpd" 
-    /// - "bpost"
+    /// For supported carriers, Google includes the carrier name and tracking URL in emails to customers. For select supported carriers, Google also automatically updates the shipment status based on the provided shipment ID. Note: You can also use unsupported carriers, but emails to customers will not include the carrier name or tracking URL, and there will be no automatic order status updates. 
+    /// Supported carriers for US are:  
+    /// - "ups" (United Parcel Service) automatic status updates 
+    /// - "usps" (United States Postal Service) automatic status updates 
+    /// - "fedex" (FedEx) automatic status updates  
+    /// - "dhl" (DHL eCommerce) automatic status updates (US only) 
+    /// - "ontrac" (OnTrac) automatic status updates  
+    /// - "dhl express" (DHL Express)
+    /// - "deliv" (Deliv) 
+    /// - "dynamex" (TForce) 
+    /// - "lasership" (LaserShip) 
+    /// - "mpx" (Military Parcel Xpress) 
+    /// - "uds" (United Delivery Service) 
+    /// - "efw" (Estes Forwarding Worldwide) 
+    /// - "jd logistics" (JD Logistics) 
+    /// - "yunexpress" (YunExpress) 
+    /// - "china post" (China Post) 
+    /// - "china ems" (China Post Express Mail Service) 
+    /// - "singapore post" (Singapore Post) 
+    /// - "pos malaysia" (Pos Malaysia) 
+    /// - "postnl" (PostNL) 
+    /// - "ptt" (PTT Turkish Post) 
+    /// - "eub" (ePacket) 
+    /// - "chukou1" (Chukou1 Logistics)  
+    /// Supported carriers for FR are:  
+    /// - "la poste" (La Poste) automatic status updates  
+    /// - "colissimo" (Colissimo by La Poste) automatic status updates 
+    /// - "ups" (United Parcel Service) automatic status updates  
+    /// - "chronopost" (Chronopost by La Poste) 
+    /// - "gls" (General Logistics Systems France) 
+    /// - "dpd" (DPD Group by GeoPost) 
+    /// - "bpost" (Belgian Post Group) 
+    /// - "colis prive" (Colis Privé) 
+    /// - "boxtal" (Boxtal) 
+    /// - "geodis" (GEODIS) 
+    /// - "tnt" (TNT) 
+    /// - "db schenker" (DB Schenker) 
+    /// - "aramex" (Aramex)
     pub carrier: Option<String>,
     /// The tracking ID for the shipment.
     #[serde(rename="trackingId")]
@@ -6179,18 +7034,18 @@ impl Part for OrderShipment {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestOrderLineItem {
-    /// Details of the return policy for the line item.
+    /// Required. Details of the return policy for the line item.
     #[serde(rename="returnInfo")]
     pub return_info: Option<OrderLineItemReturnInfo>,
-    /// Product data from the time of the order placement.
+    /// Required. Product data from the time of the order placement.
     pub product: Option<TestOrderLineItemProduct>,
     /// Deprecated. Ignored if provided.
     #[serde(rename="unitTax")]
     pub unit_tax: Option<Price>,
-    /// Number of items ordered.
+    /// Required. Number of items ordered.
     #[serde(rename="quantityOrdered")]
     pub quantity_ordered: Option<u32>,
-    /// Details of the requested shipping for the line item.
+    /// Required. Details of the requested shipping for the line item.
     #[serde(rename="shippingDetails")]
     pub shipping_details: Option<OrderLineItemShippingDetails>,
 }
@@ -6216,7 +7071,11 @@ pub struct AccounttaxCustomBatchRequestEntry {
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
     pub merchant_id: Option<String>,
-    /// no description provided
+    /// The method of the batch entry.
+    /// 
+    /// Acceptable values are:  
+    /// - "get" 
+    /// - "update"
     pub method: Option<String>,
 }
 
@@ -6237,6 +7096,10 @@ pub struct OrderinvoicesCreateChargeInvoiceResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "content#orderinvoicesCreateChargeInvoiceResponse".
     pub kind: Option<String>,
     /// The status of the execution.
+    /// 
+    /// Acceptable values are:  
+    /// - "duplicate" 
+    /// - "executed"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -6251,15 +7114,15 @@ impl ResponseResult for OrderinvoicesCreateChargeInvoiceResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [fetchnow datafeeds](struct.DatafeedFetchnowCall.html) (response)
+/// * [setinventoryverificationcontact liasettings](struct.LiasettingSetinventoryverificationcontactCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DatafeedsFetchNowResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedsFetchNowResponse".
+pub struct LiasettingsSetInventoryVerificationContactResponse {
+    /// Identifies what kind of resource this is. Value: the fixed string "content#liasettingsSetInventoryVerificationContactResponse".
     pub kind: Option<String>,
 }
 
-impl ResponseResult for DatafeedsFetchNowResponse {}
+impl ResponseResult for LiasettingsSetInventoryVerificationContactResponse {}
 
 
 /// There is no detailed description.
@@ -6315,6 +7178,52 @@ impl Part for HolidayCutoff {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderinvoicesCustomBatchRequestEntryCreateRefundInvoiceRefundOption {
     /// [required] Reason for the refund.
+    /// 
+    /// Acceptable values are:  
+    /// - "adjustment" 
+    /// - "autoPostInternal" 
+    /// - "autoPostInvalidBillingAddress" 
+    /// - "autoPostNoInventory" 
+    /// - "autoPostPriceError" 
+    /// - "autoPostUndeliverableShippingAddress" 
+    /// - "couponAbuse" 
+    /// - "courtesyAdjustment" 
+    /// - "customerCanceled" 
+    /// - "customerDiscretionaryReturn" 
+    /// - "customerInitiatedMerchantCancel" 
+    /// - "customerSupportRequested" 
+    /// - "deliveredLateByCarrier" 
+    /// - "deliveredTooLate" 
+    /// - "expiredItem" 
+    /// - "failToPushOrderGoogleError" 
+    /// - "failToPushOrderMerchantError" 
+    /// - "failToPushOrderMerchantFulfillmentError" 
+    /// - "failToPushOrderToMerchant" 
+    /// - "failToPushOrderToMerchantOutOfStock" 
+    /// - "feeAdjustment" 
+    /// - "invalidCoupon" 
+    /// - "lateShipmentCredit" 
+    /// - "malformedShippingAddress" 
+    /// - "merchantDidNotShipOnTime" 
+    /// - "noInventory" 
+    /// - "orderTimeout" 
+    /// - "other" 
+    /// - "paymentAbuse" 
+    /// - "paymentDeclined" 
+    /// - "priceAdjustment" 
+    /// - "priceError" 
+    /// - "productArrivedDamaged" 
+    /// - "productNotAsDescribed" 
+    /// - "promoReallocation" 
+    /// - "qualityNotAsExpected" 
+    /// - "returnRefundAbuse" 
+    /// - "shippingCostAdjustment" 
+    /// - "shippingPriceError" 
+    /// - "taxAdjustment" 
+    /// - "taxError" 
+    /// - "undeliverableShippingAddress" 
+    /// - "unsupportedPoBoxAddress" 
+    /// - "wrongProductShipped"
     pub reason: Option<String>,
     /// Optional description of the refund reason.
     pub description: Option<String>,
@@ -6344,20 +7253,27 @@ impl Part for Price {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MerchantOrderReturnItem {
-    /// no description provided
+    /// Product level item ID. If the returned items are of the same product, they will have the same ID.
     #[serde(rename="itemId")]
     pub item_id: Option<String>,
-    /// no description provided
+    /// Product data from the time of the order placement.
     pub product: Option<OrderLineItemProduct>,
-    /// no description provided
+    /// The reason that merchant chooses to accept a return item.
     #[serde(rename="merchantReturnReason")]
     pub merchant_return_reason: Option<RefundReason>,
-    /// no description provided
+    /// The reason that the customer chooses to return an item.
     #[serde(rename="customerReturnReason")]
     pub customer_return_reason: Option<CustomerReturnReason>,
-    /// no description provided
+    /// State of the item.
+    /// 
+    /// Acceptable values are:  
+    /// - "canceled" 
+    /// - "new" 
+    /// - "received" 
+    /// - "refunded" 
+    /// - "rejected"
     pub state: Option<String>,
-    /// no description provided
+    /// IDs of the return shipments that this return item belongs to.
     #[serde(rename="returnShipmentIds")]
     pub return_shipment_ids: Option<Vec<String>>,
 }
@@ -6370,12 +7286,18 @@ impl Part for MerchantOrderReturnItem {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TransitTableTransitTimeRow {
-    /// no description provided
-    pub values: Option<Vec<TransitTableTransitTimeRowTransitTimeValue>>,
+pub struct PickupServicesPickupService {
+    /// The CLDR country code of the carrier (e.g., "US"). Always present.
+    pub country: Option<String>,
+    /// The name of the pickup service (e.g., "Access point"). Always present.
+    #[serde(rename="serviceName")]
+    pub service_name: Option<String>,
+    /// The name of the carrier (e.g., "UPS"). Always present.
+    #[serde(rename="carrierName")]
+    pub carrier_name: Option<String>,
 }
 
-impl Part for TransitTableTransitTimeRow {}
+impl Part for PickupServicesPickupService {}
 
 
 /// There is no detailed description.
@@ -6384,25 +7306,29 @@ impl Part for TransitTableTransitTimeRow {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestOrderLineItemProduct {
-    /// The CLDR territory code of the target country of the product.
+    /// Required. The CLDR territory code of the target country of the product.
     #[serde(rename="targetCountry")]
     pub target_country: Option<String>,
-    /// The two-letter ISO 639-1 language code for the item.
+    /// Required. The two-letter ISO 639-1 language code for the item.
+    /// 
+    /// Acceptable values are:  
+    /// - "en" 
+    /// - "fr"
     #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
-    /// The title of the product.
+    /// Required. The title of the product.
     pub title: Option<String>,
     /// Manufacturer Part Number (MPN) of the item. Optional.
     pub mpn: Option<String>,
     /// Variant attributes for the item. Optional.
     #[serde(rename="variantAttributes")]
     pub variant_attributes: Option<Vec<OrderLineItemProductVariantAttribute>>,
-    /// Brand of the item.
+    /// Required. Brand of the item.
     pub brand: Option<String>,
-    /// URL of an image of the item.
+    /// Required. URL of an image of the item.
     #[serde(rename="imageLink")]
     pub image_link: Option<String>,
-    /// An identifier of the item.
+    /// Required. An identifier of the item.
     #[serde(rename="offerId")]
     pub offer_id: Option<String>,
     /// Shared identifier for all variants of the same product. Optional.
@@ -6410,13 +7336,19 @@ pub struct TestOrderLineItemProduct {
     pub item_group_id: Option<String>,
     /// Global Trade Item Number (GTIN) of the item. Optional.
     pub gtin: Option<String>,
-    /// Condition or state of the item.
+    /// Required. Condition or state of the item.
+    /// 
+    /// Acceptable values are:  
+    /// - "new"
     pub condition: Option<String>,
     /// Fees for the item. Optional.
     pub fees: Option<Vec<OrderLineItemProductFee>>,
-    /// The price for the product. Tax is automatically calculated for MFL orders. For non-MFL orders, tax settings from Merchant Center are applied.
+    /// Required. The price for the product. Tax is automatically calculated for orders where marketplace facilitator tax laws are applicable. Otherwise, tax settings from Merchant Center are applied.
     pub price: Option<Price>,
     /// Deprecated.
+    /// 
+    /// Acceptable values are:  
+    /// - "online"
     pub channel: Option<String>,
 }
 
@@ -6460,31 +7392,6 @@ pub struct OrdersGetByMerchantOrderIdResponse {
 }
 
 impl ResponseResult for OrdersGetByMerchantOrderIdResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [notifyrefund orderpayments](struct.OrderpaymentNotifyrefundCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrderpaymentsNotifyRefundRequest {
-    /// Deprecated. Please use invoiceIds instead.
-    #[serde(rename="invoiceId")]
-    pub invoice_id: Option<String>,
-    /// Whether refund was successful.
-    #[serde(rename="refundState")]
-    pub refund_state: Option<String>,
-    /// Invoice IDs from the orderinvoices service that correspond to the refund.
-    #[serde(rename="invoiceIds")]
-    pub invoice_ids: Option<Vec<String>>,
-}
-
-impl RequestValue for OrderpaymentsNotifyRefundRequest {}
 
 
 /// There is no detailed description.
@@ -6584,7 +7491,13 @@ pub struct DatafeedTarget {
     pub excluded_destinations: Option<Vec<String>>,
     /// The two-letter ISO 639-1 language of the items in the feed. Must be a valid language for targets[].country.
     pub language: Option<String>,
-    /// The list of destinations to include for this target (corresponds to checked check boxes in Merchant Center). Default destinations are always included unless provided in the excluded_destination field.
+    /// The list of destinations to include for this target (corresponds to checked check boxes in Merchant Center). Default destinations are always included unless provided in excludedDestinations.
+    /// 
+    /// List of supported destinations (if available to the account):  
+    /// - DisplayAds 
+    /// - Shopping 
+    /// - ShoppingActions 
+    /// - SurfacesAcrossGoogle
     #[serde(rename="includedDestinations")]
     pub included_destinations: Option<Vec<String>>,
 }
@@ -6637,6 +7550,11 @@ pub struct InventorySetRequest {
     #[serde(rename="customLabel3")]
     pub custom_label3: Option<String>,
     /// The availability of the product.
+    /// 
+    /// Acceptable values are:  
+    /// - "in stock" 
+    /// - "out of stock" 
+    /// - "preorder"
     pub availability: Option<String>,
     /// Loyalty points that users receive after purchasing the item. Japan only.
     #[serde(rename="loyaltyPoints")]
@@ -6726,12 +7644,12 @@ impl Part for PostalCodeRange {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PosStore {
-    /// The street address of the store.
+    /// Required. The street address of the store.
     #[serde(rename="storeAddress")]
     pub store_address: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#posStore".
     pub kind: Option<String>,
-    /// A store identifier that is unique for the given merchant.
+    /// Required. A store identifier that is unique for the given merchant.
     #[serde(rename="storeCode")]
     pub store_code: Option<String>,
 }
@@ -6747,6 +7665,10 @@ impl ResponseResult for PosStore {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountAdwordsLink {
     /// Status of the link between this Merchant Center account and the AdWords account. Upon retrieval, it represents the actual status of the link and can be either active if it was approved in Google AdWords or pending if it's pending approval. Upon insertion, it represents the intended status of the link. Re-uploading a link with status active when it's still pending or with status pending when it's already active will have no effect: the status will remain unchanged. Re-uploading a link with deprecated status inactive is equivalent to not submitting the link at all and will delete the link if it was active or cancel the link request if it was pending.
+    /// 
+    /// Acceptable values are:  
+    /// - "active" 
+    /// - "pending"
     pub status: Option<String>,
     /// Customer ID of the AdWords account.
     #[serde(rename="adwordsId")]
@@ -6792,31 +7714,6 @@ pub struct OrderPaymentMethod {
 }
 
 impl Part for OrderPaymentMethod {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [notifycharge orderpayments](struct.OrderpaymentNotifychargeCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrderpaymentsNotifyChargeRequest {
-    /// Whether charge was successful.
-    #[serde(rename="chargeState")]
-    pub charge_state: Option<String>,
-    /// Deprecated. Please use invoiceIds instead.
-    #[serde(rename="invoiceId")]
-    pub invoice_id: Option<String>,
-    /// Invoice IDs from the orderinvoices service that correspond to the charge.
-    #[serde(rename="invoiceIds")]
-    pub invoice_ids: Option<Vec<String>>,
-}
-
-impl RequestValue for OrderpaymentsNotifyChargeRequest {}
 
 
 /// A batch entry encoding a single non-batch productstatuses response.
@@ -6870,24 +7767,46 @@ pub struct Product {
     #[serde(rename="expirationDate")]
     pub expiration_date: Option<String>,
     /// Availability status of the item.
+    /// 
+    /// Acceptable values are:  
+    /// - "in stock" 
+    /// - "out of stock" 
+    /// - "preorder"
     pub availability: Option<String>,
     /// Used to group items in an arbitrary way. Only for CPA%, discouraged otherwise.
     #[serde(rename="adwordsGrouping")]
     pub adwords_grouping: Option<String>,
     /// Specifies the intended destinations for the product.
     pub destinations: Option<Vec<ProductDestination>>,
-    /// The CLDR territory code for the item.
+    /// Required. The CLDR territory code for the item.
     #[serde(rename="targetCountry")]
     pub target_country: Option<String>,
     /// Custom label 4 for custom grouping of items in a Shopping campaign.
     #[serde(rename="customLabel4")]
     pub custom_label4: Option<String>,
     /// The source of the offer, i.e., how the offer was created.
+    /// 
+    /// Acceptable values are:  
+    /// - "api" 
+    /// - "crawl" 
+    /// - "feed"
     pub source: Option<String>,
     /// Additional categories of the item (formatted as in products data specification).
     #[serde(rename="additionalProductTypes")]
     pub additional_product_types: Option<Vec<String>>,
     /// The energy efficiency class as defined in EU directive 2010/30/EU.
+    /// 
+    /// Acceptable values are:  
+    /// - "A" 
+    /// - "A+" 
+    /// - "A++" 
+    /// - "A+++" 
+    /// - "B" 
+    /// - "C" 
+    /// - "D" 
+    /// - "E" 
+    /// - "F" 
+    /// - "G"
     #[serde(rename="minEnergyEfficiencyClass")]
     pub min_energy_efficiency_class: Option<String>,
     /// Deprecated. Whether an item is available for purchase only online.
@@ -6904,7 +7823,7 @@ pub struct Product {
     /// Height of the item for shipping.
     #[serde(rename="shippingHeight")]
     pub shipping_height: Option<ProductShippingDimension>,
-    /// The two-letter ISO 639-1 language code for the item.
+    /// Required. The two-letter ISO 639-1 language code for the item.
     #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
     /// Manufacturer Part Number (MPN) of the item.
@@ -6923,12 +7842,45 @@ pub struct Product {
     #[serde(rename="adwordsRedirect")]
     pub adwords_redirect: Option<String>,
     /// The energy efficiency class as defined in EU directive 2010/30/EU.
+    /// 
+    /// Acceptable values are:  
+    /// - "A" 
+    /// - "A+" 
+    /// - "A++" 
+    /// - "A+++" 
+    /// - "B" 
+    /// - "C" 
+    /// - "D" 
+    /// - "E" 
+    /// - "F" 
+    /// - "G"
     #[serde(rename="energyEfficiencyClass")]
     pub energy_efficiency_class: Option<String>,
     /// System in which the size is specified. Recommended for apparel items.
+    /// 
+    /// Acceptable values are:  
+    /// - "AU" 
+    /// - "BR" 
+    /// - "CN" 
+    /// - "DE" 
+    /// - "EU" 
+    /// - "FR" 
+    /// - "IT" 
+    /// - "JP" 
+    /// - "MEX" 
+    /// - "UK" 
+    /// - "US"
     #[serde(rename="sizeSystem")]
     pub size_system: Option<String>,
     /// The cut of the item. Recommended for apparel items.
+    /// 
+    /// Acceptable values are:  
+    /// - "big and tall" 
+    /// - "maternity" 
+    /// - "oversize" 
+    /// - "petite" 
+    /// - "plus" 
+    /// - "regular"
     #[serde(rename="sizeType")]
     pub size_type: Option<String>,
     /// Custom label 3 for custom grouping of items in a Shopping campaign.
@@ -6938,6 +7890,10 @@ pub struct Product {
     #[serde(rename="customLabel2")]
     pub custom_label2: Option<String>,
     /// Condition or state of the item.
+    /// 
+    /// Acceptable values are:  
+    /// - "local" 
+    /// - "online"
     pub condition: Option<String>,
     /// Custom label 0 for custom grouping of items in a Shopping campaign.
     #[serde(rename="customLabel0")]
@@ -6946,13 +7902,30 @@ pub struct Product {
     pub kind: Option<String>,
     /// Number and amount of installments to pay for an item. Brazil only.
     pub installment: Option<Installment>,
-    /// Size of the item.
+    /// Size of the item. Only one value is allowed. For variants with different sizes, insert a separate product for each size with the same itemGroupId value (see size definition).
     pub sizes: Option<Vec<String>>,
     /// Target gender of the item.
+    /// 
+    /// Acceptable values are:  
+    /// - "female" 
+    /// - "male" 
+    /// - "unisex"
     pub gender: Option<String>,
     /// Tax information.
     pub taxes: Option<Vec<ProductTax>>,
     /// The energy efficiency class as defined in EU directive 2010/30/EU.
+    /// 
+    /// Acceptable values are:  
+    /// - "A" 
+    /// - "A+" 
+    /// - "A++" 
+    /// - "A+++" 
+    /// - "B" 
+    /// - "C" 
+    /// - "D" 
+    /// - "E" 
+    /// - "F" 
+    /// - "G"
     #[serde(rename="maxEnergyEfficiencyClass")]
     pub max_energy_efficiency_class: Option<String>,
     /// False when the item does not have unique product identifiers appropriate to its category, such as GTIN, MPN, and brand. Required according to the Unique Product Identifier Rules for all target countries except for Canada.
@@ -6971,6 +7944,14 @@ pub struct Product {
     #[serde(rename="customLabel1")]
     pub custom_label1: Option<String>,
     /// Target age group of the item.
+    /// 
+    /// Acceptable values are:  
+    /// - "adult" 
+    /// - "infant" 
+    /// - "kids" 
+    /// - "newborn" 
+    /// - "toddler" 
+    /// - "youngAdult"
     #[serde(rename="ageGroup")]
     pub age_group: Option<String>,
     /// Title of an item for dynamic remarketing campaigns.
@@ -6979,7 +7960,7 @@ pub struct Product {
     /// Additional URLs of images of the item.
     #[serde(rename="additionalImageLinks")]
     pub additional_image_links: Option<Vec<String>>,
-    /// A unique identifier for the item. Leading and trailing whitespaces are stripped and multiple whitespaces are replaced by a single whitespace upon submission. Only valid unicode characters are accepted. See the products feed specification for details.
+    /// Required. A unique identifier for the item. Leading and trailing whitespaces are stripped and multiple whitespaces are replaced by a single whitespace upon submission. Only valid unicode characters are accepted. See the products feed specification for details.
     /// Note: Content API methods that operate on products take the REST ID of the product, not this identifier.
     #[serde(rename="offerId")]
     pub offer_id: Option<String>,
@@ -7013,7 +7994,7 @@ pub struct Product {
     /// The measure and dimension of an item.
     #[serde(rename="unitPricingMeasure")]
     pub unit_pricing_measure: Option<ProductUnitPricingMeasure>,
-    /// A list of custom (merchant-provided) attributes. It can also be used for submitting any attribute of the feed specification in its generic form (e.g., { "name": "size type", "value": "regular" }). This is useful for submitting attributes not explicitly exposed by the API.
+    /// A list of custom (merchant-provided) attributes. It can also be used for submitting any attribute of the feed specification in its generic form (e.g., { "name": "size type", "value": "regular" }). This is useful for submitting attributes not explicitly exposed by the API, such as additional attributes used for Shopping Actions.
     #[serde(rename="customAttributes")]
     pub custom_attributes: Option<Vec<CustomAttribute>>,
     /// The day a pre-ordered product becomes available for delivery, in ISO 8601 format.
@@ -7022,7 +8003,11 @@ pub struct Product {
     /// Whether the item is a merchant-defined bundle. A bundle is a custom grouping of different products sold by a merchant for a single price.
     #[serde(rename="isBundle")]
     pub is_bundle: Option<bool>,
-    /// The item's channel (online or local).
+    /// Required. The item's channel (online or local).
+    /// 
+    /// Acceptable values are:  
+    /// - "local" 
+    /// - "online"
     pub channel: Option<String>,
     /// The material of which the item is made.
     pub material: Option<String>,
@@ -7089,7 +8074,11 @@ pub struct OrdersCustomBatchResponseEntry {
     pub order: Option<Order>,
     /// The status of the execution. Only defined if  
     /// - the request was successful; and 
-    /// - the method is not get, getByMerchantOrderId, or one of the test methods.
+    /// - the method is not get, getByMerchantOrderId, or one of the test methods.  
+    /// 
+    /// Acceptable values are:  
+    /// - "duplicate" 
+    /// - "executed"
     #[serde(rename="executionStatus")]
     pub execution_status: Option<String>,
 }
@@ -7135,7 +8124,11 @@ pub struct ShippingsettingsCustomBatchRequestEntry {
     /// The account shipping settings to update. Only defined if the method is update.
     #[serde(rename="shippingSettings")]
     pub shipping_settings: Option<ShippingSettings>,
-    /// no description provided
+    /// The method of the batch entry.
+    /// 
+    /// Acceptable values are:  
+    /// - "get" 
+    /// - "update"
     pub method: Option<String>,
 }
 
@@ -7297,25 +8290,6 @@ impl<'a, C, A> OrderreturnMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves an order return from your Merchant Center account.
-    /// 
-    /// # Arguments
-    ///
-    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
-    /// * `returnId` - Merchant order return ID generated by Google.
-    pub fn get(&self, merchant_id: &str, return_id: &str) -> OrderreturnGetCall<'a, C, A> {
-        OrderreturnGetCall {
-            hub: self.hub,
-            _merchant_id: merchant_id.to_string(),
-            _return_id: return_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Lists order returns in your Merchant Center account.
     /// 
     /// # Arguments
@@ -7330,6 +8304,25 @@ impl<'a, C, A> OrderreturnMethods<'a, C, A> {
             _max_results: Default::default(),
             _created_start_date: Default::default(),
             _created_end_date: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves an order return from your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
+    /// * `returnId` - Merchant order return ID generated by Google.
+    pub fn get(&self, merchant_id: &str, return_id: &str) -> OrderreturnGetCall<'a, C, A> {
+        OrderreturnGetCall {
+            hub: self.hub,
+            _merchant_id: merchant_id.to_string(),
+            _return_id: return_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -7363,7 +8356,7 @@ impl<'a, C, A> OrderreturnMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `custombatch(...)`, `get(...)`, `list(...)`, `patch(...)` and `update(...)`
+/// // like `custombatch(...)`, `get(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.accounttax();
 /// # }
@@ -7439,28 +8432,6 @@ impl<'a, C, A> AccounttaxMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the tax settings of the account. This method supports patch semantics.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
-    /// * `accountId` - The ID of the account for which to get/update account tax settings.
-    pub fn patch(&self, request: AccountTax, merchant_id: &str, account_id: &str) -> AccounttaxPatchCall<'a, C, A> {
-        AccounttaxPatchCall {
-            hub: self.hub,
-            _request: request,
-            _merchant_id: merchant_id.to_string(),
-            _account_id: account_id.to_string(),
-            _dry_run: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Lists the tax settings of the sub-accounts in your Merchant Center account.
     /// 
     /// # Arguments
@@ -7472,132 +8443,6 @@ impl<'a, C, A> AccounttaxMethods<'a, C, A> {
             _merchant_id: merchant_id.to_string(),
             _page_token: Default::default(),
             _max_results: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-}
-
-
-
-/// A builder providing access to all methods supported on *orderpayment* resources.
-/// It is not used directly, but through the `ShoppingContent` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_content2 as content2;
-/// 
-/// # #[test] fn egal() {
-/// use std::default::Default;
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use content2::ShoppingContent;
-/// 
-/// let secret: ApplicationSecret = Default::default();
-/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `notifyauthapproved(...)`, `notifyauthdeclined(...)`, `notifycharge(...)` and `notifyrefund(...)`
-/// // to build up your call.
-/// let rb = hub.orderpayments();
-/// # }
-/// ```
-pub struct OrderpaymentMethods<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ShoppingContent<C, A>,
-}
-
-impl<'a, C, A> MethodsBuilder for OrderpaymentMethods<'a, C, A> {}
-
-impl<'a, C, A> OrderpaymentMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Notify about successfully authorizing user's payment method for a given amount.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
-    /// * `orderId` - The ID of the order for for which payment authorization is happening.
-    pub fn notifyauthapproved(&self, request: OrderpaymentsNotifyAuthApprovedRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifyauthapprovedCall<'a, C, A> {
-        OrderpaymentNotifyauthapprovedCall {
-            hub: self.hub,
-            _request: request,
-            _merchant_id: merchant_id.to_string(),
-            _order_id: order_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Notify about failure to authorize user's payment method.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
-    /// * `orderId` - The ID of the order for which payment authorization was declined.
-    pub fn notifyauthdeclined(&self, request: OrderpaymentsNotifyAuthDeclinedRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifyauthdeclinedCall<'a, C, A> {
-        OrderpaymentNotifyauthdeclinedCall {
-            hub: self.hub,
-            _request: request,
-            _merchant_id: merchant_id.to_string(),
-            _order_id: order_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Notify about charge on user's selected payments method.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
-    /// * `orderId` - The ID of the order for which charge is happening.
-    pub fn notifycharge(&self, request: OrderpaymentsNotifyChargeRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifychargeCall<'a, C, A> {
-        OrderpaymentNotifychargeCall {
-            hub: self.hub,
-            _request: request,
-            _merchant_id: merchant_id.to_string(),
-            _order_id: order_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Notify about refund on user's selected payments method.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
-    /// * `orderId` - The ID of the order for which charge is happening.
-    pub fn notifyrefund(&self, request: OrderpaymentsNotifyRefundRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifyrefundCall<'a, C, A> {
-        OrderpaymentNotifyrefundCall {
-            hub: self.hub,
-            _request: request,
-            _merchant_id: merchant_id.to_string(),
-            _order_id: order_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -7631,7 +8476,7 @@ impl<'a, C, A> OrderpaymentMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `custombatch(...)`, `get(...)`, `getsupportedcarriers(...)`, `getsupportedholidays(...)`, `list(...)`, `patch(...)` and `update(...)`
+/// // like `custombatch(...)`, `get(...)`, `getsupportedcarriers(...)`, `getsupportedholidays(...)`, `getsupportedpickupservices(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.shippingsettings();
 /// # }
@@ -7665,6 +8510,25 @@ impl<'a, C, A> ShippingsettingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Lists the shipping settings of the sub-accounts in your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the managing account. This must be a multi-client account.
+    pub fn list(&self, merchant_id: &str) -> ShippingsettingListCall<'a, C, A> {
+        ShippingsettingListCall {
+            hub: self.hub,
+            _merchant_id: merchant_id.to_string(),
+            _page_token: Default::default(),
+            _max_results: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Retrieves and updates the shipping settings of multiple accounts in a single request.
     /// 
     /// # Arguments
@@ -7674,28 +8538,6 @@ impl<'a, C, A> ShippingsettingMethods<'a, C, A> {
         ShippingsettingCustombatchCall {
             hub: self.hub,
             _request: request,
-            _dry_run: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Updates the shipping settings of the account. This method supports patch semantics.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
-    /// * `accountId` - The ID of the account for which to get/update shipping settings.
-    pub fn patch(&self, request: ShippingSettings, merchant_id: &str, account_id: &str) -> ShippingsettingPatchCall<'a, C, A> {
-        ShippingsettingPatchCall {
-            hub: self.hub,
-            _request: request,
-            _merchant_id: merchant_id.to_string(),
-            _account_id: account_id.to_string(),
             _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -7724,13 +8566,13 @@ impl<'a, C, A> ShippingsettingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves supported holidays for an account.
+    /// Retrieves supported pickup services for an account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the account for which to retrieve the supported holidays.
-    pub fn getsupportedholidays(&self, merchant_id: &str) -> ShippingsettingGetsupportedholidayCall<'a, C, A> {
-        ShippingsettingGetsupportedholidayCall {
+    /// * `merchantId` - The ID of the account for which to retrieve the supported pickup services.
+    pub fn getsupportedpickupservices(&self, merchant_id: &str) -> ShippingsettingGetsupportedpickupserviceCall<'a, C, A> {
+        ShippingsettingGetsupportedpickupserviceCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
             _delegate: Default::default(),
@@ -7741,17 +8583,15 @@ impl<'a, C, A> ShippingsettingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the shipping settings of the sub-accounts in your Merchant Center account.
+    /// Retrieves supported holidays for an account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account. This must be a multi-client account.
-    pub fn list(&self, merchant_id: &str) -> ShippingsettingListCall<'a, C, A> {
-        ShippingsettingListCall {
+    /// * `merchantId` - The ID of the account for which to retrieve the supported holidays.
+    pub fn getsupportedholidays(&self, merchant_id: &str) -> ShippingsettingGetsupportedholidayCall<'a, C, A> {
+        ShippingsettingGetsupportedholidayCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
-            _page_token: Default::default(),
-            _max_results: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -7807,7 +8647,7 @@ impl<'a, C, A> ShippingsettingMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `custombatch(...)`, `delete(...)`, `fetchnow(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
+/// // like `custombatch(...)`, `delete(...)`, `fetchnow(...)`, `get(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.datafeeds();
 /// # }
@@ -7824,15 +8664,34 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a datafeed configuration of your Merchant Center account. This method supports patch semantics.
+    /// Retrieves a datafeed configuration from your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the account that manages the datafeed. This account cannot be a multi-client account.
+    /// * `datafeedId` - The ID of the datafeed.
+    pub fn get(&self, merchant_id: &str, datafeed_id: &str) -> DatafeedGetCall<'a, C, A> {
+        DatafeedGetCall {
+            hub: self.hub,
+            _merchant_id: merchant_id.to_string(),
+            _datafeed_id: datafeed_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a datafeed configuration of your Merchant Center account.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the datafeed. This account cannot be a multi-client account.
     /// * `datafeedId` - The ID of the datafeed.
-    pub fn patch(&self, request: Datafeed, merchant_id: &str, datafeed_id: &str) -> DatafeedPatchCall<'a, C, A> {
-        DatafeedPatchCall {
+    pub fn update(&self, request: Datafeed, merchant_id: &str, datafeed_id: &str) -> DatafeedUpdateCall<'a, C, A> {
+        DatafeedUpdateCall {
             hub: self.hub,
             _request: request,
             _merchant_id: merchant_id.to_string(),
@@ -7884,25 +8743,6 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a datafeed configuration from your Merchant Center account.
-    /// 
-    /// # Arguments
-    ///
-    /// * `merchantId` - The ID of the account that manages the datafeed. This account cannot be a multi-client account.
-    /// * `datafeedId` - The ID of the datafeed.
-    pub fn get(&self, merchant_id: &str, datafeed_id: &str) -> DatafeedGetCall<'a, C, A> {
-        DatafeedGetCall {
-            hub: self.hub,
-            _merchant_id: merchant_id.to_string(),
-            _datafeed_id: datafeed_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Invokes a fetch for the datafeed in your Merchant Center account.
     /// 
     /// # Arguments
@@ -7934,28 +8774,6 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _merchant_id: merchant_id.to_string(),
-            _dry_run: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Updates a datafeed configuration of your Merchant Center account.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the account that manages the datafeed. This account cannot be a multi-client account.
-    /// * `datafeedId` - The ID of the datafeed.
-    pub fn update(&self, request: Datafeed, merchant_id: &str, datafeed_id: &str) -> DatafeedUpdateCall<'a, C, A> {
-        DatafeedUpdateCall {
-            hub: self.hub,
-            _request: request,
-            _merchant_id: merchant_id.to_string(),
-            _datafeed_id: datafeed_id.to_string(),
             _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -8023,28 +8841,6 @@ pub struct PoMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for PoMethods<'a, C, A> {}
 
 impl<'a, C, A> PoMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Deletes a store for the given merchant.
-    /// 
-    /// # Arguments
-    ///
-    /// * `merchantId` - The ID of the POS or inventory data provider.
-    /// * `targetMerchantId` - The ID of the target merchant.
-    /// * `storeCode` - A store code that is unique per merchant.
-    pub fn delete(&self, merchant_id: &str, target_merchant_id: &str, store_code: &str) -> PoDeleteCall<'a, C, A> {
-        PoDeleteCall {
-            hub: self.hub,
-            _merchant_id: merchant_id.to_string(),
-            _target_merchant_id: target_merchant_id.to_string(),
-            _store_code: store_code.to_string(),
-            _dry_run: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8163,6 +8959,28 @@ impl<'a, C, A> PoMethods<'a, C, A> {
             _request: request,
             _merchant_id: merchant_id.to_string(),
             _target_merchant_id: target_merchant_id.to_string(),
+            _dry_run: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a store for the given merchant.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the POS or inventory data provider.
+    /// * `targetMerchantId` - The ID of the target merchant.
+    /// * `storeCode` - A store code that is unique per merchant.
+    pub fn delete(&self, merchant_id: &str, target_merchant_id: &str, store_code: &str) -> PoDeleteCall<'a, C, A> {
+        PoDeleteCall {
+            hub: self.hub,
+            _merchant_id: merchant_id.to_string(),
+            _target_merchant_id: target_merchant_id.to_string(),
+            _store_code: store_code.to_string(),
             _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -8296,7 +9114,7 @@ impl<'a, C, A> AccountstatuseMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `authinfo(...)`, `claimwebsite(...)`, `custombatch(...)`, `delete(...)`, `get(...)`, `insert(...)`, `link(...)`, `list(...)`, `patch(...)` and `update(...)`
+/// // like `authinfo(...)`, `claimwebsite(...)`, `custombatch(...)`, `delete(...)`, `get(...)`, `insert(...)`, `link(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.accounts();
 /// # }
@@ -8444,28 +9262,6 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a Merchant Center account. This method supports patch semantics.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
-    /// * `accountId` - The ID of the account.
-    pub fn patch(&self, request: Account, merchant_id: &str, account_id: &str) -> AccountPatchCall<'a, C, A> {
-        AccountPatchCall {
-            hub: self.hub,
-            _request: request,
-            _merchant_id: merchant_id.to_string(),
-            _account_id: account_id.to_string(),
-            _dry_run: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Performs an action on a link between two Merchant Center accounts, namely accountId and linkedAccountId.
     /// 
     /// # Arguments
@@ -8508,7 +9304,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
 
 
 
-/// A builder providing access to all methods supported on *inventory* resources.
+/// A builder providing access to all methods supported on *orderinvoice* resources.
 /// It is not used directly, but through the `ShoppingContent` hub.
 ///
 /// # Example
@@ -8532,33 +9328,36 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `custombatch(...)` and `set(...)`
+/// // like `createchargeinvoice(...)` and `createrefundinvoice(...)`
 /// // to build up your call.
-/// let rb = hub.inventory();
+/// let rb = hub.orderinvoices();
 /// # }
 /// ```
-pub struct InventoryMethods<'a, C, A>
+pub struct OrderinvoiceMethods<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a ShoppingContent<C, A>,
 }
 
-impl<'a, C, A> MethodsBuilder for InventoryMethods<'a, C, A> {}
+impl<'a, C, A> MethodsBuilder for OrderinvoiceMethods<'a, C, A> {}
 
-impl<'a, C, A> InventoryMethods<'a, C, A> {
+impl<'a, C, A> OrderinvoiceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates price and availability for multiple products or stores in a single request. This operation does not update the expiration date of the products.
+    /// Creates a refund invoice for one or more shipment groups, and triggers a refund for orderinvoice enabled orders. This can only be used for line items that have previously been charged using createChargeInvoice. All amounts (except for the summary) are incremental with respect to the previous invoice.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn custombatch(&self, request: InventoryCustomBatchRequest) -> InventoryCustombatchCall<'a, C, A> {
-        InventoryCustombatchCall {
+    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
+    /// * `orderId` - The ID of the order.
+    pub fn createrefundinvoice(&self, request: OrderinvoicesCreateRefundInvoiceRequest, merchant_id: &str, order_id: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> {
+        OrderinvoiceCreaterefundinvoiceCall {
             hub: self.hub,
             _request: request,
-            _dry_run: Default::default(),
+            _merchant_id: merchant_id.to_string(),
+            _order_id: order_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -8567,22 +9366,19 @@ impl<'a, C, A> InventoryMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates price and availability of a product in your Merchant Center account.
+    /// Creates a charge invoice for a shipment group, and triggers a charge capture for orderinvoice enabled orders.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
-    /// * `storeCode` - The code of the store for which to update price and availability. Use online to update price and availability of an online product.
-    /// * `productId` - The REST ID of the product for which to update price and availability.
-    pub fn set(&self, request: InventorySetRequest, merchant_id: &str, store_code: &str, product_id: &str) -> InventorySetCall<'a, C, A> {
-        InventorySetCall {
+    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
+    /// * `orderId` - The ID of the order.
+    pub fn createchargeinvoice(&self, request: OrderinvoicesCreateChargeInvoiceRequest, merchant_id: &str, order_id: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> {
+        OrderinvoiceCreatechargeinvoiceCall {
             hub: self.hub,
             _request: request,
             _merchant_id: merchant_id.to_string(),
-            _store_code: store_code.to_string(),
-            _product_id: product_id.to_string(),
-            _dry_run: Default::default(),
+            _order_id: order_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -8616,7 +9412,7 @@ impl<'a, C, A> InventoryMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `custombatch(...)`, `get(...)`, `getaccessiblegmbaccounts(...)`, `list(...)`, `listposdataproviders(...)`, `patch(...)`, `requestgmbaccess(...)`, `requestinventoryverification(...)`, `setinventoryverificationcontact(...)`, `setposdataprovider(...)` and `update(...)`
+/// // like `custombatch(...)`, `get(...)`, `getaccessiblegmbaccounts(...)`, `list(...)`, `listposdataproviders(...)`, `requestgmbaccess(...)`, `requestinventoryverification(...)`, `setinventoryverificationcontact(...)`, `setposdataprovider(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.liasettings();
 /// # }
@@ -8652,28 +9448,6 @@ impl<'a, C, A> LiasettingMethods<'a, C, A> {
             _contact_name: contact_name.to_string(),
             _country: country.to_string(),
             _language: language.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Updates the LIA settings of the account. This method supports patch semantics.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
-    /// * `accountId` - The ID of the account for which to get or update LIA settings.
-    pub fn patch(&self, request: LiaSettings, merchant_id: &str, account_id: &str) -> LiasettingPatchCall<'a, C, A> {
-        LiasettingPatchCall {
-            hub: self.hub,
-            _request: request,
-            _merchant_id: merchant_id.to_string(),
-            _account_id: account_id.to_string(),
-            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -8775,24 +9549,6 @@ impl<'a, C, A> LiasettingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves and/or updates the LIA settings of multiple accounts in a single request.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn custombatch(&self, request: LiasettingsCustomBatchRequest) -> LiasettingCustombatchCall<'a, C, A> {
-        LiasettingCustombatchCall {
-            hub: self.hub,
-            _request: request,
-            _dry_run: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Lists the LIA settings of the sub-accounts in your Merchant Center account.
     /// 
     /// # Arguments
@@ -8825,6 +9581,24 @@ impl<'a, C, A> LiasettingMethods<'a, C, A> {
             _merchant_id: merchant_id.to_string(),
             _account_id: account_id.to_string(),
             _country: country.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves and/or updates the LIA settings of multiple accounts in a single request.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn custombatch(&self, request: LiasettingsCustomBatchRequest) -> LiasettingCustombatchCall<'a, C, A> {
+        LiasettingCustombatchCall {
+            hub: self.hub,
+            _request: request,
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -9001,6 +9775,25 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Retrieves a product from your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
+    /// * `productId` - The REST ID of the product.
+    pub fn get(&self, merchant_id: &str, product_id: &str) -> ProductGetCall<'a, C, A> {
+        ProductGetCall {
+            hub: self.hub,
+            _merchant_id: merchant_id.to_string(),
+            _product_id: product_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Retrieves, inserts, and deletes multiple products in a single request.
     /// 
     /// # Arguments
@@ -9019,7 +9812,7 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the products in your Merchant Center account.
+    /// Lists the products in your Merchant Center account. The response might contain fewer items than specified by maxResults. Rely on nextPageToken to determine if there are more items to be requested.
     /// 
     /// # Arguments
     ///
@@ -9071,25 +9864,6 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
             _request: request,
             _merchant_id: merchant_id.to_string(),
             _dry_run: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Retrieves a product from your Merchant Center account.
-    /// 
-    /// # Arguments
-    ///
-    /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
-    /// * `productId` - The REST ID of the product.
-    pub fn get(&self, merchant_id: &str, product_id: &str) -> ProductGetCall<'a, C, A> {
-        ProductGetCall {
-            hub: self.hub,
-            _merchant_id: merchant_id.to_string(),
-            _product_id: product_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -9239,20 +10013,17 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Notifies that item return and refund was handled directly by merchant outside of Google payments processing (e.g. cash refund done in store).
-    /// Note: We recommend calling the returnrefundlineitem method to refund in-store returns. We will issue the refund directly to the customer. This helps to prevent possible differences arising between merchant and Google transaction records. We also recommend having the point of sale system communicate with Google to ensure that customers do not receive a double refund by first refunding via Google then via an in-store return.
+    /// Retrieves an order using merchant order ID.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
-    /// * `orderId` - The ID of the order.
-    pub fn instorerefundlineitem(&self, request: OrdersInStoreRefundLineItemRequest, merchant_id: &str, order_id: &str) -> OrderInstorerefundlineitemCall<'a, C, A> {
-        OrderInstorerefundlineitemCall {
+    /// * `merchantOrderId` - The merchant order ID to be looked for.
+    pub fn getbymerchantorderid(&self, merchant_id: &str, merchant_order_id: &str) -> OrderGetbymerchantorderidCall<'a, C, A> {
+        OrderGetbymerchantorderidCall {
             hub: self.hub,
-            _request: request,
             _merchant_id: merchant_id.to_string(),
-            _order_id: order_id.to_string(),
+            _merchant_order_id: merchant_order_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -9274,25 +10045,6 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
             _request: request,
             _merchant_id: merchant_id.to_string(),
             _order_id: order_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Retrieves an order using merchant order ID.
-    /// 
-    /// # Arguments
-    ///
-    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
-    /// * `merchantOrderId` - The merchant order ID to be looked for.
-    pub fn getbymerchantorderid(&self, merchant_id: &str, merchant_order_id: &str) -> OrderGetbymerchantorderidCall<'a, C, A> {
-        OrderGetbymerchantorderidCall {
-            hub: self.hub,
-            _merchant_id: merchant_id.to_string(),
-            _merchant_order_id: merchant_order_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -9480,6 +10232,28 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     /// * `orderId` - The ID of the order.
     pub fn rejectreturnlineitem(&self, request: OrdersRejectReturnLineItemRequest, merchant_id: &str, order_id: &str) -> OrderRejectreturnlineitemCall<'a, C, A> {
         OrderRejectreturnlineitemCall {
+            hub: self.hub,
+            _request: request,
+            _merchant_id: merchant_id.to_string(),
+            _order_id: order_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deprecated. Notifies that item return and refund was handled directly by merchant outside of Google payments processing (e.g. cash refund done in store).
+    /// Note: We recommend calling the returnrefundlineitem method to refund in-store returns. We will issue the refund directly to the customer. This helps to prevent possible differences arising between merchant and Google transaction records. We also recommend having the point of sale system communicate with Google to ensure that customers do not receive a double refund by first refunding via Google then via an in-store return.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
+    /// * `orderId` - The ID of the order.
+    pub fn instorerefundlineitem(&self, request: OrdersInStoreRefundLineItemRequest, merchant_id: &str, order_id: &str) -> OrderInstorerefundlineitemCall<'a, C, A> {
+        OrderInstorerefundlineitemCall {
             hub: self.hub,
             _request: request,
             _merchant_id: merchant_id.to_string(),
@@ -9693,7 +10467,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
 
 
 
-/// A builder providing access to all methods supported on *orderinvoice* resources.
+/// A builder providing access to all methods supported on *inventory* resources.
 /// It is not used directly, but through the `ShoppingContent` hub.
 ///
 /// # Example
@@ -9717,36 +10491,33 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `createchargeinvoice(...)` and `createrefundinvoice(...)`
+/// // like `custombatch(...)` and `set(...)`
 /// // to build up your call.
-/// let rb = hub.orderinvoices();
+/// let rb = hub.inventory();
 /// # }
 /// ```
-pub struct OrderinvoiceMethods<'a, C, A>
+pub struct InventoryMethods<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a ShoppingContent<C, A>,
 }
 
-impl<'a, C, A> MethodsBuilder for OrderinvoiceMethods<'a, C, A> {}
+impl<'a, C, A> MethodsBuilder for InventoryMethods<'a, C, A> {}
 
-impl<'a, C, A> OrderinvoiceMethods<'a, C, A> {
+impl<'a, C, A> InventoryMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a refund invoice for one or more shipment groups, and triggers a refund for orderinvoice enabled orders. This can only be used for line items that have previously been charged using createChargeInvoice. All amounts (except for the summary) are incremental with respect to the previous invoice.
+    /// Updates price and availability for multiple products or stores in a single request. This operation does not update the expiration date of the products.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
-    /// * `orderId` - The ID of the order.
-    pub fn createrefundinvoice(&self, request: OrderinvoicesCreateRefundInvoiceRequest, merchant_id: &str, order_id: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> {
-        OrderinvoiceCreaterefundinvoiceCall {
+    pub fn custombatch(&self, request: InventoryCustomBatchRequest) -> InventoryCustombatchCall<'a, C, A> {
+        InventoryCustombatchCall {
             hub: self.hub,
             _request: request,
-            _merchant_id: merchant_id.to_string(),
-            _order_id: order_id.to_string(),
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -9755,19 +10526,22 @@ impl<'a, C, A> OrderinvoiceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a charge invoice for a shipment group, and triggers a charge capture for orderinvoice enabled orders.
+    /// Updates price and availability of a product in your Merchant Center account.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
-    /// * `orderId` - The ID of the order.
-    pub fn createchargeinvoice(&self, request: OrderinvoicesCreateChargeInvoiceRequest, merchant_id: &str, order_id: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> {
-        OrderinvoiceCreatechargeinvoiceCall {
+    /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
+    /// * `storeCode` - The code of the store for which to update price and availability. Use online to update price and availability of an online product.
+    /// * `productId` - The REST ID of the product for which to update price and availability.
+    pub fn set(&self, request: InventorySetRequest, merchant_id: &str, store_code: &str, product_id: &str) -> InventorySetCall<'a, C, A> {
+        InventorySetCall {
             hub: self.hub,
             _request: request,
             _merchant_id: merchant_id.to_string(),
-            _order_id: order_id.to_string(),
+            _store_code: store_code.to_string(),
+            _product_id: product_id.to_string(),
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -10371,258 +11145,6 @@ impl<'a, C, A> OrderreportListtransactionCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Retrieves an order return from your Merchant Center account.
-///
-/// A builder for the *get* method supported by a *orderreturn* resource.
-/// It is not used directly, but through a `OrderreturnMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_content2 as content2;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use content2::ShoppingContent;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.orderreturns().get("merchantId", "returnId")
-///              .doit();
-/// # }
-/// ```
-pub struct OrderreturnGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ShoppingContent<C, A>,
-    _merchant_id: String,
-    _return_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for OrderreturnGetCall<'a, C, A> {}
-
-impl<'a, C, A> OrderreturnGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, MerchantOrderReturn)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "content.orderreturns.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("merchantId", self._merchant_id.to_string()));
-        params.push(("returnId", self._return_id.to_string()));
-        for &field in ["alt", "merchantId", "returnId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "{merchantId}/orderreturns/{returnId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{returnId}", "returnId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["returnId", "merchantId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the account that manages the order. This cannot be a multi-client account.
-    ///
-    /// Sets the *merchant id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderreturnGetCall<'a, C, A> {
-        self._merchant_id = new_value.to_string();
-        self
-    }
-    /// Merchant order return ID generated by Google.
-    ///
-    /// Sets the *return id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn return_id(mut self, new_value: &str) -> OrderreturnGetCall<'a, C, A> {
-        self._return_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrderreturnGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderreturnGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderreturnGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Lists order returns in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *orderreturn* resource.
@@ -10651,11 +11173,11 @@ impl<'a, C, A> OrderreturnGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.orderreturns().list("merchantId")
-///              .page_token("elitr")
-///              .order_by("amet")
-///              .max_results(41)
-///              .created_start_date("labore")
-///              .created_end_date("eirmod")
+///              .page_token("dolor")
+///              .order_by("eirmod")
+///              .max_results(58)
+///              .created_start_date("amet")
+///              .created_end_date("no")
 ///              .doit();
 /// # }
 /// ```
@@ -10912,6 +11434,258 @@ impl<'a, C, A> OrderreturnListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> OrderreturnListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieves an order return from your Merchant Center account.
+///
+/// A builder for the *get* method supported by a *orderreturn* resource.
+/// It is not used directly, but through a `OrderreturnMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_content2 as content2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use content2::ShoppingContent;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.orderreturns().get("merchantId", "returnId")
+///              .doit();
+/// # }
+/// ```
+pub struct OrderreturnGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a ShoppingContent<C, A>,
+    _merchant_id: String,
+    _return_id: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OrderreturnGetCall<'a, C, A> {}
+
+impl<'a, C, A> OrderreturnGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, MerchantOrderReturn)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "content.orderreturns.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("merchantId", self._merchant_id.to_string()));
+        params.push(("returnId", self._return_id.to_string()));
+        for &field in ["alt", "merchantId", "returnId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{merchantId}/orderreturns/{returnId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{returnId}", "returnId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["returnId", "merchantId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the account that manages the order. This cannot be a multi-client account.
+    ///
+    /// Sets the *merchant id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn merchant_id(mut self, new_value: &str) -> OrderreturnGetCall<'a, C, A> {
+        self._merchant_id = new_value.to_string();
+        self
+    }
+    /// Merchant order return ID generated by Google.
+    ///
+    /// Sets the *return id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn return_id(mut self, new_value: &str) -> OrderreturnGetCall<'a, C, A> {
+        self._return_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrderreturnGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> OrderreturnGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderreturnGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11720,301 +12494,6 @@ impl<'a, C, A> AccounttaxCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Updates the tax settings of the account. This method supports patch semantics.
-///
-/// A builder for the *patch* method supported by a *accounttax* resource.
-/// It is not used directly, but through a `AccounttaxMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_content2 as content2;
-/// use content2::AccountTax;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use content2::ShoppingContent;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = AccountTax::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.accounttax().patch(req, "merchantId", "accountId")
-///              .dry_run(true)
-///              .doit();
-/// # }
-/// ```
-pub struct AccounttaxPatchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ShoppingContent<C, A>,
-    _request: AccountTax,
-    _merchant_id: String,
-    _account_id: String,
-    _dry_run: Option<bool>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for AccounttaxPatchCall<'a, C, A> {}
-
-impl<'a, C, A> AccounttaxPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, AccountTax)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "content.accounttax.patch",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("merchantId", self._merchant_id.to_string()));
-        params.push(("accountId", self._account_id.to_string()));
-        if let Some(value) = self._dry_run {
-            params.push(("dryRun", value.to_string()));
-        }
-        for &field in ["alt", "merchantId", "accountId", "dryRun"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "{merchantId}/accounttax/{accountId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{accountId}", "accountId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["accountId", "merchantId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AccountTax) -> AccounttaxPatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
-    ///
-    /// Sets the *merchant id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> AccounttaxPatchCall<'a, C, A> {
-        self._merchant_id = new_value.to_string();
-        self
-    }
-    /// The ID of the account for which to get/update account tax settings.
-    ///
-    /// Sets the *account id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccounttaxPatchCall<'a, C, A> {
-        self._account_id = new_value.to_string();
-        self
-    }
-    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
-    ///
-    /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> AccounttaxPatchCall<'a, C, A> {
-        self._dry_run = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccounttaxPatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccounttaxPatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccounttaxPatchCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Lists the tax settings of the sub-accounts in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *accounttax* resource.
@@ -12043,8 +12522,8 @@ impl<'a, C, A> AccounttaxPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounttax().list("merchantId")
-///              .page_token("sanctus")
-///              .max_results(79)
+///              .page_token("duo")
+///              .max_results(80)
 ///              .doit();
 /// # }
 /// ```
@@ -12268,1138 +12747,6 @@ impl<'a, C, A> AccounttaxListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> AccounttaxListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Notify about successfully authorizing user's payment method for a given amount.
-///
-/// A builder for the *notifyauthapproved* method supported by a *orderpayment* resource.
-/// It is not used directly, but through a `OrderpaymentMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_content2 as content2;
-/// use content2::OrderpaymentsNotifyAuthApprovedRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use content2::ShoppingContent;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = OrderpaymentsNotifyAuthApprovedRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.orderpayments().notifyauthapproved(req, "merchantId", "orderId")
-///              .doit();
-/// # }
-/// ```
-pub struct OrderpaymentNotifyauthapprovedCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ShoppingContent<C, A>,
-    _request: OrderpaymentsNotifyAuthApprovedRequest,
-    _merchant_id: String,
-    _order_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for OrderpaymentNotifyauthapprovedCall<'a, C, A> {}
-
-impl<'a, C, A> OrderpaymentNotifyauthapprovedCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, OrderpaymentsNotifyAuthApprovedResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "content.orderpayments.notifyauthapproved",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("merchantId", self._merchant_id.to_string()));
-        params.push(("orderId", self._order_id.to_string()));
-        for &field in ["alt", "merchantId", "orderId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "{merchantId}/orderpayments/{orderId}/notifyAuthApproved";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{orderId}", "orderId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["orderId", "merchantId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderpaymentsNotifyAuthApprovedRequest) -> OrderpaymentNotifyauthapprovedCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the account that manages the order. This cannot be a multi-client account.
-    ///
-    /// Sets the *merchant id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifyauthapprovedCall<'a, C, A> {
-        self._merchant_id = new_value.to_string();
-        self
-    }
-    /// The ID of the order for for which payment authorization is happening.
-    ///
-    /// Sets the *order id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifyauthapprovedCall<'a, C, A> {
-        self._order_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrderpaymentNotifyauthapprovedCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifyauthapprovedCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderpaymentNotifyauthapprovedCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Notify about failure to authorize user's payment method.
-///
-/// A builder for the *notifyauthdeclined* method supported by a *orderpayment* resource.
-/// It is not used directly, but through a `OrderpaymentMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_content2 as content2;
-/// use content2::OrderpaymentsNotifyAuthDeclinedRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use content2::ShoppingContent;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = OrderpaymentsNotifyAuthDeclinedRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.orderpayments().notifyauthdeclined(req, "merchantId", "orderId")
-///              .doit();
-/// # }
-/// ```
-pub struct OrderpaymentNotifyauthdeclinedCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ShoppingContent<C, A>,
-    _request: OrderpaymentsNotifyAuthDeclinedRequest,
-    _merchant_id: String,
-    _order_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for OrderpaymentNotifyauthdeclinedCall<'a, C, A> {}
-
-impl<'a, C, A> OrderpaymentNotifyauthdeclinedCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, OrderpaymentsNotifyAuthDeclinedResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "content.orderpayments.notifyauthdeclined",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("merchantId", self._merchant_id.to_string()));
-        params.push(("orderId", self._order_id.to_string()));
-        for &field in ["alt", "merchantId", "orderId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "{merchantId}/orderpayments/{orderId}/notifyAuthDeclined";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{orderId}", "orderId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["orderId", "merchantId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderpaymentsNotifyAuthDeclinedRequest) -> OrderpaymentNotifyauthdeclinedCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the account that manages the order. This cannot be a multi-client account.
-    ///
-    /// Sets the *merchant id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifyauthdeclinedCall<'a, C, A> {
-        self._merchant_id = new_value.to_string();
-        self
-    }
-    /// The ID of the order for which payment authorization was declined.
-    ///
-    /// Sets the *order id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifyauthdeclinedCall<'a, C, A> {
-        self._order_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrderpaymentNotifyauthdeclinedCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifyauthdeclinedCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderpaymentNotifyauthdeclinedCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Notify about charge on user's selected payments method.
-///
-/// A builder for the *notifycharge* method supported by a *orderpayment* resource.
-/// It is not used directly, but through a `OrderpaymentMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_content2 as content2;
-/// use content2::OrderpaymentsNotifyChargeRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use content2::ShoppingContent;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = OrderpaymentsNotifyChargeRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.orderpayments().notifycharge(req, "merchantId", "orderId")
-///              .doit();
-/// # }
-/// ```
-pub struct OrderpaymentNotifychargeCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ShoppingContent<C, A>,
-    _request: OrderpaymentsNotifyChargeRequest,
-    _merchant_id: String,
-    _order_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for OrderpaymentNotifychargeCall<'a, C, A> {}
-
-impl<'a, C, A> OrderpaymentNotifychargeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, OrderpaymentsNotifyChargeResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "content.orderpayments.notifycharge",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("merchantId", self._merchant_id.to_string()));
-        params.push(("orderId", self._order_id.to_string()));
-        for &field in ["alt", "merchantId", "orderId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "{merchantId}/orderpayments/{orderId}/notifyCharge";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{orderId}", "orderId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["orderId", "merchantId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderpaymentsNotifyChargeRequest) -> OrderpaymentNotifychargeCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the account that manages the order. This cannot be a multi-client account.
-    ///
-    /// Sets the *merchant id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifychargeCall<'a, C, A> {
-        self._merchant_id = new_value.to_string();
-        self
-    }
-    /// The ID of the order for which charge is happening.
-    ///
-    /// Sets the *order id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifychargeCall<'a, C, A> {
-        self._order_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrderpaymentNotifychargeCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifychargeCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderpaymentNotifychargeCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Notify about refund on user's selected payments method.
-///
-/// A builder for the *notifyrefund* method supported by a *orderpayment* resource.
-/// It is not used directly, but through a `OrderpaymentMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_content2 as content2;
-/// use content2::OrderpaymentsNotifyRefundRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use content2::ShoppingContent;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = OrderpaymentsNotifyRefundRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.orderpayments().notifyrefund(req, "merchantId", "orderId")
-///              .doit();
-/// # }
-/// ```
-pub struct OrderpaymentNotifyrefundCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ShoppingContent<C, A>,
-    _request: OrderpaymentsNotifyRefundRequest,
-    _merchant_id: String,
-    _order_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for OrderpaymentNotifyrefundCall<'a, C, A> {}
-
-impl<'a, C, A> OrderpaymentNotifyrefundCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, OrderpaymentsNotifyRefundResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "content.orderpayments.notifyrefund",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("merchantId", self._merchant_id.to_string()));
-        params.push(("orderId", self._order_id.to_string()));
-        for &field in ["alt", "merchantId", "orderId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "{merchantId}/orderpayments/{orderId}/notifyRefund";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{orderId}", "orderId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["orderId", "merchantId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderpaymentsNotifyRefundRequest) -> OrderpaymentNotifyrefundCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the account that manages the order. This cannot be a multi-client account.
-    ///
-    /// Sets the *merchant id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifyrefundCall<'a, C, A> {
-        self._merchant_id = new_value.to_string();
-        self
-    }
-    /// The ID of the order for which charge is happening.
-    ///
-    /// Sets the *order id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifyrefundCall<'a, C, A> {
-        self._order_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrderpaymentNotifyrefundCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifyrefundCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderpaymentNotifyrefundCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13651,6 +12998,270 @@ impl<'a, C, A> ShippingsettingGetsupportedcarrierCall<'a, C, A> where C: BorrowM
 }
 
 
+/// Lists the shipping settings of the sub-accounts in your Merchant Center account.
+///
+/// A builder for the *list* method supported by a *shippingsetting* resource.
+/// It is not used directly, but through a `ShippingsettingMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_content2 as content2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use content2::ShoppingContent;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.shippingsettings().list("merchantId")
+///              .page_token("et")
+///              .max_results(55)
+///              .doit();
+/// # }
+/// ```
+pub struct ShippingsettingListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a ShoppingContent<C, A>,
+    _merchant_id: String,
+    _page_token: Option<String>,
+    _max_results: Option<u32>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ShippingsettingListCall<'a, C, A> {}
+
+impl<'a, C, A> ShippingsettingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ShippingsettingsListResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "content.shippingsettings.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("merchantId", self._merchant_id.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        for &field in ["alt", "merchantId", "pageToken", "maxResults"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{merchantId}/shippingsettings";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{merchantId}", "merchantId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["merchantId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the managing account. This must be a multi-client account.
+    ///
+    /// Sets the *merchant id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn merchant_id(mut self, new_value: &str) -> ShippingsettingListCall<'a, C, A> {
+        self._merchant_id = new_value.to_string();
+        self
+    }
+    /// The token returned by the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ShippingsettingListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of shipping settings to return in the response, used for paging.
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: u32) -> ShippingsettingListCall<'a, C, A> {
+        self._max_results = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ShippingsettingListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ShippingsettingListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ShippingsettingListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Retrieves and updates the shipping settings of multiple accounts in a single request.
 ///
 /// A builder for the *custombatch* method supported by a *shippingsetting* resource.
@@ -13890,301 +13501,6 @@ impl<'a, C, A> ShippingsettingCustombatchCall<'a, C, A> where C: BorrowMut<hyper
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ShippingsettingCustombatchCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Updates the shipping settings of the account. This method supports patch semantics.
-///
-/// A builder for the *patch* method supported by a *shippingsetting* resource.
-/// It is not used directly, but through a `ShippingsettingMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_content2 as content2;
-/// use content2::ShippingSettings;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use content2::ShoppingContent;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = ShippingSettings::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.shippingsettings().patch(req, "merchantId", "accountId")
-///              .dry_run(true)
-///              .doit();
-/// # }
-/// ```
-pub struct ShippingsettingPatchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ShoppingContent<C, A>,
-    _request: ShippingSettings,
-    _merchant_id: String,
-    _account_id: String,
-    _dry_run: Option<bool>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ShippingsettingPatchCall<'a, C, A> {}
-
-impl<'a, C, A> ShippingsettingPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ShippingSettings)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "content.shippingsettings.patch",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("merchantId", self._merchant_id.to_string()));
-        params.push(("accountId", self._account_id.to_string()));
-        if let Some(value) = self._dry_run {
-            params.push(("dryRun", value.to_string()));
-        }
-        for &field in ["alt", "merchantId", "accountId", "dryRun"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "{merchantId}/shippingsettings/{accountId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{accountId}", "accountId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["accountId", "merchantId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ShippingSettings) -> ShippingsettingPatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
-    ///
-    /// Sets the *merchant id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> ShippingsettingPatchCall<'a, C, A> {
-        self._merchant_id = new_value.to_string();
-        self
-    }
-    /// The ID of the account for which to get/update shipping settings.
-    ///
-    /// Sets the *account id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> ShippingsettingPatchCall<'a, C, A> {
-        self._account_id = new_value.to_string();
-        self
-    }
-    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
-    ///
-    /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> ShippingsettingPatchCall<'a, C, A> {
-        self._dry_run = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ShippingsettingPatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ShippingsettingPatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ShippingsettingPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14448,6 +13764,246 @@ impl<'a, C, A> ShippingsettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
+/// Retrieves supported pickup services for an account.
+///
+/// A builder for the *getsupportedpickupservices* method supported by a *shippingsetting* resource.
+/// It is not used directly, but through a `ShippingsettingMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_content2 as content2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use content2::ShoppingContent;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.shippingsettings().getsupportedpickupservices("merchantId")
+///              .doit();
+/// # }
+/// ```
+pub struct ShippingsettingGetsupportedpickupserviceCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a ShoppingContent<C, A>,
+    _merchant_id: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ShippingsettingGetsupportedpickupserviceCall<'a, C, A> {}
+
+impl<'a, C, A> ShippingsettingGetsupportedpickupserviceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ShippingsettingsGetSupportedPickupServicesResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "content.shippingsettings.getsupportedpickupservices",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("merchantId", self._merchant_id.to_string()));
+        for &field in ["alt", "merchantId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{merchantId}/supportedPickupServices";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{merchantId}", "merchantId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["merchantId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the account for which to retrieve the supported pickup services.
+    ///
+    /// Sets the *merchant id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn merchant_id(mut self, new_value: &str) -> ShippingsettingGetsupportedpickupserviceCall<'a, C, A> {
+        self._merchant_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ShippingsettingGetsupportedpickupserviceCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ShippingsettingGetsupportedpickupserviceCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ShippingsettingGetsupportedpickupserviceCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Retrieves supported holidays for an account.
 ///
 /// A builder for the *getsupportedholidays* method supported by a *shippingsetting* resource.
@@ -14677,270 +14233,6 @@ impl<'a, C, A> ShippingsettingGetsupportedholidayCall<'a, C, A> where C: BorrowM
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ShippingsettingGetsupportedholidayCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Lists the shipping settings of the sub-accounts in your Merchant Center account.
-///
-/// A builder for the *list* method supported by a *shippingsetting* resource.
-/// It is not used directly, but through a `ShippingsettingMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_content2 as content2;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use content2::ShoppingContent;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.shippingsettings().list("merchantId")
-///              .page_token("vero")
-///              .max_results(73)
-///              .doit();
-/// # }
-/// ```
-pub struct ShippingsettingListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ShoppingContent<C, A>,
-    _merchant_id: String,
-    _page_token: Option<String>,
-    _max_results: Option<u32>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ShippingsettingListCall<'a, C, A> {}
-
-impl<'a, C, A> ShippingsettingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ShippingsettingsListResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "content.shippingsettings.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("merchantId", self._merchant_id.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        for &field in ["alt", "merchantId", "pageToken", "maxResults"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "{merchantId}/shippingsettings";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{merchantId}", "merchantId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["merchantId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the managing account. This must be a multi-client account.
-    ///
-    /// Sets the *merchant id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> ShippingsettingListCall<'a, C, A> {
-        self._merchant_id = new_value.to_string();
-        self
-    }
-    /// The token returned by the previous request.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ShippingsettingListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// The maximum number of shipping settings to return in the response, used for paging.
-    ///
-    /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ShippingsettingListCall<'a, C, A> {
-        self._max_results = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ShippingsettingListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ShippingsettingListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ShippingsettingListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15247,9 +14539,261 @@ impl<'a, C, A> ShippingsettingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Updates a datafeed configuration of your Merchant Center account. This method supports patch semantics.
+/// Retrieves a datafeed configuration from your Merchant Center account.
 ///
-/// A builder for the *patch* method supported by a *datafeed* resource.
+/// A builder for the *get* method supported by a *datafeed* resource.
+/// It is not used directly, but through a `DatafeedMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_content2 as content2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use content2::ShoppingContent;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.datafeeds().get("merchantId", "datafeedId")
+///              .doit();
+/// # }
+/// ```
+pub struct DatafeedGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a ShoppingContent<C, A>,
+    _merchant_id: String,
+    _datafeed_id: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for DatafeedGetCall<'a, C, A> {}
+
+impl<'a, C, A> DatafeedGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Datafeed)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "content.datafeeds.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("merchantId", self._merchant_id.to_string()));
+        params.push(("datafeedId", self._datafeed_id.to_string()));
+        for &field in ["alt", "merchantId", "datafeedId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{merchantId}/datafeeds/{datafeedId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{datafeedId}", "datafeedId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["datafeedId", "merchantId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the account that manages the datafeed. This account cannot be a multi-client account.
+    ///
+    /// Sets the *merchant id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn merchant_id(mut self, new_value: &str) -> DatafeedGetCall<'a, C, A> {
+        self._merchant_id = new_value.to_string();
+        self
+    }
+    /// The ID of the datafeed.
+    ///
+    /// Sets the *datafeed id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn datafeed_id(mut self, new_value: &str) -> DatafeedGetCall<'a, C, A> {
+        self._datafeed_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> DatafeedGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> DatafeedGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> DatafeedGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Updates a datafeed configuration of your Merchant Center account.
+///
+/// A builder for the *update* method supported by a *datafeed* resource.
 /// It is not used directly, but through a `DatafeedMethods` instance.
 ///
 /// # Example
@@ -15280,12 +14824,12 @@ impl<'a, C, A> ShippingsettingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.datafeeds().patch(req, "merchantId", "datafeedId")
+/// let result = hub.datafeeds().update(req, "merchantId", "datafeedId")
 ///              .dry_run(false)
 ///              .doit();
 /// # }
 /// ```
-pub struct DatafeedPatchCall<'a, C, A>
+pub struct DatafeedUpdateCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a ShoppingContent<C, A>,
@@ -15298,9 +14842,9 @@ pub struct DatafeedPatchCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for DatafeedPatchCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for DatafeedUpdateCall<'a, C, A> {}
 
-impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> DatafeedUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15312,8 +14856,8 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "content.datafeeds.patch",
-                               http_method: hyper::method::Method::Patch });
+        dlg.begin(MethodInfo { id: "content.datafeeds.update",
+                               http_method: hyper::method::Method::Put });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("merchantId", self._merchant_id.to_string()));
         params.push(("datafeedId", self._datafeed_id.to_string()));
@@ -15391,7 +14935,7 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -15452,7 +14996,7 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Datafeed) -> DatafeedPatchCall<'a, C, A> {
+    pub fn request(mut self, new_value: Datafeed) -> DatafeedUpdateCall<'a, C, A> {
         self._request = new_value;
         self
     }
@@ -15462,7 +15006,7 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> DatafeedPatchCall<'a, C, A> {
+    pub fn merchant_id(mut self, new_value: &str) -> DatafeedUpdateCall<'a, C, A> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -15472,14 +15016,14 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn datafeed_id(mut self, new_value: &str) -> DatafeedPatchCall<'a, C, A> {
+    pub fn datafeed_id(mut self, new_value: &str) -> DatafeedUpdateCall<'a, C, A> {
         self._datafeed_id = new_value.to_string();
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> DatafeedPatchCall<'a, C, A> {
+    pub fn dry_run(mut self, new_value: bool) -> DatafeedUpdateCall<'a, C, A> {
         self._dry_run = Some(new_value);
         self
     }
@@ -15489,7 +15033,7 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> DatafeedPatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> DatafeedUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15510,7 +15054,7 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatafeedPatchCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> DatafeedUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15530,7 +15074,7 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatafeedPatchCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DatafeedUpdateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15570,7 +15114,7 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datafeeds().delete("merchantId", "datafeedId")
-///              .dry_run(true)
+///              .dry_run(false)
 ///              .doit();
 /// # }
 /// ```
@@ -15829,7 +15373,7 @@ impl<'a, C, A> DatafeedDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datafeeds().custombatch(req)
-///              .dry_run(false)
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```
@@ -16045,258 +15589,6 @@ impl<'a, C, A> DatafeedCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Retrieves a datafeed configuration from your Merchant Center account.
-///
-/// A builder for the *get* method supported by a *datafeed* resource.
-/// It is not used directly, but through a `DatafeedMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_content2 as content2;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use content2::ShoppingContent;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.datafeeds().get("merchantId", "datafeedId")
-///              .doit();
-/// # }
-/// ```
-pub struct DatafeedGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ShoppingContent<C, A>,
-    _merchant_id: String,
-    _datafeed_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for DatafeedGetCall<'a, C, A> {}
-
-impl<'a, C, A> DatafeedGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Datafeed)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "content.datafeeds.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("merchantId", self._merchant_id.to_string()));
-        params.push(("datafeedId", self._datafeed_id.to_string()));
-        for &field in ["alt", "merchantId", "datafeedId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "{merchantId}/datafeeds/{datafeedId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{datafeedId}", "datafeedId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["datafeedId", "merchantId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the account that manages the datafeed. This account cannot be a multi-client account.
-    ///
-    /// Sets the *merchant id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> DatafeedGetCall<'a, C, A> {
-        self._merchant_id = new_value.to_string();
-        self
-    }
-    /// The ID of the datafeed.
-    ///
-    /// Sets the *datafeed id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn datafeed_id(mut self, new_value: &str) -> DatafeedGetCall<'a, C, A> {
-        self._datafeed_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> DatafeedGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatafeedGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatafeedGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Invokes a fetch for the datafeed in your Merchant Center account.
 ///
 /// A builder for the *fetchnow* method supported by a *datafeed* resource.
@@ -16325,7 +15617,7 @@ impl<'a, C, A> DatafeedGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datafeeds().fetchnow("merchantId", "datafeedId")
-///              .dry_run(false)
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```
@@ -16595,7 +15887,7 @@ impl<'a, C, A> DatafeedFetchnowCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datafeeds().insert(req, "merchantId")
-///              .dry_run(true)
+///              .dry_run(false)
 ///              .doit();
 /// # }
 /// ```
@@ -16844,301 +16136,6 @@ impl<'a, C, A> DatafeedInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Updates a datafeed configuration of your Merchant Center account.
-///
-/// A builder for the *update* method supported by a *datafeed* resource.
-/// It is not used directly, but through a `DatafeedMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_content2 as content2;
-/// use content2::Datafeed;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use content2::ShoppingContent;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Datafeed::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.datafeeds().update(req, "merchantId", "datafeedId")
-///              .dry_run(true)
-///              .doit();
-/// # }
-/// ```
-pub struct DatafeedUpdateCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ShoppingContent<C, A>,
-    _request: Datafeed,
-    _merchant_id: String,
-    _datafeed_id: String,
-    _dry_run: Option<bool>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for DatafeedUpdateCall<'a, C, A> {}
-
-impl<'a, C, A> DatafeedUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Datafeed)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "content.datafeeds.update",
-                               http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("merchantId", self._merchant_id.to_string()));
-        params.push(("datafeedId", self._datafeed_id.to_string()));
-        if let Some(value) = self._dry_run {
-            params.push(("dryRun", value.to_string()));
-        }
-        for &field in ["alt", "merchantId", "datafeedId", "dryRun"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "{merchantId}/datafeeds/{datafeedId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{datafeedId}", "datafeedId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["datafeedId", "merchantId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Datafeed) -> DatafeedUpdateCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the account that manages the datafeed. This account cannot be a multi-client account.
-    ///
-    /// Sets the *merchant id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> DatafeedUpdateCall<'a, C, A> {
-        self._merchant_id = new_value.to_string();
-        self
-    }
-    /// The ID of the datafeed.
-    ///
-    /// Sets the *datafeed id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn datafeed_id(mut self, new_value: &str) -> DatafeedUpdateCall<'a, C, A> {
-        self._datafeed_id = new_value.to_string();
-        self
-    }
-    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
-    ///
-    /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> DatafeedUpdateCall<'a, C, A> {
-        self._dry_run = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> DatafeedUpdateCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DatafeedUpdateCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatafeedUpdateCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Lists the configurations for datafeeds in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *datafeed* resource.
@@ -17168,7 +16165,7 @@ impl<'a, C, A> DatafeedUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datafeeds().list("merchantId")
 ///              .page_token("invidunt")
-///              .max_results(35)
+///              .max_results(5)
 ///              .doit();
 /// # }
 /// ```
@@ -17392,271 +16389,6 @@ impl<'a, C, A> DatafeedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> DatafeedListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Deletes a store for the given merchant.
-///
-/// A builder for the *delete* method supported by a *po* resource.
-/// It is not used directly, but through a `PoMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_content2 as content2;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use content2::ShoppingContent;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.pos().delete("merchantId", "targetMerchantId", "storeCode")
-///              .dry_run(true)
-///              .doit();
-/// # }
-/// ```
-pub struct PoDeleteCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ShoppingContent<C, A>,
-    _merchant_id: String,
-    _target_merchant_id: String,
-    _store_code: String,
-    _dry_run: Option<bool>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for PoDeleteCall<'a, C, A> {}
-
-impl<'a, C, A> PoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "content.pos.delete",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("merchantId", self._merchant_id.to_string()));
-        params.push(("targetMerchantId", self._target_merchant_id.to_string()));
-        params.push(("storeCode", self._store_code.to_string()));
-        if let Some(value) = self._dry_run {
-            params.push(("dryRun", value.to_string()));
-        }
-        for &field in ["merchantId", "targetMerchantId", "storeCode", "dryRun"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = self.hub._base_url.clone() + "{merchantId}/pos/{targetMerchantId}/store/{storeCode}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{targetMerchantId}", "targetMerchantId"), ("{storeCode}", "storeCode")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["storeCode", "targetMerchantId", "merchantId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the POS or inventory data provider.
-    ///
-    /// Sets the *merchant id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> PoDeleteCall<'a, C, A> {
-        self._merchant_id = new_value.to_string();
-        self
-    }
-    /// The ID of the target merchant.
-    ///
-    /// Sets the *target merchant id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn target_merchant_id(mut self, new_value: &str) -> PoDeleteCall<'a, C, A> {
-        self._target_merchant_id = new_value.to_string();
-        self
-    }
-    /// A store code that is unique per merchant.
-    ///
-    /// Sets the *store code* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn store_code(mut self, new_value: &str) -> PoDeleteCall<'a, C, A> {
-        self._store_code = new_value.to_string();
-        self
-    }
-    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
-    ///
-    /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> PoDeleteCall<'a, C, A> {
-        self._dry_run = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> PoDeleteCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PoDeleteCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PoDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18468,7 +17200,7 @@ impl<'a, C, A> PoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.pos().inventory(req, "merchantId", "targetMerchantId")
-///              .dry_run(false)
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```
@@ -18763,7 +17495,7 @@ impl<'a, C, A> PoInventoryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.pos().insert(req, "merchantId", "targetMerchantId")
-///              .dry_run(true)
+///              .dry_run(false)
 ///              .doit();
 /// # }
 /// ```
@@ -19058,7 +17790,7 @@ impl<'a, C, A> PoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.pos().sale(req, "merchantId", "targetMerchantId")
-///              .dry_run(false)
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```
@@ -19319,6 +18051,271 @@ impl<'a, C, A> PoSaleCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 }
 
 
+/// Deletes a store for the given merchant.
+///
+/// A builder for the *delete* method supported by a *po* resource.
+/// It is not used directly, but through a `PoMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_content2 as content2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use content2::ShoppingContent;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.pos().delete("merchantId", "targetMerchantId", "storeCode")
+///              .dry_run(true)
+///              .doit();
+/// # }
+/// ```
+pub struct PoDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a ShoppingContent<C, A>,
+    _merchant_id: String,
+    _target_merchant_id: String,
+    _store_code: String,
+    _dry_run: Option<bool>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for PoDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> PoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "content.pos.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("merchantId", self._merchant_id.to_string()));
+        params.push(("targetMerchantId", self._target_merchant_id.to_string()));
+        params.push(("storeCode", self._store_code.to_string()));
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["merchantId", "targetMerchantId", "storeCode", "dryRun"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = self.hub._base_url.clone() + "{merchantId}/pos/{targetMerchantId}/store/{storeCode}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{targetMerchantId}", "targetMerchantId"), ("{storeCode}", "storeCode")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["storeCode", "targetMerchantId", "merchantId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the POS or inventory data provider.
+    ///
+    /// Sets the *merchant id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn merchant_id(mut self, new_value: &str) -> PoDeleteCall<'a, C, A> {
+        self._merchant_id = new_value.to_string();
+        self
+    }
+    /// The ID of the target merchant.
+    ///
+    /// Sets the *target merchant id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn target_merchant_id(mut self, new_value: &str) -> PoDeleteCall<'a, C, A> {
+        self._target_merchant_id = new_value.to_string();
+        self
+    }
+    /// A store code that is unique per merchant.
+    ///
+    /// Sets the *store code* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn store_code(mut self, new_value: &str) -> PoDeleteCall<'a, C, A> {
+        self._store_code = new_value.to_string();
+        self
+    }
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> PoDeleteCall<'a, C, A> {
+        self._dry_run = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> PoDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> PoDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> PoDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Lists the statuses of the sub-accounts in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *accountstatuse* resource.
@@ -19347,9 +18344,9 @@ impl<'a, C, A> PoSaleCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accountstatuses().list("merchantId")
-///              .page_token("dolores")
-///              .max_results(3)
-///              .add_destinations("diam")
+///              .page_token("sed")
+///              .max_results(19)
+///              .add_destinations("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -19864,7 +18861,7 @@ impl<'a, C, A> AccountstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accountstatuses().get("merchantId", "accountId")
-///              .add_destinations("est")
+///              .add_destinations("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -20344,7 +19341,7 @@ impl<'a, C, A> AccountAuthinfoCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().update(req, "merchantId", "accountId")
-///              .dry_run(true)
+///              .dry_run(false)
 ///              .doit();
 /// # }
 /// ```
@@ -20633,8 +19630,8 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().list("merchantId")
-///              .page_token("justo")
-///              .max_results(44)
+///              .page_token("eos")
+///              .max_results(63)
 ///              .doit();
 /// # }
 /// ```
@@ -21703,7 +20700,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().custombatch(req)
-///              .dry_run(true)
+///              .dry_run(false)
 ///              .doit();
 /// # }
 /// ```
@@ -21908,301 +20905,6 @@ impl<'a, C, A> AccountCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustombatchCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Updates a Merchant Center account. This method supports patch semantics.
-///
-/// A builder for the *patch* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_content2 as content2;
-/// use content2::Account;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use content2::ShoppingContent;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Account::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().patch(req, "merchantId", "accountId")
-///              .dry_run(false)
-///              .doit();
-/// # }
-/// ```
-pub struct AccountPatchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ShoppingContent<C, A>,
-    _request: Account,
-    _merchant_id: String,
-    _account_id: String,
-    _dry_run: Option<bool>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for AccountPatchCall<'a, C, A> {}
-
-impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Account)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "content.accounts.patch",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("merchantId", self._merchant_id.to_string()));
-        params.push(("accountId", self._account_id.to_string()));
-        if let Some(value) = self._dry_run {
-            params.push(("dryRun", value.to_string()));
-        }
-        for &field in ["alt", "merchantId", "accountId", "dryRun"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "{merchantId}/accounts/{accountId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{accountId}", "accountId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["accountId", "merchantId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Account) -> AccountPatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
-    ///
-    /// Sets the *merchant id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> AccountPatchCall<'a, C, A> {
-        self._merchant_id = new_value.to_string();
-        self
-    }
-    /// The ID of the account.
-    ///
-    /// Sets the *account id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountPatchCall<'a, C, A> {
-        self._account_id = new_value.to_string();
-        self
-    }
-    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
-    ///
-    /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> AccountPatchCall<'a, C, A> {
-        self._dry_run = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountPatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -22525,7 +21227,7 @@ impl<'a, C, A> AccountLinkCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().claimwebsite("merchantId", "accountId")
-///              .overwrite(true)
+///              .overwrite(false)
 ///              .doit();
 /// # }
 /// ```
@@ -22761,10 +21463,10 @@ impl<'a, C, A> AccountClaimwebsiteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Updates price and availability for multiple products or stores in a single request. This operation does not update the expiration date of the products.
+/// Creates a refund invoice for one or more shipment groups, and triggers a refund for orderinvoice enabled orders. This can only be used for line items that have previously been charged using createChargeInvoice. All amounts (except for the summary) are incremental with respect to the previous invoice.
 ///
-/// A builder for the *custombatch* method supported by a *inventory* resource.
-/// It is not used directly, but through a `InventoryMethods` instance.
+/// A builder for the *createrefundinvoice* method supported by a *orderinvoice* resource.
+/// It is not used directly, but through a `OrderinvoiceMethods` instance.
 ///
 /// # Example
 ///
@@ -22775,7 +21477,7 @@ impl<'a, C, A> AccountClaimwebsiteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_content2 as content2;
-/// use content2::InventoryCustomBatchRequest;
+/// use content2::OrderinvoicesCreateRefundInvoiceRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -22789,287 +21491,34 @@ impl<'a, C, A> AccountClaimwebsiteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = InventoryCustomBatchRequest::default();
+/// let mut req = OrderinvoicesCreateRefundInvoiceRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory().custombatch(req)
-///              .dry_run(true)
+/// let result = hub.orderinvoices().createrefundinvoice(req, "merchantId", "orderId")
 ///              .doit();
 /// # }
 /// ```
-pub struct InventoryCustombatchCall<'a, C, A>
+pub struct OrderinvoiceCreaterefundinvoiceCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a ShoppingContent<C, A>,
-    _request: InventoryCustomBatchRequest,
-    _dry_run: Option<bool>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for InventoryCustombatchCall<'a, C, A> {}
-
-impl<'a, C, A> InventoryCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, InventoryCustomBatchResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "content.inventory.custombatch",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        if let Some(value) = self._dry_run {
-            params.push(("dryRun", value.to_string()));
-        }
-        for &field in ["alt", "dryRun"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "inventory/batch";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InventoryCustomBatchRequest) -> InventoryCustombatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
-    ///
-    /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> InventoryCustombatchCall<'a, C, A> {
-        self._dry_run = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> InventoryCustombatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InventoryCustombatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InventoryCustombatchCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Updates price and availability of a product in your Merchant Center account.
-///
-/// A builder for the *set* method supported by a *inventory* resource.
-/// It is not used directly, but through a `InventoryMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_content2 as content2;
-/// use content2::InventorySetRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use content2::ShoppingContent;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = InventorySetRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory().set(req, "merchantId", "storeCode", "productId")
-///              .dry_run(false)
-///              .doit();
-/// # }
-/// ```
-pub struct InventorySetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ShoppingContent<C, A>,
-    _request: InventorySetRequest,
+    _request: OrderinvoicesCreateRefundInvoiceRequest,
     _merchant_id: String,
-    _store_code: String,
-    _product_id: String,
-    _dry_run: Option<bool>,
+    _order_id: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for InventorySetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for OrderinvoiceCreaterefundinvoiceCall<'a, C, A> {}
 
-impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, InventorySetResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, OrderinvoicesCreateRefundInvoiceResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -23077,16 +21526,12 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "content.inventory.set",
+        dlg.begin(MethodInfo { id: "content.orderinvoices.createrefundinvoice",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("merchantId", self._merchant_id.to_string()));
-        params.push(("storeCode", self._store_code.to_string()));
-        params.push(("productId", self._product_id.to_string()));
-        if let Some(value) = self._dry_run {
-            params.push(("dryRun", value.to_string()));
-        }
-        for &field in ["alt", "merchantId", "storeCode", "productId", "dryRun"].iter() {
+        params.push(("orderId", self._order_id.to_string()));
+        for &field in ["alt", "merchantId", "orderId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -23098,12 +21543,12 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{merchantId}/inventory/{storeCode}/products/{productId}";
+        let mut url = self.hub._base_url.clone() + "{merchantId}/orderinvoices/{orderId}/createRefundInvoice";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{storeCode}", "storeCode"), ("{productId}", "productId")].iter() {
+        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{orderId}", "orderId")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -23114,8 +21559,8 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["productId", "storeCode", "merchantId"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["orderId", "merchantId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -23218,45 +21663,28 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InventorySetRequest) -> InventorySetCall<'a, C, A> {
+    pub fn request(mut self, new_value: OrderinvoicesCreateRefundInvoiceRequest) -> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// The ID of the account that contains the product. This account cannot be a multi-client account.
+    /// The ID of the account that manages the order. This cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> InventorySetCall<'a, C, A> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> {
         self._merchant_id = new_value.to_string();
         self
     }
-    /// The code of the store for which to update price and availability. Use online to update price and availability of an online product.
+    /// The ID of the order.
     ///
-    /// Sets the *store code* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn store_code(mut self, new_value: &str) -> InventorySetCall<'a, C, A> {
-        self._store_code = new_value.to_string();
-        self
-    }
-    /// The REST ID of the product for which to update price and availability.
-    ///
-    /// Sets the *product id* path property to the given value.
+    /// Sets the *order id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> InventorySetCall<'a, C, A> {
-        self._product_id = new_value.to_string();
-        self
-    }
-    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
-    ///
-    /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> InventorySetCall<'a, C, A> {
-        self._dry_run = Some(new_value);
+    pub fn order_id(mut self, new_value: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> {
+        self._order_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -23265,7 +21693,7 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> InventorySetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -23286,7 +21714,7 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InventorySetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderinvoiceCreaterefundinvoiceCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23306,7 +21734,290 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderinvoiceCreaterefundinvoiceCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Creates a charge invoice for a shipment group, and triggers a charge capture for orderinvoice enabled orders.
+///
+/// A builder for the *createchargeinvoice* method supported by a *orderinvoice* resource.
+/// It is not used directly, but through a `OrderinvoiceMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_content2 as content2;
+/// use content2::OrderinvoicesCreateChargeInvoiceRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use content2::ShoppingContent;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = OrderinvoicesCreateChargeInvoiceRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.orderinvoices().createchargeinvoice(req, "merchantId", "orderId")
+///              .doit();
+/// # }
+/// ```
+pub struct OrderinvoiceCreatechargeinvoiceCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a ShoppingContent<C, A>,
+    _request: OrderinvoicesCreateChargeInvoiceRequest,
+    _merchant_id: String,
+    _order_id: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OrderinvoiceCreatechargeinvoiceCall<'a, C, A> {}
+
+impl<'a, C, A> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, OrderinvoicesCreateChargeInvoiceResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "content.orderinvoices.createchargeinvoice",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("merchantId", self._merchant_id.to_string()));
+        params.push(("orderId", self._order_id.to_string()));
+        for &field in ["alt", "merchantId", "orderId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{merchantId}/orderinvoices/{orderId}/createChargeInvoice";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{orderId}", "orderId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["orderId", "merchantId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: OrderinvoicesCreateChargeInvoiceRequest) -> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the account that manages the order. This cannot be a multi-client account.
+    ///
+    /// Sets the *merchant id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn merchant_id(mut self, new_value: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> {
+        self._merchant_id = new_value.to_string();
+        self
+    }
+    /// The ID of the order.
+    ///
+    /// Sets the *order id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn order_id(mut self, new_value: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> {
+        self._order_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> OrderinvoiceCreatechargeinvoiceCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderinvoiceCreatechargeinvoiceCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -23607,301 +22318,6 @@ impl<'a, C, A> LiasettingSetinventoryverificationcontactCall<'a, C, A> where C: 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> LiasettingSetinventoryverificationcontactCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Updates the LIA settings of the account. This method supports patch semantics.
-///
-/// A builder for the *patch* method supported by a *liasetting* resource.
-/// It is not used directly, but through a `LiasettingMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_content2 as content2;
-/// use content2::LiaSettings;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use content2::ShoppingContent;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = LiaSettings::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.liasettings().patch(req, "merchantId", "accountId")
-///              .dry_run(true)
-///              .doit();
-/// # }
-/// ```
-pub struct LiasettingPatchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ShoppingContent<C, A>,
-    _request: LiaSettings,
-    _merchant_id: String,
-    _account_id: String,
-    _dry_run: Option<bool>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for LiasettingPatchCall<'a, C, A> {}
-
-impl<'a, C, A> LiasettingPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, LiaSettings)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "content.liasettings.patch",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("merchantId", self._merchant_id.to_string()));
-        params.push(("accountId", self._account_id.to_string()));
-        if let Some(value) = self._dry_run {
-            params.push(("dryRun", value.to_string()));
-        }
-        for &field in ["alt", "merchantId", "accountId", "dryRun"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "{merchantId}/liasettings/{accountId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{accountId}", "accountId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["accountId", "merchantId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LiaSettings) -> LiasettingPatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
-    ///
-    /// Sets the *merchant id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> LiasettingPatchCall<'a, C, A> {
-        self._merchant_id = new_value.to_string();
-        self
-    }
-    /// The ID of the account for which to get or update LIA settings.
-    ///
-    /// Sets the *account id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> LiasettingPatchCall<'a, C, A> {
-        self._account_id = new_value.to_string();
-        self
-    }
-    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
-    ///
-    /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> LiasettingPatchCall<'a, C, A> {
-        self._dry_run = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiasettingPatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LiasettingPatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiasettingPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -24406,7 +22822,7 @@ impl<'a, C, A> LiasettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.liasettings().update(req, "merchantId", "accountId")
-///              .dry_run(false)
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```
@@ -25183,256 +23599,6 @@ impl<'a, C, A> LiasettingRequestgmbaccesCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Retrieves and/or updates the LIA settings of multiple accounts in a single request.
-///
-/// A builder for the *custombatch* method supported by a *liasetting* resource.
-/// It is not used directly, but through a `LiasettingMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_content2 as content2;
-/// use content2::LiasettingsCustomBatchRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use content2::ShoppingContent;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = LiasettingsCustomBatchRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.liasettings().custombatch(req)
-///              .dry_run(true)
-///              .doit();
-/// # }
-/// ```
-pub struct LiasettingCustombatchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ShoppingContent<C, A>,
-    _request: LiasettingsCustomBatchRequest,
-    _dry_run: Option<bool>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for LiasettingCustombatchCall<'a, C, A> {}
-
-impl<'a, C, A> LiasettingCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, LiasettingsCustomBatchResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "content.liasettings.custombatch",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        if let Some(value) = self._dry_run {
-            params.push(("dryRun", value.to_string()));
-        }
-        for &field in ["alt", "dryRun"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "liasettings/batch";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LiasettingsCustomBatchRequest) -> LiasettingCustombatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
-    ///
-    /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> LiasettingCustombatchCall<'a, C, A> {
-        self._dry_run = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiasettingCustombatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LiasettingCustombatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiasettingCustombatchCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Lists the LIA settings of the sub-accounts in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *liasetting* resource.
@@ -25461,8 +23627,8 @@ impl<'a, C, A> LiasettingCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.liasettings().list("merchantId")
-///              .page_token("voluptua.")
-///              .max_results(2)
+///              .page_token("invidunt")
+///              .max_results(11)
 ///              .doit();
 /// # }
 /// ```
@@ -25961,6 +24127,256 @@ impl<'a, C, A> LiasettingRequestinventoryverificationCall<'a, C, A> where C: Bor
 }
 
 
+/// Retrieves and/or updates the LIA settings of multiple accounts in a single request.
+///
+/// A builder for the *custombatch* method supported by a *liasetting* resource.
+/// It is not used directly, but through a `LiasettingMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_content2 as content2;
+/// use content2::LiasettingsCustomBatchRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use content2::ShoppingContent;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = LiasettingsCustomBatchRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.liasettings().custombatch(req)
+///              .dry_run(false)
+///              .doit();
+/// # }
+/// ```
+pub struct LiasettingCustombatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a ShoppingContent<C, A>,
+    _request: LiasettingsCustomBatchRequest,
+    _dry_run: Option<bool>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for LiasettingCustombatchCall<'a, C, A> {}
+
+impl<'a, C, A> LiasettingCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, LiasettingsCustomBatchResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "content.liasettings.custombatch",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "dryRun"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "liasettings/batch";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: LiasettingsCustomBatchRequest) -> LiasettingCustombatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> LiasettingCustombatchCall<'a, C, A> {
+        self._dry_run = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LiasettingCustombatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> LiasettingCustombatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiasettingCustombatchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Sets the POS data provider for the specified country.
 ///
 /// A builder for the *setposdataprovider* method supported by a *liasetting* resource.
@@ -25989,8 +24405,8 @@ impl<'a, C, A> LiasettingRequestinventoryverificationCall<'a, C, A> where C: Bor
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.liasettings().setposdataprovider("merchantId", "accountId", "country")
-///              .pos_external_account_id("ipsum")
-///              .pos_data_provider_id("justo")
+///              .pos_external_account_id("nonumy")
+///              .pos_data_provider_id("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -26277,11 +24693,11 @@ impl<'a, C, A> LiasettingSetposdataproviderCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.productstatuses().list("merchantId")
-///              .page_token("vero")
-///              .max_results(2)
-///              .include_invalid_inserted_items(false)
+///              .page_token("Lorem")
+///              .max_results(59)
+///              .include_invalid_inserted_items(true)
 ///              .include_attributes(true)
-///              .add_destinations("nonumy")
+///              .add_destinations("amet.")
 ///              .doit();
 /// # }
 /// ```
@@ -26581,7 +24997,7 @@ impl<'a, C, A> ProductstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.productstatuses().get("merchantId", "productId")
 ///              .include_attributes(true)
-///              .add_destinations("invidunt")
+///              .add_destinations("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -27081,6 +25497,258 @@ impl<'a, C, A> ProductstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
+/// Retrieves a product from your Merchant Center account.
+///
+/// A builder for the *get* method supported by a *product* resource.
+/// It is not used directly, but through a `ProductMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_content2 as content2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use content2::ShoppingContent;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.products().get("merchantId", "productId")
+///              .doit();
+/// # }
+/// ```
+pub struct ProductGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a ShoppingContent<C, A>,
+    _merchant_id: String,
+    _product_id: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProductGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Product)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "content.products.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("merchantId", self._merchant_id.to_string()));
+        params.push(("productId", self._product_id.to_string()));
+        for &field in ["alt", "merchantId", "productId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{merchantId}/products/{productId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{productId}", "productId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["productId", "merchantId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the account that contains the product. This account cannot be a multi-client account.
+    ///
+    /// Sets the *merchant id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn merchant_id(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
+        self._merchant_id = new_value.to_string();
+        self
+    }
+    /// The REST ID of the product.
+    ///
+    /// Sets the *product id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn product_id(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
+        self._product_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProductGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ProductGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProductGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Retrieves, inserts, and deletes multiple products in a single request.
 ///
 /// A builder for the *custombatch* method supported by a *product* resource.
@@ -27115,7 +25783,7 @@ impl<'a, C, A> ProductstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().custombatch(req)
-///              .dry_run(false)
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```
@@ -27331,7 +25999,7 @@ impl<'a, C, A> ProductCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Lists the products in your Merchant Center account.
+/// Lists the products in your Merchant Center account. The response might contain fewer items than specified by maxResults. Rely on nextPageToken to determine if there are more items to be requested.
 ///
 /// A builder for the *list* method supported by a *product* resource.
 /// It is not used directly, but through a `ProductMethods` instance.
@@ -27359,8 +26027,8 @@ impl<'a, C, A> ProductCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().list("merchantId")
-///              .page_token("elitr")
-///              .max_results(55)
+///              .page_token("et")
+///              .max_results(16)
 ///              .include_invalid_inserted_items(true)
 ///              .doit();
 /// # }
@@ -27894,7 +26562,7 @@ impl<'a, C, A> ProductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().insert(req, "merchantId")
-///              .dry_run(false)
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```
@@ -28143,258 +26811,6 @@ impl<'a, C, A> ProductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Retrieves a product from your Merchant Center account.
-///
-/// A builder for the *get* method supported by a *product* resource.
-/// It is not used directly, but through a `ProductMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_content2 as content2;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use content2::ShoppingContent;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.products().get("merchantId", "productId")
-///              .doit();
-/// # }
-/// ```
-pub struct ProductGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ShoppingContent<C, A>,
-    _merchant_id: String,
-    _product_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProductGetCall<'a, C, A> {}
-
-impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Product)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "content.products.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("merchantId", self._merchant_id.to_string()));
-        params.push(("productId", self._product_id.to_string()));
-        for &field in ["alt", "merchantId", "productId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "{merchantId}/products/{productId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{productId}", "productId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["productId", "merchantId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the account that contains the product. This account cannot be a multi-client account.
-    ///
-    /// Sets the *merchant id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
-        self._merchant_id = new_value.to_string();
-        self
-    }
-    /// The REST ID of the product.
-    ///
-    /// Sets the *product id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> ProductGetCall<'a, C, A> {
-        self._product_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProductGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProductGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProductGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Retrieves the status of a datafeed from your Merchant Center account.
 ///
 /// A builder for the *get* method supported by a *datafeedstatuse* resource.
@@ -28423,8 +26839,8 @@ impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datafeedstatuses().get("merchantId", "datafeedId")
-///              .language("aliquyam")
-///              .country("elitr")
+///              .language("dolor")
+///              .country("takimata")
 ///              .doit();
 /// # }
 /// ```
@@ -28699,8 +27115,8 @@ impl<'a, C, A> DatafeedstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datafeedstatuses().list("merchantId")
-///              .page_token("et")
-///              .max_results(36)
+///              .page_token("nonumy")
+///              .max_results(17)
 ///              .doit();
 /// # }
 /// ```
@@ -29173,10 +27589,9 @@ impl<'a, C, A> DatafeedstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Notifies that item return and refund was handled directly by merchant outside of Google payments processing (e.g. cash refund done in store).
-/// Note: We recommend calling the returnrefundlineitem method to refund in-store returns. We will issue the refund directly to the customer. This helps to prevent possible differences arising between merchant and Google transaction records. We also recommend having the point of sale system communicate with Google to ensure that customers do not receive a double refund by first refunding via Google then via an in-store return.
+/// Retrieves an order using merchant order ID.
 ///
-/// A builder for the *instorerefundlineitem* method supported by a *order* resource.
+/// A builder for the *getbymerchantorderid* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
 ///
 /// # Example
@@ -29188,7 +27603,6 @@ impl<'a, C, A> DatafeedstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_content2 as content2;
-/// use content2::OrdersInStoreRefundLineItemRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -29199,37 +27613,31 @@ impl<'a, C, A> DatafeedstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = OrdersInStoreRefundLineItemRequest::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().instorerefundlineitem(req, "merchantId", "orderId")
+/// let result = hub.orders().getbymerchantorderid("merchantId", "merchantOrderId")
 ///              .doit();
 /// # }
 /// ```
-pub struct OrderInstorerefundlineitemCall<'a, C, A>
+pub struct OrderGetbymerchantorderidCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a ShoppingContent<C, A>,
-    _request: OrdersInStoreRefundLineItemRequest,
     _merchant_id: String,
-    _order_id: String,
+    _merchant_order_id: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for OrderInstorerefundlineitemCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for OrderGetbymerchantorderidCall<'a, C, A> {}
 
-impl<'a, C, A> OrderInstorerefundlineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> OrderGetbymerchantorderidCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, OrdersInStoreRefundLineItemResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, OrdersGetByMerchantOrderIdResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -29237,12 +27645,12 @@ impl<'a, C, A> OrderInstorerefundlineitemCall<'a, C, A> where C: BorrowMut<hyper
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "content.orders.instorerefundlineitem",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "content.orders.getbymerchantorderid",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("merchantId", self._merchant_id.to_string()));
-        params.push(("orderId", self._order_id.to_string()));
-        for &field in ["alt", "merchantId", "orderId"].iter() {
+        params.push(("merchantOrderId", self._merchant_order_id.to_string()));
+        for &field in ["alt", "merchantId", "merchantOrderId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -29254,12 +27662,12 @@ impl<'a, C, A> OrderInstorerefundlineitemCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{merchantId}/orders/{orderId}/inStoreRefundLineItem";
+        let mut url = self.hub._base_url.clone() + "{merchantId}/ordersbymerchantid/{merchantOrderId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{orderId}", "orderId")].iter() {
+        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{merchantOrderId}", "merchantOrderId")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -29271,7 +27679,7 @@ impl<'a, C, A> OrderInstorerefundlineitemCall<'a, C, A> where C: BorrowMut<hyper
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["orderId", "merchantId"].iter() {
+            for param_name in ["merchantOrderId", "merchantId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -29283,17 +27691,6 @@ impl<'a, C, A> OrderInstorerefundlineitemCall<'a, C, A> where C: BorrowMut<hyper
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -29310,15 +27707,11 @@ impl<'a, C, A> OrderInstorerefundlineitemCall<'a, C, A> where C: BorrowMut<hyper
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -29369,33 +27762,24 @@ impl<'a, C, A> OrderInstorerefundlineitemCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersInStoreRefundLineItemRequest) -> OrderInstorerefundlineitemCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
     /// The ID of the account that manages the order. This cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderInstorerefundlineitemCall<'a, C, A> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderGetbymerchantorderidCall<'a, C, A> {
         self._merchant_id = new_value.to_string();
         self
     }
-    /// The ID of the order.
+    /// The merchant order ID to be looked for.
     ///
-    /// Sets the *order id* path property to the given value.
+    /// Sets the *merchant order id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderInstorerefundlineitemCall<'a, C, A> {
-        self._order_id = new_value.to_string();
+    pub fn merchant_order_id(mut self, new_value: &str) -> OrderGetbymerchantorderidCall<'a, C, A> {
+        self._merchant_order_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -29404,7 +27788,7 @@ impl<'a, C, A> OrderInstorerefundlineitemCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrderInstorerefundlineitemCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrderGetbymerchantorderidCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -29425,7 +27809,7 @@ impl<'a, C, A> OrderInstorerefundlineitemCall<'a, C, A> where C: BorrowMut<hyper
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderInstorerefundlineitemCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderGetbymerchantorderidCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29445,7 +27829,7 @@ impl<'a, C, A> OrderInstorerefundlineitemCall<'a, C, A> where C: BorrowMut<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderInstorerefundlineitemCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderGetbymerchantorderidCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -29729,258 +28113,6 @@ impl<'a, C, A> OrderCreatetestreturnCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> OrderCreatetestreturnCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Retrieves an order using merchant order ID.
-///
-/// A builder for the *getbymerchantorderid* method supported by a *order* resource.
-/// It is not used directly, but through a `OrderMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_content2 as content2;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use content2::ShoppingContent;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().getbymerchantorderid("merchantId", "merchantOrderId")
-///              .doit();
-/// # }
-/// ```
-pub struct OrderGetbymerchantorderidCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ShoppingContent<C, A>,
-    _merchant_id: String,
-    _merchant_order_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for OrderGetbymerchantorderidCall<'a, C, A> {}
-
-impl<'a, C, A> OrderGetbymerchantorderidCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, OrdersGetByMerchantOrderIdResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "content.orders.getbymerchantorderid",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("merchantId", self._merchant_id.to_string()));
-        params.push(("merchantOrderId", self._merchant_order_id.to_string()));
-        for &field in ["alt", "merchantId", "merchantOrderId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "{merchantId}/ordersbymerchantid/{merchantOrderId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{merchantOrderId}", "merchantOrderId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["merchantOrderId", "merchantId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the account that manages the order. This cannot be a multi-client account.
-    ///
-    /// Sets the *merchant id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderGetbymerchantorderidCall<'a, C, A> {
-        self._merchant_id = new_value.to_string();
-        self
-    }
-    /// The merchant order ID to be looked for.
-    ///
-    /// Sets the *merchant order id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn merchant_order_id(mut self, new_value: &str) -> OrderGetbymerchantorderidCall<'a, C, A> {
-        self._merchant_order_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrderGetbymerchantorderidCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderGetbymerchantorderidCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderGetbymerchantorderidCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -31152,12 +29284,12 @@ impl<'a, C, A> OrderShiplineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.orders().list("merchantId")
-///              .add_statuses("rebum.")
-///              .placed_date_start("et")
-///              .placed_date_end("clita")
-///              .page_token("eos")
-///              .order_by("dolores")
-///              .max_results(76)
+///              .add_statuses("diam")
+///              .placed_date_start("accusam")
+///              .placed_date_end("dolores")
+///              .page_token("consetetur")
+///              .order_by("dolor")
+///              .max_results(19)
 ///              .acknowledged(false)
 ///              .doit();
 /// # }
@@ -31767,7 +29899,7 @@ impl<'a, C, A> OrderUpdatemerchantorderidCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.orders().gettestordertemplate("merchantId", "templateName")
-///              .country("tempor")
+///              .country("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -32558,6 +30690,290 @@ impl<'a, C, A> OrderRejectreturnlineitemCall<'a, C, A> where C: BorrowMut<hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> OrderRejectreturnlineitemCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deprecated. Notifies that item return and refund was handled directly by merchant outside of Google payments processing (e.g. cash refund done in store).
+/// Note: We recommend calling the returnrefundlineitem method to refund in-store returns. We will issue the refund directly to the customer. This helps to prevent possible differences arising between merchant and Google transaction records. We also recommend having the point of sale system communicate with Google to ensure that customers do not receive a double refund by first refunding via Google then via an in-store return.
+///
+/// A builder for the *instorerefundlineitem* method supported by a *order* resource.
+/// It is not used directly, but through a `OrderMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_content2 as content2;
+/// use content2::OrdersInStoreRefundLineItemRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use content2::ShoppingContent;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = OrdersInStoreRefundLineItemRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.orders().instorerefundlineitem(req, "merchantId", "orderId")
+///              .doit();
+/// # }
+/// ```
+pub struct OrderInstorerefundlineitemCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a ShoppingContent<C, A>,
+    _request: OrdersInStoreRefundLineItemRequest,
+    _merchant_id: String,
+    _order_id: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OrderInstorerefundlineitemCall<'a, C, A> {}
+
+impl<'a, C, A> OrderInstorerefundlineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, OrdersInStoreRefundLineItemResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "content.orders.instorerefundlineitem",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("merchantId", self._merchant_id.to_string()));
+        params.push(("orderId", self._order_id.to_string()));
+        for &field in ["alt", "merchantId", "orderId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{merchantId}/orders/{orderId}/inStoreRefundLineItem";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{orderId}", "orderId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["orderId", "merchantId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: OrdersInStoreRefundLineItemRequest) -> OrderInstorerefundlineitemCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the account that manages the order. This cannot be a multi-client account.
+    ///
+    /// Sets the *merchant id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn merchant_id(mut self, new_value: &str) -> OrderInstorerefundlineitemCall<'a, C, A> {
+        self._merchant_id = new_value.to_string();
+        self
+    }
+    /// The ID of the order.
+    ///
+    /// Sets the *order id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn order_id(mut self, new_value: &str) -> OrderInstorerefundlineitemCall<'a, C, A> {
+        self._order_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrderInstorerefundlineitemCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> OrderInstorerefundlineitemCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderInstorerefundlineitemCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -35280,10 +33696,10 @@ impl<'a, C, A> OrderCancellineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Creates a refund invoice for one or more shipment groups, and triggers a refund for orderinvoice enabled orders. This can only be used for line items that have previously been charged using createChargeInvoice. All amounts (except for the summary) are incremental with respect to the previous invoice.
+/// Updates price and availability for multiple products or stores in a single request. This operation does not update the expiration date of the products.
 ///
-/// A builder for the *createrefundinvoice* method supported by a *orderinvoice* resource.
-/// It is not used directly, but through a `OrderinvoiceMethods` instance.
+/// A builder for the *custombatch* method supported by a *inventory* resource.
+/// It is not used directly, but through a `InventoryMethods` instance.
 ///
 /// # Example
 ///
@@ -35294,7 +33710,7 @@ impl<'a, C, A> OrderCancellineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_content2 as content2;
-/// use content2::OrderinvoicesCreateRefundInvoiceRequest;
+/// use content2::InventoryCustomBatchRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -35308,34 +33724,34 @@ impl<'a, C, A> OrderCancellineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = OrderinvoicesCreateRefundInvoiceRequest::default();
+/// let mut req = InventoryCustomBatchRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orderinvoices().createrefundinvoice(req, "merchantId", "orderId")
+/// let result = hub.inventory().custombatch(req)
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```
-pub struct OrderinvoiceCreaterefundinvoiceCall<'a, C, A>
+pub struct InventoryCustombatchCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a ShoppingContent<C, A>,
-    _request: OrderinvoicesCreateRefundInvoiceRequest,
-    _merchant_id: String,
-    _order_id: String,
+    _request: InventoryCustomBatchRequest,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for OrderinvoiceCreaterefundinvoiceCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for InventoryCustombatchCall<'a, C, A> {}
 
-impl<'a, C, A> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> InventoryCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, OrderinvoicesCreateRefundInvoiceResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, InventoryCustomBatchResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -35343,12 +33759,13 @@ impl<'a, C, A> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> where C: BorrowMut<
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "content.orderinvoices.createrefundinvoice",
+        dlg.begin(MethodInfo { id: "content.inventory.custombatch",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("merchantId", self._merchant_id.to_string()));
-        params.push(("orderId", self._order_id.to_string()));
-        for &field in ["alt", "merchantId", "orderId"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -35360,32 +33777,11 @@ impl<'a, C, A> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{merchantId}/orderinvoices/{orderId}/createRefundInvoice";
+        let mut url = self.hub._base_url.clone() + "inventory/batch";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{orderId}", "orderId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["orderId", "merchantId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
@@ -35480,28 +33876,15 @@ impl<'a, C, A> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> where C: BorrowMut<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderinvoicesCreateRefundInvoiceRequest) -> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> {
+    pub fn request(mut self, new_value: InventoryCustomBatchRequest) -> InventoryCustombatchCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// The ID of the account that manages the order. This cannot be a multi-client account.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
-    /// Sets the *merchant id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> {
-        self._merchant_id = new_value.to_string();
-        self
-    }
-    /// The ID of the order.
-    ///
-    /// Sets the *order id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> {
-        self._order_id = new_value.to_string();
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> InventoryCustombatchCall<'a, C, A> {
+        self._dry_run = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -35510,7 +33893,7 @@ impl<'a, C, A> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> InventoryCustombatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -35531,7 +33914,7 @@ impl<'a, C, A> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> where C: BorrowMut<
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderinvoiceCreaterefundinvoiceCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InventoryCustombatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -35551,7 +33934,7 @@ impl<'a, C, A> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> where C: BorrowMut<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderinvoiceCreaterefundinvoiceCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> InventoryCustombatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -35563,10 +33946,10 @@ impl<'a, C, A> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> where C: BorrowMut<
 }
 
 
-/// Creates a charge invoice for a shipment group, and triggers a charge capture for orderinvoice enabled orders.
+/// Updates price and availability of a product in your Merchant Center account.
 ///
-/// A builder for the *createchargeinvoice* method supported by a *orderinvoice* resource.
-/// It is not used directly, but through a `OrderinvoiceMethods` instance.
+/// A builder for the *set* method supported by a *inventory* resource.
+/// It is not used directly, but through a `InventoryMethods` instance.
 ///
 /// # Example
 ///
@@ -35577,7 +33960,7 @@ impl<'a, C, A> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> where C: BorrowMut<
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_content2 as content2;
-/// use content2::OrderinvoicesCreateChargeInvoiceRequest;
+/// use content2::InventorySetRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -35591,34 +33974,37 @@ impl<'a, C, A> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> where C: BorrowMut<
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = OrderinvoicesCreateChargeInvoiceRequest::default();
+/// let mut req = InventorySetRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orderinvoices().createchargeinvoice(req, "merchantId", "orderId")
+/// let result = hub.inventory().set(req, "merchantId", "storeCode", "productId")
+///              .dry_run(false)
 ///              .doit();
 /// # }
 /// ```
-pub struct OrderinvoiceCreatechargeinvoiceCall<'a, C, A>
+pub struct InventorySetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a ShoppingContent<C, A>,
-    _request: OrderinvoicesCreateChargeInvoiceRequest,
+    _request: InventorySetRequest,
     _merchant_id: String,
-    _order_id: String,
+    _store_code: String,
+    _product_id: String,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for OrderinvoiceCreatechargeinvoiceCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for InventorySetCall<'a, C, A> {}
 
-impl<'a, C, A> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, OrderinvoicesCreateChargeInvoiceResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, InventorySetResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -35626,12 +34012,16 @@ impl<'a, C, A> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> where C: BorrowMut<
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "content.orderinvoices.createchargeinvoice",
+        dlg.begin(MethodInfo { id: "content.inventory.set",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("merchantId", self._merchant_id.to_string()));
-        params.push(("orderId", self._order_id.to_string()));
-        for &field in ["alt", "merchantId", "orderId"].iter() {
+        params.push(("storeCode", self._store_code.to_string()));
+        params.push(("productId", self._product_id.to_string()));
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "merchantId", "storeCode", "productId", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -35643,12 +34033,12 @@ impl<'a, C, A> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{merchantId}/orderinvoices/{orderId}/createChargeInvoice";
+        let mut url = self.hub._base_url.clone() + "{merchantId}/inventory/{storeCode}/products/{productId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{orderId}", "orderId")].iter() {
+        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{storeCode}", "storeCode"), ("{productId}", "productId")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -35659,8 +34049,8 @@ impl<'a, C, A> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> where C: BorrowMut<
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["orderId", "merchantId"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["productId", "storeCode", "merchantId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -35763,28 +34153,45 @@ impl<'a, C, A> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> where C: BorrowMut<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderinvoicesCreateChargeInvoiceRequest) -> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> {
+    pub fn request(mut self, new_value: InventorySetRequest) -> InventorySetCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// The ID of the account that manages the order. This cannot be a multi-client account.
+    /// The ID of the account that contains the product. This account cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> {
+    pub fn merchant_id(mut self, new_value: &str) -> InventorySetCall<'a, C, A> {
         self._merchant_id = new_value.to_string();
         self
     }
-    /// The ID of the order.
+    /// The code of the store for which to update price and availability. Use online to update price and availability of an online product.
     ///
-    /// Sets the *order id* path property to the given value.
+    /// Sets the *store code* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> {
-        self._order_id = new_value.to_string();
+    pub fn store_code(mut self, new_value: &str) -> InventorySetCall<'a, C, A> {
+        self._store_code = new_value.to_string();
+        self
+    }
+    /// The REST ID of the product for which to update price and availability.
+    ///
+    /// Sets the *product id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn product_id(mut self, new_value: &str) -> InventorySetCall<'a, C, A> {
+        self._product_id = new_value.to_string();
+        self
+    }
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> InventorySetCall<'a, C, A> {
+        self._dry_run = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -35793,7 +34200,7 @@ impl<'a, C, A> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> InventorySetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -35814,7 +34221,7 @@ impl<'a, C, A> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> where C: BorrowMut<
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderinvoiceCreatechargeinvoiceCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InventorySetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -35834,7 +34241,7 @@ impl<'a, C, A> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> where C: BorrowMut<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderinvoiceCreatechargeinvoiceCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

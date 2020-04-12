@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Security Command Center* API at revision *20190628*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Security Command Center* API at revision *20200406*. The CLI is at version *1.0.13*.
 
 ```bash
 securitycenter1 [options]
@@ -35,6 +35,11 @@ securitycenter1 [options]
                 assets-run-discovery <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 assets-update-security-marks <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 get-organization-settings <name> [-p <v>]... [-o <out>]
+                notification-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                notification-configs-delete <name> [-p <v>]... [-o <out>]
+                notification-configs-get <name> [-p <v>]... [-o <out>]
+                notification-configs-list <parent> [-p <v>]... [-o <out>]
+                notification-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 operations-cancel <name> [-p <v>]... [-o <out>]
                 operations-delete <name> [-p <v>]... [-o <out>]
                 operations-get <name> [-p <v>]... [-o <out>]

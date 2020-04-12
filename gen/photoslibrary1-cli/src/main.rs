@@ -339,17 +339,18 @@ impl<'n> Engine<'n> {
                     "album.media-items-count" => Some(("album.mediaItemsCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "album.title" => Some(("album.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "album.is-writeable" => Some(("album.isWriteable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "album.share-info.shared-album-options.is-commentable" => Some(("album.shareInfo.sharedAlbumOptions.isCommentable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "album.share-info.shared-album-options.is-collaborative" => Some(("album.shareInfo.sharedAlbumOptions.isCollaborative", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "album.share-info.shareable-url" => Some(("album.shareInfo.shareableUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "album.share-info.share-token" => Some(("album.shareInfo.shareToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "album.share-info.is-joined" => Some(("album.shareInfo.isJoined", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "album.share-info.shareable-url" => Some(("album.shareInfo.shareableUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "album.share-info.is-owned" => Some(("album.shareInfo.isOwned", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "album.share-info.shared-album-options.is-commentable" => Some(("album.shareInfo.sharedAlbumOptions.isCommentable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "album.share-info.shared-album-options.is-collaborative" => Some(("album.shareInfo.sharedAlbumOptions.isCollaborative", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "album.cover-photo-base-url" => Some(("album.coverPhotoBaseUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "album.product-url" => Some(("album.productUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "album.cover-photo-media-item-id" => Some(("album.coverPhotoMediaItemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "album.id" => Some(("album.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["album", "cover-photo-base-url", "cover-photo-media-item-id", "id", "is-collaborative", "is-commentable", "is-joined", "is-writeable", "media-items-count", "product-url", "share-info", "share-token", "shareable-url", "shared-album-options", "title"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["album", "cover-photo-base-url", "cover-photo-media-item-id", "id", "is-collaborative", "is-commentable", "is-joined", "is-owned", "is-writeable", "media-items-count", "product-url", "share-info", "share-token", "shareable-url", "shared-album-options", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1947,7 +1948,7 @@ fn main() {
     
     let mut app = App::new("photoslibrary1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190702")
+           .version("1.0.13+20200329")
            .about("Manage photos, videos, and albums in Google Photos
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli")

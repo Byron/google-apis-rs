@@ -162,6 +162,7 @@ impl<'n> Engine<'n> {
                     "links.dropped-links-count" => Some(("links.droppedLinksCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "stack-trace.stack-trace-hash-id" => Some(("stackTrace.stackTraceHashId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "stack-trace.stack-frames.dropped-frames-count" => Some(("stackTrace.stackFrames.droppedFramesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "span-kind" => Some(("spanKind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-span-id" => Some(("parentSpanId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "span-id" => Some(("spanId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -171,7 +172,7 @@ impl<'n> Engine<'n> {
                     "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "same-process-as-parent-span" => Some(("sameProcessAsParentSpan", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attributes", "child-span-count", "code", "display-name", "dropped-annotations-count", "dropped-attributes-count", "dropped-frames-count", "dropped-links-count", "dropped-message-events-count", "end-time", "links", "message", "name", "parent-span-id", "same-process-as-parent-span", "span-id", "stack-frames", "stack-trace", "stack-trace-hash-id", "start-time", "status", "time-events", "truncated-byte-count", "value"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attributes", "child-span-count", "code", "display-name", "dropped-annotations-count", "dropped-attributes-count", "dropped-frames-count", "dropped-links-count", "dropped-message-events-count", "end-time", "links", "message", "name", "parent-span-id", "same-process-as-parent-span", "span-id", "span-kind", "stack-frames", "stack-trace", "stack-trace-hash-id", "start-time", "status", "time-events", "truncated-byte-count", "value"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -338,7 +339,9 @@ fn main() {
         ("projects", "methods: 'traces-batch-write' and 'traces-spans-create-span'", vec![
             ("traces-batch-write",
                     Some(r##"Sends new spans to new or existing traces. You cannot update
-        existing spans."##),
+        existing spans.
+        In this case, writing traces is not considered an active developer
+        method since traces are machine generated."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtrace2_cli/projects_traces-batch-write",
                   vec![
                     (Some(r##"name"##),
@@ -367,7 +370,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("traces-spans-create-span",
-                    Some(r##"Creates a new span."##),
+                    Some(r##"Creates a new span.
+        In this case, writing traces is not considered an active developer
+        method since traces are machine generated."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtrace2_cli/projects_traces-spans-create-span",
                   vec![
                     (Some(r##"name"##),
@@ -406,8 +411,8 @@ fn main() {
     
     let mut app = App::new("cloudtrace2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190622")
-           .about("Sends application trace data to Stackdriver Trace for viewing. Trace data is collected for all App Engine applications by default. Trace data from other applications can be provided using this API. This library is used to interact with the Trace API directly. If you are looking to instrument your application for Stackdriver Trace, we recommend using OpenCensus.
+           .version("1.0.13+20200330")
+           .about("Sends application trace data to Cloud Trace for viewing. Trace data is collected for all App Engine applications by default. Trace data from other applications can be provided using this API. This library is used to interact with the Cloud Trace API directly. If you are looking to instrument your application for Cloud Trace, we recommend using OpenCensus.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtrace2_cli")
            .arg(Arg::with_name("url")

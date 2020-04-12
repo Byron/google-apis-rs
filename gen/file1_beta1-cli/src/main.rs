@@ -471,6 +471,9 @@ impl<'n> Engine<'n> {
                 "page-size" => {
                     call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
                 },
+                "include-unrevealed-locations" => {
+                    call = call.include_unrevealed_locations(arg_from_str(value.unwrap_or("false"), err, "include-unrevealed-locations", "boolean"));
+                },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 },
@@ -487,7 +490,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "include-unrevealed-locations", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1202,7 +1205,7 @@ fn main() {
     
     let mut app = App::new("file1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190627")
+           .version("1.0.13+20200406")
            .about("The Cloud Filestore API is used for creating and managing cloud file servers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_file1_beta1_cli")
            .arg(Arg::with_name("url")

@@ -1,4 +1,4 @@
-site_name: Spanner v1.0.12+20190613
+site_name: Spanner v1.0.13+20200403
 site_url: http://byron.github.io/google-apis-rs/google-spanner1-cli
 site_description: A complete library to interact with Spanner (protocol v1)
 
@@ -11,7 +11,21 @@ pages:
 - ['index.md', 'Home']
 - ['projects_instance-configs-get.md', 'Projects', 'Instance Configs Get']
 - ['projects_instance-configs-list.md', 'Projects', 'Instance Configs List']
+- ['projects_instances-backup-operations-list.md', 'Projects', 'Instances Backup Operations List']
+- ['projects_instances-backups-create.md', 'Projects', 'Instances Backups Create']
+- ['projects_instances-backups-delete.md', 'Projects', 'Instances Backups Delete']
+- ['projects_instances-backups-get.md', 'Projects', 'Instances Backups Get']
+- ['projects_instances-backups-get-iam-policy.md', 'Projects', 'Instances Backups Get Iam Policy']
+- ['projects_instances-backups-list.md', 'Projects', 'Instances Backups List']
+- ['projects_instances-backups-operations-cancel.md', 'Projects', 'Instances Backups Operations Cancel']
+- ['projects_instances-backups-operations-delete.md', 'Projects', 'Instances Backups Operations Delete']
+- ['projects_instances-backups-operations-get.md', 'Projects', 'Instances Backups Operations Get']
+- ['projects_instances-backups-operations-list.md', 'Projects', 'Instances Backups Operations List']
+- ['projects_instances-backups-patch.md', 'Projects', 'Instances Backups Patch']
+- ['projects_instances-backups-set-iam-policy.md', 'Projects', 'Instances Backups Set Iam Policy']
+- ['projects_instances-backups-test-iam-permissions.md', 'Projects', 'Instances Backups Test Iam Permissions']
 - ['projects_instances-create.md', 'Projects', 'Instances Create']
+- ['projects_instances-database-operations-list.md', 'Projects', 'Instances Database Operations List']
 - ['projects_instances-databases-create.md', 'Projects', 'Instances Databases Create']
 - ['projects_instances-databases-drop-database.md', 'Projects', 'Instances Databases Drop Database']
 - ['projects_instances-databases-get.md', 'Projects', 'Instances Databases Get']
@@ -22,6 +36,8 @@ pages:
 - ['projects_instances-databases-operations-delete.md', 'Projects', 'Instances Databases Operations Delete']
 - ['projects_instances-databases-operations-get.md', 'Projects', 'Instances Databases Operations Get']
 - ['projects_instances-databases-operations-list.md', 'Projects', 'Instances Databases Operations List']
+- ['projects_instances-databases-restore.md', 'Projects', 'Instances Databases Restore']
+- ['projects_instances-databases-sessions-batch-create.md', 'Projects', 'Instances Databases Sessions Batch Create']
 - ['projects_instances-databases-sessions-begin-transaction.md', 'Projects', 'Instances Databases Sessions Begin Transaction']
 - ['projects_instances-databases-sessions-commit.md', 'Projects', 'Instances Databases Sessions Commit']
 - ['projects_instances-databases-sessions-create.md', 'Projects', 'Instances Databases Sessions Create']

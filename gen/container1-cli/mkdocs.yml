@@ -1,4 +1,4 @@
-site_name: Container v1.0.12+20190610
+site_name: Container v1.0.13+20200324
 site_url: http://byron.github.io/google-apis-rs/google-container1-cli
 site_description: A complete library to interact with Container (protocol v1)
 

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Hangouts Chat* crate version *1.0.12+20190622*, where *20190622* is the exact revision of the *chat:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Hangouts Chat* crate version *1.0.13+20200405*, where *20200405* is the exact revision of the *chat:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Hangouts Chat* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/hangouts/chat).
@@ -316,7 +316,7 @@ impl<'a, C, A> HangoutsChat<C, A>
         HangoutsChat {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://chat.googleapis.com/".to_string(),
             _root_url: "https://chat.googleapis.com/".to_string(),
         }
@@ -327,7 +327,7 @@ impl<'a, C, A> HangoutsChat<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -493,8 +493,10 @@ impl Part for TextParagraph {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FormAction {
-    /// Apps Script function to invoke when the containing element is
-    /// clicked/activated.
+    /// The method name is used to identify which part of the form triggered the
+    /// form submission. This information is echoed back to the bot as part of
+    /// the card click event. The same method name can be used for several
+    /// elements that trigger a common behavior if desired.
     #[serde(rename="actionMethodName")]
     pub action_method_name: Option<String>,
     /// List of action parameters.
@@ -650,7 +652,10 @@ impl Part for ImageButton {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Image {
-    /// The aspect ratio of this image (width/height).
+    /// The aspect ratio of this image (width/height). This field allows clients
+    /// to reserve the right height for the image while waiting for it to load.
+    /// It's not meant to override the native aspect ratio of the image.
+    /// If unset, the server fills it by prefetching the image.
     #[serde(rename="aspectRatio")]
     pub aspect_ratio: Option<f64>,
     /// The URL of the image.
@@ -939,6 +944,9 @@ pub struct User {
     /// The user's display name.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
+    /// Obfuscated domain information.
+    #[serde(rename="domainId")]
+    pub domain_id: Option<String>,
     /// User type.
     #[serde(rename="type")]
     pub type_: Option<String>,
@@ -2014,9 +2022,12 @@ impl<'a, C, A> SpaceMessageUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._name = new_value.to_string();
         self
     }
-    /// Required. The field paths to be updated.
+    /// Required. The field paths to be updated, comma separated if there are
+    /// multiple.
     /// 
-    /// Currently supported field paths: "text", "cards".
+    /// Currently supported field paths:
+    /// * text
+    /// * cards
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: &str) -> SpaceMessageUpdateCall<'a, C, A> {

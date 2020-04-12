@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Photos Library* crate version *1.0.12+20190702*, where *20190702* is the exact revision of the *photoslibrary:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Photos Library* crate version *1.0.13+20200329*, where *20200329* is the exact revision of the *photoslibrary:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Photos Library* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/photos/).
@@ -351,7 +351,7 @@ impl<'a, C, A> PhotosLibrary<C, A>
         PhotosLibrary {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://photoslibrary.googleapis.com/".to_string(),
             _root_url: "https://photoslibrary.googleapis.com/".to_string(),
         }
@@ -368,7 +368,7 @@ impl<'a, C, A> PhotosLibrary<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -448,8 +448,7 @@ pub struct Album {
     /// in to their Google Photos account to access this link.
     #[serde(rename="productUrl")]
     pub product_url: Option<String>,
-    /// [Output only] Identifier for the media item associated with the cover
-    /// photo.
+    /// Identifier for the media item associated with the cover photo.
     #[serde(rename="coverPhotoMediaItemId")]
     pub cover_photo_media_item_id: Option<String>,
     /// [Ouput only] Identifier for the album. This is a persistent identifier that
@@ -517,7 +516,7 @@ impl ResponseResult for ShareAlbumResponse {}
 
 
 /// Defines a range of dates. Both dates must be of the same format. For more
-/// information, see <a href="#Date">Date</a>
+/// information, see Date.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -957,7 +956,9 @@ pub struct JoinSharedAlbumResponse {
 impl ResponseResult for JoinSharedAlbumResponse {}
 
 
-/// Represents a whole calendar date. The day may be 0 to represent a year and month where the day isn't significant, such as a whole calendar month. The month may be 0 to represent a a day and a year where the month isn't signficant, like when you want to specify the same day in every month of a year or a specific year. The year may be 0 to represent a month and day independent of year, like an anniversary date.
+/// Represents a whole calendar date. Set `day` to 0 when only the month and year are significant, for example, all of December 2018. Set `day` and `month` to 0 if only the year is significant, for example, the entire of 2018. Set `year` to 0 when only the day and month are significant, for example, an anniversary or birthday.
+/// 
+/// Unsupported: Setting all values to 0, only `month` to 0, or both `day` and `year` to 0 at the same time.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1078,6 +1079,14 @@ pub struct SimpleMediaItem {
     /// Token identifying the media bytes that have been uploaded to Google.
     #[serde(rename="uploadToken")]
     pub upload_token: Option<String>,
+    /// File name with extension of the media item. This is shown to the user in
+    /// Google Photos. The file name specified during the <a
+    /// href="https://developers.google.com/photos/library/guides/upload-media">byte
+    /// upload process</a> is ignored if this field is set. The file name,
+    /// including the file extension, shouldn't be more than 255 characters. This
+    /// is an optional field.
+    #[serde(rename="fileName")]
+    pub file_name: Option<String>,
 }
 
 impl Part for SimpleMediaItem {}
@@ -1132,19 +1141,22 @@ impl ResponseResult for ListMediaItemsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ShareInfo {
-    /// A link to the album that's now shared on the Google Photos website and app.
-    /// Anyone with the link can access this shared album and see all of the items
-    /// present in the album.
-    #[serde(rename="shareableUrl")]
-    pub shareable_url: Option<String>,
-    /// A token that can be used by other users to join this shared album via the
-    /// API.
+    /// True if the user owns the album.
+    #[serde(rename="isOwned")]
+    pub is_owned: Option<bool>,
+    /// A token that can be used by other users to join or leave this shared album
+    /// via the API.
     #[serde(rename="shareToken")]
     pub share_token: Option<String>,
     /// True if the user has joined the album. This is always true for the owner
     /// of the shared album.
     #[serde(rename="isJoined")]
     pub is_joined: Option<bool>,
+    /// A link to the album that's now shared on the Google Photos website and app.
+    /// Anyone with the link can access this shared album and see all of the items
+    /// present in the album.
+    #[serde(rename="shareableUrl")]
+    pub shareable_url: Option<String>,
     /// Options that control the sharing of an album.
     #[serde(rename="sharedAlbumOptions")]
     pub shared_album_options: Option<SharedAlbumOptions>,
@@ -1425,9 +1437,9 @@ pub struct SearchMediaItemsRequest {
     /// Filters to apply to the request. Can't be set in conjunction with an
     /// `albumId`.
     pub filters: Option<Filters>,
-    /// Maximum number of media items to return in the response. The default number
-    /// of media items to return at a time is 25. The maximum
-    /// `pageSize` is 100.
+    /// Maximum number of media items to return in the response. Fewer media items
+    /// might be returned than the specified number. The default `pageSize` is 25,
+    /// the maximum is 100.
     #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
     /// A continuation token to get the next page of the results. Adding this to
@@ -3055,8 +3067,9 @@ impl<'a, C, A> AlbumListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of albums to return in the response. The default number of
-    /// albums to return at a time is 20. The maximum `pageSize` is 50.
+    /// Maximum number of albums to return in the response. Fewer albums might be
+    /// returned than the specified number. The default `pageSize` is 20, the
+    /// maximum is 50.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> AlbumListCall<'a, C, A> {
@@ -5101,8 +5114,9 @@ impl<'a, C, A> SharedAlbumListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of albums to return in the response. The default number of
-    /// albums to return at a time is 20. The maximum `pageSize` is 50.
+    /// Maximum number of albums to return in the response. Fewer albums might be
+    /// returned than the specified number. The default `pageSize` is 20, the
+    /// maximum is 50.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> SharedAlbumListCall<'a, C, A> {
@@ -6334,8 +6348,9 @@ impl<'a, C, A> MediaItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of media items to return in the response. The default number
-    /// of media items to return at a time is 25. The maximum `pageSize` is 100.
+    /// Maximum number of media items to return in the response. Fewer media items
+    /// might be returned than the specified number. The default `pageSize` is 25,
+    /// the maximum is 100.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> MediaItemListCall<'a, C, A> {

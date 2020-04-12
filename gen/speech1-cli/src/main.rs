@@ -313,17 +313,20 @@ impl<'n> Engine<'n> {
                     "config.sample-rate-hertz" => Some(("config.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.profanity-filter" => Some(("config.profanityFilter", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.model" => Some(("config.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.diarization-config.min-speaker-count" => Some(("config.diarizationConfig.minSpeakerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.diarization-config.enable-speaker-diarization" => Some(("config.diarizationConfig.enableSpeakerDiarization", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.diarization-config.max-speaker-count" => Some(("config.diarizationConfig.maxSpeakerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.diarization-config.speaker-tag" => Some(("config.diarizationConfig.speakerTag", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.metadata.recording-device-type" => Some(("config.metadata.recordingDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.metadata.original-media-type" => Some(("config.metadata.originalMediaType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.metadata.microphone-distance" => Some(("config.metadata.microphoneDistance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.metadata.obfuscated-id" => Some(("config.metadata.obfuscatedId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.metadata.recording-device-name" => Some(("config.metadata.recordingDeviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.metadata.industry-naics-code-of-audio" => Some(("config.metadata.industryNaicsCodeOfAudio", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.metadata.audio-topic" => Some(("config.metadata.audioTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.metadata.original-mime-type" => Some(("config.metadata.originalMimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.metadata.interaction-type" => Some(("config.metadata.interactionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio", "audio-channel-count", "audio-topic", "config", "content", "enable-automatic-punctuation", "enable-separate-recognition-per-channel", "enable-word-time-offsets", "encoding", "industry-naics-code-of-audio", "interaction-type", "language-code", "max-alternatives", "metadata", "microphone-distance", "model", "obfuscated-id", "original-media-type", "original-mime-type", "profanity-filter", "recording-device-name", "recording-device-type", "sample-rate-hertz", "uri", "use-enhanced"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio", "audio-channel-count", "audio-topic", "config", "content", "diarization-config", "enable-automatic-punctuation", "enable-separate-recognition-per-channel", "enable-speaker-diarization", "enable-word-time-offsets", "encoding", "industry-naics-code-of-audio", "interaction-type", "language-code", "max-alternatives", "max-speaker-count", "metadata", "microphone-distance", "min-speaker-count", "model", "original-media-type", "original-mime-type", "profanity-filter", "recording-device-name", "recording-device-type", "sample-rate-hertz", "speaker-tag", "uri", "use-enhanced"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -419,17 +422,20 @@ impl<'n> Engine<'n> {
                     "config.sample-rate-hertz" => Some(("config.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.profanity-filter" => Some(("config.profanityFilter", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.model" => Some(("config.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.diarization-config.min-speaker-count" => Some(("config.diarizationConfig.minSpeakerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.diarization-config.enable-speaker-diarization" => Some(("config.diarizationConfig.enableSpeakerDiarization", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.diarization-config.max-speaker-count" => Some(("config.diarizationConfig.maxSpeakerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.diarization-config.speaker-tag" => Some(("config.diarizationConfig.speakerTag", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.metadata.recording-device-type" => Some(("config.metadata.recordingDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.metadata.original-media-type" => Some(("config.metadata.originalMediaType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.metadata.microphone-distance" => Some(("config.metadata.microphoneDistance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.metadata.obfuscated-id" => Some(("config.metadata.obfuscatedId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.metadata.recording-device-name" => Some(("config.metadata.recordingDeviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.metadata.industry-naics-code-of-audio" => Some(("config.metadata.industryNaicsCodeOfAudio", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.metadata.audio-topic" => Some(("config.metadata.audioTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.metadata.original-mime-type" => Some(("config.metadata.originalMimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.metadata.interaction-type" => Some(("config.metadata.interactionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio", "audio-channel-count", "audio-topic", "config", "content", "enable-automatic-punctuation", "enable-separate-recognition-per-channel", "enable-word-time-offsets", "encoding", "industry-naics-code-of-audio", "interaction-type", "language-code", "max-alternatives", "metadata", "microphone-distance", "model", "obfuscated-id", "original-media-type", "original-mime-type", "profanity-filter", "recording-device-name", "recording-device-type", "sample-rate-hertz", "uri", "use-enhanced"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio", "audio-channel-count", "audio-topic", "config", "content", "diarization-config", "enable-automatic-punctuation", "enable-separate-recognition-per-channel", "enable-speaker-diarization", "enable-word-time-offsets", "encoding", "industry-naics-code-of-audio", "interaction-type", "language-code", "max-alternatives", "max-speaker-count", "metadata", "microphone-distance", "min-speaker-count", "model", "original-media-type", "original-mime-type", "profanity-filter", "recording-device-name", "recording-device-type", "sample-rate-hertz", "speaker-tag", "uri", "use-enhanced"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -788,7 +794,7 @@ fn main() {
     
     let mut app = App::new("speech1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190627")
+           .version("1.0.13+20200406")
            .about("Converts audio to text by applying powerful neural network models.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_speech1_cli")
            .arg(Arg::with_name("url")

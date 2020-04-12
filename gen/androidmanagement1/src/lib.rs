@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Management* crate version *1.0.12+20190624*, where *20190624* is the exact revision of the *androidmanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Android Management* crate version *1.0.13+20200330*, where *20200330* is the exact revision of the *androidmanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Android Management* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/android/management).
@@ -361,7 +361,7 @@ impl<'a, C, A> AndroidManagement<C, A>
         AndroidManagement {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://androidmanagement.googleapis.com/".to_string(),
             _root_url: "https://androidmanagement.googleapis.com/".to_string(),
         }
@@ -375,7 +375,7 @@ impl<'a, C, A> AndroidManagement<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -403,69 +403,6 @@ impl<'a, C, A> AndroidManagement<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// Response to a request to list policies for a given enterprise.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [policies list enterprises](struct.EnterprisePolicyListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListPoliciesResponse {
-    /// If there are more results, a token to retrieve next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of policies.
-    pub policies: Option<Vec<Policy>>,
-}
-
-impl ResponseResult for ListPoliciesResponse {}
-
-
-/// Information reported about an installed app.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ApplicationReport {
-    /// The display name of the app.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The package name of the app that installed this app.
-    #[serde(rename="installerPackageName")]
-    pub installer_package_name: Option<String>,
-    /// Package name of the app.
-    #[serde(rename="packageName")]
-    pub package_name: Option<String>,
-    /// List of keyed app states reported by the app.
-    #[serde(rename="keyedAppStates")]
-    pub keyed_app_states: Option<Vec<KeyedAppState>>,
-    /// The SHA-256 hash of the app's APK file, which can be used to verify the app hasn't been modified. Each byte of the hash value is represented as a two-digit hexadecimal number.
-    #[serde(rename="packageSha256Hash")]
-    pub package_sha256_hash: Option<String>,
-    /// The SHA-1 hash of each android.content.pm.Signature (https://developer.android.com/reference/android/content/pm/Signature.html) associated with the app package. Each byte of each hash value is represented as a two-digit hexadecimal number.
-    #[serde(rename="signingKeyCertFingerprints")]
-    pub signing_key_cert_fingerprints: Option<Vec<String>>,
-    /// The source of the package.
-    #[serde(rename="applicationSource")]
-    pub application_source: Option<String>,
-    /// Application state.
-    pub state: Option<String>,
-    /// The app version as displayed to the user.
-    #[serde(rename="versionName")]
-    pub version_name: Option<String>,
-    /// The app version code, which can be used to determine whether one version is more recent than another.
-    #[serde(rename="versionCode")]
-    pub version_code: Option<i32>,
-    /// List of app events. The most recent 20 events are stored in the list.
-    pub events: Option<Vec<ApplicationEvent>>,
-}
-
-impl Part for ApplicationReport {}
-
-
 /// Provides detail about non-compliance with a policy setting.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -495,402 +432,44 @@ pub struct NonComplianceDetail {
 impl Part for NonComplianceDetail {}
 
 
-/// A compliance rule condition which is satisfied if there exists any matching NonComplianceDetail for the device. A NonComplianceDetail matches a NonComplianceDetailCondition if all the fields which are set within the NonComplianceDetailCondition match the corresponding NonComplianceDetail fields.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NonComplianceDetailCondition {
-    /// The package name of the app that's out of compliance. If not set, then this condition matches any package name.
-    #[serde(rename="packageName")]
-    pub package_name: Option<String>,
-    /// The name of the policy setting. This is the JSON field name of a top-level Policy field. If not set, then this condition matches any setting name.
-    #[serde(rename="settingName")]
-    pub setting_name: Option<String>,
-    /// The reason the device is not in compliance with the setting. If not set, then this condition matches any reason.
-    #[serde(rename="nonComplianceReason")]
-    pub non_compliance_reason: Option<String>,
-}
-
-impl Part for NonComplianceDetailCondition {}
-
-
-/// Configuration for managing system updates
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SystemUpdate {
-    /// If the type is WINDOWED, the end of the maintenance window, measured as the number of minutes after midnight in device's local time. This value must be between 0 and 1439, inclusive. If this value is less than start_minutes, then the maintenance window spans midnight. If the maintenance window specified is smaller than 30 minutes, the actual window is extended to 30 minutes beyond the start time.
-    #[serde(rename="endMinutes")]
-    pub end_minutes: Option<i32>,
-    /// If the type is WINDOWED, the start of the maintenance window, measured as the number of minutes after midnight in the device's local time. This value must be between 0 and 1439, inclusive.
-    #[serde(rename="startMinutes")]
-    pub start_minutes: Option<i32>,
-    /// The type of system update to configure.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-}
-
-impl Part for SystemUpdate {}
-
-
-/// An app-related event.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ApplicationEvent {
-    /// App event type.
-    #[serde(rename="eventType")]
-    pub event_type: Option<String>,
-    /// The creation time of the event.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
-}
-
-impl Part for ApplicationEvent {}
-
-
-/// Hardware status. Temperatures may be compared to the temperature thresholds available in hardwareInfo to determine hardware health.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct HardwareStatus {
-    /// Current battery temperatures in Celsius for each battery on the device.
-    #[serde(rename="batteryTemperatures")]
-    pub battery_temperatures: Option<Vec<f32>>,
-    /// Current device skin temperatures in Celsius.
-    #[serde(rename="skinTemperatures")]
-    pub skin_temperatures: Option<Vec<f32>>,
-    /// Current GPU temperatures in Celsius for each GPU on the device.
-    #[serde(rename="gpuTemperatures")]
-    pub gpu_temperatures: Option<Vec<f32>>,
-    /// Fan speeds in RPM for each fan on the device. Empty array means that there are no fans or fan speed is not supported on the system.
-    #[serde(rename="fanSpeeds")]
-    pub fan_speeds: Option<Vec<f32>>,
-    /// Current CPU temperatures in Celsius for each CPU on the device.
-    #[serde(rename="cpuTemperatures")]
-    pub cpu_temperatures: Option<Vec<f32>>,
-    /// The time the measurements were taken.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
-    /// CPU usages in percentage for each core available on the device. Usage is 0 for each unplugged core. Empty array implies that CPU usage is not supported in the system.
-    #[serde(rename="cpuUsages")]
-    pub cpu_usages: Option<Vec<f32>>,
-}
-
-impl Part for HardwareStatus {}
-
-
-/// Information about an app.
+/// An enrollment token.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [applications get enterprises](struct.EnterpriseApplicationGetCall.html) (response)
+/// * [enrollment tokens create enterprises](struct.EnterpriseEnrollmentTokenCreateCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Application {
-    /// The set of managed properties available to be pre-configured for the app.
-    #[serde(rename="managedProperties")]
-    pub managed_properties: Option<Vec<ManagedProperty>>,
-    /// The permissions required by the app.
-    pub permissions: Option<Vec<ApplicationPermission>>,
-    /// The name of the app in the form enterprises/{enterpriseId}/applications/{package_name}.
+pub struct EnrollmentToken {
+    /// Optional, arbitrary data associated with the enrollment token. This could contain, for example, the ID of an org unit the device is assigned to after enrollment. After a device enrolls with the token, this data will be exposed in the enrollment_token_data field of the Device resource. The data must be 1024 characters or less; otherwise, the creation request will fail.
+    #[serde(rename="additionalData")]
+    pub additional_data: Option<String>,
+    /// The name of the enrollment token, which is generated by the server during creation, in the form enterprises/{enterpriseId}/enrollmentTokens/{enrollmentTokenId}.
     pub name: Option<String>,
-    /// The title of the app. Localized.
-    pub title: Option<String>,
+    /// Whether the enrollment token is for one time use only. If the flag is set to true, only one device can use it for registration.
+    #[serde(rename="oneTimeOnly")]
+    pub one_time_only: Option<bool>,
+    /// The name of the policy initially applied to the enrolled device, in the form enterprises/{enterpriseId}/policies/{policyId}. If not specified, the policy_name for the device’s user is applied. If user_name is also not specified, enterprises/{enterpriseId}/policies/default is applied by default. When updating this field, you can specify only the policyId as long as the policyId doesn’t contain any slashes. The rest of the policy name will be inferred.
+    #[serde(rename="policyName")]
+    pub policy_name: Option<String>,
+    /// The token value that's passed to the device and authorizes the device to enroll. This is a read-only field generated by the server.
+    pub value: Option<String>,
+    /// The length of time the enrollment token is valid, ranging from 1 minute to 30 days. If not specified, the default duration is 1 hour.
+    pub duration: Option<String>,
+    /// The user associated with this enrollment token. If it's specified when the enrollment token is created and the user does not exist, the user will be created. This field must not contain personally identifiable information. Only the account_identifier field needs to be set.
+    pub user: Option<User>,
+    /// A JSON string whose UTF-8 representation can be used to generate a QR code to enroll a device with this enrollment token. To enroll a device using NFC, the NFC record must contain a serialized java.util.Properties representation of the properties in the JSON.
+    #[serde(rename="qrCode")]
+    pub qr_code: Option<String>,
+    /// The expiration time of the token. This is a read-only field generated by the server.
+    #[serde(rename="expirationTimestamp")]
+    pub expiration_timestamp: Option<String>,
 }
 
-impl ResponseResult for Application {}
-
-
-/// An enterprise signup URL.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [create signup urls](struct.SignupUrlCreateCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SignupUrl {
-    /// A URL where an enterprise admin can register their enterprise. The page can't be rendered in an iframe.
-    pub url: Option<String>,
-    /// The name of the resource. Use this value in the signupUrl field when calling enterprises.create to complete the enterprise signup flow.
-    pub name: Option<String>,
-}
-
-impl Resource for SignupUrl {}
-impl ResponseResult for SignupUrl {}
-
-
-/// Information about device memory and storage.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MemoryInfo {
-    /// Total internal storage on device in bytes.
-    #[serde(rename="totalInternalStorage")]
-    pub total_internal_storage: Option<String>,
-    /// Total RAM on device in bytes.
-    #[serde(rename="totalRam")]
-    pub total_ram: Option<String>,
-}
-
-impl Part for MemoryInfo {}
-
-
-/// A policy resources represents a group settings that govern the behavior of a managed device and the apps installed on it.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [policies patch enterprises](struct.EnterprisePolicyPatchCall.html) (request|response)
-/// * [policies get enterprises](struct.EnterprisePolicyGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Policy {
-    /// Rules declaring which mitigating actions to take when a device is not compliant with its policy. When the conditions for multiple rules are satisfied, all of the mitigating actions for the rules are taken. There is a maximum limit of 100 rules. Use policy enforcement rules instead.
-    #[serde(rename="complianceRules")]
-    pub compliance_rules: Option<Vec<ComplianceRule>>,
-    /// Whether roaming data services are disabled.
-    #[serde(rename="dataRoamingDisabled")]
-    pub data_roaming_disabled: Option<bool>,
-    /// Whether resetting network settings is disabled.
-    #[serde(rename="networkResetDisabled")]
-    pub network_reset_disabled: Option<bool>,
-    /// Whether location sharing is disabled.
-    #[serde(rename="shareLocationDisabled")]
-    pub share_location_disabled: Option<bool>,
-    /// Default intent handler activities.
-    #[serde(rename="persistentPreferredActivities")]
-    pub persistent_preferred_activities: Option<Vec<PersistentPreferredActivity>>,
-    /// If present, only the input methods provided by packages in this list are permitted. If this field is present, but the list is empty, then only system input methods are permitted.
-    #[serde(rename="permittedInputMethods")]
-    pub permitted_input_methods: Option<PackageNameList>,
-    /// Status reporting settings
-    #[serde(rename="statusReportingSettings")]
-    pub status_reporting_settings: Option<StatusReportingSettings>,
-    /// Whether configuring bluetooth is disabled.
-    #[serde(rename="bluetoothConfigDisabled")]
-    pub bluetooth_config_disabled: Option<bool>,
-    /// The degree of location detection enabled. The user may change the value unless the user is otherwise blocked from accessing device settings.
-    #[serde(rename="locationMode")]
-    pub location_mode: Option<String>,
-    /// Whether configuring mobile networks is disabled.
-    #[serde(rename="mobileNetworksConfigDisabled")]
-    pub mobile_networks_config_disabled: Option<bool>,
-    /// Whether the user is allowed to enable the "Unknown Sources" setting, which allows installation of apps from unknown sources.
-    #[serde(rename="installUnknownSourcesAllowed")]
-    pub install_unknown_sources_allowed: Option<bool>,
-    /// Whether applications other than the ones configured in applications are blocked from being installed. When set, applications that were installed under a previous policy but no longer appear in the policy are automatically uninstalled.
-    #[serde(rename="blockApplicationsEnabled")]
-    pub block_applications_enabled: Option<bool>,
-    /// A message displayed to the user in the device administators settings screen.
-    #[serde(rename="longSupportMessage")]
-    pub long_support_message: Option<UserFacingMessage>,
-    /// The app tracks for Android Device Policy the device can access. The device receives the latest version among all accessible tracks. If no tracks are specified, then the device only uses the production track.
-    #[serde(rename="androidDevicePolicyTracks")]
-    pub android_device_policy_tracks: Option<Vec<String>>,
-    /// The device owner information to be shown on the lock screen.
-    #[serde(rename="deviceOwnerLockScreenInfo")]
-    pub device_owner_lock_screen_info: Option<UserFacingMessage>,
-    /// Whether bluetooth is disabled. Prefer this setting over bluetooth_config_disabled because bluetooth_config_disabled can be bypassed by the user.
-    #[serde(rename="bluetoothDisabled")]
-    pub bluetooth_disabled: Option<bool>,
-    /// Whether the status bar is disabled. This disables notifications, quick settings, and other screen overlays that allow escape from full-screen mode.
-    #[serde(rename="statusBarDisabled")]
-    pub status_bar_disabled: Option<bool>,
-    /// Rules for automatically choosing a private key and certificate to authenticate the device to a server. The rules are ordered by increasing precedence, so if an outgoing request matches more than one rule, the last rule defines which private key to use.
-    #[serde(rename="choosePrivateKeyRules")]
-    pub choose_private_key_rules: Option<Vec<ChoosePrivateKeyRule>>,
-    /// This mode controls which apps are available to the user in the Play Store and the behavior on the device when apps are removed from the policy.
-    #[serde(rename="playStoreMode")]
-    pub play_store_mode: Option<String>,
-    /// Whether transferring files over USB is disabled.
-    #[serde(rename="usbFileTransferDisabled")]
-    pub usb_file_transfer_disabled: Option<bool>,
-    /// Whether using NFC to beam data from apps is disabled.
-    #[serde(rename="outgoingBeamDisabled")]
-    pub outgoing_beam_disabled: Option<bool>,
-    /// Whether the user is allowed to have fun. Controls whether the Easter egg game in Settings is disabled.
-    #[serde(rename="funDisabled")]
-    pub fun_disabled: Option<bool>,
-    /// Configuration for an always-on VPN connection. Use with vpn_config_disabled to prevent modification of this setting.
-    #[serde(rename="alwaysOnVpnPackage")]
-    pub always_on_vpn_package: Option<AlwaysOnVpnPackage>,
-    /// Disabled keyguard customizations, such as widgets.
-    #[serde(rename="keyguardDisabledFeatures")]
-    pub keyguard_disabled_features: Option<Vec<String>>,
-    /// Whether configuring cell broadcast is disabled.
-    #[serde(rename="cellBroadcastsConfigDisabled")]
-    pub cell_broadcasts_config_disabled: Option<bool>,
-    /// Whether the keyguard is disabled.
-    #[serde(rename="keyguardDisabled")]
-    pub keyguard_disabled: Option<bool>,
-    /// The default permission policy for runtime permission requests.
-    #[serde(rename="defaultPermissionPolicy")]
-    pub default_permission_policy: Option<String>,
-    /// Whether factory resetting from settings is disabled.
-    #[serde(rename="factoryResetDisabled")]
-    pub factory_reset_disabled: Option<bool>,
-    /// Password requirement policies. Different policies can be set for work profile or fully managed devices by setting the password_scope field in the policy.
-    #[serde(rename="passwordPolicies")]
-    pub password_policies: Option<Vec<PasswordRequirements>>,
-    /// Whether the network escape hatch is enabled. If a network connection can't be made at boot time, the escape hatch prompts the user to temporarily connect to a network in order to refresh the device policy. After applying policy, the temporary network will be forgotten and the device will continue booting. This prevents being unable to connect to a network if there is no suitable network in the last policy and the device boots into an app in lock task mode, or the user is otherwise unable to reach device settings.
-    #[serde(rename="networkEscapeHatchEnabled")]
-    pub network_escape_hatch_enabled: Option<bool>,
-    /// The name of the policy in the form enterprises/{enterpriseId}/policies/{policyId}.
-    pub name: Option<String>,
-    /// The app auto update policy, which controls when automatic app updates can be applied.
-    #[serde(rename="appAutoUpdatePolicy")]
-    pub app_auto_update_policy: Option<String>,
-    /// Whether changing the user icon is disabled.
-    #[serde(rename="setUserIconDisabled")]
-    pub set_user_icon_disabled: Option<bool>,
-    /// The battery plugged in modes for which the device stays on. When using this setting, it is recommended to clear maximum_time_to_lock so that the device doesn't lock itself while it stays on.
-    #[serde(rename="stayOnPluggedModes")]
-    pub stay_on_plugged_modes: Option<Vec<String>>,
-    /// Whether user installation of apps is disabled.
-    #[serde(rename="installAppsDisabled")]
-    pub install_apps_disabled: Option<bool>,
-    /// Whether adjusting the master volume is disabled.
-    #[serde(rename="adjustVolumeDisabled")]
-    pub adjust_volume_disabled: Option<bool>,
-    /// A message displayed to the user in the settings screen wherever functionality has been disabled by the admin.
-    #[serde(rename="shortSupportMessage")]
-    pub short_support_message: Option<UserFacingMessage>,
-    /// Whether app verification is force-enabled.
-    #[serde(rename="ensureVerifyAppsEnabled")]
-    pub ensure_verify_apps_enabled: Option<bool>,
-    /// Allows showing UI on a device for a user to choose a private key alias if there are no matching rules in ChoosePrivateKeyRules. For devices below Android P, setting this may leave enterprise keys vulnerable.
-    #[serde(rename="privateKeySelectionEnabled")]
-    pub private_key_selection_enabled: Option<bool>,
-    /// Rules that define the behavior when a particular policy can not be applied on device
-    #[serde(rename="policyEnforcementRules")]
-    pub policy_enforcement_rules: Option<Vec<PolicyEnforcementRule>>,
-    /// Actions to take during the setup process.
-    #[serde(rename="setupActions")]
-    pub setup_actions: Option<Vec<SetupAction>>,
-    /// Whether configuring tethering and portable hotspots is disabled.
-    #[serde(rename="tetheringConfigDisabled")]
-    pub tethering_config_disabled: Option<bool>,
-    /// Whether all cameras on the device are disabled.
-    #[serde(rename="cameraDisabled")]
-    pub camera_disabled: Option<bool>,
-    /// DEPRECATED - Use wifi_config_disabled.
-    #[serde(rename="wifiConfigsLockdownEnabled")]
-    pub wifi_configs_lockdown_enabled: Option<bool>,
-    /// Whether adding new users and profiles is disabled.
-    #[serde(rename="addUserDisabled")]
-    pub add_user_disabled: Option<bool>,
-    /// Whether the kiosk custom launcher is enabled. This replaces the home screen with a launcher that locks down the device to the apps installed via the applications setting. The apps appear on a single page in alphabetical order. It is recommended to also use status_bar_disabled to block access to device settings.
-    #[serde(rename="kioskCustomLauncherEnabled")]
-    pub kiosk_custom_launcher_enabled: Option<bool>,
-    /// Whether rebooting the device into safe boot is disabled.
-    #[serde(rename="safeBootDisabled")]
-    pub safe_boot_disabled: Option<bool>,
-    /// Whether removing other users is disabled.
-    #[serde(rename="removeUserDisabled")]
-    pub remove_user_disabled: Option<bool>,
-    /// Network configuration for the device. See configure networks for more information.
-    #[serde(rename="openNetworkConfiguration")]
-    pub open_network_configuration: Option<HashMap<String, String>>,
-    /// Account types that can't be managed by the user.
-    #[serde(rename="accountTypesWithManagementDisabled")]
-    pub account_types_with_management_disabled: Option<Vec<String>>,
-    /// Email addresses of device administrators for factory reset protection. When the device is factory reset, it will require one of these admins to log in with the Google account email and password to unlock the device. If no admins are specified, the device won't provide factory reset protection.
-    #[serde(rename="frpAdminEmails")]
-    pub frp_admin_emails: Option<Vec<String>>,
-    /// Password requirements. DEPRECATED - Use password_policies
-    #[serde(rename="passwordRequirements")]
-    pub password_requirements: Option<PasswordRequirements>,
-    /// Maximum time in milliseconds for user activity until the device locks. A value of 0 means there is no restriction.
-    #[serde(rename="maximumTimeToLock")]
-    pub maximum_time_to_lock: Option<String>,
-    /// The version of the policy. This is a read-only field. The version is incremented each time the policy is updated.
-    pub version: Option<String>,
-    /// Whether the user mounting physical external media is disabled.
-    #[serde(rename="mountPhysicalMediaDisabled")]
-    pub mount_physical_media_disabled: Option<bool>,
-    /// Whether configuring VPN is disabled.
-    #[serde(rename="vpnConfigDisabled")]
-    pub vpn_config_disabled: Option<bool>,
-    /// Whether adding or removing accounts is disabled.
-    #[serde(rename="modifyAccountsDisabled")]
-    pub modify_accounts_disabled: Option<bool>,
-    /// Whether changing the wallpaper is disabled.
-    #[serde(rename="setWallpaperDisabled")]
-    pub set_wallpaper_disabled: Option<bool>,
-    /// Flag to skip hints on the first use. Enterprise admin can enable the system recommendation for apps to skip their user tutorial and other introductory hints on first start-up.
-    #[serde(rename="skipFirstUseHintsEnabled")]
-    pub skip_first_use_hints_enabled: Option<bool>,
-    /// Whether encryption is enabled
-    #[serde(rename="encryptionPolicy")]
-    pub encryption_policy: Option<String>,
-    /// Whether sending and receiving SMS messages is disabled.
-    #[serde(rename="smsDisabled")]
-    pub sms_disabled: Option<bool>,
-    /// The network-independent global HTTP proxy. Typically proxies should be configured per-network in open_network_configuration. However for unusual configurations like general internal filtering a global HTTP proxy may be useful. If the proxy is not accessible, network access may break. The global proxy is only a recommendation and some apps may ignore it.
-    #[serde(rename="recommendedGlobalProxy")]
-    pub recommended_global_proxy: Option<ProxyInfo>,
-    /// Whether bluetooth contact sharing is disabled.
-    #[serde(rename="bluetoothContactSharingDisabled")]
-    pub bluetooth_contact_sharing_disabled: Option<bool>,
-    /// Whether configuring Wi-Fi access points is disabled.
-    #[serde(rename="wifiConfigDisabled")]
-    pub wifi_config_disabled: Option<bool>,
-    /// Whether USB storage is enabled. Deprecated.
-    #[serde(rename="usbMassStorageEnabled")]
-    pub usb_mass_storage_enabled: Option<bool>,
-    /// Policy applied to apps.
-    pub applications: Option<Vec<ApplicationPolicy>>,
-    /// Whether the microphone is muted and adjusting microphone volume is disabled.
-    #[serde(rename="unmuteMicrophoneDisabled")]
-    pub unmute_microphone_disabled: Option<bool>,
-    /// Whether the user is allowed to enable debugging features.
-    #[serde(rename="debuggingFeaturesAllowed")]
-    pub debugging_features_allowed: Option<bool>,
-    /// Whether user uninstallation of applications is disabled.
-    #[serde(rename="uninstallAppsDisabled")]
-    pub uninstall_apps_disabled: Option<bool>,
-    /// The minimum allowed Android API level.
-    #[serde(rename="minimumApiLevel")]
-    pub minimum_api_level: Option<i32>,
-    /// Whether outgoing calls are disabled.
-    #[serde(rename="outgoingCallsDisabled")]
-    pub outgoing_calls_disabled: Option<bool>,
-    /// Whether auto time is required, which prevents the user from manually setting the date and time.
-    #[serde(rename="autoTimeRequired")]
-    pub auto_time_required: Option<bool>,
-    /// The system update policy, which controls how OS updates are applied. If the update type is WINDOWED, the update window will automatically apply to Play app updates as well.
-    #[serde(rename="systemUpdate")]
-    pub system_update: Option<SystemUpdate>,
-    /// Whether screen capture is disabled.
-    #[serde(rename="screenCaptureDisabled")]
-    pub screen_capture_disabled: Option<bool>,
-    /// Whether configuring user credentials is disabled.
-    #[serde(rename="credentialsConfigDisabled")]
-    pub credentials_config_disabled: Option<bool>,
-    /// Explicit permission or group grants or denials for all apps. These values override the default_permission_policy.
-    #[serde(rename="permissionGrants")]
-    pub permission_grants: Option<Vec<PermissionGrant>>,
-    /// Whether creating windows besides app windows is disabled.
-    #[serde(rename="createWindowsDisabled")]
-    pub create_windows_disabled: Option<bool>,
-}
-
-impl RequestValue for Policy {}
-impl ResponseResult for Policy {}
+impl RequestValue for EnrollmentToken {}
+impl ResponseResult for EnrollmentToken {}
 
 
 /// A web app.
@@ -910,7 +489,7 @@ pub struct WebApp {
     pub name: Option<String>,
     /// A list of icons for the web app. Must have at least one element.
     pub icons: Option<Vec<WebAppIcon>>,
-    /// The current version of the app.<p>Note that the version can automatically increase during the lifetime of the web app, while Google does internal housekeeping to keep the web app up-to-date.
+    /// The current version of the app.Note that the version can automatically increase during the lifetime of the web app, while Google does internal housekeeping to keep the web app up-to-date.
     #[serde(rename="versionCode")]
     pub version_code: Option<String>,
     /// The title of the web app as displayed to the user (e.g., amongst a list of other applications, or as a label for an icon).
@@ -1019,50 +598,30 @@ pub struct Status {
 impl Part for Status {}
 
 
-/// Information about security related device settings on device.
+/// Settings controlling the behavior of a device in kiosk mode. To enable kiosk mode, set kioskCustomLauncherEnabled to true or specify an app in the policy with installType KIOSK.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeviceSettings {
-    /// Whether ADB (https://developer.android.com/studio/command-line/adb.html) is enabled on the device.
-    #[serde(rename="adbEnabled")]
-    pub adb_enabled: Option<bool>,
-    /// Whether the storage encryption is enabled.
-    #[serde(rename="isEncrypted")]
-    pub is_encrypted: Option<bool>,
-    /// Whether developer mode is enabled on the device.
-    #[serde(rename="developmentSettingsEnabled")]
-    pub development_settings_enabled: Option<bool>,
-    /// Whether the device is secured with PIN/password.
-    #[serde(rename="isDeviceSecure")]
-    pub is_device_secure: Option<bool>,
-    /// Encryption status from DevicePolicyManager.
-    #[serde(rename="encryptionStatus")]
-    pub encryption_status: Option<String>,
-    /// Whether installing apps from unknown sources is enabled.
-    #[serde(rename="unknownSourcesEnabled")]
-    pub unknown_sources_enabled: Option<bool>,
-    /// Whether Verify Apps (Google Play Protect (https://support.google.com/googleplay/answer/2812853)) is enabled on the device.
-    #[serde(rename="verifyAppsEnabled")]
-    pub verify_apps_enabled: Option<bool>,
+pub struct KioskCustomization {
+    /// Specifies whether system info and notifications are disabled in kiosk mode.
+    #[serde(rename="statusBar")]
+    pub status_bar: Option<String>,
+    /// Specifies whether the Settings app is allowed in kiosk mode.
+    #[serde(rename="deviceSettings")]
+    pub device_settings: Option<String>,
+    /// Specifies which navigation features are enabled (e.g. Home, Overview buttons) in kiosk mode.
+    #[serde(rename="systemNavigation")]
+    pub system_navigation: Option<String>,
+    /// Sets the behavior of a device in kiosk mode when a user presses and holds (long-presses) the Power button.
+    #[serde(rename="powerButtonActions")]
+    pub power_button_actions: Option<String>,
+    /// Specifies whether system error dialogs for crashed or unresponsive apps are blocked in kiosk mode. When blocked, the system will force-stop the app as if the user chooses the "close app" option on the UI.
+    #[serde(rename="systemErrorWarnings")]
+    pub system_error_warnings: Option<String>,
 }
 
-impl Part for DeviceSettings {}
-
-
-/// An action to block access to apps and data on a fully managed device or in a work profile. This action also triggers a device or work profile to displays a user-facing notification with information (where possible) on how to correct the compliance issue. Note: wipeAction must also be specified.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BlockAction {
-    /// Number of days the policy is non-compliant before the device or work profile is blocked. To block access immediately, set to 0. blockAfterDays must be less than wipeAfterDays.
-    #[serde(rename="blockAfterDays")]
-    pub block_after_days: Option<i32>,
-}
-
-impl Part for BlockAction {}
+impl Part for KioskCustomization {}
 
 
 /// A compliance rule condition which is satisfied if the Android Framework API level on the device doesn't meet a minimum requirement. There can only be one rule with this type of condition per policy.
@@ -1119,83 +678,34 @@ impl Part for User {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Device {
-    /// Detailed information about the device hardware.
-    #[serde(rename="hardwareInfo")]
-    pub hardware_info: Option<HardwareInfo>,
     /// The name of the policy currently applied to the device.
     #[serde(rename="appliedPolicyName")]
     pub applied_policy_name: Option<String>,
-    /// Device network information. This information is only available if networkInfoEnabled is true in the device's policy.
-    #[serde(rename="networkInfo")]
-    pub network_info: Option<NetworkInfo>,
-    /// If the device state is DISABLED, an optional message that is displayed on the device indicating the reason the device is disabled. This field can be modified by a patch request.
-    #[serde(rename="disabledReason")]
-    pub disabled_reason: Option<UserFacingMessage>,
-    /// Events related to memory and storage measurements in chronological order. This information is only available if memoryInfoEnabled is true in the device's policy.
-    #[serde(rename="memoryEvents")]
-    pub memory_events: Option<Vec<MemoryEvent>>,
-    /// Power management events on the device in chronological order. This information is only available if powerManagementEventsEnabled is true in the device's policy.
-    #[serde(rename="powerManagementEvents")]
-    pub power_management_events: Option<Vec<PowerManagementEvent>>,
-    /// If the device was enrolled with an enrollment token, this field contains the name of the token.
-    #[serde(rename="enrollmentTokenName")]
-    pub enrollment_token_name: Option<String>,
     /// Detailed information about displays on the device. This information is only available if displayInfoEnabled is true in the device's policy.
     pub displays: Option<Vec<Display>>,
     /// Details about policy settings that the device is not compliant with.
     #[serde(rename="nonComplianceDetails")]
     pub non_compliance_details: Option<Vec<NonComplianceDetail>>,
-    /// Hardware status samples in chronological order. This information is only available if hardwareStatusEnabled is true in the device's policy.
-    #[serde(rename="hardwareStatusSamples")]
-    pub hardware_status_samples: Option<Vec<HardwareStatus>>,
     /// The API level of the Android platform version running on the device.
     #[serde(rename="apiLevel")]
     pub api_level: Option<i32>,
-    /// The last time the device fetched its policy.
-    #[serde(rename="lastPolicySyncTime")]
-    pub last_policy_sync_time: Option<String>,
-    /// The version of the policy currently applied to the device.
-    #[serde(rename="appliedPolicyVersion")]
-    pub applied_policy_version: Option<String>,
-    /// The resource name of the user that owns this device in the form enterprises/{enterpriseId}/users/{userId}.
-    #[serde(rename="userName")]
-    pub user_name: Option<String>,
     /// The name of the policy applied to the device, in the form enterprises/{enterpriseId}/policies/{policyId}. If not specified, the policy_name for the device's user is applied. This field can be modified by a patch request. You can specify only the policyId when calling enterprises.devices.patch, as long as the policyId doesn’t contain any slashes. The rest of the policy name is inferred.
     #[serde(rename="policyName")]
     pub policy_name: Option<String>,
-    /// The type of management mode Android Device Policy takes on the device. This influences which policy settings are supported.
-    #[serde(rename="managementMode")]
-    pub management_mode: Option<String>,
+    /// If the device state is DISABLED, an optional message that is displayed on the device indicating the reason the device is disabled. This field can be modified by a patch request.
+    #[serde(rename="disabledReason")]
+    pub disabled_reason: Option<UserFacingMessage>,
     /// If the device was enrolled with an enrollment token with additional data provided, this field contains that data.
     #[serde(rename="enrollmentTokenData")]
     pub enrollment_token_data: Option<String>,
-    /// The name of the device in the form enterprises/{enterpriseId}/devices/{deviceId}.
-    pub name: Option<String>,
-    /// If the same physical device has been enrolled multiple times, this field contains its previous device names. The serial number is used as the unique identifier to determine if the same physical device has enrolled previously. The names are in chronological order.
-    #[serde(rename="previousDeviceNames")]
-    pub previous_device_names: Option<Vec<String>>,
-    /// The user who owns the device.
-    pub user: Option<User>,
     /// Detailed information about the device software. This information is only available if softwareInfoEnabled is true in the device's policy.
     #[serde(rename="softwareInfo")]
     pub software_info: Option<SoftwareInfo>,
-    /// The state currently applied to the device.
-    #[serde(rename="appliedState")]
-    pub applied_state: Option<String>,
     /// Whether the device is compliant with its policy.
     #[serde(rename="policyCompliant")]
     pub policy_compliant: Option<bool>,
-    /// The time of device enrollment.
-    #[serde(rename="enrollmentTime")]
-    pub enrollment_time: Option<String>,
-    /// Map of selected system properties name and value related to the device.
-    #[serde(rename="systemProperties")]
-    pub system_properties: Option<HashMap<String, String>>,
     /// The state to be applied to the device. This field can be modified by a patch request. Note that when calling enterprises.devices.patch, ACTIVE and DISABLED are the only allowable values. To enter the device into a DELETED state, call enterprises.devices.delete.
     pub state: Option<String>,
-    /// Memory information. This information is only available if memoryInfoEnabled is true in the device's policy.
-    #[serde(rename="memoryInfo")]
-    pub memory_info: Option<MemoryInfo>,
     /// Deprecated.
     #[serde(rename="lastPolicyComplianceReportTime")]
     pub last_policy_compliance_report_time: Option<String>,
@@ -1208,24 +718,79 @@ pub struct Device {
     /// The last time the device sent a status report.
     #[serde(rename="lastStatusReportTime")]
     pub last_status_report_time: Option<String>,
+    /// Detailed information about the device hardware.
+    #[serde(rename="hardwareInfo")]
+    pub hardware_info: Option<HardwareInfo>,
+    /// Device's security posture value that reflects how secure the device is.
+    #[serde(rename="securityPosture")]
+    pub security_posture: Option<SecurityPosture>,
+    /// Device network information. This information is only available if networkInfoEnabled is true in the device's policy.
+    #[serde(rename="networkInfo")]
+    pub network_info: Option<NetworkInfo>,
+    /// The type of management mode Android Device Policy takes on the device. This influences which policy settings are supported.
+    #[serde(rename="managementMode")]
+    pub management_mode: Option<String>,
+    /// Events related to memory and storage measurements in chronological order. This information is only available if memoryInfoEnabled is true in the device's policy.
+    #[serde(rename="memoryEvents")]
+    pub memory_events: Option<Vec<MemoryEvent>>,
+    /// Power management events on the device in chronological order. This information is only available if powerManagementEventsEnabled is true in the device's policy.
+    #[serde(rename="powerManagementEvents")]
+    pub power_management_events: Option<Vec<PowerManagementEvent>>,
+    /// If the device was enrolled with an enrollment token, this field contains the name of the token.
+    #[serde(rename="enrollmentTokenName")]
+    pub enrollment_token_name: Option<String>,
+    /// The user who owns the device.
+    pub user: Option<User>,
+    /// Hardware status samples in chronological order. This information is only available if hardwareStatusEnabled is true in the device's policy.
+    #[serde(rename="hardwareStatusSamples")]
+    pub hardware_status_samples: Option<Vec<HardwareStatus>>,
+    /// The version of the policy currently applied to the device.
+    #[serde(rename="appliedPolicyVersion")]
+    pub applied_policy_version: Option<String>,
+    /// The resource name of the user that owns this device in the form enterprises/{enterpriseId}/users/{userId}.
+    #[serde(rename="userName")]
+    pub user_name: Option<String>,
+    /// The name of the device in the form enterprises/{enterpriseId}/devices/{deviceId}.
+    pub name: Option<String>,
+    /// If the same physical device has been enrolled multiple times, this field contains its previous device names. The serial number is used as the unique identifier to determine if the same physical device has enrolled previously. The names are in chronological order.
+    #[serde(rename="previousDeviceNames")]
+    pub previous_device_names: Option<Vec<String>>,
+    /// The last time the device fetched its policy.
+    #[serde(rename="lastPolicySyncTime")]
+    pub last_policy_sync_time: Option<String>,
+    /// The state currently applied to the device.
+    #[serde(rename="appliedState")]
+    pub applied_state: Option<String>,
+    /// Map of selected system properties name and value related to the device. This information is only available if systemPropertiesEnabled is true in the device's policy.
+    #[serde(rename="systemProperties")]
+    pub system_properties: Option<HashMap<String, String>>,
+    /// Memory information. This information is only available if memoryInfoEnabled is true in the device's policy.
+    #[serde(rename="memoryInfo")]
+    pub memory_info: Option<MemoryInfo>,
+    /// The time of device enrollment.
+    #[serde(rename="enrollmentTime")]
+    pub enrollment_time: Option<String>,
 }
 
 impl RequestValue for Device {}
 impl ResponseResult for Device {}
 
 
-/// Settings controlling the behavior of application reports.
+/// Id to name association of a app track.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ApplicationReportingSettings {
-    /// Whether removed apps are included in application reports.
-    #[serde(rename="includeRemovedApps")]
-    pub include_removed_apps: Option<bool>,
+pub struct AppTrackInfo {
+    /// The track name associated with the trackId, set in the Play Console. The name is modifiable from Play Console.
+    #[serde(rename="trackAlias")]
+    pub track_alias: Option<String>,
+    /// The unmodifiable unique track identifier, taken from the releaseTrackId in the URL of the Play Console page that displays the app’s track information.
+    #[serde(rename="trackId")]
+    pub track_id: Option<String>,
 }
 
-impl Part for ApplicationReportingSettings {}
+impl Part for AppTrackInfo {}
 
 
 /// A resource containing sign in details for an enterprise.
@@ -1248,69 +813,298 @@ pub struct SigninDetail {
 impl Part for SigninDetail {}
 
 
-/// An enrollment token.
+/// A rule that defines the actions to take if a device or work profile is not compliant with the policy specified in settingName.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PolicyEnforcementRule {
+    /// An action to reset a fully managed device or delete a work profile. Note: blockAction must also be specified.
+    #[serde(rename="wipeAction")]
+    pub wipe_action: Option<WipeAction>,
+    /// An action to block access to apps and data on a fully managed device or in a work profile. This action also triggers a user-facing notification with information (where possible) on how to correct the compliance issue. Note: wipeAction must also be specified.
+    #[serde(rename="blockAction")]
+    pub block_action: Option<BlockAction>,
+    /// The top-level policy to enforce. For example, applications or passwordPolicies.
+    #[serde(rename="settingName")]
+    pub setting_name: Option<String>,
+}
+
+impl Part for PolicyEnforcementRule {}
+
+
+/// A list of package names.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PackageNameList {
+    /// A list of package names.
+    #[serde(rename="packageNames")]
+    pub package_names: Option<Vec<String>>,
+}
+
+impl Part for PackageNameList {}
+
+
+/// A system freeze period. When a device’s clock is within the freeze period, all incoming system updates (including security patches) are blocked and won’t be installed. When a device is outside the freeze period, normal update behavior applies. Leap years are ignored in freeze period calculations, in particular: * If Feb. 29th is set as the start or end date of a freeze period, the freeze period will start or end on Feb. 28th instead. * When a device’s system clock reads Feb. 29th, it’s treated as Feb. 28th. * When calculating the number of days in a freeze period or the time between two freeze periods, Feb. 29th is ignored and not counted as a day.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FreezePeriod {
+    /// The start date (inclusive) of the freeze period. Note: year must not be set. For example, {"month": 1,"date": 30}.
+    #[serde(rename="startDate")]
+    pub start_date: Option<Date>,
+    /// The end date (inclusive) of the freeze period. Must be no later than 90 days from the start date. If the end date is earlier than the start date, the freeze period is considered wrapping year-end. Note: year must not be set. For example, {"month": 1,"date": 30}.
+    #[serde(rename="endDate")]
+    pub end_date: Option<Date>,
+}
+
+impl Part for FreezePeriod {}
+
+
+/// Information about device software.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SoftwareInfo {
+    /// An IETF BCP 47 language code for the primary locale on the device.
+    #[serde(rename="primaryLanguageCode")]
+    pub primary_language_code: Option<String>,
+    /// Build time.
+    #[serde(rename="androidBuildTime")]
+    pub android_build_time: Option<String>,
+    /// Android build ID string meant for displaying to the user. For example, shamu-userdebug 6.0.1 MOB30I 2756745 dev-keys.
+    #[serde(rename="androidBuildNumber")]
+    pub android_build_number: Option<String>,
+    /// SHA-256 hash of android.content.pm.Signature (https://developer.android.com/reference/android/content/pm/Signature.html) associated with the system package, which can be used to verify that the system build hasn't been modified.
+    #[serde(rename="deviceBuildSignature")]
+    pub device_build_signature: Option<String>,
+    /// The Android Device Policy app version code.
+    #[serde(rename="androidDevicePolicyVersionCode")]
+    pub android_device_policy_version_code: Option<i32>,
+    /// Security patch level, e.g. 2016-05-01.
+    #[serde(rename="securityPatchLevel")]
+    pub security_patch_level: Option<String>,
+    /// The Android Device Policy app version as displayed to the user.
+    #[serde(rename="androidDevicePolicyVersionName")]
+    pub android_device_policy_version_name: Option<String>,
+    /// Kernel version, for example, 2.6.32.9-g103d848.
+    #[serde(rename="deviceKernelVersion")]
+    pub device_kernel_version: Option<String>,
+    /// The user-visible Android version string. For example, 6.0.1.
+    #[serde(rename="androidVersion")]
+    pub android_version: Option<String>,
+    /// The system bootloader version number, e.g. 0.6.7.
+    #[serde(rename="bootloaderVersion")]
+    pub bootloader_version: Option<String>,
+}
+
+impl Part for SoftwareInfo {}
+
+
+/// A rule declaring which mitigating actions to take when a device is not compliant with its policy. For every rule, there is always an implicit mitigating action to set policy_compliant to false for the Device resource, and display a message on the device indicating that the device is not compliant with its policy. Other mitigating actions may optionally be taken as well, depending on the field values in the rule.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ComplianceRule {
+    /// A condition which is satisfied if the Android Framework API level on the device doesn't meet a minimum requirement.
+    #[serde(rename="apiLevelCondition")]
+    pub api_level_condition: Option<ApiLevelCondition>,
+    /// If set, the rule includes a mitigating action to disable apps specified in the list, but app data is preserved.
+    #[serde(rename="packageNamesToDisable")]
+    pub package_names_to_disable: Option<Vec<String>>,
+    /// A condition which is satisfied if there exists any matching NonComplianceDetail for the device.
+    #[serde(rename="nonComplianceDetailCondition")]
+    pub non_compliance_detail_condition: Option<NonComplianceDetailCondition>,
+    /// If set to true, the rule includes a mitigating action to disable apps so that the device is effectively disabled, but app data is preserved. If the device is running an app in locked task mode, the app will be closed and a UI showing the reason for non-compliance will be displayed.
+    #[serde(rename="disableApps")]
+    pub disable_apps: Option<bool>,
+}
+
+impl Part for ComplianceRule {}
+
+
+/// An action executed during setup.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SetupAction {
+    /// An action to launch an app.
+    #[serde(rename="launchApp")]
+    pub launch_app: Option<LaunchAppAction>,
+    /// Description of this action.
+    pub description: Option<UserFacingMessage>,
+    /// Title of this action.
+    pub title: Option<UserFacingMessage>,
+}
+
+impl Part for SetupAction {}
+
+
+/// The configuration applied to an enterprise.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [enrollment tokens create enterprises](struct.EnterpriseEnrollmentTokenCreateCall.html) (request|response)
+/// * [policies list enterprises](struct.EnterprisePolicyListCall.html) (none)
+/// * [web apps delete enterprises](struct.EnterpriseWebAppDeleteCall.html) (none)
+/// * [policies patch enterprises](struct.EnterprisePolicyPatchCall.html) (none)
+/// * [create enterprises](struct.EnterpriseCreateCall.html) (request|response)
+/// * [web apps create enterprises](struct.EnterpriseWebAppCreateCall.html) (none)
+/// * [enrollment tokens create enterprises](struct.EnterpriseEnrollmentTokenCreateCall.html) (none)
+/// * [web apps list enterprises](struct.EnterpriseWebAppListCall.html) (none)
+/// * [devices list enterprises](struct.EnterpriseDeviceListCall.html) (none)
+/// * [policies delete enterprises](struct.EnterprisePolicyDeleteCall.html) (none)
+/// * [devices operations cancel enterprises](struct.EnterpriseDeviceOperationCancelCall.html) (none)
+/// * [devices operations delete enterprises](struct.EnterpriseDeviceOperationDeleteCall.html) (none)
+/// * [devices operations get enterprises](struct.EnterpriseDeviceOperationGetCall.html) (none)
+/// * [devices operations list enterprises](struct.EnterpriseDeviceOperationListCall.html) (none)
+/// * [devices patch enterprises](struct.EnterpriseDevicePatchCall.html) (none)
+/// * [patch enterprises](struct.EnterprisePatchCall.html) (request|response)
+/// * [policies get enterprises](struct.EnterprisePolicyGetCall.html) (none)
+/// * [web tokens create enterprises](struct.EnterpriseWebTokenCreateCall.html) (none)
+/// * [web apps patch enterprises](struct.EnterpriseWebAppPatchCall.html) (none)
+/// * [enrollment tokens delete enterprises](struct.EnterpriseEnrollmentTokenDeleteCall.html) (none)
+/// * [devices issue command enterprises](struct.EnterpriseDeviceIssueCommandCall.html) (none)
+/// * [devices delete enterprises](struct.EnterpriseDeviceDeleteCall.html) (none)
+/// * [web apps get enterprises](struct.EnterpriseWebAppGetCall.html) (none)
+/// * [devices get enterprises](struct.EnterpriseDeviceGetCall.html) (none)
+/// * [get enterprises](struct.EnterpriseGetCall.html) (response)
+/// * [applications get enterprises](struct.EnterpriseApplicationGetCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EnrollmentToken {
-    /// Optional, arbitrary data associated with the enrollment token. This could contain, for example, the ID of an org unit the device is assigned to after enrollment. After a device enrolls with the token, this data will be exposed in the enrollment_token_data field of the Device resource. The data must be 1024 characters or less; otherwise, the creation request will fail.
-    #[serde(rename="additionalData")]
-    pub additional_data: Option<String>,
-    /// The name of the enrollment token, which is generated by the server during creation, in the form enterprises/{enterpriseId}/enrollmentTokens/{enrollmentTokenId}.
+pub struct Enterprise {
+    /// Terms and conditions that must be accepted when provisioning a device for this enterprise. A page of terms is generated for each value in this list.
+    #[serde(rename="termsAndConditions")]
+    pub terms_and_conditions: Option<Vec<TermsAndConditions>>,
+    /// The name of the enterprise which is generated by the server during creation, in the form enterprises/{enterpriseId}.
     pub name: Option<String>,
-    /// Whether the enrollment token is for one time use only. If the flag is set to true, only one device can use it for registration.
-    #[serde(rename="oneTimeOnly")]
-    pub one_time_only: Option<bool>,
-    /// The name of the policy initially applied to the enrolled device, in the form enterprises/{enterpriseId}/policies/{policyId}. If not specified, the policy_name for the device’s user is applied. If user_name is also not specified, enterprises/{enterpriseId}/policies/default is applied by default. When updating this field, you can specify only the policyId as long as the policyId doesn’t contain any slashes. The rest of the policy name will be inferred.
-    #[serde(rename="policyName")]
-    pub policy_name: Option<String>,
-    /// The token value that's passed to the device and authorizes the device to enroll. This is a read-only field generated by the server.
-    pub value: Option<String>,
-    /// The length of time the enrollment token is valid, ranging from 1 minute to 30 days. If not specified, the default duration is 1 hour.
-    pub duration: Option<String>,
-    /// The user associated with this enrollment token. If it's specified when the enrollment token is created and the user does not exist, the user will be created. This field must not contain personally identifiable information. Only the account_identifier field needs to be set.
-    pub user: Option<User>,
-    /// A JSON string whose UTF-8 representation can be used to generate a QR code to enroll a device with this enrollment token. To enroll a device using NFC, the NFC record must contain a serialized java.util.Properties representation of the properties in the JSON.
-    #[serde(rename="qrCode")]
-    pub qr_code: Option<String>,
-    /// The expiration time of the token. This is a read-only field generated by the server.
-    #[serde(rename="expirationTimestamp")]
-    pub expiration_timestamp: Option<String>,
+    /// The types of Google Pub/Sub notifications enabled for the enterprise.
+    #[serde(rename="enabledNotificationTypes")]
+    pub enabled_notification_types: Option<Vec<String>>,
+    /// An image displayed as a logo during device provisioning. Supported types are: image/bmp, image/gif, image/x-ico, image/jpeg, image/png, image/webp, image/vnd.wap.wbmp, image/x-adobe-dng.
+    pub logo: Option<ExternalData>,
+    /// Sign-in details of the enterprise.
+    #[serde(rename="signinDetails")]
+    pub signin_details: Option<Vec<SigninDetail>>,
+    /// The name of the enterprise displayed to users.
+    #[serde(rename="enterpriseDisplayName")]
+    pub enterprise_display_name: Option<String>,
+    /// A color in RGB format that indicates the predominant color to display in the device management app UI. The color components are stored as follows: (red << 16) | (green << 8) | blue, where the value of each component is between 0 and 255, inclusive.
+    #[serde(rename="primaryColor")]
+    pub primary_color: Option<i32>,
+    /// The topic that Cloud Pub/Sub notifications are published to, in the form projects/{project}/topics/{topic}. This field is only required if Pub/Sub notifications are enabled.
+    #[serde(rename="pubsubTopic")]
+    pub pubsub_topic: Option<String>,
+    /// Deprecated and unused.
+    #[serde(rename="appAutoApprovalEnabled")]
+    pub app_auto_approval_enabled: Option<bool>,
 }
 
-impl RequestValue for EnrollmentToken {}
-impl ResponseResult for EnrollmentToken {}
+impl RequestValue for Enterprise {}
+impl Resource for Enterprise {}
+impl ResponseResult for Enterprise {}
 
 
-/// Keyed app state reported by the app.
+/// A default activity for handling intents that match a particular intent filter. Note: To set up a kiosk, use InstallType to KIOSK rather than use persistent preferred activities.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct KeyedAppState {
-    /// The key for the app state. Acts as a point of reference for what the app is providing state for. For example, when providing managed configuration feedback, this key could be the managed configuration key.
-    pub key: Option<String>,
-    /// The severity of the app state.
-    pub severity: Option<String>,
-    /// The time the app state was most recently updated.
-    #[serde(rename="lastUpdateTime")]
-    pub last_update_time: Option<String>,
-    /// Optionally, a free-form message string to explain the app state. If the state was triggered by a particular value (e.g. a managed configuration value), it should be included in the message.
-    pub message: Option<String>,
-    /// Optionally, a machine-readable value to be read by the EMM. For example, setting values that the admin can choose to query against in the EMM console (e.g. “notify me if the battery_warning data < 10”).
-    pub data: Option<String>,
-    /// The creation time of the app state on the device.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
+pub struct PersistentPreferredActivity {
+    /// The activity that should be the default intent handler. This should be an Android component name, e.g. com.android.enterprise.app/.MainActivity. Alternatively, the value may be the package name of an app, which causes Android Device Policy to choose an appropriate activity from the app to handle the intent.
+    #[serde(rename="receiverActivity")]
+    pub receiver_activity: Option<String>,
+    /// The intent actions to match in the filter. If any actions are included in the filter, then an intent's action must be one of those values for it to match. If no actions are included, the intent action is ignored.
+    pub actions: Option<Vec<String>>,
+    /// The intent categories to match in the filter. An intent includes the categories that it requires, all of which must be included in the filter in order to match. In other words, adding a category to the filter has no impact on matching unless that category is specified in the intent.
+    pub categories: Option<Vec<String>>,
 }
 
-impl Part for KeyedAppState {}
+impl Part for PersistentPreferredActivity {}
+
+
+/// Information about security related device settings on device.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeviceSettings {
+    /// Whether ADB (https://developer.android.com/studio/command-line/adb.html) is enabled on the device.
+    #[serde(rename="adbEnabled")]
+    pub adb_enabled: Option<bool>,
+    /// Whether the storage encryption is enabled.
+    #[serde(rename="isEncrypted")]
+    pub is_encrypted: Option<bool>,
+    /// Whether developer mode is enabled on the device.
+    #[serde(rename="developmentSettingsEnabled")]
+    pub development_settings_enabled: Option<bool>,
+    /// Whether the device is secured with PIN/password.
+    #[serde(rename="isDeviceSecure")]
+    pub is_device_secure: Option<bool>,
+    /// Encryption status from DevicePolicyManager.
+    #[serde(rename="encryptionStatus")]
+    pub encryption_status: Option<String>,
+    /// Whether installing apps from unknown sources is enabled.
+    #[serde(rename="unknownSourcesEnabled")]
+    pub unknown_sources_enabled: Option<bool>,
+    /// Whether Verify Apps (Google Play Protect (https://support.google.com/googleplay/answer/2812853)) is enabled on the device.
+    #[serde(rename="verifyAppsEnabled")]
+    pub verify_apps_enabled: Option<bool>,
+}
+
+impl Part for DeviceSettings {}
+
+
+/// Device display information.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Display {
+    /// Refresh rate of the display in frames per second.
+    #[serde(rename="refreshRate")]
+    pub refresh_rate: Option<i32>,
+    /// Display width in pixels.
+    pub width: Option<i32>,
+    /// State of the display.
+    pub state: Option<String>,
+    /// Name of the display.
+    pub name: Option<String>,
+    /// Display density expressed as dots-per-inch.
+    pub density: Option<i32>,
+    /// Unique display id.
+    #[serde(rename="displayId")]
+    pub display_id: Option<i32>,
+    /// Display height in pixels.
+    pub height: Option<i32>,
+}
+
+impl Part for Display {}
+
+
+/// The managed configurations template for the app, saved from the managed configurations iframe.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ManagedConfigurationTemplate {
+    /// Optional, a map containing <key, value> configuration variables defined for the configuration.
+    #[serde(rename="configurationVariables")]
+    pub configuration_variables: Option<HashMap<String, String>>,
+    /// The ID of the managed configurations template.
+    #[serde(rename="templateId")]
+    pub template_id: Option<String>,
+}
+
+impl Part for ManagedConfigurationTemplate {}
 
 
 /// Information about device hardware. The fields related to temperature thresholds are only available if hardwareStatusEnabled is true in the device's policy.
@@ -1362,46 +1156,158 @@ pub struct HardwareInfo {
 impl Part for HardwareInfo {}
 
 
-/// A rule that defines the actions to take if a device or work profile is not compliant with the policy specified in settingName.
+/// Hardware status. Temperatures may be compared to the temperature thresholds available in hardwareInfo to determine hardware health.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PolicyEnforcementRule {
-    /// An action to reset a fully managed device or delete a work profile. Note: blockAction must also be specified.
-    #[serde(rename="wipeAction")]
-    pub wipe_action: Option<WipeAction>,
-    /// An action to block access to apps and data on a fully managed device or in a work profile. This action also triggers a user-facing notification with information (where possible) on how to correct the compliance issue. Note: wipeAction must also be specified.
-    #[serde(rename="blockAction")]
-    pub block_action: Option<BlockAction>,
-    /// The top-level policy to enforce. For example, applications or passwordPolicies.
-    #[serde(rename="settingName")]
-    pub setting_name: Option<String>,
+pub struct HardwareStatus {
+    /// Current battery temperatures in Celsius for each battery on the device.
+    #[serde(rename="batteryTemperatures")]
+    pub battery_temperatures: Option<Vec<f32>>,
+    /// Current device skin temperatures in Celsius.
+    #[serde(rename="skinTemperatures")]
+    pub skin_temperatures: Option<Vec<f32>>,
+    /// Current GPU temperatures in Celsius for each GPU on the device.
+    #[serde(rename="gpuTemperatures")]
+    pub gpu_temperatures: Option<Vec<f32>>,
+    /// Fan speeds in RPM for each fan on the device. Empty array means that there are no fans or fan speed is not supported on the system.
+    #[serde(rename="fanSpeeds")]
+    pub fan_speeds: Option<Vec<f32>>,
+    /// Current CPU temperatures in Celsius for each CPU on the device.
+    #[serde(rename="cpuTemperatures")]
+    pub cpu_temperatures: Option<Vec<f32>>,
+    /// The time the measurements were taken.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+    /// CPU usages in percentage for each core available on the device. Usage is 0 for each unplugged core. Empty array implies that CPU usage is not supported in the system.
+    #[serde(rename="cpuUsages")]
+    pub cpu_usages: Option<Vec<f32>>,
 }
 
-impl Part for PolicyEnforcementRule {}
+impl Part for HardwareStatus {}
 
 
-/// Response to a request to list web apps for a given enterprise.
+/// The security posture of the device, as determined by the current device state and the policies applied.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SecurityPosture {
+    /// Device's security posture value.
+    #[serde(rename="devicePosture")]
+    pub device_posture: Option<String>,
+    /// Additional details regarding the security posture of the device.
+    #[serde(rename="postureDetails")]
+    pub posture_details: Option<Vec<PostureDetail>>,
+}
+
+impl Part for SecurityPosture {}
+
+
+/// An enterprise signup URL.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [web apps list enterprises](struct.EnterpriseWebAppListCall.html) (response)
+/// * [create signup urls](struct.SignupUrlCreateCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListWebAppsResponse {
-    /// If there are more results, a token to retrieve next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of web apps.
-    #[serde(rename="webApps")]
-    pub web_apps: Option<Vec<WebApp>>,
+pub struct SignupUrl {
+    /// A URL where an enterprise admin can register their enterprise. The page can't be rendered in an iframe.
+    pub url: Option<String>,
+    /// The name of the resource. Use this value in the signupUrl field when calling enterprises.create to complete the enterprise signup flow.
+    pub name: Option<String>,
 }
 
-impl ResponseResult for ListWebAppsResponse {}
+impl Resource for SignupUrl {}
+impl ResponseResult for SignupUrl {}
+
+
+/// A web token used to access the managed Google Play iframe.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [web tokens create enterprises](struct.EnterpriseWebTokenCreateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WebToken {
+    /// The features to enable. Use this if you want to control exactly which feature(s) will be activated; leave empty to allow all features.Restrictions / things to note: <ul> <li> If no features are listed here, all features are enabled — this is the  default behavior where you give access to all features to your admins. <li> This must not contain any FEATURE_UNSPECIFIED values. <li> Repeated values are ignored </ul>
+    #[serde(rename="enabledFeatures")]
+    pub enabled_features: Option<Vec<String>>,
+    /// The URL of the parent frame hosting the iframe with the embedded UI. To prevent XSS, the iframe may not be hosted at other URLs. The URL must use the https scheme.
+    #[serde(rename="parentFrameUrl")]
+    pub parent_frame_url: Option<String>,
+    /// The name of the web token, which is generated by the server during creation in the form enterprises/{enterpriseId}/webTokens/{webTokenId}.
+    pub name: Option<String>,
+    /// The token value which is used in the hosting page to generate the iframe with the embedded UI. This is a read-only field generated by the server.
+    pub value: Option<String>,
+    /// Permissions available to an admin in the embedded UI. An admin must have all of these permissions in order to view the UI. This field is deprecated.
+    pub permissions: Option<Vec<String>>,
+}
+
+impl RequestValue for WebToken {}
+impl ResponseResult for WebToken {}
+
+
+/// Settings controlling the behavior of application reports.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApplicationReportingSettings {
+    /// Whether removed apps are included in application reports.
+    #[serde(rename="includeRemovedApps")]
+    pub include_removed_apps: Option<bool>,
+}
+
+impl Part for ApplicationReportingSettings {}
+
+
+/// Settings controlling the behavior of status reports.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StatusReportingSettings {
+    /// Whether network info reporting is enabled.
+    #[serde(rename="networkInfoEnabled")]
+    pub network_info_enabled: Option<bool>,
+    /// Whether system properties reporting is enabled.
+    #[serde(rename="systemPropertiesEnabled")]
+    pub system_properties_enabled: Option<bool>,
+    /// Whether memory reporting is enabled.
+    #[serde(rename="memoryInfoEnabled")]
+    pub memory_info_enabled: Option<bool>,
+    /// Whether hardware status reporting is enabled. Report data is not available for personally owned devices with work profiles.
+    #[serde(rename="hardwareStatusEnabled")]
+    pub hardware_status_enabled: Option<bool>,
+    /// Whether device settings reporting is enabled.
+    #[serde(rename="deviceSettingsEnabled")]
+    pub device_settings_enabled: Option<bool>,
+    /// Whether app reports are enabled.
+    #[serde(rename="applicationReportsEnabled")]
+    pub application_reports_enabled: Option<bool>,
+    /// Whether power management event reporting is enabled. Report data is not available for personally owned devices with work profiles.
+    #[serde(rename="powerManagementEventsEnabled")]
+    pub power_management_events_enabled: Option<bool>,
+    /// Application reporting settings. Only applicable if application_reports_enabled is true.
+    #[serde(rename="applicationReportingSettings")]
+    pub application_reporting_settings: Option<ApplicationReportingSettings>,
+    /// Whether software info reporting is enabled.
+    #[serde(rename="softwareInfoEnabled")]
+    pub software_info_enabled: Option<bool>,
+    /// Whether displays reporting is enabled. Report data is not available for personally owned devices with work profiles.
+    #[serde(rename="displayInfoEnabled")]
+    pub display_info_enabled: Option<bool>,
+}
+
+impl Part for StatusReportingSettings {}
 
 
 /// This resource represents a long-running operation that is the result of a network API call.
@@ -1431,18 +1337,542 @@ pub struct Operation {
 impl ResponseResult for Operation {}
 
 
-/// A list of package names.
+/// Response to a request to list policies for a given enterprise.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [policies list enterprises](struct.EnterprisePolicyListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListPoliciesResponse {
+    /// If there are more results, a token to retrieve next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of policies.
+    pub policies: Option<Vec<Policy>>,
+}
+
+impl ResponseResult for ListPoliciesResponse {}
+
+
+/// Information reported about an installed app.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PackageNameList {
-    /// A list of package names.
-    #[serde(rename="packageNames")]
-    pub package_names: Option<Vec<String>>,
+pub struct ApplicationReport {
+    /// The display name of the app.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The package name of the app that installed this app.
+    #[serde(rename="installerPackageName")]
+    pub installer_package_name: Option<String>,
+    /// Package name of the app.
+    #[serde(rename="packageName")]
+    pub package_name: Option<String>,
+    /// List of keyed app states reported by the app.
+    #[serde(rename="keyedAppStates")]
+    pub keyed_app_states: Option<Vec<KeyedAppState>>,
+    /// The SHA-256 hash of the app's APK file, which can be used to verify the app hasn't been modified. Each byte of the hash value is represented as a two-digit hexadecimal number.
+    #[serde(rename="packageSha256Hash")]
+    pub package_sha256_hash: Option<String>,
+    /// The SHA-1 hash of each android.content.pm.Signature (https://developer.android.com/reference/android/content/pm/Signature.html) associated with the app package. Each byte of each hash value is represented as a two-digit hexadecimal number.
+    #[serde(rename="signingKeyCertFingerprints")]
+    pub signing_key_cert_fingerprints: Option<Vec<String>>,
+    /// The source of the package.
+    #[serde(rename="applicationSource")]
+    pub application_source: Option<String>,
+    /// Application state.
+    pub state: Option<String>,
+    /// The app version as displayed to the user.
+    #[serde(rename="versionName")]
+    pub version_name: Option<String>,
+    /// The app version code, which can be used to determine whether one version is more recent than another.
+    #[serde(rename="versionCode")]
+    pub version_code: Option<i32>,
+    /// List of app events. The most recent 20 events are stored in the list.
+    pub events: Option<Vec<ApplicationEvent>>,
 }
 
-impl Part for PackageNameList {}
+impl Part for ApplicationReport {}
+
+
+/// A compliance rule condition which is satisfied if there exists any matching NonComplianceDetail for the device. A NonComplianceDetail matches a NonComplianceDetailCondition if all the fields which are set within the NonComplianceDetailCondition match the corresponding NonComplianceDetail fields.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NonComplianceDetailCondition {
+    /// The package name of the app that's out of compliance. If not set, then this condition matches any package name.
+    #[serde(rename="packageName")]
+    pub package_name: Option<String>,
+    /// The name of the policy setting. This is the JSON field name of a top-level Policy field. If not set, then this condition matches any setting name.
+    #[serde(rename="settingName")]
+    pub setting_name: Option<String>,
+    /// The reason the device is not in compliance with the setting. If not set, then this condition matches any reason.
+    #[serde(rename="nonComplianceReason")]
+    pub non_compliance_reason: Option<String>,
+}
+
+impl Part for NonComplianceDetailCondition {}
+
+
+/// Configuration for managing system updates
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SystemUpdate {
+    /// If the type is WINDOWED, the end of the maintenance window, measured as the number of minutes after midnight in device's local time. This value must be between 0 and 1439, inclusive. If this value is less than start_minutes, then the maintenance window spans midnight. If the maintenance window specified is smaller than 30 minutes, the actual window is extended to 30 minutes beyond the start time.
+    #[serde(rename="endMinutes")]
+    pub end_minutes: Option<i32>,
+    /// An annually repeating time period in which over-the-air (OTA) system updates are postponed to freeze the OS version running on a device. To prevent freezing the device indefinitely, each freeze period must be separated by at least 60 days.
+    #[serde(rename="freezePeriods")]
+    pub freeze_periods: Option<Vec<FreezePeriod>>,
+    /// If the type is WINDOWED, the start of the maintenance window, measured as the number of minutes after midnight in the device's local time. This value must be between 0 and 1439, inclusive.
+    #[serde(rename="startMinutes")]
+    pub start_minutes: Option<i32>,
+    /// The type of system update to configure.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+}
+
+impl Part for SystemUpdate {}
+
+
+/// An app-related event.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApplicationEvent {
+    /// App event type.
+    #[serde(rename="eventType")]
+    pub event_type: Option<String>,
+    /// The creation time of the event.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+}
+
+impl Part for ApplicationEvent {}
+
+
+/// An event related to memory and storage measurements.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MemoryEvent {
+    /// Event type.
+    #[serde(rename="eventType")]
+    pub event_type: Option<String>,
+    /// The number of free bytes in the medium, or for EXTERNAL_STORAGE_DETECTED, the total capacity in bytes of the storage medium.
+    #[serde(rename="byteCount")]
+    pub byte_count: Option<String>,
+    /// The creation time of the event.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+}
+
+impl Part for MemoryEvent {}
+
+
+/// Information about an app.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [applications get enterprises](struct.EnterpriseApplicationGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Application {
+    /// Application tracks visible to the enterprise.
+    #[serde(rename="appTracks")]
+    pub app_tracks: Option<Vec<AppTrackInfo>>,
+    /// The set of managed properties available to be pre-configured for the app.
+    #[serde(rename="managedProperties")]
+    pub managed_properties: Option<Vec<ManagedProperty>>,
+    /// The permissions required by the app.
+    pub permissions: Option<Vec<ApplicationPermission>>,
+    /// The name of the app in the form enterprises/{enterpriseId}/applications/{package_name}.
+    pub name: Option<String>,
+    /// The title of the app. Localized.
+    pub title: Option<String>,
+}
+
+impl ResponseResult for Application {}
+
+
+/// Information about device memory and storage.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MemoryInfo {
+    /// Total internal storage on device in bytes.
+    #[serde(rename="totalInternalStorage")]
+    pub total_internal_storage: Option<String>,
+    /// Total RAM on device in bytes.
+    #[serde(rename="totalRam")]
+    pub total_ram: Option<String>,
+}
+
+impl Part for MemoryInfo {}
+
+
+/// A policy resource represents a group of settings that govern the behavior of a managed device and the apps installed on it.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [policies patch enterprises](struct.EnterprisePolicyPatchCall.html) (request|response)
+/// * [policies get enterprises](struct.EnterprisePolicyGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Policy {
+    /// Rules declaring which mitigating actions to take when a device is not compliant with its policy. When the conditions for multiple rules are satisfied, all of the mitigating actions for the rules are taken. There is a maximum limit of 100 rules. Use policy enforcement rules instead.
+    #[serde(rename="complianceRules")]
+    pub compliance_rules: Option<Vec<ComplianceRule>>,
+    /// Whether roaming data services are disabled.
+    #[serde(rename="dataRoamingDisabled")]
+    pub data_roaming_disabled: Option<bool>,
+    /// Whether resetting network settings is disabled.
+    #[serde(rename="networkResetDisabled")]
+    pub network_reset_disabled: Option<bool>,
+    /// Whether location sharing is disabled.
+    #[serde(rename="shareLocationDisabled")]
+    pub share_location_disabled: Option<bool>,
+    /// Default intent handler activities.
+    #[serde(rename="persistentPreferredActivities")]
+    pub persistent_preferred_activities: Option<Vec<PersistentPreferredActivity>>,
+    /// If present, only the input methods provided by packages in this list are permitted. If this field is present, but the list is empty, then only system input methods are permitted.
+    #[serde(rename="permittedInputMethods")]
+    pub permitted_input_methods: Option<PackageNameList>,
+    /// Status reporting settings
+    #[serde(rename="statusReportingSettings")]
+    pub status_reporting_settings: Option<StatusReportingSettings>,
+    /// Whether configuring bluetooth is disabled.
+    #[serde(rename="bluetoothConfigDisabled")]
+    pub bluetooth_config_disabled: Option<bool>,
+    /// The degree of location detection enabled. The user may change the value unless the user is otherwise blocked from accessing device settings.
+    #[serde(rename="locationMode")]
+    pub location_mode: Option<String>,
+    /// Whether configuring mobile networks is disabled.
+    #[serde(rename="mobileNetworksConfigDisabled")]
+    pub mobile_networks_config_disabled: Option<bool>,
+    /// Security policies set to the most secure values by default. To maintain the security posture of a device, we don't recommend overriding any of the default values.
+    #[serde(rename="advancedSecurityOverrides")]
+    pub advanced_security_overrides: Option<AdvancedSecurityOverrides>,
+    /// Whether the user is allowed to enable the "Unknown Sources" setting, which allows installation of apps from unknown sources.
+    #[serde(rename="installUnknownSourcesAllowed")]
+    pub install_unknown_sources_allowed: Option<bool>,
+    /// Whether applications other than the ones configured in applications are blocked from being installed. When set, applications that were installed under a previous policy but no longer appear in the policy are automatically uninstalled.
+    #[serde(rename="blockApplicationsEnabled")]
+    pub block_applications_enabled: Option<bool>,
+    /// A message displayed to the user in the device administators settings screen.
+    #[serde(rename="longSupportMessage")]
+    pub long_support_message: Option<UserFacingMessage>,
+    /// The app tracks for Android Device Policy the device can access. The device receives the latest version among all accessible tracks. If no tracks are specified, then the device only uses the production track.
+    #[serde(rename="androidDevicePolicyTracks")]
+    pub android_device_policy_tracks: Option<Vec<String>>,
+    /// The name of the policy in the form enterprises/{enterpriseId}/policies/{policyId}.
+    pub name: Option<String>,
+    /// The default permission policy for runtime permission requests.
+    #[serde(rename="defaultPermissionPolicy")]
+    pub default_permission_policy: Option<String>,
+    /// Whether bluetooth is disabled. Prefer this setting over bluetooth_config_disabled because bluetooth_config_disabled can be bypassed by the user.
+    #[serde(rename="bluetoothDisabled")]
+    pub bluetooth_disabled: Option<bool>,
+    /// Whether the status bar is disabled. This disables notifications, quick settings, and other screen overlays that allow escape from full-screen mode. DEPRECATED. To disable the status bar on a kiosk device, use InstallType KIOSK or kioskCustomLauncherEnabled.
+    #[serde(rename="statusBarDisabled")]
+    pub status_bar_disabled: Option<bool>,
+    /// Rules for automatically choosing a private key and certificate to authenticate the device to a server. The rules are ordered by increasing precedence, so if an outgoing request matches more than one rule, the last rule defines which private key to use.
+    #[serde(rename="choosePrivateKeyRules")]
+    pub choose_private_key_rules: Option<Vec<ChoosePrivateKeyRule>>,
+    /// This mode controls which apps are available to the user in the Play Store and the behavior on the device when apps are removed from the policy.
+    #[serde(rename="playStoreMode")]
+    pub play_store_mode: Option<String>,
+    /// Whether transferring files over USB is disabled.
+    #[serde(rename="usbFileTransferDisabled")]
+    pub usb_file_transfer_disabled: Option<bool>,
+    /// Whether using NFC to beam data from apps is disabled.
+    #[serde(rename="outgoingBeamDisabled")]
+    pub outgoing_beam_disabled: Option<bool>,
+    /// Whether the user is allowed to have fun. Controls whether the Easter egg game in Settings is disabled.
+    #[serde(rename="funDisabled")]
+    pub fun_disabled: Option<bool>,
+    /// The device owner information to be shown on the lock screen.
+    #[serde(rename="deviceOwnerLockScreenInfo")]
+    pub device_owner_lock_screen_info: Option<UserFacingMessage>,
+    /// Configuration for an always-on VPN connection. Use with vpn_config_disabled to prevent modification of this setting.
+    #[serde(rename="alwaysOnVpnPackage")]
+    pub always_on_vpn_package: Option<AlwaysOnVpnPackage>,
+    /// Disabled keyguard customizations, such as widgets.
+    #[serde(rename="keyguardDisabledFeatures")]
+    pub keyguard_disabled_features: Option<Vec<String>>,
+    /// Whether configuring cell broadcast is disabled.
+    #[serde(rename="cellBroadcastsConfigDisabled")]
+    pub cell_broadcasts_config_disabled: Option<bool>,
+    /// Whether the keyguard is disabled.
+    #[serde(rename="keyguardDisabled")]
+    pub keyguard_disabled: Option<bool>,
+    /// Whether factory resetting from settings is disabled.
+    #[serde(rename="factoryResetDisabled")]
+    pub factory_reset_disabled: Option<bool>,
+    /// Password requirement policies. Different policies can be set for work profile or fully managed devices by setting the password_scope field in the policy.
+    #[serde(rename="passwordPolicies")]
+    pub password_policies: Option<Vec<PasswordRequirements>>,
+    /// Whether the network escape hatch is enabled. If a network connection can't be made at boot time, the escape hatch prompts the user to temporarily connect to a network in order to refresh the device policy. After applying policy, the temporary network will be forgotten and the device will continue booting. This prevents being unable to connect to a network if there is no suitable network in the last policy and the device boots into an app in lock task mode, or the user is otherwise unable to reach device settings.
+    #[serde(rename="networkEscapeHatchEnabled")]
+    pub network_escape_hatch_enabled: Option<bool>,
+    /// Whether auto time is required, which prevents the user from manually setting the date and time.
+    #[serde(rename="autoTimeRequired")]
+    pub auto_time_required: Option<bool>,
+    /// The app auto update policy, which controls when automatic app updates can be applied.
+    #[serde(rename="appAutoUpdatePolicy")]
+    pub app_auto_update_policy: Option<String>,
+    /// Whether changing the user icon is disabled.
+    #[serde(rename="setUserIconDisabled")]
+    pub set_user_icon_disabled: Option<bool>,
+    /// The battery plugged in modes for which the device stays on. When using this setting, it is recommended to clear maximum_time_to_lock so that the device doesn't lock itself while it stays on.
+    #[serde(rename="stayOnPluggedModes")]
+    pub stay_on_plugged_modes: Option<Vec<String>>,
+    /// Whether user installation of apps is disabled.
+    #[serde(rename="installAppsDisabled")]
+    pub install_apps_disabled: Option<bool>,
+    /// Whether adjusting the master volume is disabled.
+    #[serde(rename="adjustVolumeDisabled")]
+    pub adjust_volume_disabled: Option<bool>,
+    /// A message displayed to the user in the settings screen wherever functionality has been disabled by the admin. If the message is longer than 200 characters it may be truncated.
+    #[serde(rename="shortSupportMessage")]
+    pub short_support_message: Option<UserFacingMessage>,
+    /// Whether app verification is force-enabled.
+    #[serde(rename="ensureVerifyAppsEnabled")]
+    pub ensure_verify_apps_enabled: Option<bool>,
+    /// Allows showing UI on a device for a user to choose a private key alias if there are no matching rules in ChoosePrivateKeyRules. For devices below Android P, setting this may leave enterprise keys vulnerable.
+    #[serde(rename="privateKeySelectionEnabled")]
+    pub private_key_selection_enabled: Option<bool>,
+    /// Settings controlling the behavior of a device in kiosk mode. To enable kiosk mode, set kioskCustomLauncherEnabled to true or specify an app in the policy with installType KIOSK.
+    #[serde(rename="kioskCustomization")]
+    pub kiosk_customization: Option<KioskCustomization>,
+    /// Rules that define the behavior when a particular policy can not be applied on device
+    #[serde(rename="policyEnforcementRules")]
+    pub policy_enforcement_rules: Option<Vec<PolicyEnforcementRule>>,
+    /// Actions to take during the setup process.
+    #[serde(rename="setupActions")]
+    pub setup_actions: Option<Vec<SetupAction>>,
+    /// Whether configuring tethering and portable hotspots is disabled.
+    #[serde(rename="tetheringConfigDisabled")]
+    pub tethering_config_disabled: Option<bool>,
+    /// Whether all cameras on the device are disabled.
+    #[serde(rename="cameraDisabled")]
+    pub camera_disabled: Option<bool>,
+    /// DEPRECATED - Use wifi_config_disabled.
+    #[serde(rename="wifiConfigsLockdownEnabled")]
+    pub wifi_configs_lockdown_enabled: Option<bool>,
+    /// Whether adding new users and profiles is disabled.
+    #[serde(rename="addUserDisabled")]
+    pub add_user_disabled: Option<bool>,
+    /// Whether the kiosk custom launcher is enabled. This replaces the home screen with a launcher that locks down the device to the apps installed via the applications setting. Apps appear on a single page in alphabetical order. Use kioskCustomization to further configure the kiosk device behavior.
+    #[serde(rename="kioskCustomLauncherEnabled")]
+    pub kiosk_custom_launcher_enabled: Option<bool>,
+    /// Whether rebooting the device into safe boot is disabled.
+    #[serde(rename="safeBootDisabled")]
+    pub safe_boot_disabled: Option<bool>,
+    /// Whether removing other users is disabled.
+    #[serde(rename="removeUserDisabled")]
+    pub remove_user_disabled: Option<bool>,
+    /// Network configuration for the device. See configure networks for more information.
+    #[serde(rename="openNetworkConfiguration")]
+    pub open_network_configuration: Option<HashMap<String, String>>,
+    /// Account types that can't be managed by the user.
+    #[serde(rename="accountTypesWithManagementDisabled")]
+    pub account_types_with_management_disabled: Option<Vec<String>>,
+    /// Email addresses of device administrators for factory reset protection. When the device is factory reset, it will require one of these admins to log in with the Google account email and password to unlock the device. If no admins are specified, the device won't provide factory reset protection.
+    #[serde(rename="frpAdminEmails")]
+    pub frp_admin_emails: Option<Vec<String>>,
+    /// Password requirements. The field password_requirements.require_password_unlock must not be set. DEPRECATED - Use password_policies.
+    #[serde(rename="passwordRequirements")]
+    pub password_requirements: Option<PasswordRequirements>,
+    /// Maximum time in milliseconds for user activity until the device locks. A value of 0 means there is no restriction.
+    #[serde(rename="maximumTimeToLock")]
+    pub maximum_time_to_lock: Option<String>,
+    /// The version of the policy. This is a read-only field. The version is incremented each time the policy is updated.
+    pub version: Option<String>,
+    /// Whether the user mounting physical external media is disabled.
+    #[serde(rename="mountPhysicalMediaDisabled")]
+    pub mount_physical_media_disabled: Option<bool>,
+    /// Whether configuring VPN is disabled.
+    #[serde(rename="vpnConfigDisabled")]
+    pub vpn_config_disabled: Option<bool>,
+    /// Whether adding or removing accounts is disabled.
+    #[serde(rename="modifyAccountsDisabled")]
+    pub modify_accounts_disabled: Option<bool>,
+    /// Whether changing the wallpaper is disabled.
+    #[serde(rename="setWallpaperDisabled")]
+    pub set_wallpaper_disabled: Option<bool>,
+    /// Flag to skip hints on the first use. Enterprise admin can enable the system recommendation for apps to skip their user tutorial and other introductory hints on first start-up.
+    #[serde(rename="skipFirstUseHintsEnabled")]
+    pub skip_first_use_hints_enabled: Option<bool>,
+    /// Whether encryption is enabled
+    #[serde(rename="encryptionPolicy")]
+    pub encryption_policy: Option<String>,
+    /// Whether sending and receiving SMS messages is disabled.
+    #[serde(rename="smsDisabled")]
+    pub sms_disabled: Option<bool>,
+    /// The network-independent global HTTP proxy. Typically proxies should be configured per-network in open_network_configuration. However for unusual configurations like general internal filtering a global HTTP proxy may be useful. If the proxy is not accessible, network access may break. The global proxy is only a recommendation and some apps may ignore it.
+    #[serde(rename="recommendedGlobalProxy")]
+    pub recommended_global_proxy: Option<ProxyInfo>,
+    /// Whether bluetooth contact sharing is disabled.
+    #[serde(rename="bluetoothContactSharingDisabled")]
+    pub bluetooth_contact_sharing_disabled: Option<bool>,
+    /// Whether configuring Wi-Fi access points is disabled.
+    #[serde(rename="wifiConfigDisabled")]
+    pub wifi_config_disabled: Option<bool>,
+    /// Whether USB storage is enabled. Deprecated.
+    #[serde(rename="usbMassStorageEnabled")]
+    pub usb_mass_storage_enabled: Option<bool>,
+    /// Policy applied to apps.
+    pub applications: Option<Vec<ApplicationPolicy>>,
+    /// Whether the microphone is muted and adjusting microphone volume is disabled.
+    #[serde(rename="unmuteMicrophoneDisabled")]
+    pub unmute_microphone_disabled: Option<bool>,
+    /// Whether the user is allowed to enable debugging features.
+    #[serde(rename="debuggingFeaturesAllowed")]
+    pub debugging_features_allowed: Option<bool>,
+    /// Whether user uninstallation of applications is disabled.
+    #[serde(rename="uninstallAppsDisabled")]
+    pub uninstall_apps_disabled: Option<bool>,
+    /// The minimum allowed Android API level.
+    #[serde(rename="minimumApiLevel")]
+    pub minimum_api_level: Option<i32>,
+    /// Whether outgoing calls are disabled.
+    #[serde(rename="outgoingCallsDisabled")]
+    pub outgoing_calls_disabled: Option<bool>,
+    /// The system update policy, which controls how OS updates are applied. If the update type is WINDOWED, the update window will automatically apply to Play app updates as well.
+    #[serde(rename="systemUpdate")]
+    pub system_update: Option<SystemUpdate>,
+    /// Whether screen capture is disabled.
+    #[serde(rename="screenCaptureDisabled")]
+    pub screen_capture_disabled: Option<bool>,
+    /// Whether configuring user credentials is disabled.
+    #[serde(rename="credentialsConfigDisabled")]
+    pub credentials_config_disabled: Option<bool>,
+    /// Specifies permitted accessibility services. If the field is not set, any accessibility service can be used. If the field is set, only the accessibility services in this list and the system's built-in accessibility service can be used. In particular, if the field is set to empty, only the system's built-in accessibility servicess can be used.
+    #[serde(rename="permittedAccessibilityServices")]
+    pub permitted_accessibility_services: Option<PackageNameList>,
+    /// Explicit permission or group grants or denials for all apps. These values override the default_permission_policy.
+    #[serde(rename="permissionGrants")]
+    pub permission_grants: Option<Vec<PermissionGrant>>,
+    /// Whether creating windows besides app windows is disabled.
+    #[serde(rename="createWindowsDisabled")]
+    pub create_windows_disabled: Option<bool>,
+}
+
+impl RequestValue for Policy {}
+impl ResponseResult for Policy {}
+
+
+/// An action to block access to apps and data on a fully managed device or in a work profile. This action also triggers a device or work profile to displays a user-facing notification with information (where possible) on how to correct the compliance issue. Note: wipeAction must also be specified.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BlockAction {
+    /// Number of days the policy is non-compliant before the device or work profile is blocked. To block access immediately, set to 0. blockAfterDays must be less than wipeAfterDays.
+    #[serde(rename="blockAfterDays")]
+    pub block_after_days: Option<i32>,
+}
+
+impl Part for BlockAction {}
+
+
+/// Additional details regarding the security posture of the device.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PostureDetail {
+    /// Corresponding admin-facing advice to mitigate this security risk and improve the security posture of the device.
+    pub advice: Option<Vec<UserFacingMessage>>,
+    /// A specific security risk that negatively affects the security posture of the device.
+    #[serde(rename="securityRisk")]
+    pub security_risk: Option<String>,
+}
+
+impl Part for PostureDetail {}
+
+
+/// A permission required by the app.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApplicationPermission {
+    /// An opaque string uniquely identifying the permission. Not localized.
+    #[serde(rename="permissionId")]
+    pub permission_id: Option<String>,
+    /// A longer description of the permission, providing more detail on what it affects. Localized.
+    pub description: Option<String>,
+    /// The name of the permission. Localized.
+    pub name: Option<String>,
+}
+
+impl Part for ApplicationPermission {}
+
+
+/// Keyed app state reported by the app.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct KeyedAppState {
+    /// The key for the app state. Acts as a point of reference for what the app is providing state for. For example, when providing managed configuration feedback, this key could be the managed configuration key.
+    pub key: Option<String>,
+    /// The severity of the app state.
+    pub severity: Option<String>,
+    /// The time the app state was most recently updated.
+    #[serde(rename="lastUpdateTime")]
+    pub last_update_time: Option<String>,
+    /// Optionally, a free-form message string to explain the app state. If the state was triggered by a particular value (e.g. a managed configuration value), it should be included in the message.
+    pub message: Option<String>,
+    /// Optionally, a machine-readable value to be read by the EMM. For example, setting values that the admin can choose to query against in the EMM console (e.g. “notify me if the battery_warning data < 10”).
+    pub data: Option<String>,
+    /// The creation time of the app state on the device.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+}
+
+impl Part for KeyedAppState {}
+
+
+/// Response to a request to list web apps for a given enterprise.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [web apps list enterprises](struct.EnterpriseWebAppListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListWebAppsResponse {
+    /// If there are more results, a token to retrieve next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of web apps.
+    #[serde(rename="webApps")]
+    pub web_apps: Option<Vec<WebApp>>,
+}
+
+impl ResponseResult for ListWebAppsResponse {}
 
 
 /// Requirements for the password used to unlock a device.
@@ -1460,6 +1890,9 @@ pub struct PasswordRequirements {
     /// Number of incorrect device-unlock passwords that can be entered before a device is wiped. A value of 0 means there is no restriction.
     #[serde(rename="maximumFailedPasswordsForWipe")]
     pub maximum_failed_passwords_for_wipe: Option<i32>,
+    /// The length of time after a device or work profile is unlocked using a strong form of authentication (password, PIN, pattern) that it can be unlocked using any other authentication method (e.g. fingerprint, trust agents, face). After the specified time period elapses, only strong forms of authentication can be used to unlock the device or work profile.
+    #[serde(rename="requirePasswordUnlock")]
+    pub require_password_unlock: Option<String>,
     /// Minimum number of symbols required in the password. Only enforced when password_quality is COMPLEX.
     #[serde(rename="passwordMinimumSymbols")]
     pub password_minimum_symbols: Option<i32>,
@@ -1490,29 +1923,6 @@ pub struct PasswordRequirements {
 }
 
 impl Part for PasswordRequirements {}
-
-
-/// A rule declaring which mitigating actions to take when a device is not compliant with its policy. For every rule, there is always an implicit mitigating action to set policy_compliant to false for the Device resource, and display a message on the device indicating that the device is not compliant with its policy. Other mitigating actions may optionally be taken as well, depending on the field values in the rule.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ComplianceRule {
-    /// A condition which is satisfied if the Android Framework API level on the device doesn't meet a minimum requirement.
-    #[serde(rename="apiLevelCondition")]
-    pub api_level_condition: Option<ApiLevelCondition>,
-    /// If set, the rule includes a mitigating action to disable apps specified in the list, but app data is preserved.
-    #[serde(rename="packageNamesToDisable")]
-    pub package_names_to_disable: Option<Vec<String>>,
-    /// A condition which is satisfied if there exists any matching NonComplianceDetail for the device.
-    #[serde(rename="nonComplianceDetailCondition")]
-    pub non_compliance_detail_condition: Option<NonComplianceDetailCondition>,
-    /// If set to true, the rule includes a mitigating action to disable apps so that the device is effectively disabled, but app data is preserved. If the device is running an app in locked task mode, the app will be closed and a UI showing the reason for non-compliance will be displayed.
-    #[serde(rename="disableApps")]
-    pub disable_apps: Option<bool>,
-}
-
-impl Part for ComplianceRule {}
 
 
 /// Response to a request to list devices for a given enterprise.
@@ -1589,109 +1999,6 @@ pub struct UserFacingMessage {
 impl Part for UserFacingMessage {}
 
 
-/// An action executed during setup.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SetupAction {
-    /// An action to launch an app.
-    #[serde(rename="launchApp")]
-    pub launch_app: Option<LaunchAppAction>,
-    /// Description of this action.
-    pub description: Option<UserFacingMessage>,
-    /// Title of this action.
-    pub title: Option<UserFacingMessage>,
-}
-
-impl Part for SetupAction {}
-
-
-/// The configuration applied to an enterprise.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [policies list enterprises](struct.EnterprisePolicyListCall.html) (none)
-/// * [web apps delete enterprises](struct.EnterpriseWebAppDeleteCall.html) (none)
-/// * [policies patch enterprises](struct.EnterprisePolicyPatchCall.html) (none)
-/// * [create enterprises](struct.EnterpriseCreateCall.html) (request|response)
-/// * [web apps create enterprises](struct.EnterpriseWebAppCreateCall.html) (none)
-/// * [enrollment tokens create enterprises](struct.EnterpriseEnrollmentTokenCreateCall.html) (none)
-/// * [web apps list enterprises](struct.EnterpriseWebAppListCall.html) (none)
-/// * [devices list enterprises](struct.EnterpriseDeviceListCall.html) (none)
-/// * [policies delete enterprises](struct.EnterprisePolicyDeleteCall.html) (none)
-/// * [devices operations cancel enterprises](struct.EnterpriseDeviceOperationCancelCall.html) (none)
-/// * [devices operations delete enterprises](struct.EnterpriseDeviceOperationDeleteCall.html) (none)
-/// * [devices operations get enterprises](struct.EnterpriseDeviceOperationGetCall.html) (none)
-/// * [devices operations list enterprises](struct.EnterpriseDeviceOperationListCall.html) (none)
-/// * [devices patch enterprises](struct.EnterpriseDevicePatchCall.html) (none)
-/// * [patch enterprises](struct.EnterprisePatchCall.html) (request|response)
-/// * [policies get enterprises](struct.EnterprisePolicyGetCall.html) (none)
-/// * [web tokens create enterprises](struct.EnterpriseWebTokenCreateCall.html) (none)
-/// * [web apps patch enterprises](struct.EnterpriseWebAppPatchCall.html) (none)
-/// * [enrollment tokens delete enterprises](struct.EnterpriseEnrollmentTokenDeleteCall.html) (none)
-/// * [devices issue command enterprises](struct.EnterpriseDeviceIssueCommandCall.html) (none)
-/// * [devices delete enterprises](struct.EnterpriseDeviceDeleteCall.html) (none)
-/// * [web apps get enterprises](struct.EnterpriseWebAppGetCall.html) (none)
-/// * [devices get enterprises](struct.EnterpriseDeviceGetCall.html) (none)
-/// * [get enterprises](struct.EnterpriseGetCall.html) (response)
-/// * [applications get enterprises](struct.EnterpriseApplicationGetCall.html) (none)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Enterprise {
-    /// Terms and conditions that must be accepted when provisioning a device for this enterprise. A page of terms is generated for each value in this list.
-    #[serde(rename="termsAndConditions")]
-    pub terms_and_conditions: Option<Vec<TermsAndConditions>>,
-    /// The name of the enterprise which is generated by the server during creation, in the form enterprises/{enterpriseId}.
-    pub name: Option<String>,
-    /// The types of Google Pub/Sub notifications enabled for the enterprise.
-    #[serde(rename="enabledNotificationTypes")]
-    pub enabled_notification_types: Option<Vec<String>>,
-    /// An image displayed as a logo during device provisioning. Supported types are: image/bmp, image/gif, image/x-ico, image/jpeg, image/png, image/webp, image/vnd.wap.wbmp, image/x-adobe-dng.
-    pub logo: Option<ExternalData>,
-    /// Sign-in details of the enterprise. Maximum of 1 SigninDetail is supported.
-    #[serde(rename="signinDetails")]
-    pub signin_details: Option<Vec<SigninDetail>>,
-    /// The name of the enterprise displayed to users.
-    #[serde(rename="enterpriseDisplayName")]
-    pub enterprise_display_name: Option<String>,
-    /// A color in RGB format that indicates the predominant color to display in the device management app UI. The color components are stored as follows: (red << 16) | (green << 8) | blue, where the value of each component is between 0 and 255, inclusive.
-    #[serde(rename="primaryColor")]
-    pub primary_color: Option<i32>,
-    /// The topic that Cloud Pub/Sub notifications are published to, in the form projects/{project}/topics/{topic}. This field is only required if Pub/Sub notifications are enabled.
-    #[serde(rename="pubsubTopic")]
-    pub pubsub_topic: Option<String>,
-    /// Deprecated and unused.
-    #[serde(rename="appAutoApprovalEnabled")]
-    pub app_auto_approval_enabled: Option<bool>,
-}
-
-impl RequestValue for Enterprise {}
-impl Resource for Enterprise {}
-impl ResponseResult for Enterprise {}
-
-
-/// A default activity for handling intents that match a particular intent filter.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PersistentPreferredActivity {
-    /// The activity that should be the default intent handler. This should be an Android component name, e.g. com.android.enterprise.app/.MainActivity. Alternatively, the value may be the package name of an app, which causes Android Device Policy to choose an appropriate activity from the app to handle the intent.
-    #[serde(rename="receiverActivity")]
-    pub receiver_activity: Option<String>,
-    /// The intent actions to match in the filter. If any actions are included in the filter, then an intent's action must be one of those values for it to match. If no actions are included, the intent action is ignored.
-    pub actions: Option<Vec<String>>,
-    /// The intent categories to match in the filter. An intent includes the categories that it requires, all of which must be included in the filter in order to match. In other words, adding a category to the filter has no impact on matching unless that category is specified in the intent.
-    pub categories: Option<Vec<String>>,
-}
-
-impl Part for PersistentPreferredActivity {}
-
-
 /// An action to launch an app.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1706,31 +2013,19 @@ pub struct LaunchAppAction {
 impl Part for LaunchAppAction {}
 
 
-/// Device display information.
+/// A terms and conditions page to be accepted during provisioning.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Display {
-    /// Refresh rate of the display in frames per second.
-    #[serde(rename="refreshRate")]
-    pub refresh_rate: Option<i32>,
-    /// Display width in pixels.
-    pub width: Option<i32>,
-    /// State of the display.
-    pub state: Option<String>,
-    /// Name of the display.
-    pub name: Option<String>,
-    /// Display density expressed as dots-per-inch.
-    pub density: Option<i32>,
-    /// Unique display id.
-    #[serde(rename="displayId")]
-    pub display_id: Option<i32>,
-    /// Display height in pixels.
-    pub height: Option<i32>,
+pub struct TermsAndConditions {
+    /// A well-formatted HTML string. It will be parsed on the client with android.text.Html#fromHtml.
+    pub content: Option<UserFacingMessage>,
+    /// A short header which appears above the HTML content.
+    pub header: Option<UserFacingMessage>,
 }
 
-impl Part for Display {}
+impl Part for TermsAndConditions {}
 
 
 /// The response message for Operations.ListOperations.
@@ -1754,58 +2049,6 @@ pub struct ListOperationsResponse {
 impl ResponseResult for ListOperationsResponse {}
 
 
-/// A terms and conditions page to be accepted during provisioning.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TermsAndConditions {
-    /// A well-formatted HTML string. It will be parsed on the client with android.text.Html#fromHtml.
-    pub content: Option<UserFacingMessage>,
-    /// A short header which appears above the HTML content.
-    pub header: Option<UserFacingMessage>,
-}
-
-impl Part for TermsAndConditions {}
-
-
-/// An event related to memory and storage measurements.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MemoryEvent {
-    /// Event type.
-    #[serde(rename="eventType")]
-    pub event_type: Option<String>,
-    /// The number of free bytes in the medium, or for EXTERNAL_STORAGE_DETECTED, the total capacity in bytes of the storage medium.
-    #[serde(rename="byteCount")]
-    pub byte_count: Option<String>,
-    /// The creation time of the event.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
-}
-
-impl Part for MemoryEvent {}
-
-
-/// The managed configurations template for the app, saved from the managed configurations iframe.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedConfigurationTemplate {
-    /// Optional, a map containing <key, value> configuration variables defined for the configuration.
-    #[serde(rename="configurationVariables")]
-    pub configuration_variables: Option<HashMap<String, String>>,
-    /// The ID of the managed configurations template.
-    #[serde(rename="templateId")]
-    pub template_id: Option<String>,
-}
-
-impl Part for ManagedConfigurationTemplate {}
-
-
 /// A power management event.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1826,30 +2069,42 @@ pub struct PowerManagementEvent {
 impl Part for PowerManagementEvent {}
 
 
-/// A web token used to access the managed Google Play iframe.
+/// An action to reset a fully managed device or delete a work profile. Note: blockAction must also be specified.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [web tokens create enterprises](struct.EnterpriseWebTokenCreateCall.html) (request|response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct WebToken {
-    /// The URL of the parent frame hosting the iframe with the embedded UI. To prevent XSS, the iframe may not be hosted at other URLs. The URL must use the https scheme.
-    #[serde(rename="parentFrameUrl")]
-    pub parent_frame_url: Option<String>,
-    /// The name of the web token, which is generated by the server during creation in the form enterprises/{enterpriseId}/webTokens/{webTokenId}.
-    pub name: Option<String>,
-    /// The token value which is used in the hosting page to generate the iframe with the embedded UI. This is a read-only field generated by the server.
-    pub value: Option<String>,
-    /// Permissions available to an admin in the embedded UI. An admin must have all of these permissions in order to view the UI.
-    pub permissions: Option<Vec<String>>,
+pub struct WipeAction {
+    /// Number of days the policy is non-compliant before the device or work profile is wiped. wipeAfterDays must be greater than blockAfterDays.
+    #[serde(rename="wipeAfterDays")]
+    pub wipe_after_days: Option<i32>,
+    /// Whether the factory-reset protection data is preserved on the device. This setting doesn’t apply to work profiles.
+    #[serde(rename="preserveFrp")]
+    pub preserve_frp: Option<bool>,
 }
 
-impl RequestValue for WebToken {}
-impl ResponseResult for WebToken {}
+impl Part for WipeAction {}
+
+
+/// Represents a whole or partial calendar date, e.g. a birthday. The time of day and time zone are either specified elsewhere or are not significant. The date is relative to the Proleptic Gregorian Calendar. This can represent:
+/// A full date, with non-zero year, month and day values
+/// A month and day value, with a zero year, e.g. an anniversary
+/// A year on its own, with zero month and day values
+/// A year and month value, with a zero day, e.g. a credit card expiration dateRelated types are google.type.TimeOfDay and google.protobuf.Timestamp.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Date {
+    /// Month of year. Must be from 1 to 12, or 0 if specifying a year without a month and day.
+    pub month: Option<i32>,
+    /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0 if specifying a year by itself or a year and month where the day is not significant.
+    pub day: Option<i32>,
+    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without a year.
+    pub year: Option<i32>,
+}
+
+impl Part for Date {}
 
 
 /// Policy for an individual app.
@@ -1861,7 +2116,7 @@ pub struct ApplicationPolicy {
     /// The managed configurations template for the app, saved from the managed configurations iframe. This field is ignored if managed_configuration is set.
     #[serde(rename="managedConfigurationTemplate")]
     pub managed_configuration_template: Option<ManagedConfigurationTemplate>,
-    /// Whether the app is allowed to lock itself in full-screen mode.
+    /// Whether the app is allowed to lock itself in full-screen mode. DEPRECATED. Use InstallType KIOSK or kioskCustomLauncherEnabled to to configure a dedicated device.
     #[serde(rename="lockTaskAllowed")]
     pub lock_task_allowed: Option<bool>,
     /// The package name of the app. For example, com.google.android.youtube for the YouTube app.
@@ -1878,6 +2133,9 @@ pub struct ApplicationPolicy {
     /// The minimum version of the app that runs on the device. If set, the device attempts to update the app to at least this version code. If the app is not up-to-date, the device will contain a NonComplianceDetail with non_compliance_reason set to APP_NOT_UPDATED. The app must already be published to Google Play with a version code greater than or equal to this value. At most 20 apps may specify a minimum version code per policy.
     #[serde(rename="minimumVersionCode")]
     pub minimum_version_code: Option<i32>,
+    /// List of the app’s track IDs that a device belonging to the enterprise can access. If the list contains multiple track IDs, devices receive the latest version among all accessible tracks. If the list contains no track IDs, devices only have access to the app’s production track. More details about each track are available in AppTrackInfo.
+    #[serde(rename="accessibleTrackIds")]
+    pub accessible_track_ids: Option<Vec<String>>,
     /// The scopes delegated to the app from Android Device Policy.
     #[serde(rename="delegatedScopes")]
     pub delegated_scopes: Option<Vec<String>>,
@@ -1937,79 +2195,6 @@ pub struct ManagedProperty {
 impl Part for ManagedProperty {}
 
 
-/// A permission required by the app.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ApplicationPermission {
-    /// An opaque string uniquely identifying the permission. Not localized.
-    #[serde(rename="permissionId")]
-    pub permission_id: Option<String>,
-    /// A longer description of the permission, providing more detail on what it affects. Localized.
-    pub description: Option<String>,
-    /// The name of the permission. Localized.
-    pub name: Option<String>,
-}
-
-impl Part for ApplicationPermission {}
-
-
-/// An action to reset a fully managed device or delete a work profile. Note: blockAction must also be specified.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct WipeAction {
-    /// Number of days the policy is non-compliant before the device or work profile is wiped. wipeAfterDays must be greater than blockAfterDays.
-    #[serde(rename="wipeAfterDays")]
-    pub wipe_after_days: Option<i32>,
-    /// Whether the factory-reset protection data is preserved on the device. This setting doesn’t apply to work profiles.
-    #[serde(rename="preserveFrp")]
-    pub preserve_frp: Option<bool>,
-}
-
-impl Part for WipeAction {}
-
-
-/// Settings controlling the behavior of status reports.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct StatusReportingSettings {
-    /// Whether network info reporting is enabled.
-    #[serde(rename="networkInfoEnabled")]
-    pub network_info_enabled: Option<bool>,
-    /// Whether memory reporting is enabled.
-    #[serde(rename="memoryInfoEnabled")]
-    pub memory_info_enabled: Option<bool>,
-    /// Whether hardware status reporting is enabled.
-    #[serde(rename="hardwareStatusEnabled")]
-    pub hardware_status_enabled: Option<bool>,
-    /// Whether device settings reporting is enabled.
-    #[serde(rename="deviceSettingsEnabled")]
-    pub device_settings_enabled: Option<bool>,
-    /// Whether app reports are enabled.
-    #[serde(rename="applicationReportsEnabled")]
-    pub application_reports_enabled: Option<bool>,
-    /// Whether power management event reporting is enabled.
-    #[serde(rename="powerManagementEventsEnabled")]
-    pub power_management_events_enabled: Option<bool>,
-    /// Application reporting settings. Only applicable if application_reports_enabled is true.
-    #[serde(rename="applicationReportingSettings")]
-    pub application_reporting_settings: Option<ApplicationReportingSettings>,
-    /// Whether software info reporting is enabled.
-    #[serde(rename="softwareInfoEnabled")]
-    pub software_info_enabled: Option<bool>,
-    /// Whether displays reporting is enabled.
-    #[serde(rename="displayInfoEnabled")]
-    pub display_info_enabled: Option<bool>,
-}
-
-impl Part for StatusReportingSettings {}
-
-
 /// Data hosted at an external location. The data is to be downloaded by Android Device Policy and verified against the hash.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2024,47 +2209,6 @@ pub struct ExternalData {
 }
 
 impl Part for ExternalData {}
-
-
-/// Information about device software.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SoftwareInfo {
-    /// An IETF BCP 47 language code for the primary locale on the device.
-    #[serde(rename="primaryLanguageCode")]
-    pub primary_language_code: Option<String>,
-    /// Build time.
-    #[serde(rename="androidBuildTime")]
-    pub android_build_time: Option<String>,
-    /// Android build ID string meant for displaying to the user. For example, shamu-userdebug 6.0.1 MOB30I 2756745 dev-keys.
-    #[serde(rename="androidBuildNumber")]
-    pub android_build_number: Option<String>,
-    /// SHA-256 hash of android.content.pm.Signature (https://developer.android.com/reference/android/content/pm/Signature.html) associated with the system package, which can be used to verify that the system build hasn't been modified.
-    #[serde(rename="deviceBuildSignature")]
-    pub device_build_signature: Option<String>,
-    /// The Android Device Policy app version code.
-    #[serde(rename="androidDevicePolicyVersionCode")]
-    pub android_device_policy_version_code: Option<i32>,
-    /// Security patch level, e.g. 2016-05-01.
-    #[serde(rename="securityPatchLevel")]
-    pub security_patch_level: Option<String>,
-    /// The Android Device Policy app version as displayed to the user.
-    #[serde(rename="androidDevicePolicyVersionName")]
-    pub android_device_policy_version_name: Option<String>,
-    /// Kernel version, for example, 2.6.32.9-g103d848.
-    #[serde(rename="deviceKernelVersion")]
-    pub device_kernel_version: Option<String>,
-    /// The user-visible Android version string. For example, 6.0.1.
-    #[serde(rename="androidVersion")]
-    pub android_version: Option<String>,
-    /// The system bootloader version number, e.g. 0.6.7.
-    #[serde(rename="bootloaderVersion")]
-    pub bootloader_version: Option<String>,
-}
-
-impl Part for SoftwareInfo {}
 
 
 /// Configuration info for an HTTP proxy. For a direct proxy, set the host, port, and excluded_hosts fields. For a PAC script proxy, set the pac_uri field.
@@ -2086,6 +2230,20 @@ pub struct ProxyInfo {
 }
 
 impl Part for ProxyInfo {}
+
+
+/// Security policies set to the most secure values by default. To maintain the security posture of a device, we don't recommend overriding any of the default values.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AdvancedSecurityOverrides {
+    /// The policy for untrusted apps (apps from unknown sources) enforced on the device. Replaces install_unknown_sources_allowed (deprecated).
+    #[serde(rename="untrustedAppsPolicy")]
+    pub untrusted_apps_policy: Option<String>,
+}
+
+impl Part for AdvancedSecurityOverrides {}
 
 
 /// A rule for automatically choosing a private key and certificate to authenticate the device to a server.
@@ -2591,6 +2749,7 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
         EnterpriseDeviceDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
+            _wipe_reason_message: Default::default(),
             _wipe_data_flags: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -8333,7 +8492,8 @@ impl<'a, C, A> EnterpriseDeviceIssueCommandCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().devices_delete("name")
-///              .add_wipe_data_flags("Lorem")
+///              .wipe_reason_message("Lorem")
+///              .add_wipe_data_flags("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -8342,6 +8502,7 @@ pub struct EnterpriseDeviceDeleteCall<'a, C, A>
 
     hub: &'a AndroidManagement<C, A>,
     _name: String,
+    _wipe_reason_message: Option<String>,
     _wipe_data_flags: Vec<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
@@ -8365,14 +8526,17 @@ impl<'a, C, A> EnterpriseDeviceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "androidmanagement.enterprises.devices.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
+        if let Some(value) = self._wipe_reason_message {
+            params.push(("wipeReasonMessage", value.to_string()));
+        }
         if self._wipe_data_flags.len() > 0 {
             for f in self._wipe_data_flags.iter() {
                 params.push(("wipeDataFlags", f.to_string()));
             }
         }
-        for &field in ["alt", "name", "wipeDataFlags"].iter() {
+        for &field in ["alt", "name", "wipeReasonMessage", "wipeDataFlags"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8495,6 +8659,13 @@ impl<'a, C, A> EnterpriseDeviceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// we provide this method for API completeness.
     pub fn name(mut self, new_value: &str) -> EnterpriseDeviceDeleteCall<'a, C, A> {
         self._name = new_value.to_string();
+        self
+    }
+    /// Optional. A short message displayed to the user before wiping the work profile on personal devices. This has no effect on company owned devices. The maximum message length is 200 characters.
+    ///
+    /// Sets the *wipe reason message* query property to the given value.
+    pub fn wipe_reason_message(mut self, new_value: &str) -> EnterpriseDeviceDeleteCall<'a, C, A> {
+        self._wipe_reason_message = Some(new_value.to_string());
         self
     }
     /// Optional flags that control the device wiping behavior.
@@ -9340,7 +9511,7 @@ impl<'a, C, A> EnterpriseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().applications_get("name")
-///              .language_code("eirmod")
+///              .language_code("sanctus")
 ///              .doit();
 /// # }
 /// ```

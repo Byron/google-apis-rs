@@ -578,18 +578,20 @@ impl<'n> Engine<'n> {
                     "destination-dataset-id" => Some(("destinationDatasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule" => Some(("schedule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dataset-region" => Some(("datasetRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-options.disable-auto-scheduling" => Some(("scheduleOptions.disableAutoScheduling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "schedule-options.end-time" => Some(("scheduleOptions.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-options.start-time" => Some(("scheduleOptions.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-source-id" => Some(("dataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "email-preferences.enable-failure-email" => Some(("emailPreferences.enableFailureEmail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "end-time", "name", "next-run-time", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "email-preferences", "enable-failure-email", "end-time", "name", "next-run-time", "notification-pubsub-topic", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -605,6 +607,9 @@ impl<'n> Engine<'n> {
             match key {
                 "version-info" => {
                     call = call.version_info(value.unwrap_or(""));
+                },
+                "service-account-name" => {
+                    call = call.service_account_name(value.unwrap_or(""));
                 },
                 "authorization-code" => {
                     call = call.authorization_code(value.unwrap_or(""));
@@ -622,7 +627,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["authorization-code", "version-info"].iter().map(|v|*v));
+                                                                           v.extend(["authorization-code", "version-info", "service-account-name"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -850,18 +855,20 @@ impl<'n> Engine<'n> {
                     "destination-dataset-id" => Some(("destinationDatasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule" => Some(("schedule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dataset-region" => Some(("datasetRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-options.disable-auto-scheduling" => Some(("scheduleOptions.disableAutoScheduling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "schedule-options.end-time" => Some(("scheduleOptions.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-options.start-time" => Some(("scheduleOptions.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-source-id" => Some(("dataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "email-preferences.enable-failure-email" => Some(("emailPreferences.enableFailureEmail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "end-time", "name", "next-run-time", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "email-preferences", "enable-failure-email", "end-time", "name", "next-run-time", "notification-pubsub-topic", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -881,6 +888,9 @@ impl<'n> Engine<'n> {
                 "update-mask" => {
                     call = call.update_mask(value.unwrap_or(""));
                 },
+                "service-account-name" => {
+                    call = call.service_account_name(value.unwrap_or(""));
+                },
                 "authorization-code" => {
                     call = call.authorization_code(value.unwrap_or(""));
                 },
@@ -897,7 +907,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["authorization-code", "version-info", "update-mask"].iter().map(|v|*v));
+                                                                           v.extend(["authorization-code", "version-info", "update-mask", "service-account-name"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1363,18 +1373,20 @@ impl<'n> Engine<'n> {
                     "destination-dataset-id" => Some(("destinationDatasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule" => Some(("schedule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dataset-region" => Some(("datasetRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-options.disable-auto-scheduling" => Some(("scheduleOptions.disableAutoScheduling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "schedule-options.end-time" => Some(("scheduleOptions.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-options.start-time" => Some(("scheduleOptions.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-source-id" => Some(("dataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "email-preferences.enable-failure-email" => Some(("emailPreferences.enableFailureEmail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "end-time", "name", "next-run-time", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "email-preferences", "enable-failure-email", "end-time", "name", "next-run-time", "notification-pubsub-topic", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1390,6 +1402,9 @@ impl<'n> Engine<'n> {
             match key {
                 "version-info" => {
                     call = call.version_info(value.unwrap_or(""));
+                },
+                "service-account-name" => {
+                    call = call.service_account_name(value.unwrap_or(""));
                 },
                 "authorization-code" => {
                     call = call.authorization_code(value.unwrap_or(""));
@@ -1407,7 +1422,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["authorization-code", "version-info"].iter().map(|v|*v));
+                                                                           v.extend(["authorization-code", "version-info", "service-account-name"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1635,18 +1650,20 @@ impl<'n> Engine<'n> {
                     "destination-dataset-id" => Some(("destinationDatasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule" => Some(("schedule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dataset-region" => Some(("datasetRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-options.disable-auto-scheduling" => Some(("scheduleOptions.disableAutoScheduling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "schedule-options.end-time" => Some(("scheduleOptions.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-options.start-time" => Some(("scheduleOptions.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-source-id" => Some(("dataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "email-preferences.enable-failure-email" => Some(("emailPreferences.enableFailureEmail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "end-time", "name", "next-run-time", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "email-preferences", "enable-failure-email", "end-time", "name", "next-run-time", "notification-pubsub-topic", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1666,6 +1683,9 @@ impl<'n> Engine<'n> {
                 "update-mask" => {
                     call = call.update_mask(value.unwrap_or(""));
                 },
+                "service-account-name" => {
+                    call = call.service_account_name(value.unwrap_or(""));
+                },
                 "authorization-code" => {
                     call = call.authorization_code(value.unwrap_or(""));
                 },
@@ -1682,7 +1702,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["authorization-code", "version-info", "update-mask"].iter().map(|v|*v));
+                                                                           v.extend(["authorization-code", "version-info", "update-mask", "service-account-name"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2320,8 +2340,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The data source in the form:
-        `projects/{project_id}/dataSources/{data_source_id}`"##),
+                     Some(r##"Required. The data source in the form:
+        `projects/{project_id}/dataSources/{data_source_id}` or
+        `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2350,8 +2371,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The field will contain name of the resource requested, for example:
-        `projects/{project_id}/dataSources/{data_source_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example:
+        `projects/{project_id}/dataSources/{data_source_id}` or
+        `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2374,8 +2396,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The BigQuery project id for which data sources should be returned.
-        Must be in the form: `projects/{project_id}`"##),
+                     Some(r##"Required. The BigQuery project id for which data sources should be returned.
+        Must be in the form: `projects/{project_id}` or
+        `projects/{project_id}/locations/{location_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -2402,8 +2425,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The data source in the form:
-        `projects/{project_id}/dataSources/{data_source_id}`"##),
+                     Some(r##"Required. The data source in the form:
+        `projects/{project_id}/dataSources/{data_source_id}` or
+        `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2432,8 +2456,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The field will contain name of the resource requested, for example:
-        `projects/{project_id}/dataSources/{data_source_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example:
+        `projects/{project_id}/dataSources/{data_source_id}` or
+        `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2456,8 +2481,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The BigQuery project id for which data sources should be returned.
-        Must be in the form: `projects/{project_id}`"##),
+                     Some(r##"Required. The BigQuery project id for which data sources should be returned.
+        Must be in the form: `projects/{project_id}` or
+        `projects/{project_id}/locations/{location_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -2523,10 +2549,10 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The BigQuery project id where the transfer configuration should be created.
-        Must be in the format projects/{project_id}/locations/{location_id}
-        If specified location and location of the destination bigquery dataset
-        do not match - the request will fail."##),
+                     Some(r##"Required. The BigQuery project id where the transfer configuration should be created.
+        Must be in the format projects/{project_id}/locations/{location_id} or
+        projects/{project_id}. If specified location and location of the
+        destination bigquery dataset do not match - the request will fail."##),
                      Some(true),
                      Some(false)),
         
@@ -2555,8 +2581,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The field will contain name of the resource requested, for example:
-        `projects/{project_id}/transferConfigs/{config_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example:
+        `projects/{project_id}/transferConfigs/{config_id}` or
+        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2578,8 +2605,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The field will contain name of the resource requested, for example:
-        `projects/{project_id}/transferConfigs/{config_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example:
+        `projects/{project_id}/transferConfigs/{config_id}` or
+        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2601,8 +2629,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The BigQuery project id for which data sources
-        should be returned: `projects/{project_id}`."##),
+                     Some(r##"Required. The BigQuery project id for which data sources
+        should be returned: `projects/{project_id}` or
+        `projects/{project_id}/locations/{location_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2659,8 +2688,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The field will contain name of the resource requested, for example:
-        `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example:
+        `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
+        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2682,8 +2712,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The field will contain name of the resource requested, for example:
-        `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example:
+        `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
+        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2705,9 +2736,10 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Name of transfer configuration for which transfer runs should be retrieved.
+                     Some(r##"Required. Name of transfer configuration for which transfer runs should be retrieved.
         Format of transfer configuration resource name is:
-        `projects/{project_id}/transferConfigs/{config_id}`."##),
+        `projects/{project_id}/transferConfigs/{config_id}` or
+        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2729,8 +2761,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Transfer run name in the form:
-        `projects/{project_id}/transferConfigs/{config_Id}/runs/{run_id}`."##),
+                     Some(r##"Required. Transfer run name in the form:
+        `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
+        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2756,8 +2789,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Transfer configuration name in the form:
-        `projects/{project_id}/transferConfigs/{config_id}`."##),
+                     Some(r##"Required. Transfer configuration name in the form:
+        `projects/{project_id}/transferConfigs/{config_id}` or
+        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2789,7 +2823,8 @@ fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"Transfer configuration name in the form:
-        `projects/{project_id}/transferConfigs/{config_id}`."##),
+        `projects/{project_id}/transferConfigs/{config_id}` or
+        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2817,10 +2852,10 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The BigQuery project id where the transfer configuration should be created.
-        Must be in the format projects/{project_id}/locations/{location_id}
-        If specified location and location of the destination bigquery dataset
-        do not match - the request will fail."##),
+                     Some(r##"Required. The BigQuery project id where the transfer configuration should be created.
+        Must be in the format projects/{project_id}/locations/{location_id} or
+        projects/{project_id}. If specified location and location of the
+        destination bigquery dataset do not match - the request will fail."##),
                      Some(true),
                      Some(false)),
         
@@ -2849,8 +2884,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The field will contain name of the resource requested, for example:
-        `projects/{project_id}/transferConfigs/{config_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example:
+        `projects/{project_id}/transferConfigs/{config_id}` or
+        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2872,8 +2908,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The field will contain name of the resource requested, for example:
-        `projects/{project_id}/transferConfigs/{config_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example:
+        `projects/{project_id}/transferConfigs/{config_id}` or
+        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2895,8 +2932,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The BigQuery project id for which data sources
-        should be returned: `projects/{project_id}`."##),
+                     Some(r##"Required. The BigQuery project id for which data sources
+        should be returned: `projects/{project_id}` or
+        `projects/{project_id}/locations/{location_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2953,8 +2991,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The field will contain name of the resource requested, for example:
-        `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example:
+        `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
+        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2976,8 +3015,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The field will contain name of the resource requested, for example:
-        `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
+                     Some(r##"Required. The field will contain name of the resource requested, for example:
+        `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
+        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2999,9 +3039,10 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Name of transfer configuration for which transfer runs should be retrieved.
+                     Some(r##"Required. Name of transfer configuration for which transfer runs should be retrieved.
         Format of transfer configuration resource name is:
-        `projects/{project_id}/transferConfigs/{config_id}`."##),
+        `projects/{project_id}/transferConfigs/{config_id}` or
+        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3023,8 +3064,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Transfer run name in the form:
-        `projects/{project_id}/transferConfigs/{config_Id}/runs/{run_id}`."##),
+                     Some(r##"Required. Transfer run name in the form:
+        `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
+        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -3050,8 +3092,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Transfer configuration name in the form:
-        `projects/{project_id}/transferConfigs/{config_id}`."##),
+                     Some(r##"Required. Transfer configuration name in the form:
+        `projects/{project_id}/transferConfigs/{config_id}` or
+        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3083,7 +3126,8 @@ fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"Transfer configuration name in the form:
-        `projects/{project_id}/transferConfigs/{config_id}`."##),
+        `projects/{project_id}/transferConfigs/{config_id}` or
+        `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3111,7 +3155,7 @@ fn main() {
     
     let mut app = App::new("bigquerydatatransfer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190629")
+           .version("1.0.13+20200326")
            .about("Schedule queries or transfer external data from SaaS applications to Google BigQuery on a regular basis.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli")
            .arg(Arg::with_name("url")

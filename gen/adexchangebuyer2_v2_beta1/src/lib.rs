@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AdExchangeBuyerII* crate version *1.0.12+20190701*, where *20190701* is the exact revision of the *adexchangebuyer2:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *AdExchangeBuyerII* crate version *1.0.13+20200409*, where *20200409* is the exact revision of the *adexchangebuyer2:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *AdExchangeBuyerII* *v2_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/authorized-buyers/apis/reference/rest/).
@@ -338,7 +338,7 @@ impl<'a, C, A> AdExchangeBuyerII<C, A>
         AdExchangeBuyerII {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://adexchangebuyer.googleapis.com/".to_string(),
             _root_url: "https://adexchangebuyer.googleapis.com/".to_string(),
         }
@@ -352,7 +352,7 @@ impl<'a, C, A> AdExchangeBuyerII<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1667,6 +1667,8 @@ pub struct FilterSet {
     /// 
     /// This field is required in create operations.
     pub name: Option<String>,
+    /// Creative format bidded on or allowed to bid on, can be empty.
+    pub format: Option<String>,
     /// For Authorized Buyers only.
     /// The list of IDs of the seller (publisher) networks on which to filter;
     /// may be empty. The filters represented by multiple seller network IDs are
@@ -1711,9 +1713,10 @@ pub struct FilterSet {
     /// Interpreted relative to Pacific time zone.
     #[serde(rename="absoluteDateRange")]
     pub absolute_date_range: Option<AbsoluteDateRange>,
-    /// The list of formats on which to filter; may be empty. The filters
-    /// represented by multiple formats are ORed together (i.e., if non-empty,
-    /// results must match any one of the formats).
+    /// Creative formats bidded on or allowed to bid on, can be empty. Although
+    /// this field is a list, it can only be populated with a single item. A
+    /// HTTP 400 bad request error will be returned in the response if you specify
+    /// multiple items.
     pub formats: Option<Vec<String>>,
     /// The ID of the creative on which to filter; optional. This field may be set
     /// only for a filter set that accesses account-level troubleshooting data,
@@ -3170,7 +3173,7 @@ impl Part for OperatingSystemTargeting {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BidMetricsRow {
-    /// The number of bids that won an impression.
+    /// The number of bids that won the auction.
     #[serde(rename="impressionsWon")]
     pub impressions_won: Option<MetricValue>,
     /// The values of all dimensions associated with metric values in this row.

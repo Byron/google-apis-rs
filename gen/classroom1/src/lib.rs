@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *classroom* crate version *1.0.12+20190701*, where *20190701* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *classroom* crate version *1.0.13+20200408*, where *20200408* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *classroom* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/classroom/).
@@ -449,7 +449,7 @@ impl<'a, C, A> Classroom<C, A>
         Classroom {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://classroom.googleapis.com/".to_string(),
             _root_url: "https://classroom.googleapis.com/".to_string(),
         }
@@ -469,7 +469,7 @@ impl<'a, C, A> Classroom<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -558,7 +558,7 @@ pub struct Announcement {
     /// Identifiers of students with access to the announcement.
     /// This field is set only if `assigneeMode` is `INDIVIDUAL_STUDENTS`.
     /// If the `assigneeMode` is `INDIVIDUAL_STUDENTS`, then only students
-    /// specified in this field will be able to see the announcement.
+    /// specified in this field can see the announcement.
     #[serde(rename="individualStudentsOptions")]
     pub individual_students_options: Option<IndividualStudentsOptions>,
     /// Classroom-assigned identifier of this announcement, unique per course.
@@ -597,11 +597,11 @@ impl Part for CloudPubsubTopic {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ModifyIndividualStudentsOptions {
-    /// Ids of students to be added as having access to this
+    /// IDs of students to be added as having access to this
     /// coursework/announcement.
     #[serde(rename="addStudentIds")]
     pub add_student_ids: Option<Vec<String>>,
-    /// Ids of students to be removed from having access to this
+    /// IDs of students to be removed from having access to this
     /// coursework/announcement.
     #[serde(rename="removeStudentIds")]
     pub remove_student_ids: Option<Vec<String>>,
@@ -790,7 +790,7 @@ pub struct UserProfile {
     pub photo_url: Option<String>,
     /// Represents whether a G Suite for Education user's domain administrator has
     /// explicitly verified them as being a teacher. If the user is not a member of
-    /// a G Suite for Education domain, than this field will always be false.
+    /// a G Suite for Education domain, than this field is always false.
     /// 
     /// Read-only
     #[serde(rename="verifiedTeacher")]
@@ -839,7 +839,7 @@ pub struct AssignmentSubmission {
     /// 
     /// Some attachment metadata is only populated if the requesting user has
     /// permission to access it. Identifier and alternate_link fields are always
-    /// available, but others (e.g. title) may not be.
+    /// available, but others (for example, title) may not be.
     pub attachments: Option<Vec<Attachment>>,
 }
 
@@ -1091,8 +1091,8 @@ impl RequestValue for TurnInStudentSubmissionRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Material {
-    /// Link material. On creation, will be upgraded to a more appropriate type
-    /// if possible, and this will be reflected in the response.
+    /// Link material. On creation, this is upgraded to a more appropriate type
+    /// if possible, and this is reflected in the response.
     pub link: Option<Link>,
     /// Google Drive file material.
     #[serde(rename="driveFile")]
@@ -1667,7 +1667,7 @@ impl Part for IndividualStudentsOptions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ModifyAnnouncementAssigneesRequest {
-    /// Mode of the announcement describing whether it will be accessible by all
+    /// Mode of the announcement describing whether it is accessible by all
     /// students or specified individual students.
     #[serde(rename="assigneeMode")]
     pub assignee_mode: Option<String>,
@@ -1796,7 +1796,7 @@ pub struct CourseWork {
     /// Whether this course work item is associated with the Developer Console
     /// project making the request.
     /// 
-    /// See google.classroom.Work.CreateCourseWork for more
+    /// See CreateCourseWork for more
     /// details.
     /// 
     /// Read-only.
@@ -1858,7 +1858,7 @@ pub struct CourseWork {
     /// Identifiers of students with access to the coursework.
     /// This field is set only if `assigneeMode` is `INDIVIDUAL_STUDENTS`.
     /// If the `assigneeMode` is `INDIVIDUAL_STUDENTS`, then only students
-    /// specified in this field will be assigned the coursework.
+    /// specified in this field are assigned the coursework.
     #[serde(rename="individualStudentsOptions")]
     pub individual_students_options: Option<IndividualStudentsOptions>,
     /// Optional time of day, in UTC, that submissions for this course work
@@ -1923,8 +1923,8 @@ pub struct StudentSubmission {
     #[serde(rename="courseWorkType")]
     pub course_work_type: Option<String>,
     /// Optional grade. If unset, no grade was set.
-    /// This value must be non-negative. Decimal (i.e. non-integer) values are
-    /// allowed, but will be rounded to two decimal places.
+    /// This value must be non-negative. Decimal (that is, non-integer) values are
+    /// allowed, but are rounded to two decimal places.
     /// 
     /// This may be modified only by course teachers.
     #[serde(rename="assignedGrade")]
@@ -1932,7 +1932,7 @@ pub struct StudentSubmission {
     /// Whether this student submission is associated with the Developer Console
     /// project making the request.
     /// 
-    /// See google.classroom.Work.CreateCourseWork for more
+    /// See CreateCourseWork for more
     /// details.
     /// 
     /// Read-only.
@@ -1944,8 +1944,8 @@ pub struct StudentSubmission {
     /// Read-only.
     pub id: Option<String>,
     /// Optional pending grade. If unset, no grade was set.
-    /// This value must be non-negative. Decimal (i.e. non-integer) values are
-    /// allowed, but will be rounded to two decimal places.
+    /// This value must be non-negative. Decimal (that is, non-integer) values are
+    /// allowed, but are rounded to two decimal places.
     /// 
     /// This is only visible to and modifiable by course teachers.
     #[serde(rename="draftGrade")]
@@ -1985,7 +1985,7 @@ pub struct StudentSubmission {
     /// Submission content when course_work_type is ASSIGNMENT.
     /// 
     /// Students can modify this content using
-    /// google.classroom.Work.ModifyAttachments.
+    /// ModifyAttachments.
     #[serde(rename="assignmentSubmission")]
     pub assignment_submission: Option<AssignmentSubmission>,
 }
@@ -2096,8 +2096,8 @@ pub struct Topic {
     #[serde(rename="updateTime")]
     pub update_time: Option<String>,
     /// The name of the topic, generated by the user.
-    /// Leading and trailing whitespaces, if any, will be trimmed. Also, multiple
-    /// consecutive whitespaces will be collapsed into one inside the name. The
+    /// Leading and trailing whitespaces, if any, are trimmed. Also, multiple
+    /// consecutive whitespaces are collapsed into one inside the name. The
     /// result must be a non-empty string. Topic names are case sensitive, and must
     /// be no longer than 100 characters.
     pub name: Option<String>,
@@ -2240,7 +2240,7 @@ impl Part for GlobalPermission {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StateHistory {
-    /// The teacher or student who made the change
+    /// The teacher or student who made the change.
     #[serde(rename="actorUserId")]
     pub actor_user_id: Option<String>,
     /// The workflow pipeline stage.
@@ -10845,7 +10845,7 @@ impl<'a, C, A> CourseTopicPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// fields are specified. If a field supports empty values, it can be cleared
     /// by specifying it in the update mask and not in the Topic object. If a
     /// field that does not support empty values is included in the update mask and
-    /// not set in the Topic object, an `INVALID_ARGUMENT` error will be
+    /// not set in the Topic object, an `INVALID_ARGUMENT` error is
     /// returned.
     /// 
     /// The following fields may be specified:
@@ -11165,7 +11165,7 @@ impl<'a, C, A> CourseAnnouncementPatchCall<'a, C, A> where C: BorrowMut<hyper::C
     /// fields are specified. If a field supports empty values, it can be cleared
     /// by specifying it in the update mask and not in the Announcement object. If
     /// a field that does not support empty values is included in the update mask
-    /// and not set in the Announcement object, an `INVALID_ARGUMENT` error will be
+    /// and not set in the Announcement object, an `INVALID_ARGUMENT` error is
     /// returned.
     /// 
     /// The following fields may be specified by teachers:
@@ -13720,7 +13720,7 @@ impl<'a, C, A> CourseCourseWorkPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// fields are specified. If a field supports empty values, it can be cleared
     /// by specifying it in the update mask and not in the CourseWork object. If a
     /// field that does not support empty values is included in the update mask and
-    /// not set in the CourseWork object, an `INVALID_ARGUMENT` error will be
+    /// not set in the CourseWork object, an `INVALID_ARGUMENT` error is
     /// returned.
     /// 
     /// The following fields may be specified by teachers:
@@ -17141,7 +17141,7 @@ impl<'a, C, A> UserProfileGuardianInvitationPatchCall<'a, C, A> where C: BorrowM
         self
     }
     /// Mask that identifies which fields on the course to update.
-    /// This field is required to do an update. The update will fail if invalid
+    /// This field is required to do an update. The update fails if invalid
     /// fields are specified. The following fields are valid:
     /// 
     /// * `state`
@@ -18562,8 +18562,8 @@ impl<'a, C, A> UserProfileGuardianInvitationListCall<'a, C, A> where C: BorrowMu
         self._student_id = new_value.to_string();
         self
     }
-    /// If specified, only results with the specified `state` values will be
-    /// returned. Otherwise, results with a `state` of `PENDING` will be returned.
+    /// If specified, only results with the specified `state` values are
+    /// returned. Otherwise, results with a `state` of `PENDING` are returned.
     ///
     /// Append the given value to the *states* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -18573,11 +18573,11 @@ impl<'a, C, A> UserProfileGuardianInvitationListCall<'a, C, A> where C: BorrowMu
     }
     /// nextPageToken
     /// value returned from a previous
-    /// list call,
-    /// indicating that the subsequent page of results should be returned.
+    /// list
+    /// call, indicating that the subsequent page of results should be returned.
     /// 
-    /// The list request
-    /// must be otherwise identical to the one that resulted in this token.
+    /// The list
+    /// request must be otherwise identical to the one that resulted in this token.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> UserProfileGuardianInvitationListCall<'a, C, A> {
@@ -18595,7 +18595,7 @@ impl<'a, C, A> UserProfileGuardianInvitationListCall<'a, C, A> where C: BorrowMu
         self
     }
     /// If specified, only results with the specified `invited_email_address`
-    /// will be returned.
+    /// are returned.
     ///
     /// Sets the *invited email address* query property to the given value.
     pub fn invited_email_address(mut self, new_value: &str) -> UserProfileGuardianInvitationListCall<'a, C, A> {

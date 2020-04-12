@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Trace* crate version *1.0.12+20190622*, where *20190622* is the exact revision of the *cloudtrace:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Cloud Trace* crate version *1.0.13+20200330*, where *20200330* is the exact revision of the *cloudtrace:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Cloud Trace* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/trace).
@@ -325,7 +325,7 @@ impl<'a, C, A> CloudTrace<C, A>
         CloudTrace {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://cloudtrace.googleapis.com/".to_string(),
             _root_url: "https://cloudtrace.googleapis.com/".to_string(),
         }
@@ -336,7 +336,7 @@ impl<'a, C, A> CloudTrace<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -471,7 +471,7 @@ pub struct TraceSpan {
     /// two spans with the same name may be distinguished using `RPC_CLIENT`
     /// and `RPC_SERVER` to identify queueing latency associated with the span.
     pub kind: Option<String>,
-    /// ID of the parent span, if any. Optional.
+    /// Optional. ID of the parent span, if any.
     #[serde(rename="parentSpanId")]
     pub parent_span_id: Option<String>,
     /// Name of the span. Must be less than 128 bytes. The span name is sanitized
@@ -580,11 +580,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Gets a single trace by its ID.
+    /// In this case, getting for traces is considered an active developer method,
+    /// even though it is technically a read-only method.
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - ID of the Cloud project where the trace data is stored.
-    /// * `traceId` - ID of the trace to return.
+    /// * `projectId` - Required. ID of the Cloud project where the trace data is stored.
+    /// * `traceId` - Required. ID of the trace to return.
     pub fn traces_get(&self, project_id: &str, trace_id: &str) -> ProjectTraceGetCall<'a, C, A> {
         ProjectTraceGetCall {
             hub: self.hub,
@@ -603,11 +605,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// in the existing trace and its spans are overwritten by the provided values,
     /// and any new fields provided are merged with the existing trace data. If the
     /// ID does not match, a new trace is created.
+    /// In this case, writing traces is not considered an active developer
+    /// method since traces are machine generated.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - ID of the Cloud project where the trace data is stored.
+    /// * `projectId` - Required. ID of the Cloud project where the trace data is stored.
     pub fn patch_traces(&self, request: Traces, project_id: &str) -> ProjectPatchTraceCall<'a, C, A> {
         ProjectPatchTraceCall {
             hub: self.hub,
@@ -622,10 +626,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns of a list of traces that match the specified filter conditions.
+    /// In this case, listing for traces is considered an active developer method,
+    /// even though it is technically a read-only method.
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - ID of the Cloud project where the trace data is stored.
+    /// * `projectId` - Required. ID of the Cloud project where the trace data is stored.
     pub fn traces_list(&self, project_id: &str) -> ProjectTraceListCall<'a, C, A> {
         ProjectTraceListCall {
             hub: self.hub,
@@ -653,6 +659,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // #################
 
 /// Gets a single trace by its ID.
+/// In this case, getting for traces is considered an active developer method,
+/// even though it is technically a read-only method.
 ///
 /// A builder for the *traces.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -825,7 +833,7 @@ impl<'a, C, A> ProjectTraceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// ID of the Cloud project where the trace data is stored.
+    /// Required. ID of the Cloud project where the trace data is stored.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -835,7 +843,7 @@ impl<'a, C, A> ProjectTraceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._project_id = new_value.to_string();
         self
     }
-    /// ID of the trace to return.
+    /// Required. ID of the trace to return.
     ///
     /// Sets the *trace id* path property to the given value.
     ///
@@ -913,6 +921,8 @@ impl<'a, C, A> ProjectTraceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// in the existing trace and its spans are overwritten by the provided values,
 /// and any new fields provided are merged with the existing trace data. If the
 /// ID does not match, a new trace is created.
+/// In this case, writing traces is not considered an active developer
+/// method since traces are machine generated.
 ///
 /// A builder for the *patchTraces* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -1114,7 +1124,7 @@ impl<'a, C, A> ProjectPatchTraceCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._request = new_value;
         self
     }
-    /// ID of the Cloud project where the trace data is stored.
+    /// Required. ID of the Cloud project where the trace data is stored.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -1188,6 +1198,8 @@ impl<'a, C, A> ProjectPatchTraceCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
 /// Returns of a list of traces that match the specified filter conditions.
+/// In this case, listing for traces is considered an active developer method,
+/// even though it is technically a read-only method.
 ///
 /// A builder for the *traces.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -1393,7 +1405,7 @@ impl<'a, C, A> ProjectTraceListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// ID of the Cloud project where the trace data is stored.
+    /// Required. ID of the Cloud project where the trace data is stored.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -1403,7 +1415,7 @@ impl<'a, C, A> ProjectTraceListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._project_id = new_value.to_string();
         self
     }
-    /// Type of data returned for traces in the list. Optional. Default is
+    /// Optional. Type of data returned for traces in the list. Default is
     /// `MINIMAL`.
     ///
     /// Sets the *view* query property to the given value.
@@ -1420,23 +1432,23 @@ impl<'a, C, A> ProjectTraceListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self
     }
     /// Token identifying the page of results to return. If provided, use the
-    /// value of the `next_page_token` field from a previous request. Optional.
+    /// value of the `next_page_token` field from a previous request.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectTraceListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of traces to return. If not specified or <= 0, the
+    /// Optional. Maximum number of traces to return. If not specified or <= 0, the
     /// implementation selects a reasonable value.  The implementation may
-    /// return fewer traces than the requested page size. Optional.
+    /// return fewer traces than the requested page size.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectTraceListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
-    /// Field used to sort the returned traces. Optional.
+    /// Optional. Field used to sort the returned traces.
     /// Can be one of the following:
     /// 
     /// * `trace_id`
@@ -1455,7 +1467,7 @@ impl<'a, C, A> ProjectTraceListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// An optional filter against labels for the request.
+    /// Optional. A filter against labels for the request.
     /// 
     /// By default, searches use prefix matching. To specify exact match, prepend
     /// a plus symbol (`+`) to the search term.

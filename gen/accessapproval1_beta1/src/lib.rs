@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Access Approval* crate version *1.0.12+20190628*, where *20190628* is the exact revision of the *accessapproval:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Access Approval* crate version *1.0.13+20200409*, where *20200409* is the exact revision of the *accessapproval:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Access Approval* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/access-approval/docs).
@@ -12,11 +12,11 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.AccessApproval.html) ... 
 //! 
 //! * folders
-//!  * [*approval requests approve*](struct.FolderApprovalRequestApproveCall.html), [*approval requests dismiss*](struct.FolderApprovalRequestDismisCall.html), [*approval requests get*](struct.FolderApprovalRequestGetCall.html), [*approval requests list*](struct.FolderApprovalRequestListCall.html), [*get access approval settings*](struct.FolderGetAccessApprovalSettingCall.html) and [*update access approval settings*](struct.FolderUpdateAccessApprovalSettingCall.html)
+//!  * [*approval requests approve*](struct.FolderApprovalRequestApproveCall.html), [*approval requests dismiss*](struct.FolderApprovalRequestDismisCall.html), [*approval requests get*](struct.FolderApprovalRequestGetCall.html), [*approval requests list*](struct.FolderApprovalRequestListCall.html), [*delete access approval settings*](struct.FolderDeleteAccessApprovalSettingCall.html), [*get access approval settings*](struct.FolderGetAccessApprovalSettingCall.html) and [*update access approval settings*](struct.FolderUpdateAccessApprovalSettingCall.html)
 //! * organizations
-//!  * [*approval requests approve*](struct.OrganizationApprovalRequestApproveCall.html), [*approval requests dismiss*](struct.OrganizationApprovalRequestDismisCall.html), [*approval requests get*](struct.OrganizationApprovalRequestGetCall.html), [*approval requests list*](struct.OrganizationApprovalRequestListCall.html), [*get access approval settings*](struct.OrganizationGetAccessApprovalSettingCall.html) and [*update access approval settings*](struct.OrganizationUpdateAccessApprovalSettingCall.html)
+//!  * [*approval requests approve*](struct.OrganizationApprovalRequestApproveCall.html), [*approval requests dismiss*](struct.OrganizationApprovalRequestDismisCall.html), [*approval requests get*](struct.OrganizationApprovalRequestGetCall.html), [*approval requests list*](struct.OrganizationApprovalRequestListCall.html), [*delete access approval settings*](struct.OrganizationDeleteAccessApprovalSettingCall.html), [*get access approval settings*](struct.OrganizationGetAccessApprovalSettingCall.html) and [*update access approval settings*](struct.OrganizationUpdateAccessApprovalSettingCall.html)
 //! * projects
-//!  * [*approval requests approve*](struct.ProjectApprovalRequestApproveCall.html), [*approval requests dismiss*](struct.ProjectApprovalRequestDismisCall.html), [*approval requests get*](struct.ProjectApprovalRequestGetCall.html), [*approval requests list*](struct.ProjectApprovalRequestListCall.html), [*get access approval settings*](struct.ProjectGetAccessApprovalSettingCall.html) and [*update access approval settings*](struct.ProjectUpdateAccessApprovalSettingCall.html)
+//!  * [*approval requests approve*](struct.ProjectApprovalRequestApproveCall.html), [*approval requests dismiss*](struct.ProjectApprovalRequestDismisCall.html), [*approval requests get*](struct.ProjectApprovalRequestGetCall.html), [*approval requests list*](struct.ProjectApprovalRequestListCall.html), [*delete access approval settings*](struct.ProjectDeleteAccessApprovalSettingCall.html), [*get access approval settings*](struct.ProjectGetAccessApprovalSettingCall.html) and [*update access approval settings*](struct.ProjectUpdateAccessApprovalSettingCall.html)
 //! 
 //! 
 //! 
@@ -341,7 +341,7 @@ impl<'a, C, A> AccessApproval<C, A>
         AccessApproval {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://accessapproval.googleapis.com/".to_string(),
             _root_url: "https://accessapproval.googleapis.com/".to_string(),
         }
@@ -358,7 +358,7 @@ impl<'a, C, A> AccessApproval<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -386,6 +386,62 @@ impl<'a, C, A> AccessApproval<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// A request for the customer to approve access to a resource.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [approval requests get projects](struct.ProjectApprovalRequestGetCall.html) (response)
+/// * [approval requests approve organizations](struct.OrganizationApprovalRequestApproveCall.html) (response)
+/// * [approval requests approve projects](struct.ProjectApprovalRequestApproveCall.html) (response)
+/// * [approval requests approve folders](struct.FolderApprovalRequestApproveCall.html) (response)
+/// * [approval requests get folders](struct.FolderApprovalRequestGetCall.html) (response)
+/// * [approval requests get organizations](struct.OrganizationApprovalRequestGetCall.html) (response)
+/// * [approval requests dismiss projects](struct.ProjectApprovalRequestDismisCall.html) (response)
+/// * [approval requests dismiss organizations](struct.OrganizationApprovalRequestDismisCall.html) (response)
+/// * [approval requests dismiss folders](struct.FolderApprovalRequestDismisCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApprovalRequest {
+    /// Properties related to the resource represented by requested_resource_name.
+    #[serde(rename="requestedResourceProperties")]
+    pub requested_resource_properties: Option<ResourceProperties>,
+    /// The time at which approval was requested.
+    #[serde(rename="requestTime")]
+    pub request_time: Option<String>,
+    /// The requested expiration for the approval. If the request is approved,
+    /// access will be granted from the time of approval until the expiration time.
+    #[serde(rename="requestedExpiration")]
+    pub requested_expiration: Option<String>,
+    /// The resource name of the request. Format is
+    /// "{projects|folders|organizations}/{id}/approvalRequests/{approval_request_id}".
+    pub name: Option<String>,
+    /// The request was dismissed.
+    pub dismiss: Option<DismissDecision>,
+    /// The justification for which approval is being requested.
+    #[serde(rename="requestedReason")]
+    pub requested_reason: Option<AccessReason>,
+    /// The resource for which approval is being requested. The format of the
+    /// resource name is defined at
+    /// https://cloud.google.com/apis/design/resource_names. The resource name here
+    /// may either be a "full" resource name (e.g.
+    /// "//library.googleapis.com/shelves/shelf1/books/book2") or a "relative"
+    /// resource name (e.g. "shelves/shelf1/books/book2") as described in the
+    /// resource name specification.
+    #[serde(rename="requestedResourceName")]
+    pub requested_resource_name: Option<String>,
+    /// Access was approved.
+    pub approve: Option<ApproveDecision>,
+    /// The locations for which approval is being requested.
+    #[serde(rename="requestedLocations")]
+    pub requested_locations: Option<AccessLocations>,
+}
+
+impl ResponseResult for ApprovalRequest {}
+
+
 /// A decision that has been made to dismiss an approval request.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -493,9 +549,17 @@ impl Part for ResourceProperties {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccessApprovalSettings {
+    /// Output only. This field is read only (not settable via
+    /// UpdateAccessAccessApprovalSettings method). If the field is true, that
+    /// indicates that at least one service is enrolled for Access Approval in one
+    /// or more ancestors of the Project or Folder (this field will always be
+    /// unset for the organization since organizations do not have ancestors).
+    #[serde(rename="enrolledAncestor")]
+    pub enrolled_ancestor: Option<bool>,
     /// A list of email addresses to which notifications relating to approval
     /// requests should be sent. Notifications relating to a resource will be sent
-    /// to all emails in the settings of ancestor resources of that resource.
+    /// to all emails in the settings of ancestor resources of that resource. A
+    /// maximum of 50 email addresses are allowed.
     #[serde(rename="notificationEmails")]
     pub notification_emails: Option<Vec<String>>,
     /// The resource name of the settings. Format is one of:
@@ -505,10 +569,39 @@ pub struct AccessApprovalSettings {
     ///   <li>"organizations/{organization_id}/accessApprovalSettings"</li>
     /// <ol>
     pub name: Option<String>,
+    /// A list of Google Cloud Services for which the given resource has Access
+    /// Approval enrolled. Access requests for the resource given by name against
+    /// any of these services contained here will be required to have explicit
+    /// approval. If name refers to an organization, enrollment can be done for
+    /// individual services. If name refers to a folder or project, enrollment can
+    /// only be done on an all or nothing basis.
+    /// 
+    /// If a cloud_product is repeated in this list, the first entry will be
+    /// honored and all following entries will be discarded. A maximum of 10
+    /// enrolled services will be enforced, to be expanded as the set of supported
+    /// services is expanded.
+    #[serde(rename="enrolledServices")]
+    pub enrolled_services: Option<Vec<EnrolledService>>,
 }
 
 impl RequestValue for AccessApprovalSettings {}
 impl ResponseResult for AccessApprovalSettings {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AccessReason {
+    /// Type of access justification.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// More detail about certain reason types. See comments for each type above.
+    pub detail: Option<String>,
+}
+
+impl Part for AccessReason {}
 
 
 /// Response to listing of ApprovalRequest objects.
@@ -552,76 +645,60 @@ pub struct ApproveDecision {
 impl Part for ApproveDecision {}
 
 
-/// A request for the customer to approve access to a resource.
+/// Represents the enrollment of a cloud resource into a specific service.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EnrolledService {
+    /// The product for which Access Approval will be enrolled. Allowed values are
+    /// listed below (case-sensitive):
+    /// <ol>
+    ///   <li>all</li>
+    ///   <li>appengine.googleapis.com</li>
+    ///   <li>bigquery.googleapis.com</li>
+    ///   <li>bigtable.googleapis.com</li>
+    ///   <li>cloudkms.googleapis.com</li>
+    ///   <li>compute.googleapis.com</li>
+    ///   <li>dataflow.googleapis.com</li>
+    ///   <li>iam.googleapis.com</li>
+    ///   <li>pubsub.googleapis.com</li>
+    ///   <li>storage.googleapis.com</li>
+    /// <ol>
+    #[serde(rename="cloudProduct")]
+    pub cloud_product: Option<String>,
+    /// The enrollment level of the service.
+    #[serde(rename="enrollmentLevel")]
+    pub enrollment_level: Option<String>,
+}
+
+impl Part for EnrolledService {}
+
+
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
+/// 
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [approval requests get projects](struct.ProjectApprovalRequestGetCall.html) (response)
-/// * [approval requests approve organizations](struct.OrganizationApprovalRequestApproveCall.html) (response)
-/// * [approval requests approve projects](struct.ProjectApprovalRequestApproveCall.html) (response)
-/// * [approval requests approve folders](struct.FolderApprovalRequestApproveCall.html) (response)
-/// * [approval requests get folders](struct.FolderApprovalRequestGetCall.html) (response)
-/// * [approval requests get organizations](struct.OrganizationApprovalRequestGetCall.html) (response)
-/// * [approval requests dismiss projects](struct.ProjectApprovalRequestDismisCall.html) (response)
-/// * [approval requests dismiss organizations](struct.OrganizationApprovalRequestDismisCall.html) (response)
-/// * [approval requests dismiss folders](struct.FolderApprovalRequestDismisCall.html) (response)
-/// 
+/// * [delete access approval settings projects](struct.ProjectDeleteAccessApprovalSettingCall.html) (response)
+/// * [delete access approval settings organizations](struct.OrganizationDeleteAccessApprovalSettingCall.html) (response)
+/// * [delete access approval settings folders](struct.FolderDeleteAccessApprovalSettingCall.html) (response)
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ApprovalRequest {
-    /// Properties related to the resource represented by requested_resource_name.
-    #[serde(rename="requestedResourceProperties")]
-    pub requested_resource_properties: Option<ResourceProperties>,
-    /// The time at which approval was requested.
-    #[serde(rename="requestTime")]
-    pub request_time: Option<String>,
-    /// The requested expiration for the approval. If the request is approved,
-    /// access will be granted from the time of approval until the expiration time.
-    #[serde(rename="requestedExpiration")]
-    pub requested_expiration: Option<String>,
-    /// The resource name of the request. Format is
-    /// "{projects|folders|organizations}/{id}/approvalRequests/{approval_request_id}".
-    pub name: Option<String>,
-    /// The request was dismissed.
-    pub dismiss: Option<DismissDecision>,
-    /// The justification for which approval is being requested.
-    #[serde(rename="requestedReason")]
-    pub requested_reason: Option<AccessReason>,
-    /// The resource for which approval is being requested. The format of the
-    /// resource name is defined at
-    /// https://cloud.google.com/apis/design/resource_names. The resource name here
-    /// may either be a "full" resource name (e.g.
-    /// "//library.googleapis.com/shelves/shelf1/books/book2") or a "relative"
-    /// resource name (e.g. "shelves/shelf1/books/book2") as described in the
-    /// resource name specification.
-    #[serde(rename="requestedResourceName")]
-    pub requested_resource_name: Option<String>,
-    /// Access was approved.
-    pub approve: Option<ApproveDecision>,
-    /// The locations for which approval is being requested.
-    #[serde(rename="requestedLocations")]
-    pub requested_locations: Option<AccessLocations>,
-}
+pub struct Empty { _never_set: Option<bool> }
 
-impl ResponseResult for ApprovalRequest {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AccessReason {
-    /// Type of access justification.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// More detail about certain reason types. See comments for each type above.
-    pub detail: Option<String>,
-}
-
-impl Part for AccessReason {}
+impl ResponseResult for Empty {}
 
 
 /// Request to approve an ApprovalRequest.
@@ -674,7 +751,7 @@ impl RequestValue for ApproveApprovalRequestMessage {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = AccessApproval::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `approval_requests_approve(...)`, `approval_requests_dismiss(...)`, `approval_requests_get(...)`, `approval_requests_list(...)`, `get_access_approval_settings(...)` and `update_access_approval_settings(...)`
+/// // like `approval_requests_approve(...)`, `approval_requests_dismiss(...)`, `approval_requests_get(...)`, `approval_requests_list(...)`, `delete_access_approval_settings(...)`, `get_access_approval_settings(...)` and `update_access_approval_settings(...)`
 /// // to build up your call.
 /// let rb = hub.folders();
 /// # }
@@ -692,7 +769,7 @@ impl<'a, C, A> FolderMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Updates the settings associated with a project, folder, or organization.
-    /// Completely replaces the existing settings.
+    /// Settings to update are determined by the value of field_mask.
     /// 
     /// # Arguments
     ///
@@ -708,6 +785,7 @@ impl<'a, C, A> FolderMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
+            _update_mask: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -795,6 +873,28 @@ impl<'a, C, A> FolderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Deletes the settings associated with a project, folder, or organization.
+    /// This will have the effect of disabling Access Approval for the project,
+    /// folder, or organization, but only if all ancestors also have Access
+    /// Approval disabled. If Access Approval is enabled at a higher level of the
+    /// hierarchy, then Access Approval will still be enabled at this level as
+    /// the settings are inherited.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Name of the AccessApprovalSettings to delete.
+    pub fn delete_access_approval_settings(&self, name: &str) -> FolderDeleteAccessApprovalSettingCall<'a, C, A> {
+        FolderDeleteAccessApprovalSettingCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Dismisses a request. Returns the updated ApprovalRequest.
     /// 
     /// NOTE: This does not deny access to the resource if another request has been
@@ -848,7 +948,7 @@ impl<'a, C, A> FolderMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = AccessApproval::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `approval_requests_approve(...)`, `approval_requests_dismiss(...)`, `approval_requests_get(...)`, `approval_requests_list(...)`, `get_access_approval_settings(...)` and `update_access_approval_settings(...)`
+/// // like `approval_requests_approve(...)`, `approval_requests_dismiss(...)`, `approval_requests_get(...)`, `approval_requests_list(...)`, `delete_access_approval_settings(...)`, `get_access_approval_settings(...)` and `update_access_approval_settings(...)`
 /// // to build up your call.
 /// let rb = hub.organizations();
 /// # }
@@ -866,7 +966,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Updates the settings associated with a project, folder, or organization.
-    /// Completely replaces the existing settings.
+    /// Settings to update are determined by the value of field_mask.
     /// 
     /// # Arguments
     ///
@@ -881,6 +981,29 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
         OrganizationUpdateAccessApprovalSettingCall {
             hub: self.hub,
             _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes the settings associated with a project, folder, or organization.
+    /// This will have the effect of disabling Access Approval for the project,
+    /// folder, or organization, but only if all ancestors also have Access
+    /// Approval disabled. If Access Approval is enabled at a higher level of the
+    /// hierarchy, then Access Approval will still be enabled at this level as
+    /// the settings are inherited.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Name of the AccessApprovalSettings to delete.
+    pub fn delete_access_approval_settings(&self, name: &str) -> OrganizationDeleteAccessApprovalSettingCall<'a, C, A> {
+        OrganizationDeleteAccessApprovalSettingCall {
+            hub: self.hub,
             _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1022,7 +1145,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = AccessApproval::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `approval_requests_approve(...)`, `approval_requests_dismiss(...)`, `approval_requests_get(...)`, `approval_requests_list(...)`, `get_access_approval_settings(...)` and `update_access_approval_settings(...)`
+/// // like `approval_requests_approve(...)`, `approval_requests_dismiss(...)`, `approval_requests_get(...)`, `approval_requests_list(...)`, `delete_access_approval_settings(...)`, `get_access_approval_settings(...)` and `update_access_approval_settings(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1118,8 +1241,30 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Deletes the settings associated with a project, folder, or organization.
+    /// This will have the effect of disabling Access Approval for the project,
+    /// folder, or organization, but only if all ancestors also have Access
+    /// Approval disabled. If Access Approval is enabled at a higher level of the
+    /// hierarchy, then Access Approval will still be enabled at this level as
+    /// the settings are inherited.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Name of the AccessApprovalSettings to delete.
+    pub fn delete_access_approval_settings(&self, name: &str) -> ProjectDeleteAccessApprovalSettingCall<'a, C, A> {
+        ProjectDeleteAccessApprovalSettingCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Updates the settings associated with a project, folder, or organization.
-    /// Completely replaces the existing settings.
+    /// Settings to update are determined by the value of field_mask.
     /// 
     /// # Arguments
     ///
@@ -1135,6 +1280,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
+            _update_mask: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1179,7 +1325,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // #################
 
 /// Updates the settings associated with a project, folder, or organization.
-/// Completely replaces the existing settings.
+/// Settings to update are determined by the value of field_mask.
 ///
 /// A builder for the *updateAccessApprovalSettings* method supported by a *folder* resource.
 /// It is not used directly, but through a `FolderMethods` instance.
@@ -1213,6 +1359,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().update_access_approval_settings(req, "name")
+///              .update_mask("et")
 ///              .doit();
 /// # }
 /// ```
@@ -1222,6 +1369,7 @@ pub struct FolderUpdateAccessApprovalSettingCall<'a, C, A>
     hub: &'a AccessApproval<C, A>,
     _request: AccessApprovalSettings,
     _name: String,
+    _update_mask: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -1244,9 +1392,12 @@ impl<'a, C, A> FolderUpdateAccessApprovalSettingCall<'a, C, A> where C: BorrowMu
         };
         dlg.begin(MethodInfo { id: "accessapproval.folders.updateAccessApprovalSettings",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "name", "updateMask"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1398,6 +1549,16 @@ impl<'a, C, A> FolderUpdateAccessApprovalSettingCall<'a, C, A> where C: BorrowMu
     /// we provide this method for API completeness.
     pub fn name(mut self, new_value: &str) -> FolderUpdateAccessApprovalSettingCall<'a, C, A> {
         self._name = new_value.to_string();
+        self
+    }
+    /// For the `FieldMask` definition, see
+    /// https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
+    /// If this field is left unset, only the notification_emails field will be
+    /// updated.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> FolderUpdateAccessApprovalSettingCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -2271,9 +2432,9 @@ impl<'a, C, A> FolderApprovalRequestGetCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().approval_requests_list("parent")
-///              .page_token("takimata")
-///              .page_size(-70)
-///              .filter("amet.")
+///              .page_token("justo")
+///              .page_size(-1)
+///              .filter("erat")
 ///              .doit();
 /// # }
 /// ```
@@ -2525,6 +2686,259 @@ impl<'a, C, A> FolderApprovalRequestListCall<'a, C, A> where C: BorrowMut<hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> FolderApprovalRequestListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes the settings associated with a project, folder, or organization.
+/// This will have the effect of disabling Access Approval for the project,
+/// folder, or organization, but only if all ancestors also have Access
+/// Approval disabled. If Access Approval is enabled at a higher level of the
+/// hierarchy, then Access Approval will still be enabled at this level as
+/// the settings are inherited.
+///
+/// A builder for the *deleteAccessApprovalSettings* method supported by a *folder* resource.
+/// It is not used directly, but through a `FolderMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_accessapproval1_beta1 as accessapproval1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use accessapproval1_beta1::AccessApproval;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AccessApproval::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.folders().delete_access_approval_settings("name")
+///              .doit();
+/// # }
+/// ```
+pub struct FolderDeleteAccessApprovalSettingCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AccessApproval<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for FolderDeleteAccessApprovalSettingCall<'a, C, A> {}
+
+impl<'a, C, A> FolderDeleteAccessApprovalSettingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "accessapproval.folders.deleteAccessApprovalSettings",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Name of the AccessApprovalSettings to delete.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> FolderDeleteAccessApprovalSettingCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> FolderDeleteAccessApprovalSettingCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> FolderDeleteAccessApprovalSettingCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderDeleteAccessApprovalSettingCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2825,7 +3239,7 @@ impl<'a, C, A> FolderApprovalRequestDismisCall<'a, C, A> where C: BorrowMut<hype
 
 
 /// Updates the settings associated with a project, folder, or organization.
-/// Completely replaces the existing settings.
+/// Settings to update are determined by the value of field_mask.
 ///
 /// A builder for the *updateAccessApprovalSettings* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -2859,6 +3273,7 @@ impl<'a, C, A> FolderApprovalRequestDismisCall<'a, C, A> where C: BorrowMut<hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().update_access_approval_settings(req, "name")
+///              .update_mask("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -2868,6 +3283,7 @@ pub struct OrganizationUpdateAccessApprovalSettingCall<'a, C, A>
     hub: &'a AccessApproval<C, A>,
     _request: AccessApprovalSettings,
     _name: String,
+    _update_mask: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -2890,9 +3306,12 @@ impl<'a, C, A> OrganizationUpdateAccessApprovalSettingCall<'a, C, A> where C: Bo
         };
         dlg.begin(MethodInfo { id: "accessapproval.organizations.updateAccessApprovalSettings",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "name", "updateMask"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -3046,6 +3465,16 @@ impl<'a, C, A> OrganizationUpdateAccessApprovalSettingCall<'a, C, A> where C: Bo
         self._name = new_value.to_string();
         self
     }
+    /// For the `FieldMask` definition, see
+    /// https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
+    /// If this field is left unset, only the notification_emails field will be
+    /// updated.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> OrganizationUpdateAccessApprovalSettingCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -3098,6 +3527,259 @@ impl<'a, C, A> OrganizationUpdateAccessApprovalSettingCall<'a, C, A> where C: Bo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationUpdateAccessApprovalSettingCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes the settings associated with a project, folder, or organization.
+/// This will have the effect of disabling Access Approval for the project,
+/// folder, or organization, but only if all ancestors also have Access
+/// Approval disabled. If Access Approval is enabled at a higher level of the
+/// hierarchy, then Access Approval will still be enabled at this level as
+/// the settings are inherited.
+///
+/// A builder for the *deleteAccessApprovalSettings* method supported by a *organization* resource.
+/// It is not used directly, but through a `OrganizationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_accessapproval1_beta1 as accessapproval1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use accessapproval1_beta1::AccessApproval;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AccessApproval::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.organizations().delete_access_approval_settings("name")
+///              .doit();
+/// # }
+/// ```
+pub struct OrganizationDeleteAccessApprovalSettingCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AccessApproval<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OrganizationDeleteAccessApprovalSettingCall<'a, C, A> {}
+
+impl<'a, C, A> OrganizationDeleteAccessApprovalSettingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "accessapproval.organizations.deleteAccessApprovalSettings",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Name of the AccessApprovalSettings to delete.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> OrganizationDeleteAccessApprovalSettingCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationDeleteAccessApprovalSettingCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationDeleteAccessApprovalSettingCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationDeleteAccessApprovalSettingCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3421,9 +4103,9 @@ impl<'a, C, A> OrganizationApprovalRequestApproveCall<'a, C, A> where C: BorrowM
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().approval_requests_list("parent")
-///              .page_token("dolores")
+///              .page_token("ea")
 ///              .page_size(-61)
-///              .filter("sadipscing")
+///              .filter("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -4500,8 +5182,8 @@ impl<'a, C, A> OrganizationApprovalRequestDismisCall<'a, C, A> where C: BorrowMu
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().approval_requests_list("parent")
-///              .page_token("justo")
-///              .page_size(-34)
+///              .page_token("ipsum")
+///              .page_size(-5)
 ///              .filter("et")
 ///              .doit();
 /// # }
@@ -5543,8 +6225,261 @@ impl<'a, C, A> ProjectApprovalRequestApproveCall<'a, C, A> where C: BorrowMut<hy
 }
 
 
+/// Deletes the settings associated with a project, folder, or organization.
+/// This will have the effect of disabling Access Approval for the project,
+/// folder, or organization, but only if all ancestors also have Access
+/// Approval disabled. If Access Approval is enabled at a higher level of the
+/// hierarchy, then Access Approval will still be enabled at this level as
+/// the settings are inherited.
+///
+/// A builder for the *deleteAccessApprovalSettings* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_accessapproval1_beta1 as accessapproval1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use accessapproval1_beta1::AccessApproval;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AccessApproval::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().delete_access_approval_settings("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectDeleteAccessApprovalSettingCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AccessApproval<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectDeleteAccessApprovalSettingCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectDeleteAccessApprovalSettingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "accessapproval.projects.deleteAccessApprovalSettings",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Name of the AccessApprovalSettings to delete.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectDeleteAccessApprovalSettingCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectDeleteAccessApprovalSettingCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectDeleteAccessApprovalSettingCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectDeleteAccessApprovalSettingCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Updates the settings associated with a project, folder, or organization.
-/// Completely replaces the existing settings.
+/// Settings to update are determined by the value of field_mask.
 ///
 /// A builder for the *updateAccessApprovalSettings* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5578,6 +6513,7 @@ impl<'a, C, A> ProjectApprovalRequestApproveCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().update_access_approval_settings(req, "name")
+///              .update_mask("erat")
 ///              .doit();
 /// # }
 /// ```
@@ -5587,6 +6523,7 @@ pub struct ProjectUpdateAccessApprovalSettingCall<'a, C, A>
     hub: &'a AccessApproval<C, A>,
     _request: AccessApprovalSettings,
     _name: String,
+    _update_mask: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5609,9 +6546,12 @@ impl<'a, C, A> ProjectUpdateAccessApprovalSettingCall<'a, C, A> where C: BorrowM
         };
         dlg.begin(MethodInfo { id: "accessapproval.projects.updateAccessApprovalSettings",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "name", "updateMask"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5763,6 +6703,16 @@ impl<'a, C, A> ProjectUpdateAccessApprovalSettingCall<'a, C, A> where C: BorrowM
     /// we provide this method for API completeness.
     pub fn name(mut self, new_value: &str) -> ProjectUpdateAccessApprovalSettingCall<'a, C, A> {
         self._name = new_value.to_string();
+        self
+    }
+    /// For the `FieldMask` definition, see
+    /// https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
+    /// If this field is left unset, only the notification_emails field will be
+    /// updated.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> ProjectUpdateAccessApprovalSettingCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong

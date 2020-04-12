@@ -1,4 +1,4 @@
-site_name: Games Management v1.0.12+20190627
+site_name: Games Management v1.0.13+20200402
 site_url: http://byron.github.io/google-apis-rs/google-gamesmanagement1_management-cli
 site_description: A complete library to interact with Games Management (protocol v1management)
 
@@ -22,11 +22,6 @@ pages:
 - ['events_reset-multiple-for-all-players.md', 'Events', 'Reset Multiple For All Players']
 - ['players_hide.md', 'Players', 'Hide']
 - ['players_unhide.md', 'Players', 'Unhide']
-- ['quests_reset.md', 'Quests', 'Reset']
-- ['quests_reset-all.md', 'Quests', 'Reset All']
-- ['quests_reset-all-for-all-players.md', 'Quests', 'Reset All For All Players']
-- ['quests_reset-for-all-players.md', 'Quests', 'Reset For All Players']
-- ['quests_reset-multiple-for-all-players.md', 'Quests', 'Reset Multiple For All Players']
 - ['rooms_reset.md', 'Rooms', 'Reset']
 - ['rooms_reset-for-all-players.md', 'Rooms', 'Reset For All Players']
 - ['scores_reset.md', 'Scores', 'Reset']

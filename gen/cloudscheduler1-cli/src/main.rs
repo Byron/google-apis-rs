@@ -974,9 +974,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required.
-        
-        The location name. For example:
+                     Some(r##"Required. The location name. For example:
         `projects/PROJECT_ID/locations/LOCATION_ID`."##),
                      Some(true),
                      Some(false)),
@@ -1005,9 +1003,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required.
-        
-        The job name. For example:
+                     Some(r##"Required. The job name. For example:
         `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`."##),
                      Some(true),
                      Some(false)),
@@ -1030,9 +1026,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required.
-        
-        The job name. For example:
+                     Some(r##"Required. The job name. For example:
         `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`."##),
                      Some(true),
                      Some(false)),
@@ -1055,9 +1049,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required.
-        
-        The location name. For example:
+                     Some(r##"Required. The location name. For example:
         `projects/PROJECT_ID/locations/LOCATION_ID`."##),
                      Some(true),
                      Some(false)),
@@ -1138,9 +1130,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required.
-        
-        The job name. For example:
+                     Some(r##"Required. The job name. For example:
         `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`."##),
                      Some(true),
                      Some(false)),
@@ -1174,9 +1164,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required.
-        
-        The job name. For example:
+                     Some(r##"Required. The job name. For example:
         `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`."##),
                      Some(true),
                      Some(false)),
@@ -1208,9 +1196,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required.
-        
-        The job name. For example:
+                     Some(r##"Required. The job name. For example:
         `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`."##),
                      Some(true),
                      Some(false)),
@@ -1261,7 +1247,7 @@ fn main() {
     
     let mut app = App::new("cloudscheduler1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190617")
+           .version("1.0.13+20200331")
            .about("Creates and manages jobs run on a regular recurring schedule.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudscheduler1_cli")
            .arg(Arg::with_name("url")

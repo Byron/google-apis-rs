@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Manufacturer Center* crate version *1.0.12+20190627*, where *20190627* is the exact revision of the *manufacturers:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Manufacturer Center* crate version *1.0.13+20200317*, where *20200317* is the exact revision of the *manufacturers:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Manufacturer Center* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/manufacturers/).
@@ -330,7 +330,7 @@ impl<'a, C, A> ManufacturerCenter<C, A>
         ManufacturerCenter {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://manufacturers.googleapis.com/".to_string(),
             _root_url: "https://manufacturers.googleapis.com/".to_string(),
         }
@@ -341,7 +341,7 @@ impl<'a, C, A> ManufacturerCenter<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -609,6 +609,10 @@ pub struct Attributes {
     /// The pattern of the product. For more information, see
     /// https://support.google.com/manufacturers/answer/6124116#pattern.
     pub pattern: Option<String>,
+    /// Rich product content. For more information, see
+    /// https://support.google.com/manufacturers/answer/9389865
+    #[serde(rename="richProductContent")]
+    pub rich_product_content: Option<Vec<String>>,
     /// The disclosure date of the product. For more information, see
     /// https://support.google.com/manufacturers/answer/6124116#disclosure.
     #[serde(rename="disclosureDate")]

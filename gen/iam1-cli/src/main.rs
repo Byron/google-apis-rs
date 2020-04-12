@@ -69,21 +69,13 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "full-resource-name" => Some(("fullResourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "binding.role" => Some(("binding.role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "binding.members" => Some(("binding.members", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "binding.condition.title" => Some(("binding.condition.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "binding.condition.expression" => Some(("binding.condition.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "binding.condition.description" => Some(("binding.condition.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "binding.condition.location" => Some(("binding.condition.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "condition.title" => Some(("condition.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "condition.expression" => Some(("condition.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "condition.description" => Some(("condition.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "condition.location" => Some(("condition.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["binding", "condition", "description", "etag", "expression", "full-resource-name", "location", "members", "policy", "role", "title", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["condition", "description", "expression", "full-resource-name", "location", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1877,6 +1869,91 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_service_accounts_keys_upload(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "public-key-data" => Some(("publicKeyData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["public-key-data"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::UploadServiceAccountKeyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().service_accounts_keys_upload(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_service_accounts_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().service_accounts_list(opt.value_of("name").unwrap_or(""));
@@ -2863,6 +2940,9 @@ impl<'n> Engine<'n> {
                     ("service-accounts-keys-list", Some(opt)) => {
                         call_result = self._projects_service_accounts_keys_list(opt, dry_run, &mut err);
                     },
+                    ("service-accounts-keys-upload", Some(opt)) => {
+                        call_result = self._projects_service_accounts_keys_upload(opt, dry_run, &mut err);
+                    },
                     ("service-accounts-list", Some(opt)) => {
                         call_result = self._projects_service_accounts_list(opt, dry_run, &mut err);
                     },
@@ -2998,23 +3078,12 @@ fn main() {
         ("iam-policies", "methods: 'lint-policy' and 'query-auditable-services'", vec![
             ("lint-policy",
                     Some(r##"Lints a Cloud IAM policy object or its sub fields. Currently supports
-        google.iam.v1.Policy, google.iam.v1.Binding and
         google.iam.v1.Binding.condition.
         
         Each lint operation consists of multiple lint validation units.
-        Validation units have the following properties:
-        
-        - Each unit inspects the input object in regard to a particular
-          linting aspect and issues a google.iam.admin.v1.LintResult
-          disclosing the result.
-        - Domain of discourse of each unit can be either
-          google.iam.v1.Policy, google.iam.v1.Binding, or
-          google.iam.v1.Binding.condition depending on the purpose of the
-          validation.
-        - A unit may require additional data (like the list of all possible
-          enumerable values of a particular attribute used in the policy instance)
-          which shall be provided by the caller. Refer to the comments of
-          google.iam.admin.v1.LintPolicyRequest.context for more details.
+        Each unit inspects the input object in regard to a particular linting
+        aspect and issues a google.iam.admin.v1.LintResult disclosing the
+        result.
         
         The set of applicable validation units is determined by the Cloud IAM
         server and is not configurable.
@@ -3379,7 +3448,7 @@ fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'roles-create', 'roles-delete', 'roles-get', 'roles-list', 'roles-patch', 'roles-undelete', 'service-accounts-create', 'service-accounts-delete', 'service-accounts-disable', 'service-accounts-enable', 'service-accounts-get', 'service-accounts-get-iam-policy', 'service-accounts-keys-create', 'service-accounts-keys-delete', 'service-accounts-keys-get', 'service-accounts-keys-list', 'service-accounts-list', 'service-accounts-patch', 'service-accounts-set-iam-policy', 'service-accounts-sign-blob', 'service-accounts-sign-jwt', 'service-accounts-test-iam-permissions', 'service-accounts-undelete' and 'service-accounts-update'", vec![
+        ("projects", "methods: 'roles-create', 'roles-delete', 'roles-get', 'roles-list', 'roles-patch', 'roles-undelete', 'service-accounts-create', 'service-accounts-delete', 'service-accounts-disable', 'service-accounts-enable', 'service-accounts-get', 'service-accounts-get-iam-policy', 'service-accounts-keys-create', 'service-accounts-keys-delete', 'service-accounts-keys-get', 'service-accounts-keys-list', 'service-accounts-keys-upload', 'service-accounts-list', 'service-accounts-patch', 'service-accounts-set-iam-policy', 'service-accounts-sign-blob', 'service-accounts-sign-jwt', 'service-accounts-test-iam-permissions', 'service-accounts-undelete' and 'service-accounts-update'", vec![
             ("roles-create",
                     Some(r##"Creates a new Role."##),
                     "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_roles-create",
@@ -3700,7 +3769,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the service account in the following format:
+                     Some(r##"Required. The resource name of the service account in the following format:
         `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
         Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
         the account. The `ACCOUNT` value can be the `email` address or the
@@ -3785,9 +3854,10 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The resource name of the service account in the following format:
-        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_UNIQUE_ID}'.
+        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
         Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
-        the account."##),
+        the account. The `ACCOUNT` value can be the `email` address or the
+        `unique_id` of the service account."##),
                      Some(true),
                      Some(false)),
         
@@ -3815,7 +3885,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the service account in the following format:
+                     Some(r##"Required. The resource name of the service account in the following format:
         `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
         Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
         the account. The `ACCOUNT` value can be the `email` address or the
@@ -3879,7 +3949,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the service account in the following format:
+                     Some(r##"Required. The resource name of the service account in the following format:
         `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
         Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
         the account. The `ACCOUNT` value can be the `email` address or the
@@ -3911,7 +3981,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the service account key in the following format:
+                     Some(r##"Required. The resource name of the service account key in the following format:
         `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
         Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
         the account. The `ACCOUNT` value can be the `email` address or the
@@ -3938,7 +4008,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the service account key in the following format:
+                     Some(r##"Required. The resource name of the service account key in the following format:
         `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
         
         Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
@@ -3965,7 +4035,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the service account in the following format:
+                     Some(r##"Required. The resource name of the service account in the following format:
         `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
         
         Using `-` as a wildcard for the `PROJECT_ID`, will infer the project from
@@ -3973,6 +4043,41 @@ fn main() {
         `unique_id` of the service account."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("service-accounts-keys-upload",
+                    Some(r##"Upload public key for a given service account.
+        This rpc will create a
+        ServiceAccountKey that has the
+        provided public key and returns it."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-keys-upload",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The resource name of the service account in the following format:
+        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+        Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+        the account. The `ACCOUNT` value can be the `email` address or the
+        `unique_id` of the service account."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -4107,7 +4212,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the service account in the following format:
+                     Some(r##"Required. The resource name of the service account in the following format:
         `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
         Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
         the account. The `ACCOUNT` value can be the `email` address or the
@@ -4147,7 +4252,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the service account in the following format:
+                     Some(r##"Required. The resource name of the service account in the following format:
         `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
         Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
         the account. The `ACCOUNT` value can be the `email` address or the
@@ -4212,7 +4317,7 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The resource name of the service account in the following format:
-        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_UNIQUE_ID}'.
+        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_UNIQUE_ID}`.
         Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
         the account."##),
                      Some(true),
@@ -4375,7 +4480,7 @@ fn main() {
     
     let mut app = App::new("iam1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190627")
+           .version("1.0.13+20200319")
            .about("Manages identity and access control for Google Cloud Platform resources, including the creation of service accounts, which you can use to authenticate to Google and make API calls.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_iam1_cli")
            .arg(Arg::with_name("url")

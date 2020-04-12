@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *iam* crate version *1.0.12+20190627*, where *20190627* is the exact revision of the *iam:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *iam* crate version *1.0.13+20200319*, where *20200319* is the exact revision of the *iam:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *iam* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iam/).
@@ -18,7 +18,7 @@
 //! * [permissions](struct.Permission.html)
 //!  * [*query testable permissions*](struct.PermissionQueryTestablePermissionCall.html)
 //! * projects
-//!  * [*roles create*](struct.ProjectRoleCreateCall.html), [*roles delete*](struct.ProjectRoleDeleteCall.html), [*roles get*](struct.ProjectRoleGetCall.html), [*roles list*](struct.ProjectRoleListCall.html), [*roles patch*](struct.ProjectRolePatchCall.html), [*roles undelete*](struct.ProjectRoleUndeleteCall.html), [*service accounts create*](struct.ProjectServiceAccountCreateCall.html), [*service accounts delete*](struct.ProjectServiceAccountDeleteCall.html), [*service accounts disable*](struct.ProjectServiceAccountDisableCall.html), [*service accounts enable*](struct.ProjectServiceAccountEnableCall.html), [*service accounts get*](struct.ProjectServiceAccountGetCall.html), [*service accounts get iam policy*](struct.ProjectServiceAccountGetIamPolicyCall.html), [*service accounts keys create*](struct.ProjectServiceAccountKeyCreateCall.html), [*service accounts keys delete*](struct.ProjectServiceAccountKeyDeleteCall.html), [*service accounts keys get*](struct.ProjectServiceAccountKeyGetCall.html), [*service accounts keys list*](struct.ProjectServiceAccountKeyListCall.html), [*service accounts list*](struct.ProjectServiceAccountListCall.html), [*service accounts patch*](struct.ProjectServiceAccountPatchCall.html), [*service accounts set iam policy*](struct.ProjectServiceAccountSetIamPolicyCall.html), [*service accounts sign blob*](struct.ProjectServiceAccountSignBlobCall.html), [*service accounts sign jwt*](struct.ProjectServiceAccountSignJwtCall.html), [*service accounts test iam permissions*](struct.ProjectServiceAccountTestIamPermissionCall.html), [*service accounts undelete*](struct.ProjectServiceAccountUndeleteCall.html) and [*service accounts update*](struct.ProjectServiceAccountUpdateCall.html)
+//!  * [*roles create*](struct.ProjectRoleCreateCall.html), [*roles delete*](struct.ProjectRoleDeleteCall.html), [*roles get*](struct.ProjectRoleGetCall.html), [*roles list*](struct.ProjectRoleListCall.html), [*roles patch*](struct.ProjectRolePatchCall.html), [*roles undelete*](struct.ProjectRoleUndeleteCall.html), [*service accounts create*](struct.ProjectServiceAccountCreateCall.html), [*service accounts delete*](struct.ProjectServiceAccountDeleteCall.html), [*service accounts disable*](struct.ProjectServiceAccountDisableCall.html), [*service accounts enable*](struct.ProjectServiceAccountEnableCall.html), [*service accounts get*](struct.ProjectServiceAccountGetCall.html), [*service accounts get iam policy*](struct.ProjectServiceAccountGetIamPolicyCall.html), [*service accounts keys create*](struct.ProjectServiceAccountKeyCreateCall.html), [*service accounts keys delete*](struct.ProjectServiceAccountKeyDeleteCall.html), [*service accounts keys get*](struct.ProjectServiceAccountKeyGetCall.html), [*service accounts keys list*](struct.ProjectServiceAccountKeyListCall.html), [*service accounts keys upload*](struct.ProjectServiceAccountKeyUploadCall.html), [*service accounts list*](struct.ProjectServiceAccountListCall.html), [*service accounts patch*](struct.ProjectServiceAccountPatchCall.html), [*service accounts set iam policy*](struct.ProjectServiceAccountSetIamPolicyCall.html), [*service accounts sign blob*](struct.ProjectServiceAccountSignBlobCall.html), [*service accounts sign jwt*](struct.ProjectServiceAccountSignJwtCall.html), [*service accounts test iam permissions*](struct.ProjectServiceAccountTestIamPermissionCall.html), [*service accounts undelete*](struct.ProjectServiceAccountUndeleteCall.html) and [*service accounts update*](struct.ProjectServiceAccountUpdateCall.html)
 //! * [roles](struct.Role.html)
 //!  * [*get*](struct.RoleGetCall.html), [*list*](struct.RoleListCall.html) and [*query grantable roles*](struct.RoleQueryGrantableRoleCall.html)
 //! 
@@ -347,7 +347,7 @@ impl<'a, C, A> Iam<C, A>
         Iam {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://iam.googleapis.com/".to_string(),
             _root_url: "https://iam.googleapis.com/".to_string(),
         }
@@ -370,7 +370,7 @@ impl<'a, C, A> Iam<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -488,7 +488,7 @@ impl Part for AuditableService {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SignJwtRequest {
-    /// The JWT payload to sign, a JSON JWT Claim set.
+    /// Required. The JWT payload to sign, a JSON JWT Claim set.
     pub payload: Option<String>,
 }
 
@@ -582,9 +582,9 @@ impl ResponseResult for QueryTestablePermissionsResponse {}
 pub struct Role {
     /// Used to perform a consistent read-modify-write.
     pub etag: Option<String>,
-    /// Optional.  A human-readable description for the role.
+    /// Optional. A human-readable description for the role.
     pub description: Option<String>,
-    /// Optional.  A human-readable title for the role.  Typically this
+    /// Optional. A human-readable title for the role.  Typically this
     /// is limited to 100 UTF-8 bytes.
     pub title: Option<String>,
     /// The current deleted state of the role. This field is read only.
@@ -602,7 +602,7 @@ pub struct Role {
     /// When Role is used in CreateRole, the role name must not be set.
     /// 
     /// When Role is used in output and other input such as UpdateRole, the role
-    /// name is the complete path, e.g., roles/logging.viewer for curated roles
+    /// name is the complete path, e.g., roles/logging.viewer for predefined roles
     /// and organizations/{ORGANIZATION_ID}/roles/logging.viewer for custom roles.
     pub name: Option<String>,
 }
@@ -612,60 +612,72 @@ impl Resource for Role {}
 impl ResponseResult for Role {}
 
 
-/// The service account list response.
+/// The service account key upload request.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [service accounts list projects](struct.ProjectServiceAccountListCall.html) (response)
+/// * [service accounts keys upload projects](struct.ProjectServiceAccountKeyUploadCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListServiceAccountsResponse {
-    /// To retrieve the next page of results, set
-    /// ListServiceAccountsRequest.page_token
-    /// to this value.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of matching service accounts.
-    pub accounts: Option<Vec<ServiceAccount>>,
+pub struct UploadServiceAccountKeyRequest {
+    /// A field that allows clients to upload their own public key. If set,
+    /// use this public key data to create a service account key for given
+    /// service account.
+    /// Please note, the expected format for this field is X509_PEM.
+    #[serde(rename="publicKeyData")]
+    pub public_key_data: Option<String>,
 }
 
-impl ResponseResult for ListServiceAccountsResponse {}
+impl RequestValue for UploadServiceAccountKeyRequest {}
 
 
-/// Defines an Identity and Access Management (IAM) policy. It is used to
-/// specify access control policies for Cloud Platform resources.
+/// An Identity and Access Management (IAM) policy, which specifies access
+/// controls for Google Cloud resources.
 /// 
-/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
-/// `members` to a `role`, where the members can be user accounts, Google groups,
-/// Google domains, and service accounts. A `role` is a named list of permissions
-/// defined by IAM.
+/// A `Policy` is a collection of `bindings`. A `binding` binds one or more
+/// `members` to a single `role`. Members can be user accounts, service accounts,
+/// Google groups, and domains (such as G Suite). A `role` is a named list of
+/// permissions; each `role` can be an IAM predefined role or a user-created
+/// custom role.
 /// 
-/// **JSON Example**
+/// Optionally, a `binding` can specify a `condition`, which is a logical
+/// expression that allows access to a resource only if the expression evaluates
+/// to `true`. A condition can add constraints based on attributes of the
+/// request, the resource, or both.
+/// 
+/// **JSON example:**
 /// 
 /// ````text
 /// {
 ///   "bindings": [
 ///     {
-///       "role": "roles/owner",
+///       "role": "roles/resourcemanager.organizationAdmin",
 ///       "members": [
 ///         "user:mike@example.com",
 ///         "group:admins@example.com",
 ///         "domain:google.com",
-///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
+///         "serviceAccount:my-project-id@appspot.gserviceaccount.com"
 ///       ]
 ///     },
 ///     {
-///       "role": "roles/viewer",
-///       "members": ["user:sean@example.com"]
+///       "role": "roles/resourcemanager.organizationViewer",
+///       "members": ["user:eve@example.com"],
+///       "condition": {
+///         "title": "expirable access",
+///         "description": "Does not grant access after Sep 2020",
+///         "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')",
+///       }
 ///     }
-///   ]
+///   ],
+///   "etag": "BwWWja0YfJA=",
+///   "version": 3
 /// }
 /// ````
 /// 
-/// **YAML Example**
+/// **YAML example:**
 /// 
 /// ````text
 /// bindings:
@@ -673,15 +685,21 @@ impl ResponseResult for ListServiceAccountsResponse {}
 ///   - user:mike@example.com
 ///   - group:admins@example.com
 ///   - domain:google.com
-///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///   role: roles/owner
+///   - serviceAccount:my-project-id@appspot.gserviceaccount.com
+///   role: roles/resourcemanager.organizationAdmin
 /// - members:
-///   - user:sean@example.com
-///   role: roles/viewer
+///   - user:eve@example.com
+///   role: roles/resourcemanager.organizationViewer
+///   condition:
+///     title: expirable access
+///     description: Does not grant access after Sep 2020
+///     expression: request.time < timestamp('2020-10-01T00:00:00.000Z')
+/// - etag: BwWWja0YfJA=
+/// - version: 3
 /// ````
 /// 
 /// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam/docs).
+/// [IAM documentation](https://cloud.google.com/iam/docs/).
 /// 
 /// # Activities
 /// 
@@ -703,13 +721,36 @@ pub struct Policy {
     /// systems are expected to put that etag in the request to `setIamPolicy` to
     /// ensure that their change will be applied to the same version of the policy.
     /// 
-    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
-    /// policy is overwritten blindly.
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
     pub etag: Option<String>,
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
+    /// Associates a list of `members` to a `role`. Optionally, may specify a
+    /// `condition` that determines how and when the `bindings` are applied. Each
+    /// of the `bindings` must contain at least one member.
     pub bindings: Option<Vec<Binding>>,
-    /// Deprecated.
+    /// Specifies the format of the policy.
+    /// 
+    /// Valid values are `0`, `1`, and `3`. Requests that specify an invalid value
+    /// are rejected.
+    /// 
+    /// Any operation that affects conditional role bindings must specify version
+    /// `3`. This requirement applies to the following operations:
+    /// 
+    /// * Getting a policy that includes a conditional role binding
+    /// * Adding a conditional role binding to a policy
+    /// * Changing a conditional role binding in a policy
+    /// * Removing any role binding, with or without a condition, from a policy
+    ///   that includes conditions
+    /// 
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
+    /// 
+    /// If a policy does not include any conditions, operations on that policy may
+    /// specify any valid version or leave the field unset.
     pub version: Option<i32>,
 }
 
@@ -858,19 +899,24 @@ pub struct Permission {
     #[serde(rename="apiDisabled")]
     pub api_disabled: Option<bool>,
     /// A brief description of what this Permission is used for.
+    /// This permission can ONLY be used in predefined roles.
     pub description: Option<String>,
     /// The title of this Permission.
     pub title: Option<String>,
-    /// The current launch stage of the permission.
-    pub stage: Option<String>,
-    /// This permission can ONLY be used in predefined roles.
+    /// The preferred name for this permission. If present, then this permission is
+    /// an alias of, and equivalent to, the listed primary_permission.
+    #[serde(rename="primaryPermission")]
+    pub primary_permission: Option<String>,
+    /// The name of this Permission.
+    pub name: Option<String>,
+    /// no description provided
     #[serde(rename="onlyInPredefinedRoles")]
     pub only_in_predefined_roles: Option<bool>,
     /// The current custom role support level.
     #[serde(rename="customRolesSupportLevel")]
     pub custom_roles_support_level: Option<String>,
-    /// The name of this Permission.
-    pub name: Option<String>,
+    /// The current launch stage of the permission.
+    pub stage: Option<String>,
 }
 
 impl Resource for Permission {}
@@ -998,7 +1044,7 @@ impl RequestValue for CreateRoleRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LintResult {
     /// The validation unit name, for instance
-    /// “lintValidationUnits/ConditionComplexityCheck”.
+    /// "lintValidationUnits/ConditionComplexityCheck".
     #[serde(rename="validationUnitName")]
     pub validation_unit_name: Option<String>,
     /// The validation unit severity.
@@ -1007,15 +1053,11 @@ pub struct LintResult {
     pub level: Option<String>,
     /// The name of the field for which this lint result is about.
     /// 
-    /// For nested messages, `field_name` consists of names of the embedded fields
+    /// For nested messages `field_name` consists of names of the embedded fields
     /// separated by period character. The top-level qualifier is the input object
-    /// to lint in the request. For instance, if the lint request is on a
-    /// google.iam.v1.Policy and this lint result is about a condition
-    /// expression of one of the input policy bindings, the field would be
-    /// populated as `policy.bindings.condition.expression`.
-    /// 
-    /// This field does not identify the ordinality of the repetitive fields (for
-    /// instance bindings in a policy).
+    /// to lint in the request. For example, the `field_name` value
+    /// `condition.expression` identifies a lint result for the `expression` field
+    /// of the provided condition.
     #[serde(rename="fieldName")]
     pub field_name: Option<String>,
     /// 0-based character position of problematic construct within the object
@@ -1023,15 +1065,6 @@ pub struct LintResult {
     /// expression.
     #[serde(rename="locationOffset")]
     pub location_offset: Option<i32>,
-    /// 0-based index ordinality of the binding in the input object associated
-    /// with this result.
-    /// This field is populated only if the input object to lint is of type
-    /// google.iam.v1.Policy, which can comprise more than one binding.
-    /// It is set to -1 if the result is not associated with any particular
-    /// binding and only targets the policy as a whole, such as results about
-    /// policy size violations.
-    #[serde(rename="bindingOrdinal")]
-    pub binding_ordinal: Option<i32>,
     /// Human readable debug message associated with the issue.
     #[serde(rename="debugMessage")]
     pub debug_message: Option<String>,
@@ -1049,7 +1082,7 @@ impl Part for LintResult {}
 ///     {
 ///       "log_type": "DATA_READ",
 ///       "exempted_members": [
-///         "user:foo@gmail.com"
+///         "user:jose@example.com"
 ///       ]
 ///     },
 ///     {
@@ -1060,7 +1093,7 @@ impl Part for LintResult {}
 /// ````
 /// 
 /// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
-/// foo@gmail.com from DATA_READ logging.
+/// jose@example.com from DATA_READ logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1099,30 +1132,59 @@ pub struct TestIamPermissionsRequest {
 impl RequestValue for TestIamPermissionsRequest {}
 
 
-/// Represents an expression text. Example:
+/// Represents a textual expression in the Common Expression Language (CEL)
+/// syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+/// are documented at https://github.com/google/cel-spec.
+/// 
+/// Example (Comparison):
 /// 
 /// ````text
-/// title: "User account presence"
-/// description: "Determines whether the request has a user account"
-/// expression: "size(request.user) > 0"
+/// title: "Summary size limit"
+/// description: "Determines if a summary is less than 100 chars"
+/// expression: "document.summary.size() < 100"
 /// ````
+/// 
+/// Example (Equality):
+/// 
+/// ````text
+/// title: "Requestor is owner"
+/// description: "Determines if requestor is the document owner"
+/// expression: "document.owner == request.auth.claims.email"
+/// ````
+/// 
+/// Example (Logic):
+/// 
+/// ````text
+/// title: "Public documents"
+/// description: "Determine whether the document should be publicly visible"
+/// expression: "document.type != 'private' && document.type != 'internal'"
+/// ````
+/// 
+/// Example (Data Manipulation):
+/// 
+/// ````text
+/// title: "Notification string"
+/// description: "Create a notification string with a timestamp."
+/// expression: "'New message received at ' + string(document.create_time)"
+/// ````
+/// 
+/// The exact variables and functions that may be referenced within an expression
+/// are determined by the service that evaluates it. See the service
+/// documentation for additional information.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
-    /// An optional description of the expression. This is a longer text which
+    /// Optional. Description of the expression. This is a longer text which
     /// describes the expression, e.g. when hovered over it in a UI.
     pub description: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
+    /// Textual representation of an expression in Common Expression Language
+    /// syntax.
     pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error
+    /// Optional. String indicating the location of the expression for error
     /// reporting, e.g. a file name and a position in the file.
     pub location: Option<String>,
-    /// An optional title for the expression, i.e. a short string describing
+    /// Optional. Title for the expression, i.e. a short string describing
     /// its purpose. This can be used e.g. in UIs which allow to enter the
     /// expression.
     pub title: Option<String>,
@@ -1259,7 +1321,7 @@ impl RequestValue for DisableServiceAccountRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SignBlobRequest {
-    /// The bytes to sign.
+    /// Required. The bytes to sign.
     #[serde(rename="bytesToSign")]
     pub bytes_to_sign: Option<String>,
 }
@@ -1267,8 +1329,7 @@ pub struct SignBlobRequest {
 impl RequestValue for SignBlobRequest {}
 
 
-/// The request to lint a Cloud IAM policy object. LintPolicy is currently
-/// functional only for `lint_object` of type `condition`.
+/// The request to lint a Cloud IAM policy object.
 /// 
 /// # Activities
 /// 
@@ -1279,10 +1340,6 @@ impl RequestValue for SignBlobRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LintPolicyRequest {
-    /// Policy object to be linted. The functionality of linting a policy is not
-    /// yet implemented and if this field is set, it returns NOT_IMPLEMENTED
-    /// error.
-    pub policy: Option<Policy>,
     /// The full resource name of the policy this lint request is about.
     /// 
     /// The name follows the Google Cloud Platform (GCP) resource format.
@@ -1294,16 +1351,8 @@ pub struct LintPolicyRequest {
     /// request object.
     #[serde(rename="fullResourceName")]
     pub full_resource_name: Option<String>,
-    /// Binding object to be linted. The functionality of linting a binding is
-    /// not yet implemented and if this field is set, it returns NOT_IMPLEMENTED
-    /// error.
-    pub binding: Option<Binding>,
     /// google.iam.v1.Binding.condition object to be linted.
     pub condition: Option<Expr>,
-    /// `context` contains additional *permission-controlled* data that any
-    /// lint unit may depend on, in form of `{key: value}` pairs. Currently, this
-    /// field is non-operational and it will not be used during the lint operation.
-    pub context: Option<HashMap<String, String>>,
 }
 
 impl RequestValue for LintPolicyRequest {}
@@ -1322,7 +1371,7 @@ impl RequestValue for LintPolicyRequest {}
 pub struct CreateServiceAccountRequest {
     /// The ServiceAccount resource to
     /// create. Currently, only the following values are user assignable:
-    /// `display_name` .
+    /// `display_name` and `description`.
     #[serde(rename="serviceAccount")]
     pub service_account: Option<ServiceAccount>,
     /// Required. The account id that is used to generate the service account
@@ -1334,6 +1383,29 @@ pub struct CreateServiceAccountRequest {
 }
 
 impl RequestValue for CreateServiceAccountRequest {}
+
+
+/// The service account list response.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [service accounts list projects](struct.ProjectServiceAccountListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListServiceAccountsResponse {
+    /// To retrieve the next page of results, set
+    /// ListServiceAccountsRequest.page_token
+    /// to this value.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of matching service accounts.
+    pub accounts: Option<Vec<ServiceAccount>>,
+}
+
+impl ResponseResult for ListServiceAccountsResponse {}
 
 
 /// The service account sign JWT response.
@@ -1382,7 +1454,7 @@ pub struct Binding {
     ///    who is authenticated with a Google account or a service account.
     /// 
     /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` .
+    ///    account. For example, `alice@example.com` .
     /// 
     /// 
     /// * `serviceAccount:{emailid}`: An email address that represents a service
@@ -1390,6 +1462,26 @@ pub struct Binding {
     /// 
     /// * `group:{emailid}`: An email address that represents a Google group.
     ///    For example, `admins@example.com`.
+    /// 
+    /// * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a user that has been recently deleted. For
+    ///    example, `alice@example.com?uid=123456789012345678901`. If the user is
+    ///    recovered, this value reverts to `user:{emailid}` and the recovered user
+    ///    retains the role in the binding.
+    /// 
+    /// * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus
+    ///    unique identifier) representing a service account that has been recently
+    ///    deleted. For example,
+    ///    `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.
+    ///    If the service account is undeleted, this value reverts to
+    ///    `serviceAccount:{emailid}` and the undeleted service account retains the
+    ///    role in the binding.
+    /// 
+    /// * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a Google group that has been recently
+    ///    deleted. For example, `admins@example.com?uid=123456789012345678901`. If
+    ///    the group is recovered, this value reverts to `group:{emailid}` and the
+    ///    recovered group retains the role in the binding.
     /// 
     /// 
     /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
@@ -1426,6 +1518,7 @@ impl Part for Binding {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [service accounts keys upload projects](struct.ProjectServiceAccountKeyUploadCall.html) (response)
 /// * [service accounts keys get projects](struct.ProjectServiceAccountKeyGetCall.html) (response)
 /// * [service accounts keys create projects](struct.ProjectServiceAccountKeyCreateCall.html) (response)
 /// 
@@ -1437,7 +1530,13 @@ pub struct ServiceAccountKey {
     /// The resource name of the service account key in the following format
     /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
     pub name: Option<String>,
+    /// The key type.
+    #[serde(rename="keyType")]
+    pub key_type: Option<String>,
     /// The key can be used before this timestamp.
+    /// For system-managed key pairs, this timestamp is the end time for the
+    /// private key signing operation. The public key could still be used
+    /// for verification for a few hours after this time.
     #[serde(rename="validBeforeTime")]
     pub valid_before_time: Option<String>,
     /// Specifies the algorithm (and possibly key size) for the key.
@@ -1492,7 +1591,7 @@ impl ResponseResult for ServiceAccountKey {}
 ///         {
 ///           "log_type": "DATA_READ",
 ///           "exempted_members": [
-///             "user:foo@gmail.com"
+///             "user:jose@example.com"
 ///           ]
 ///         },
 ///         {
@@ -1504,7 +1603,7 @@ impl ResponseResult for ServiceAccountKey {}
 ///       ]
 ///     },
 ///     {
-///       "service": "fooservice.googleapis.com"
+///       "service": "sampleservice.googleapis.com"
 ///       "audit_log_configs": [
 ///         {
 ///           "log_type": "DATA_READ",
@@ -1512,7 +1611,7 @@ impl ResponseResult for ServiceAccountKey {}
 ///         {
 ///           "log_type": "DATA_WRITE",
 ///           "exempted_members": [
-///             "user:bar@gmail.com"
+///             "user:aliya@example.com"
 ///           ]
 ///         }
 ///       ]
@@ -1521,9 +1620,9 @@ impl ResponseResult for ServiceAccountKey {}
 /// }
 /// ````
 /// 
-/// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
-/// logging. It also exempts foo@gmail.com from DATA_READ logging, and
-/// bar@gmail.com from DATA_WRITE logging.
+/// For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
+/// logging. It also exempts jose@example.com from DATA_READ logging, and
+/// aliya@example.com from DATA_WRITE logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1552,15 +1651,7 @@ impl Part for AuditConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LintPolicyResponse {
-    /// List of lint results sorted by a composite <severity, binding_ordinal> key,
-    /// descending order of severity and ascending order of binding_ordinal.
-    /// There is no certain order among the same keys.
-    /// 
-    /// For cross-binding results (only if the input object to lint is
-    /// instance of google.iam.v1.Policy), there will be a
-    /// google.iam.admin.v1.LintResult for each of the involved bindings,
-    /// and the associated debug_message may enumerate the other involved
-    /// binding ordinal number(s).
+    /// List of lint results sorted by `severity` in descending order.
     #[serde(rename="lintResults")]
     pub lint_results: Option<Vec<LintResult>>,
 }
@@ -1927,23 +2018,12 @@ impl<'a, C, A> IamPolicyMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lints a Cloud IAM policy object or its sub fields. Currently supports
-    /// google.iam.v1.Policy, google.iam.v1.Binding and
     /// google.iam.v1.Binding.condition.
     /// 
     /// Each lint operation consists of multiple lint validation units.
-    /// Validation units have the following properties:
-    /// 
-    /// - Each unit inspects the input object in regard to a particular
-    ///   linting aspect and issues a google.iam.admin.v1.LintResult
-    ///   disclosing the result.
-    /// - Domain of discourse of each unit can be either
-    ///   google.iam.v1.Policy, google.iam.v1.Binding, or
-    ///   google.iam.v1.Binding.condition depending on the purpose of the
-    ///   validation.
-    /// - A unit may require additional data (like the list of all possible
-    ///   enumerable values of a particular attribute used in the policy instance)
-    ///   which shall be provided by the caller. Refer to the comments of
-    ///   google.iam.admin.v1.LintPolicyRequest.context for more details.
+    /// Each unit inspects the input object in regard to a particular linting
+    /// aspect and issues a google.iam.admin.v1.LintResult disclosing the
+    /// result.
     /// 
     /// The set of applicable validation units is determined by the Cloud IAM
     /// server and is not configurable.
@@ -2108,7 +2188,7 @@ impl<'a, C, A> RoleMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Iam::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `roles_create(...)`, `roles_delete(...)`, `roles_get(...)`, `roles_list(...)`, `roles_patch(...)`, `roles_undelete(...)`, `service_accounts_create(...)`, `service_accounts_delete(...)`, `service_accounts_disable(...)`, `service_accounts_enable(...)`, `service_accounts_get(...)`, `service_accounts_get_iam_policy(...)`, `service_accounts_keys_create(...)`, `service_accounts_keys_delete(...)`, `service_accounts_keys_get(...)`, `service_accounts_keys_list(...)`, `service_accounts_list(...)`, `service_accounts_patch(...)`, `service_accounts_set_iam_policy(...)`, `service_accounts_sign_blob(...)`, `service_accounts_sign_jwt(...)`, `service_accounts_test_iam_permissions(...)`, `service_accounts_undelete(...)` and `service_accounts_update(...)`
+/// // like `roles_create(...)`, `roles_delete(...)`, `roles_get(...)`, `roles_list(...)`, `roles_patch(...)`, `roles_undelete(...)`, `service_accounts_create(...)`, `service_accounts_delete(...)`, `service_accounts_disable(...)`, `service_accounts_enable(...)`, `service_accounts_get(...)`, `service_accounts_get_iam_policy(...)`, `service_accounts_keys_create(...)`, `service_accounts_keys_delete(...)`, `service_accounts_keys_get(...)`, `service_accounts_keys_list(...)`, `service_accounts_keys_upload(...)`, `service_accounts_list(...)`, `service_accounts_patch(...)`, `service_accounts_set_iam_policy(...)`, `service_accounts_sign_blob(...)`, `service_accounts_sign_jwt(...)`, `service_accounts_test_iam_permissions(...)`, `service_accounts_undelete(...)` and `service_accounts_update(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2129,7 +2209,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the service account key in the following format:
+    /// * `name` - Required. The resource name of the service account key in the following format:
     ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
     ///            Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
     ///            the account. The `ACCOUNT` value can be the `email` address or the
@@ -2200,9 +2280,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the service account in the following format:
-    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_UNIQUE_ID}'.
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     ///            Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
-    ///            the account.
+    ///            the account. The `ACCOUNT` value can be the `email` address or the
+    ///            `unique_id` of the service account.
     pub fn service_accounts_enable(&self, request: EnableServiceAccountRequest, name: &str) -> ProjectServiceAccountEnableCall<'a, C, A> {
         ProjectServiceAccountEnableCall {
             hub: self.hub,
@@ -2354,7 +2435,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the service account in the following format:
+    /// * `name` - Required. The resource name of the service account in the following format:
     ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     ///            Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
     ///            the account. The `ACCOUNT` value can be the `email` address or the
@@ -2411,7 +2492,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the service account in the following format:
+    /// * `name` - Required. The resource name of the service account in the following format:
     ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     ///            Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
     ///            the account. The `ACCOUNT` value can be the `email` address or the
@@ -2471,6 +2552,32 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     pub fn service_accounts_patch(&self, request: PatchServiceAccountRequest, name: &str) -> ProjectServiceAccountPatchCall<'a, C, A> {
         ProjectServiceAccountPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Upload public key for a given service account.
+    /// This rpc will create a
+    /// ServiceAccountKey that has the
+    /// provided public key and returns it.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The resource name of the service account in the following format:
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    ///            Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+    ///            the account. The `ACCOUNT` value can be the `email` address or the
+    ///            `unique_id` of the service account.
+    pub fn service_accounts_keys_upload(&self, request: UploadServiceAccountKeyRequest, name: &str) -> ProjectServiceAccountKeyUploadCall<'a, C, A> {
+        ProjectServiceAccountKeyUploadCall {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
@@ -2644,7 +2751,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the service account in the following format:
-    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_UNIQUE_ID}'.
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_UNIQUE_ID}`.
     ///            Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
     ///            the account.
     pub fn service_accounts_undelete(&self, request: UndeleteServiceAccountRequest, name: &str) -> ProjectServiceAccountUndeleteCall<'a, C, A> {
@@ -2704,7 +2811,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the service account in the following format:
+    /// * `name` - Required. The resource name of the service account in the following format:
     ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     ///            Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
     ///            the account. The `ACCOUNT` value can be the `email` address or the
@@ -2726,7 +2833,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the service account in the following format:
+    /// * `name` - Required. The resource name of the service account in the following format:
     ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     ///            Using `-` as a wildcard for the `PROJECT_ID`, will infer the project from
     ///            the account. The `ACCOUNT` value can be the `email` address or the
@@ -2750,7 +2857,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the service account in the following format:
+    /// * `name` - Required. The resource name of the service account in the following format:
     ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     ///            Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
     ///            the account. The `ACCOUNT` value can be the `email` address or the
@@ -2793,7 +2900,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the service account key in the following format:
+    /// * `name` - Required. The resource name of the service account key in the following format:
     ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
     ///            Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
     ///            the account. The `ACCOUNT` value can be the `email` address or the
@@ -2815,7 +2922,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the service account in the following format:
+    /// * `name` - Required. The resource name of the service account in the following format:
     ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     ///            Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
     ///            the account. The `ACCOUNT` value can be the `email` address or the
@@ -4933,23 +5040,12 @@ impl<'a, C, A> IamPolicyQueryAuditableServiceCall<'a, C, A> where C: BorrowMut<h
 
 
 /// Lints a Cloud IAM policy object or its sub fields. Currently supports
-/// google.iam.v1.Policy, google.iam.v1.Binding and
 /// google.iam.v1.Binding.condition.
 /// 
 /// Each lint operation consists of multiple lint validation units.
-/// Validation units have the following properties:
-/// 
-/// - Each unit inspects the input object in regard to a particular
-///   linting aspect and issues a google.iam.admin.v1.LintResult
-///   disclosing the result.
-/// - Domain of discourse of each unit can be either
-///   google.iam.v1.Policy, google.iam.v1.Binding, or
-///   google.iam.v1.Binding.condition depending on the purpose of the
-///   validation.
-/// - A unit may require additional data (like the list of all possible
-///   enumerable values of a particular attribute used in the policy instance)
-///   which shall be provided by the caller. Refer to the comments of
-///   google.iam.admin.v1.LintPolicyRequest.context for more details.
+/// Each unit inspects the input object in regard to a particular linting
+/// aspect and issues a google.iam.admin.v1.LintResult disclosing the
+/// result.
 /// 
 /// The set of applicable validation units is determined by the Cloud IAM
 /// server and is not configurable.
@@ -6190,7 +6286,7 @@ impl<'a, C, A> ProjectServiceAccountKeyDeleteCall<'a, C, A> where C: BorrowMut<h
     }
 
 
-    /// The resource name of the service account key in the following format:
+    /// Required. The resource name of the service account key in the following format:
     /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
     /// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
     /// the account. The `ACCOUNT` value can be the `email` address or the
@@ -6757,9 +6853,10 @@ impl<'a, C, A> ProjectServiceAccountEnableCall<'a, C, A> where C: BorrowMut<hype
         self
     }
     /// The resource name of the service account in the following format:
-    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_UNIQUE_ID}'.
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     /// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
-    /// the account.
+    /// the account. The `ACCOUNT` value can be the `email` address or the
+    /// `unique_id` of the service account.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -7038,9 +7135,13 @@ impl<'a, C, A> ProjectServiceAccountGetIamPolicyCall<'a, C, A> where C: BorrowMu
         self
     }
     /// Optional. The policy format version to be returned.
-    /// Acceptable values are 0 and 1.
-    /// If the value is 0, or the field is omitted, policy format version 1 will be
-    /// returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
     ///
     /// Sets the *options.requested policy version* query property to the given value.
     pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectServiceAccountGetIamPolicyCall<'a, C, A> {
@@ -8184,7 +8285,7 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
         self._request = new_value;
         self
     }
-    /// The resource name of the service account in the following format:
+    /// Required. The resource name of the service account in the following format:
     /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     /// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
     /// the account. The `ACCOUNT` value can be the `email` address or the
@@ -8731,7 +8832,7 @@ impl<'a, C, A> ProjectServiceAccountDeleteCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
-    /// The resource name of the service account in the following format:
+    /// Required. The resource name of the service account in the following format:
     /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     /// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
     /// the account. The `ACCOUNT` value can be the `email` address or the
@@ -9384,6 +9485,292 @@ impl<'a, C, A> ProjectServiceAccountPatchCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
+/// Upload public key for a given service account.
+/// This rpc will create a
+/// ServiceAccountKey that has the
+/// provided public key and returns it.
+///
+/// A builder for the *serviceAccounts.keys.upload* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_iam1 as iam1;
+/// use iam1::UploadServiceAccountKeyRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use iam1::Iam;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Iam::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = UploadServiceAccountKeyRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().service_accounts_keys_upload(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectServiceAccountKeyUploadCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Iam<C, A>,
+    _request: UploadServiceAccountKeyRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectServiceAccountKeyUploadCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectServiceAccountKeyUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ServiceAccountKey)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "iam.projects.serviceAccounts.keys.upload",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}/keys:upload";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: UploadServiceAccountKeyRequest) -> ProjectServiceAccountKeyUploadCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The resource name of the service account in the following format:
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    /// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+    /// the account. The `ACCOUNT` value can be the `email` address or the
+    /// `unique_id` of the service account.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectServiceAccountKeyUploadCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectServiceAccountKeyUploadCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountKeyUploadCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectServiceAccountKeyUploadCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Updates a Role definition.
 ///
 /// A builder for the *roles.patch* method supported by a *project* resource.
@@ -9418,7 +9805,7 @@ impl<'a, C, A> ProjectServiceAccountPatchCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().roles_patch(req, "name")
-///              .update_mask("sea")
+///              .update_mask("et")
 ///              .doit();
 /// # }
 /// ```
@@ -10320,10 +10707,10 @@ impl<'a, C, A> ProjectServiceAccountDisableCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().roles_list("parent")
-///              .view("eirmod")
-///              .show_deleted(false)
-///              .page_token("et")
-///              .page_size(-46)
+///              .view("sanctus")
+///              .show_deleted(true)
+///              .page_token("amet")
+///              .page_size(-23)
 ///              .doit();
 /// # }
 /// ```
@@ -10826,7 +11213,7 @@ impl<'a, C, A> ProjectServiceAccountUndeleteCall<'a, C, A> where C: BorrowMut<hy
         self
     }
     /// The resource name of the service account in the following format:
-    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_UNIQUE_ID}'.
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_UNIQUE_ID}`.
     /// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
     /// the account.
     ///
@@ -11408,7 +11795,7 @@ impl<'a, C, A> ProjectServiceAccountSignJwtCall<'a, C, A> where C: BorrowMut<hyp
         self._request = new_value;
         self
     }
-    /// The resource name of the service account in the following format:
+    /// Required. The resource name of the service account in the following format:
     /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     /// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
     /// the account. The `ACCOUNT` value can be the `email` address or the
@@ -11513,7 +11900,7 @@ impl<'a, C, A> ProjectServiceAccountSignJwtCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().service_accounts_keys_list("name")
-///              .add_key_types("sed")
+///              .add_key_types("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -11667,7 +12054,7 @@ impl<'a, C, A> ProjectServiceAccountKeyListCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
-    /// The resource name of the service account in the following format:
+    /// Required. The resource name of the service account in the following format:
     /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     /// 
     /// Using `-` as a wildcard for the `PROJECT_ID`, will infer the project from
@@ -11962,7 +12349,7 @@ impl<'a, C, A> ProjectServiceAccountKeyCreateCall<'a, C, A> where C: BorrowMut<h
         self._request = new_value;
         self
     }
-    /// The resource name of the service account in the following format:
+    /// Required. The resource name of the service account in the following format:
     /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     /// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
     /// the account. The `ACCOUNT` value can be the `email` address or the
@@ -12067,8 +12454,8 @@ impl<'a, C, A> ProjectServiceAccountKeyCreateCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().service_accounts_list("name")
-///              .page_token("dolor")
-///              .page_size(-23)
+///              .page_token("et")
+///              .page_size(-96)
 ///              .doit();
 /// # }
 /// ```
@@ -12345,7 +12732,7 @@ impl<'a, C, A> ProjectServiceAccountListCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().service_accounts_keys_get("name")
-///              .public_key_type("amet.")
+///              .public_key_type("voluptua.")
 ///              .doit();
 /// # }
 /// ```
@@ -12497,7 +12884,7 @@ impl<'a, C, A> ProjectServiceAccountKeyGetCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
-    /// The resource name of the service account key in the following format:
+    /// Required. The resource name of the service account key in the following format:
     /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
     /// 
     /// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
@@ -12758,7 +13145,7 @@ impl<'a, C, A> ProjectServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
-    /// The resource name of the service account in the following format:
+    /// Required. The resource name of the service account in the following format:
     /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     /// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
     /// the account. The `ACCOUNT` value can be the `email` address or the

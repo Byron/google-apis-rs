@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Container* crate version *1.0.12+20190610*, where *20190610* is the exact revision of the *container:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Container* crate version *1.0.13+20200324*, where *20200324* is the exact revision of the *container:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Container* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/container-engine/).
@@ -374,7 +374,7 @@ impl<'a, C, A> Container<C, A>
         Container {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://container.googleapis.com/".to_string(),
             _root_url: "https://container.googleapis.com/".to_string(),
         }
@@ -385,7 +385,7 @@ impl<'a, C, A> Container<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -425,28 +425,72 @@ impl<'a, C, A> Container<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetMaintenancePolicyRequest {
-    /// The Google Developers Console [project ID or project
+    /// Required. The Google Developers Console [project ID or project
     /// number](https://support.google.com/cloud/answer/6158840).
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
-    /// The maintenance policy to be set for the cluster. An empty field
+    /// Required. The maintenance policy to be set for the cluster. An empty field
     /// clears the existing maintenance policy.
     #[serde(rename="maintenancePolicy")]
     pub maintenance_policy: Option<MaintenancePolicy>,
-    /// The name of the cluster to update.
+    /// Required. The name of the cluster to update.
     #[serde(rename="clusterId")]
     pub cluster_id: Option<String>,
     /// The name (project, location, cluster id) of the cluster to set maintenance
     /// policy.
     /// Specified in the format 'projects/*/locations/*/clusters/*'.
     pub name: Option<String>,
-    /// The name of the Google Compute Engine
+    /// Required. The name of the Google Compute Engine
     /// [zone](/compute/docs/zones#available) in which the cluster
     /// resides.
     pub zone: Option<String>,
 }
 
 impl RequestValue for SetMaintenancePolicyRequest {}
+
+
+/// A set of Shielded Instance options.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ShieldedInstanceConfig {
+    /// Defines whether the instance has integrity monitoring enabled.
+    /// 
+    /// Enables monitoring and attestation of the boot integrity of the instance.
+    /// The attestation is performed against the integrity policy baseline. This
+    /// baseline is initially derived from the implicitly trusted boot image when
+    /// the instance is created.
+    #[serde(rename="enableIntegrityMonitoring")]
+    pub enable_integrity_monitoring: Option<bool>,
+    /// Defines whether the instance has Secure Boot enabled.
+    /// 
+    /// Secure Boot helps ensure that the system only runs authentic software by
+    /// verifying the digital signature of all boot components, and halting the
+    /// boot process if signature verification fails.
+    #[serde(rename="enableSecureBoot")]
+    pub enable_secure_boot: Option<bool>,
+}
+
+impl Part for ShieldedInstanceConfig {}
+
+
+/// Represents an arbitrary window of time.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TimeWindow {
+    /// The time that the window ends. The end time should take place after the
+    /// start time.
+    #[serde(rename="endTime")]
+    pub end_time: Option<String>,
+    /// The time that the window first starts.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+}
+
+impl Part for TimeWindow {}
 
 
 /// AcceleratorConfig represents a Hardware Accelerator request.
@@ -459,12 +503,27 @@ pub struct AcceleratorConfig {
     #[serde(rename="acceleratorCount")]
     pub accelerator_count: Option<String>,
     /// The accelerator type resource name. List of supported accelerators
-    /// [here](/compute/docs/gpus/#Introduction)
+    /// [here](/compute/docs/gpus)
     #[serde(rename="acceleratorType")]
     pub accelerator_type: Option<String>,
 }
 
 impl Part for AcceleratorConfig {}
+
+
+/// WorkloadMetadataConfig defines the metadata configuration to expose to
+/// workloads on the node pool.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WorkloadMetadataConfig {
+    /// Mode is the configuration for how to expose metadata to workloads running
+    /// on the node pool.
+    pub mode: Option<String>,
+}
+
+impl Part for WorkloadMetadataConfig {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated
@@ -518,7 +577,7 @@ pub struct SetNodePoolAutoscalingRequest {
     /// This field has been deprecated and replaced by the name field.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
-    /// Autoscaling configuration for the node pool.
+    /// Required. Autoscaling configuration for the node pool.
     pub autoscaling: Option<NodePoolAutoscaling>,
     /// Deprecated. The name of the cluster to upgrade.
     /// This field has been deprecated and replaced by the name field.
@@ -559,7 +618,7 @@ impl Part for BigQueryDestination {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateClusterRequest {
-    /// A [cluster
+    /// Required. A [cluster
     /// resource](/container-engine/reference/rest/v1/projects.zones.clusters)
     pub cluster: Option<Cluster>,
     /// The parent (project and location) where the cluster will be created.
@@ -592,18 +651,22 @@ impl RequestValue for CreateClusterRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetOpenIDConfigResponse {
-    /// supported ID Token signing Algorithms.
-    pub id_token_signing_alg_values_supported: Option<Vec<String>>,
-    /// Supported claims.
-    pub claims_supported: Option<Vec<String>>,
-    /// Supported response types.
-    pub response_types_supported: Option<Vec<String>>,
     /// JSON Web Key uri.
     pub jwks_uri: Option<String>,
+    /// OnePlatform automatically extracts this field and uses it to set the HTTP
+    /// Cache-Control header.
+    #[serde(rename="cacheHeader")]
+    pub cache_header: Option<HttpCacheControlResponseHeader>,
     /// Supported grant types.
     pub grant_types: Option<Vec<String>>,
     /// Supported subject types.
     pub subject_types_supported: Option<Vec<String>>,
+    /// supported ID Token signing Algorithms.
+    pub id_token_signing_alg_values_supported: Option<Vec<String>>,
+    /// Supported response types.
+    pub response_types_supported: Option<Vec<String>>,
+    /// Supported claims.
+    pub claims_supported: Option<Vec<String>>,
     /// OIDC Issuer.
     pub issuer: Option<String>,
 }
@@ -629,6 +692,21 @@ pub struct MasterAuthorizedNetworksConfig {
 }
 
 impl Part for MasterAuthorizedNetworksConfig {}
+
+
+/// Configuration for the use of Kubernetes Service Accounts in GCP IAM
+/// policies.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WorkloadIdentityConfig {
+    /// The workload pool to attach all Kubernetes service accounts to.
+    #[serde(rename="workloadPool")]
+    pub workload_pool: Option<String>,
+}
+
+impl Part for WorkloadIdentityConfig {}
 
 
 /// Constraints applied to pods.
@@ -662,7 +740,7 @@ pub struct SetAddonsConfigRequest {
     /// This field has been deprecated and replaced by the name field.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
-    /// The desired configurations for the various addons available to run in the
+    /// Required. The desired configurations for the various addons available to run in the
     /// cluster.
     #[serde(rename="addonsConfig")]
     pub addons_config: Option<AddonsConfig>,
@@ -681,6 +759,47 @@ pub struct SetAddonsConfigRequest {
 }
 
 impl RequestValue for SetAddonsConfigRequest {}
+
+
+/// Represents an arbitrary window of time that recurs.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RecurringTimeWindow {
+    /// An RRULE (https://tools.ietf.org/html/rfc5545#section-3.8.5.3) for how
+    /// this window reccurs. They go on for the span of time between the start and
+    /// end time.
+    /// 
+    /// For example, to have something repeat every weekday, you'd use:
+    ///   <code>FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR</code>
+    /// To repeat some window daily (equivalent to the DailyMaintenanceWindow):
+    ///   <code>FREQ=DAILY</code>
+    /// For the first weekend of every month:
+    ///   <code>FREQ=MONTHLY;BYSETPOS=1;BYDAY=SA,SU</code>
+    /// This specifies how frequently the window starts. Eg, if you wanted to have
+    /// a 9-5 UTC-4 window every weekday, you'd use something like:
+    /// <code>
+    ///   start time = 2019-01-01T09:00:00-0400
+    ///   end time = 2019-01-01T17:00:00-0400
+    ///   recurrence = FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR
+    /// </code>
+    /// Windows can span multiple days. Eg, to make the window encompass every
+    /// weekend from midnight Saturday till the last minute of Sunday UTC:
+    /// <code>
+    ///   start time = 2019-01-05T00:00:00Z
+    ///   end time = 2019-01-07T23:59:00Z
+    ///   recurrence = FREQ=WEEKLY;BYDAY=SA
+    /// </code>
+    /// Note the start and end time's specific dates are largely arbitrary except
+    /// to specify duration of the window and when it first starts.
+    /// The FREQ values of HOURLY, MINUTELY, and SECONDLY are not supported.
+    pub recurrence: Option<String>,
+    /// The window of the first recurrence.
+    pub window: Option<TimeWindow>,
+}
+
+impl Part for RecurringTimeWindow {}
 
 
 /// Time window specified for daily maintenance operations.
@@ -721,7 +840,7 @@ pub struct UpdateMasterRequest {
     /// This field has been deprecated and replaced by the name field.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
-    /// The Kubernetes version to change the master to.
+    /// Required. The Kubernetes version to change the master to.
     /// 
     /// Users may specify either explicit versions offered by Kubernetes Engine or
     /// version aliases, which have the following behavior:
@@ -748,6 +867,23 @@ pub struct UpdateMasterRequest {
 }
 
 impl RequestValue for UpdateMasterRequest {}
+
+
+/// RFC-2616: cache control support
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct HttpCacheControlResponseHeader {
+    /// 14.6 response cache age, in seconds since the response is generated
+    pub age: Option<String>,
+    /// 14.21 response cache expires, in RFC 1123 date format
+    pub expires: Option<String>,
+    /// 14.9 request and response directives
+    pub directive: Option<String>,
+}
+
+impl Part for HttpCacheControlResponseHeader {}
 
 
 /// Configuration for client certificates on the cluster.
@@ -780,6 +916,20 @@ pub struct HttpLoadBalancing {
 impl Part for HttpLoadBalancing {}
 
 
+/// IntraNodeVisibilityConfig contains the desired config of the intra-node
+/// visibility on this cluster.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IntraNodeVisibilityConfig {
+    /// Enables intra node visibility for this cluster.
+    pub enabled: Option<bool>,
+}
+
+impl Part for IntraNodeVisibilityConfig {}
+
+
 /// NetworkConfig reports the relative names of network & subnetwork.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -795,6 +945,10 @@ pub struct NetworkConfig {
     /// the cluster is connected.
     /// Example: projects/my-project/global/networks/my-network
     pub network: Option<String>,
+    /// Whether Intra-node visibility is enabled for this cluster.
+    /// This makes same node pod to pod traffic visible for VPC network.
+    #[serde(rename="enableIntraNodeVisibility")]
+    pub enable_intra_node_visibility: Option<bool>,
 }
 
 impl Part for NetworkConfig {}
@@ -830,7 +984,7 @@ pub struct CreateNodePoolRequest {
     /// resides.
     /// This field has been deprecated and replaced by the parent field.
     pub zone: Option<String>,
-    /// The node pool to create.
+    /// Required. The node pool to create.
     #[serde(rename="nodePool")]
     pub node_pool: Option<NodePool>,
 }
@@ -844,9 +998,18 @@ impl RequestValue for CreateNodePoolRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MaintenanceWindow {
+    /// RecurringWindow specifies some number of recurring time periods for
+    /// maintenance to occur. The time windows may be overlapping. If no
+    /// maintenance windows are set, maintenance can occur at any time.
+    #[serde(rename="recurringWindow")]
+    pub recurring_window: Option<RecurringTimeWindow>,
     /// DailyMaintenanceWindow specifies a daily maintenance operation window.
     #[serde(rename="dailyMaintenanceWindow")]
     pub daily_maintenance_window: Option<DailyMaintenanceWindow>,
+    /// Exceptions to maintenance window. Non-emergency maintenance should not
+    /// occur in these windows.
+    #[serde(rename="maintenanceExclusions")]
+    pub maintenance_exclusions: Option<HashMap<String, TimeWindow>>,
 }
 
 impl Part for MaintenanceWindow {}
@@ -886,12 +1049,18 @@ pub struct NodePool {
     /// Autoscaler configuration for this NodePool. Autoscaler is enabled
     /// only if a valid configuration is present.
     pub autoscaling: Option<NodePoolAutoscaling>,
+    /// The list of Google Compute Engine [zones](/compute/docs/zones#available)
+    /// in which the NodePool's nodes should be located.
+    pub locations: Option<Vec<String>>,
     /// The constraint on the maximum number of pods that can be run
     /// simultaneously on a node in the node pool.
     #[serde(rename="maxPodsConstraint")]
     pub max_pods_constraint: Option<MaxPodsConstraint>,
     /// The version of the Kubernetes of this node.
     pub version: Option<String>,
+    /// Upgrade settings control disruption and speed of the upgrade.
+    #[serde(rename="upgradeSettings")]
+    pub upgrade_settings: Option<UpgradeSettings>,
     /// The initial node count for the pool. You must ensure that your
     /// Compute Engine <a href="/compute/docs/resource-quotas">resource quota</a>
     /// is sufficient for this number of instances. You must also have available
@@ -912,6 +1081,84 @@ pub struct NodePool {
 }
 
 impl ResponseResult for NodePool {}
+
+
+/// AutoprovisioningNodePoolDefaults contains defaults for a node pool created
+/// by NAP.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AutoprovisioningNodePoolDefaults {
+    /// The Google Cloud Platform Service Account to be used by the node VMs. If
+    /// service_account is specified, scopes should be empty.
+    #[serde(rename="serviceAccount")]
+    pub service_account: Option<String>,
+    /// Specifies the node management options for NAP created node-pools.
+    pub management: Option<NodeManagement>,
+    /// Specifies the upgrade settings for NAP created node pools
+    #[serde(rename="upgradeSettings")]
+    pub upgrade_settings: Option<UpgradeSettings>,
+    /// Scopes that are used by NAP when creating node pools. If oauth_scopes are
+    /// specified, service_account should be empty.
+    #[serde(rename="oauthScopes")]
+    pub oauth_scopes: Option<Vec<String>>,
+}
+
+impl Part for AutoprovisioningNodePoolDefaults {}
+
+
+/// Configuration options for the Cloud Run feature.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CloudRunConfig {
+    /// Whether Cloud Run addon is enabled for this cluster.
+    pub disabled: Option<bool>,
+}
+
+impl Part for CloudRunConfig {}
+
+
+/// Information about operation (or operation stage) progress.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OperationProgress {
+    /// Progress metric bundle, for example:
+    /// metrics: [{name: "nodes done",     int_value: 15},
+    /// {name: "nodes total",    int_value: 32}]
+    /// or
+    /// metrics: [{name: "progress",       double_value: 0.56},
+    /// {name: "progress scale", double_value: 1.0}]
+    pub metrics: Option<Vec<Metric>>,
+    /// Status of an operation stage.
+    /// Unset for single-stage operations.
+    pub status: Option<String>,
+    /// Substages of an operation or a stage.
+    pub stages: Option<Vec<OperationProgress>>,
+    /// A non-parameterized string describing an operation stage.
+    /// Unset for single-stage operations.
+    pub name: Option<String>,
+}
+
+impl Part for OperationProgress {}
+
+
+/// Configuration for Binary Authorization.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BinaryAuthorization {
+    /// Enable Binary Authorization for this cluster. If enabled, all container
+    /// images will be validated by Binary Authorization.
+    pub enabled: Option<bool>,
+}
+
+impl Part for BinaryAuthorization {}
 
 
 /// A Google Kubernetes Engine cluster.
@@ -973,11 +1220,14 @@ pub struct Cluster {
     /// The logging service the cluster should use to write logs.
     /// Currently available options:
     /// 
-    /// * "logging.googleapis.com/kubernetes" - the Google Cloud Logging
-    /// service with Kubernetes-native resource model in Stackdriver
-    /// * `logging.googleapis.com` - the Google Cloud Logging service.
+    /// * `logging.googleapis.com/kubernetes` - The Cloud Logging
+    /// service with a Kubernetes-native resource model
+    /// * `logging.googleapis.com` - The legacy Cloud Logging service (no longer
+    ///   available as of GKE 1.15).
     /// * `none` - no logs will be exported from the cluster.
-    /// * if left as an empty string,`logging.googleapis.com` will be used.
+    /// 
+    /// If left as an empty string,`logging.googleapis.com/kubernetes` will be
+    /// used for GKE 1.14+ or `logging.googleapis.com` for earlier versions.
     #[serde(rename="loggingService")]
     pub logging_service: Option<String>,
     /// Deprecated. Use node_pools.instance_group_urls.
@@ -987,17 +1237,24 @@ pub struct Cluster {
     #[serde(rename="networkConfig")]
     pub network_config: Option<NetworkConfig>,
     /// The name of this cluster. The name must be unique within this project
-    /// and zone, and can be up to 40 characters with the following restrictions:
+    /// and location (e.g. zone or region), and can be up to 40 characters with
+    /// the following restrictions:
     /// 
     /// * Lowercase letters, numbers, and hyphens only.
     /// * Must start with a letter.
     /// * Must end with a number or a letter.
     pub name: Option<String>,
+    /// Shielded Nodes configuration.
+    #[serde(rename="shieldedNodes")]
+    pub shielded_nodes: Option<ShieldedNodes>,
     /// [Output only] The name of the Google Compute Engine
     /// [zone](/compute/docs/regions-zones/regions-zones#available) or
     /// [region](/compute/docs/regions-zones/regions-zones#available) in which
     /// the cluster resides.
     pub location: Option<String>,
+    /// Configuration for Binary Authorization.
+    #[serde(rename="binaryAuthorization")]
+    pub binary_authorization: Option<BinaryAuthorization>,
     /// Configuration for exporting resource usages. Resource usage export is
     /// disabled when this config is unspecified.
     #[serde(rename="resourceUsageExportConfig")]
@@ -1016,6 +1273,9 @@ pub struct Cluster {
     pub ip_allocation_policy: Option<IPAllocationPolicy>,
     /// [Output only] The current status of this cluster.
     pub status: Option<String>,
+    /// [Output only] The current software version of the master endpoint.
+    #[serde(rename="currentMasterVersion")]
+    pub current_master_version: Option<String>,
     /// An optional description of this cluster.
     pub description: Option<String>,
     /// [Output only] Deprecated, use
@@ -1025,12 +1285,15 @@ pub struct Cluster {
     /// upgraded, this reflects the minimum version of all nodes.
     #[serde(rename="currentNodeVersion")]
     pub current_node_version: Option<String>,
+    /// Configuration for the use of Kubernetes Service Accounts in GCP IAM
+    /// policies.
+    #[serde(rename="workloadIdentityConfig")]
+    pub workload_identity_config: Option<WorkloadIdentityConfig>,
     /// The fingerprint of the set of labels for this cluster.
     #[serde(rename="labelFingerprint")]
     pub label_fingerprint: Option<String>,
-    /// [Output only] The current software version of the master endpoint.
-    #[serde(rename="currentMasterVersion")]
-    pub current_master_version: Option<String>,
+    /// Cluster-level autoscaling configuration.
+    pub autoscaling: Option<ClusterAutoscaling>,
     /// The authentication information for accessing the master endpoint.
     /// If unspecified, the defaults are used:
     /// For clusters before v1.12, if master_auth is unspecified, `username` will
@@ -1062,15 +1325,23 @@ pub struct Cluster {
     /// The monitoring service the cluster should use to write metrics.
     /// Currently available options:
     /// 
-    /// * `monitoring.googleapis.com` - the Google Cloud Monitoring service.
-    /// * `none` - no metrics will be exported from the cluster.
-    /// * if left as an empty string, `monitoring.googleapis.com` will be used.
+    /// * "monitoring.googleapis.com/kubernetes" - The Cloud Monitoring
+    /// service with a Kubernetes-native resource model
+    /// * `monitoring.googleapis.com` - The legacy Cloud Monitoring service (no
+    ///   longer available as of GKE 1.15).
+    /// * `none` - No metrics will be exported from the cluster.
+    /// 
+    /// If left as an empty string,`monitoring.googleapis.com/kubernetes` will be
+    /// used for GKE 1.14+ or `monitoring.googleapis.com` for earlier versions.
     #[serde(rename="monitoringService")]
     pub monitoring_service: Option<String>,
     /// [Output only] The time the cluster was created, in
     /// [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
+    /// Configuration of etcd encryption.
+    #[serde(rename="databaseEncryption")]
+    pub database_encryption: Option<DatabaseEncryption>,
     /// Configuration for private cluster.
     #[serde(rename="privateClusterConfig")]
     pub private_cluster_config: Option<PrivateClusterConfig>,
@@ -1090,6 +1361,9 @@ pub struct Cluster {
     /// resides.
     /// This field is deprecated, use location instead.
     pub zone: Option<String>,
+    /// Cluster-level Vertical Pod Autoscaling configuration.
+    #[serde(rename="verticalPodAutoscaling")]
+    pub vertical_pod_autoscaling: Option<VerticalPodAutoscaling>,
     /// Configuration for the legacy ABAC authorization mode.
     #[serde(rename="legacyAbac")]
     pub legacy_abac: Option<LegacyAbac>,
@@ -1127,6 +1401,9 @@ pub struct Cluster {
     /// one automatically chosen or specify a `/14` block in `10.0.0.0/8`.
     #[serde(rename="clusterIpv4Cidr")]
     pub cluster_ipv4_cidr: Option<String>,
+    /// Configuration controlling RBAC group membership information.
+    #[serde(rename="authenticatorGroupsConfig")]
+    pub authenticator_groups_config: Option<AuthenticatorGroupsConfig>,
     /// The name of the Google Compute Engine
     /// [subnetwork](/compute/docs/subnetworks) to which the
     /// cluster is connected.
@@ -1283,9 +1560,55 @@ pub struct GetJSONWebKeysResponse {
     /// The public component of the keys used by the cluster to sign token
     /// requests.
     pub keys: Option<Vec<Jwk>>,
+    /// OnePlatform automatically extracts this field and uses it to set the HTTP
+    /// Cache-Control header.
+    #[serde(rename="cacheHeader")]
+    pub cache_header: Option<HttpCacheControlResponseHeader>,
 }
 
 impl ResponseResult for GetJSONWebKeysResponse {}
+
+
+/// These upgrade settings control the level of parallelism and the level of
+/// disruption caused by an upgrade.
+/// 
+/// maxUnavailable controls the number of nodes that can be simultaneously
+/// unavailable.
+/// 
+/// maxSurge controls the number of additional nodes that can be added to the
+/// node pool temporarily for the time of the upgrade to increase the number of
+/// available nodes.
+/// 
+/// (maxUnavailable + maxSurge) determines the level of parallelism (how many
+/// nodes are being upgraded at the same time).
+/// 
+/// Note: upgrades inevitably introduce some disruption since workloads need to
+/// be moved from old nodes to new, upgraded ones. Even if maxUnavailable=0,
+/// this holds true. (Disruption stays within the limits of
+/// PodDisruptionBudget, if it is configured.)
+/// 
+/// Consider a hypothetical node pool with 5 nodes having maxSurge=2,
+/// maxUnavailable=1. This means the upgrade process upgrades 3 nodes
+/// simultaneously. It creates 2 additional (upgraded) nodes, then it brings
+/// down 3 old (not yet upgraded) nodes at the same time. This ensures that
+/// there are always at least 4 nodes available.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpgradeSettings {
+    /// The maximum number of nodes that can be created beyond the current size
+    /// of the node pool during the upgrade process.
+    #[serde(rename="maxSurge")]
+    pub max_surge: Option<i32>,
+    /// The maximum number of nodes that can be simultaneously unavailable during
+    /// the upgrade process. A node is considered available if its status is
+    /// Ready.
+    #[serde(rename="maxUnavailable")]
+    pub max_unavailable: Option<i32>,
+}
+
+impl Part for UpgradeSettings {}
 
 
 /// This operation resource represents operations that may have happened or are
@@ -1378,10 +1701,12 @@ pub struct Operation {
     /// [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
+    /// Output only. [Output only] Progress information for an operation.
+    pub progress: Option<OperationProgress>,
     /// Which conditions caused the current node pool state.
     #[serde(rename="nodepoolConditions")]
     pub nodepool_conditions: Option<Vec<StatusCondition>>,
-    /// If an error has occurred, a textual description of the error.
+    /// Output only. If an error has occurred, a textual description of the error.
     #[serde(rename="statusMessage")]
     pub status_message: Option<String>,
     /// Which conditions caused the current cluster state.
@@ -1401,12 +1726,6 @@ pub struct PrivateClusterConfig {
     /// Whether the master's internal IP address is used as the cluster endpoint.
     #[serde(rename="enablePrivateEndpoint")]
     pub enable_private_endpoint: Option<bool>,
-    /// The IP range in CIDR notation to use for the hosted master network. This
-    /// range will be used for assigning internal IP addresses to the master or
-    /// set of masters, as well as the ILB VIP. This range must not overlap with
-    /// any other ranges in use within the cluster's network.
-    #[serde(rename="masterIpv4CidrBlock")]
-    pub master_ipv4_cidr_block: Option<String>,
     /// Output only. The internal IP address of this cluster's master endpoint.
     #[serde(rename="privateEndpoint")]
     pub private_endpoint: Option<String>,
@@ -1418,9 +1737,35 @@ pub struct PrivateClusterConfig {
     /// private networking.
     #[serde(rename="enablePrivateNodes")]
     pub enable_private_nodes: Option<bool>,
+    /// The IP range in CIDR notation to use for the hosted master network. This
+    /// range will be used for assigning internal IP addresses to the master or
+    /// set of masters, as well as the ILB VIP. This range must not overlap with
+    /// any other ranges in use within the cluster's network.
+    #[serde(rename="masterIpv4CidrBlock")]
+    pub master_ipv4_cidr_block: Option<String>,
+    /// Output only. The peering name in the customer VPC used by this cluster.
+    #[serde(rename="peeringName")]
+    pub peering_name: Option<String>,
 }
 
 impl Part for PrivateClusterConfig {}
+
+
+/// Configuration of etcd encryption.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DatabaseEncryption {
+    /// Denotes the state of etcd encryption.
+    pub state: Option<String>,
+    /// Name of CloudKMS key to use for the encryption of secrets in etcd.
+    /// Ex. projects/my-project/locations/global/keyRings/my-ring/cryptoKeys/my-key
+    #[serde(rename="keyName")]
+    pub key_name: Option<String>,
+}
+
+impl Part for DatabaseEncryption {}
 
 
 /// ClusterUpdate describes an update to the cluster. Exactly one update can
@@ -1434,15 +1779,19 @@ pub struct ClusterUpdate {
     /// The logging service the cluster should use to write logs.
     /// Currently available options:
     /// 
-    /// * "logging.googleapis.com/kubernetes" - the Google Cloud Logging
-    /// service with Kubernetes-native resource model in Stackdriver
-    /// * "logging.googleapis.com" - the Google Cloud Logging service
-    /// * "none" - no logs will be exported from the cluster
+    /// * `logging.googleapis.com/kubernetes` - The Cloud Logging
+    /// service with a Kubernetes-native resource model
+    /// * `logging.googleapis.com` - The legacy Cloud Logging service (no longer
+    ///   available as of GKE 1.15).
+    /// * `none` - no logs will be exported from the cluster.
+    /// 
+    /// If left as an empty string,`logging.googleapis.com/kubernetes` will be
+    /// used for GKE 1.14+ or `logging.googleapis.com` for earlier versions.
     #[serde(rename="desiredLoggingService")]
     pub desired_logging_service: Option<String>,
-    /// The desired configuration options for master authorized networks feature.
-    #[serde(rename="desiredMasterAuthorizedNetworksConfig")]
-    pub desired_master_authorized_networks_config: Option<MasterAuthorizedNetworksConfig>,
+    /// Configurations for the various addons available to run in the cluster.
+    #[serde(rename="desiredAddonsConfig")]
+    pub desired_addons_config: Option<AddonsConfig>,
     /// The desired list of Google Compute Engine
     /// [zones](/compute/docs/zones#available) in which the cluster's nodes
     /// should be located. Changing the locations a cluster is in will result
@@ -1452,9 +1801,34 @@ pub struct ClusterUpdate {
     /// This list must always include the cluster's primary zone.
     #[serde(rename="desiredLocations")]
     pub desired_locations: Option<Vec<String>>,
-    /// Configurations for the various addons available to run in the cluster.
-    #[serde(rename="desiredAddonsConfig")]
-    pub desired_addons_config: Option<AddonsConfig>,
+    /// The desired image type for the node pool.
+    /// NOTE: Set the "desired_node_pool" field as well.
+    #[serde(rename="desiredImageType")]
+    pub desired_image_type: Option<String>,
+    /// The desired configuration for exporting resource usage.
+    #[serde(rename="desiredResourceUsageExportConfig")]
+    pub desired_resource_usage_export_config: Option<ResourceUsageExportConfig>,
+    /// Cluster-level autoscaling configuration.
+    #[serde(rename="desiredClusterAutoscaling")]
+    pub desired_cluster_autoscaling: Option<ClusterAutoscaling>,
+    /// Autoscaler configuration for the node pool specified in
+    /// desired_node_pool_id. If there is only one pool in the
+    /// cluster and desired_node_pool_id is not provided then
+    /// the change applies to that single node pool.
+    #[serde(rename="desiredNodePoolAutoscaling")]
+    pub desired_node_pool_autoscaling: Option<NodePoolAutoscaling>,
+    /// The desired config of Intra-node visibility.
+    #[serde(rename="desiredIntraNodeVisibilityConfig")]
+    pub desired_intra_node_visibility_config: Option<IntraNodeVisibilityConfig>,
+    /// The desired configuration options for master authorized networks feature.
+    #[serde(rename="desiredMasterAuthorizedNetworksConfig")]
+    pub desired_master_authorized_networks_config: Option<MasterAuthorizedNetworksConfig>,
+    /// The node pool to be upgraded. This field is mandatory if
+    /// "desired_node_version", "desired_image_family" or
+    /// "desired_node_pool_autoscaling" is specified and there is more than one
+    /// node pool on the cluster.
+    #[serde(rename="desiredNodePoolId")]
+    pub desired_node_pool_id: Option<String>,
     /// The Kubernetes version to change the master to.
     /// 
     /// Users may specify either explicit versions offered by
@@ -1467,12 +1841,9 @@ pub struct ClusterUpdate {
     /// - "-": picks the default Kubernetes version
     #[serde(rename="desiredMasterVersion")]
     pub desired_master_version: Option<String>,
-    /// The node pool to be upgraded. This field is mandatory if
-    /// "desired_node_version", "desired_image_family" or
-    /// "desired_node_pool_autoscaling" is specified and there is more than one
-    /// node pool on the cluster.
-    #[serde(rename="desiredNodePoolId")]
-    pub desired_node_pool_id: Option<String>,
+    /// Cluster-level Vertical Pod Autoscaling configuration.
+    #[serde(rename="desiredVerticalPodAutoscaling")]
+    pub desired_vertical_pod_autoscaling: Option<VerticalPodAutoscaling>,
     /// The Kubernetes version to change the nodes to (typically an
     /// upgrade).
     /// 
@@ -1486,28 +1857,31 @@ pub struct ClusterUpdate {
     /// - "-": picks the Kubernetes master version
     #[serde(rename="desiredNodeVersion")]
     pub desired_node_version: Option<String>,
-    /// The desired image type for the node pool.
-    /// NOTE: Set the "desired_node_pool" field as well.
-    #[serde(rename="desiredImageType")]
-    pub desired_image_type: Option<String>,
-    /// The desired configuration for exporting resource usage.
-    #[serde(rename="desiredResourceUsageExportConfig")]
-    pub desired_resource_usage_export_config: Option<ResourceUsageExportConfig>,
-    /// Autoscaler configuration for the node pool specified in
-    /// desired_node_pool_id. If there is only one pool in the
-    /// cluster and desired_node_pool_id is not provided then
-    /// the change applies to that single node pool.
-    #[serde(rename="desiredNodePoolAutoscaling")]
-    pub desired_node_pool_autoscaling: Option<NodePoolAutoscaling>,
     /// The monitoring service the cluster should use to write metrics.
     /// Currently available options:
     /// 
-    /// * "monitoring.googleapis.com/kubernetes" - the Google Cloud Monitoring
-    /// service with Kubernetes-native resource model in Stackdriver
-    /// * "monitoring.googleapis.com" - the Google Cloud Monitoring service
-    /// * "none" - no metrics will be exported from the cluster
+    /// * "monitoring.googleapis.com/kubernetes" - The Cloud Monitoring
+    /// service with a Kubernetes-native resource model
+    /// * `monitoring.googleapis.com` - The legacy Cloud Monitoring service (no
+    ///   longer available as of GKE 1.15).
+    /// * `none` - No metrics will be exported from the cluster.
+    /// 
+    /// If left as an empty string,`monitoring.googleapis.com/kubernetes` will be
+    /// used for GKE 1.14+ or `monitoring.googleapis.com` for earlier versions.
     #[serde(rename="desiredMonitoringService")]
     pub desired_monitoring_service: Option<String>,
+    /// The desired configuration options for the Binary Authorization feature.
+    #[serde(rename="desiredBinaryAuthorization")]
+    pub desired_binary_authorization: Option<BinaryAuthorization>,
+    /// Configuration for Workload Identity.
+    #[serde(rename="desiredWorkloadIdentityConfig")]
+    pub desired_workload_identity_config: Option<WorkloadIdentityConfig>,
+    /// Configuration for Shielded Nodes.
+    #[serde(rename="desiredShieldedNodes")]
+    pub desired_shielded_nodes: Option<ShieldedNodes>,
+    /// Configuration of etcd encryption.
+    #[serde(rename="desiredDatabaseEncryption")]
+    pub desired_database_encryption: Option<DatabaseEncryption>,
 }
 
 impl Part for ClusterUpdate {}
@@ -1522,8 +1896,8 @@ impl Part for ClusterUpdate {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HorizontalPodAutoscaling {
     /// Whether the Horizontal Pod Autoscaling feature is enabled in the cluster.
-    /// When enabled, it ensures that a Heapster pod is running in the cluster,
-    /// which is also used by the Cloud Monitoring service.
+    /// When enabled, it ensures that metrics are collected into Stackdriver
+    /// Monitoring.
     pub disabled: Option<bool>,
 }
 
@@ -1568,14 +1942,12 @@ impl ResponseResult for ServerConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NodeConfig {
-    /// The number of local SSD disks to be attached to the node.
-    /// 
-    /// The limit for this value is dependant upon the maximum number of
-    /// disks available on a machine per zone. See:
-    /// https://cloud.google.com/compute/docs/disks/local-ssd#local_ssd_limits
-    /// for more information.
-    #[serde(rename="localSsdCount")]
-    pub local_ssd_count: Option<i32>,
+    /// The optional reservation affinity. Setting this field will apply
+    /// the specified [Zonal Compute
+    /// Reservation](/compute/docs/instances/reserving-zonal-resources)
+    /// to this node pool.
+    #[serde(rename="reservationAffinity")]
+    pub reservation_affinity: Option<ReservationAffinity>,
     /// The name of a Google Compute Engine [machine
     /// type](/compute/docs/machine-types) (e.g.
     /// `n1-standard-1`).
@@ -1602,15 +1974,6 @@ pub struct NodeConfig {
     /// For more information, including usage and the valid values, see:
     /// https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
     pub labels: Option<HashMap<String, String>>,
-    /// The Google Cloud Platform Service Account to be used by the node VMs. If
-    /// no Service Account is specified, the "default" service account is used.
-    #[serde(rename="serviceAccount")]
-    pub service_account: Option<String>,
-    /// List of kubernetes taints to be applied to each node.
-    /// 
-    /// For more information, including usage and the valid values, see:
-    /// https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-    pub taints: Option<Vec<NodeTaint>>,
     /// The set of Google API scopes to be made available on all of the
     /// node VMs under the "default" service account.
     /// 
@@ -1627,12 +1990,11 @@ pub struct NodeConfig {
     /// Monitoring are enabled, in which case their required scopes will be added.
     #[serde(rename="oauthScopes")]
     pub oauth_scopes: Option<Vec<String>>,
-    /// Size of the disk attached to each node, specified in GB.
-    /// The smallest allowed disk size is 10GB.
+    /// List of kubernetes taints to be applied to each node.
     /// 
-    /// If unspecified, the default disk size is 100GB.
-    #[serde(rename="diskSizeGb")]
-    pub disk_size_gb: Option<i32>,
+    /// For more information, including usage and the valid values, see:
+    /// https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+    pub taints: Option<Vec<NodeTaint>>,
     /// A list of hardware accelerators to be attached to each node.
     /// See https://cloud.google.com/compute/docs/gpus for more information about
     /// support for GPUs.
@@ -1646,11 +2008,39 @@ pub struct NodeConfig {
     /// platform](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform)
     #[serde(rename="minCpuPlatform")]
     pub min_cpu_platform: Option<String>,
+    /// The number of local SSD disks to be attached to the node.
+    /// 
+    /// The limit for this value is dependent upon the maximum number of
+    /// disks available on a machine per zone. See:
+    /// https://cloud.google.com/compute/docs/disks/local-ssd
+    /// for more information.
+    #[serde(rename="localSsdCount")]
+    pub local_ssd_count: Option<i32>,
+    /// Sandbox configuration for this node.
+    #[serde(rename="sandboxConfig")]
+    pub sandbox_config: Option<SandboxConfig>,
+    /// Shielded Instance options.
+    #[serde(rename="shieldedInstanceConfig")]
+    pub shielded_instance_config: Option<ShieldedInstanceConfig>,
+    /// The Google Cloud Platform Service Account to be used by the node VMs.
+    /// Specify the email address of the Service Account; otherwise, if no Service
+    /// Account is specified, the "default" service account is used.
+    #[serde(rename="serviceAccount")]
+    pub service_account: Option<String>,
     /// Type of the disk attached to each node (e.g. 'pd-standard' or 'pd-ssd')
     /// 
     /// If unspecified, the default disk type is 'pd-standard'
     #[serde(rename="diskType")]
     pub disk_type: Option<String>,
+    /// The workload metadata configuration for this node.
+    #[serde(rename="workloadMetadataConfig")]
+    pub workload_metadata_config: Option<WorkloadMetadataConfig>,
+    /// Size of the disk attached to each node, specified in GB.
+    /// The smallest allowed disk size is 10GB.
+    /// 
+    /// If unspecified, the default disk size is 100GB.
+    #[serde(rename="diskSizeGb")]
+    pub disk_size_gb: Option<i32>,
     /// The image type to use for this node. Note that for a given image type,
     /// the latest version of it will be used.
     #[serde(rename="imageType")]
@@ -1667,8 +2057,9 @@ pub struct NodeConfig {
     ///  "configure-sh"
     ///  "containerd-configure-sh"
     ///  "enable-os-login"
-    ///  "gci-update-strategy"
     ///  "gci-ensure-gke-docker"
+    ///  "gci-metrics-enabled"
+    ///  "gci-update-strategy"
     ///  "instance-template"
     ///  "kube-env"
     ///  "startup-script"
@@ -1712,6 +2103,44 @@ pub struct AutoUpgradeOptions {
 impl Part for AutoUpgradeOptions {}
 
 
+/// StartIPRotationRequest creates a new IP for the cluster and then performs
+/// a node upgrade on each node pool to point to the new IP.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations clusters start ip rotation projects](struct.ProjectLocationClusterStartIpRotationCall.html) (request)
+/// * [zones clusters start ip rotation projects](struct.ProjectZoneClusterStartIpRotationCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StartIPRotationRequest {
+    /// Deprecated. The Google Developers Console [project ID or project
+    /// number](https://developers.google.com/console/help/new/#projectnumber).
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Deprecated. The name of the cluster.
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="clusterId")]
+    pub cluster_id: Option<String>,
+    /// Whether to rotate credentials during IP rotation.
+    #[serde(rename="rotateCredentials")]
+    pub rotate_credentials: Option<bool>,
+    /// The name (project, location, cluster id) of the cluster to start IP
+    /// rotation. Specified in the format 'projects/*/locations/*/clusters/*'.
+    pub name: Option<String>,
+    /// Deprecated. The name of the Google Compute Engine
+    /// [zone](/compute/docs/zones#available) in which the cluster
+    /// resides.
+    /// This field has been deprecated and replaced by the name field.
+    pub zone: Option<String>,
+}
+
+impl RequestValue for StartIPRotationRequest {}
+
+
 /// SetMonitoringServiceRequest sets the monitoring service of a cluster.
 /// 
 /// # Activities
@@ -1729,13 +2158,17 @@ pub struct SetMonitoringServiceRequest {
     /// This field has been deprecated and replaced by the name field.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
-    /// The monitoring service the cluster should use to write metrics.
+    /// Required. The monitoring service the cluster should use to write metrics.
     /// Currently available options:
     /// 
-    /// * "monitoring.googleapis.com/kubernetes" - the Google Cloud Monitoring
-    /// service with Kubernetes-native resource model in Stackdriver
-    /// * "monitoring.googleapis.com" - the Google Cloud Monitoring service
-    /// * "none" - no metrics will be exported from the cluster
+    /// * "monitoring.googleapis.com/kubernetes" - The Cloud Monitoring
+    /// service with a Kubernetes-native resource model
+    /// * `monitoring.googleapis.com` - The legacy Cloud Monitoring service (no
+    ///   longer available as of GKE 1.15).
+    /// * `none` - No metrics will be exported from the cluster.
+    /// 
+    /// If left as an empty string,`monitoring.googleapis.com/kubernetes` will be
+    /// used for GKE 1.14+ or `monitoring.googleapis.com` for earlier versions.
     #[serde(rename="monitoringService")]
     pub monitoring_service: Option<String>,
     /// Deprecated. The name of the cluster to upgrade.
@@ -1796,6 +2229,25 @@ pub struct RollbackNodePoolUpgradeRequest {
 impl RequestValue for RollbackNodePoolUpgradeRequest {}
 
 
+/// Contains information about amount of some resource in the cluster.
+/// For memory, value should be in GB.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ResourceLimit {
+    /// Resource name "cpu", "memory" or gpu-specific string.
+    #[serde(rename="resourceType")]
+    pub resource_type: Option<String>,
+    /// Minimum amount of the resource in the cluster.
+    pub minimum: Option<String>,
+    /// Maximum amount of the resource in the cluster.
+    pub maximum: Option<String>,
+}
+
+impl Part for ResourceLimit {}
+
+
 /// Configuration for NetworkPolicy. This only tracks whether the addon
 /// is enabled or not on the Master, it does not track whether network policy
 /// is enabled for the nodes.
@@ -1819,6 +2271,13 @@ impl Part for NetworkPolicyConfig {}
 pub struct MaintenancePolicy {
     /// Specifies the maintenance window in which maintenance may be performed.
     pub window: Option<MaintenanceWindow>,
+    /// A hash identifying the version of this policy, so that updates to fields of
+    /// the policy won't accidentally undo intermediate changes (and so that users
+    /// of the API unaware of some fields won't accidentally remove other fields).
+    /// Make a <code>get()</code> request to the cluster to get the current
+    /// resource version and include it with requests to set the policy.
+    #[serde(rename="resourceVersion")]
+    pub resource_version: Option<String>,
 }
 
 impl Part for MaintenancePolicy {}
@@ -1853,7 +2312,7 @@ impl Part for NetworkPolicy {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetNodePoolManagementRequest {
-    /// NodeManagement configuration for the node pool.
+    /// Required. NodeManagement configuration for the node pool.
     pub management: Option<NodeManagement>,
     /// The name (project, location, cluster, node pool id) of the node pool to set
     /// management properties. Specified in the format
@@ -1905,6 +2364,10 @@ pub struct AddonsConfig {
     /// https://cloud.google.com/kubernetes-engine/docs/concepts/dashboards
     #[serde(rename="kubernetesDashboard")]
     pub kubernetes_dashboard: Option<KubernetesDashboard>,
+    /// Configuration for the Cloud Run addon, which allows the user to use a
+    /// managed Knative service.
+    #[serde(rename="cloudRunConfig")]
+    pub cloud_run_config: Option<CloudRunConfig>,
     /// Configuration for the horizontal pod autoscaling feature, which
     /// increases or decreases the number of replica pods a replication controller
     /// has based on the resource usage of the existing pods.
@@ -1979,7 +2442,7 @@ pub struct SetLocationsRequest {
     /// This field has been deprecated and replaced by the name field.
     #[serde(rename="clusterId")]
     pub cluster_id: Option<String>,
-    /// The desired list of Google Compute Engine
+    /// Required. The desired list of Google Compute Engine
     /// [zones](/compute/docs/zones#available) in which the cluster's nodes
     /// should be located. Changing the locations a cluster is in will result
     /// in nodes being either created or removed from the cluster, depending on
@@ -2013,42 +2476,51 @@ pub struct KubernetesDashboard {
 impl Part for KubernetesDashboard {}
 
 
-/// StartIPRotationRequest creates a new IP for the cluster and then performs
-/// a node upgrade on each node pool to point to the new IP.
+/// Configuration for returning group information from authenticators.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations clusters start ip rotation projects](struct.ProjectLocationClusterStartIpRotationCall.html) (request)
-/// * [zones clusters start ip rotation projects](struct.ProjectZoneClusterStartIpRotationCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct StartIPRotationRequest {
-    /// Deprecated. The Google Developers Console [project ID or project
-    /// number](https://developers.google.com/console/help/new/#projectnumber).
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// Deprecated. The name of the cluster.
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="clusterId")]
-    pub cluster_id: Option<String>,
-    /// Whether to rotate credentials during IP rotation.
-    #[serde(rename="rotateCredentials")]
-    pub rotate_credentials: Option<bool>,
-    /// The name (project, location, cluster id) of the cluster to start IP
-    /// rotation. Specified in the format 'projects/*/locations/*/clusters/*'.
-    pub name: Option<String>,
-    /// Deprecated. The name of the Google Compute Engine
-    /// [zone](/compute/docs/zones#available) in which the cluster
-    /// resides.
-    /// This field has been deprecated and replaced by the name field.
-    pub zone: Option<String>,
+pub struct AuthenticatorGroupsConfig {
+    /// Whether this cluster should return group membership lookups
+    /// during authentication using a group of security groups.
+    pub enabled: Option<bool>,
+    /// The name of the security group-of-groups to be used. Only relevant
+    /// if enabled = true.
+    #[serde(rename="securityGroup")]
+    pub security_group: Option<String>,
 }
 
-impl RequestValue for StartIPRotationRequest {}
+impl Part for AuthenticatorGroupsConfig {}
+
+
+/// SandboxConfig contains configurations of the sandbox to use for the node.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SandboxConfig {
+    /// Type of the sandbox to use for the node.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+}
+
+impl Part for SandboxConfig {}
+
+
+/// VerticalPodAutoscaling contains global, per-cluster information
+/// required by Vertical Pod Autoscaler to automatically adjust
+/// the resources of pods controlled by it.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VerticalPodAutoscaling {
+    /// Enables vertical pod autoscaling.
+    pub enabled: Option<bool>,
+}
+
+impl Part for VerticalPodAutoscaling {}
 
 
 /// CompleteIPRotationRequest moves the cluster master back into single-IP mode.
@@ -2112,7 +2584,7 @@ pub struct SetLabelsRequest {
     /// This field has been deprecated and replaced by the name field.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
-    /// The fingerprint of the previous set of labels for this resource,
+    /// Required. The fingerprint of the previous set of labels for this resource,
     /// used to detect conflicts. The fingerprint is initially generated by
     /// Kubernetes Engine and changes after every request to modify or update
     /// labels. You must always provide an up-to-date fingerprint hash when
@@ -2124,12 +2596,41 @@ pub struct SetLabelsRequest {
     /// This field has been deprecated and replaced by the name field.
     #[serde(rename="clusterId")]
     pub cluster_id: Option<String>,
-    /// The labels to set for that cluster.
+    /// Required. The labels to set for that cluster.
     #[serde(rename="resourceLabels")]
     pub resource_labels: Option<HashMap<String, String>>,
 }
 
 impl RequestValue for SetLabelsRequest {}
+
+
+/// ClusterAutoscaling contains global, per-cluster information
+/// required by Cluster Autoscaler to automatically adjust
+/// the size of the cluster and create/delete
+/// node pools based on the current needs.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ClusterAutoscaling {
+    /// AutoprovisioningNodePoolDefaults contains defaults for a node pool
+    /// created by NAP.
+    #[serde(rename="autoprovisioningNodePoolDefaults")]
+    pub autoprovisioning_node_pool_defaults: Option<AutoprovisioningNodePoolDefaults>,
+    /// The list of Google Compute Engine [zones](/compute/docs/zones#available)
+    /// in which the NodePool's nodes can be created by NAP.
+    #[serde(rename="autoprovisioningLocations")]
+    pub autoprovisioning_locations: Option<Vec<String>>,
+    /// Enables automatic node pool creation and deletion.
+    #[serde(rename="enableNodeAutoprovisioning")]
+    pub enable_node_autoprovisioning: Option<bool>,
+    /// Contains global constraints regarding minimum and maximum
+    /// amount of resources in the cluster.
+    #[serde(rename="resourceLimits")]
+    pub resource_limits: Option<Vec<ResourceLimit>>,
+}
+
+impl Part for ClusterAutoscaling {}
 
 
 /// ListClustersResponse is the result of ListClustersRequest.
@@ -2174,6 +2675,19 @@ pub struct UsableSubnetworkSecondaryRange {
 }
 
 impl Part for UsableSubnetworkSecondaryRange {}
+
+
+/// Configuration of Shielded Nodes feature.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ShieldedNodes {
+    /// Whether Shielded Nodes features are enabled on all nodes in this cluster.
+    pub enabled: Option<bool>,
+}
+
+impl Part for ShieldedNodes {}
 
 
 /// Jwk is a JSON Web Key as specified in RFC 7517
@@ -2290,11 +2804,17 @@ pub struct SetLoggingServiceRequest {
     /// This field has been deprecated and replaced by the name field.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
-    /// The logging service the cluster should use to write metrics.
+    /// Required. The logging service the cluster should use to write logs.
     /// Currently available options:
     /// 
-    /// * "logging.googleapis.com" - the Google Cloud Logging service
-    /// * "none" - no metrics will be exported from the cluster
+    /// * `logging.googleapis.com/kubernetes` - The Cloud Logging
+    /// service with a Kubernetes-native resource model
+    /// * `logging.googleapis.com` - The legacy Cloud Logging service (no longer
+    ///   available as of GKE 1.15).
+    /// * `none` - no logs will be exported from the cluster.
+    /// 
+    /// If left as an empty string,`logging.googleapis.com/kubernetes` will be
+    /// used for GKE 1.14+ or `logging.googleapis.com` for earlier versions.
     #[serde(rename="loggingService")]
     pub logging_service: Option<String>,
     /// Deprecated. The name of the cluster to upgrade.
@@ -2332,6 +2852,28 @@ pub struct ListNodePoolsResponse {
 }
 
 impl ResponseResult for ListNodePoolsResponse {}
+
+
+/// [ReservationAffinity](/compute/docs/instances/reserving-zonal-resources) is
+/// the configuration of desired reservation which instances could take
+/// capacity from.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReservationAffinity {
+    /// Corresponds to the label value(s) of reservation resource(s).
+    pub values: Option<Vec<String>>,
+    /// Corresponds to the type of reservation consumption.
+    #[serde(rename="consumeReservationType")]
+    pub consume_reservation_type: Option<String>,
+    /// Corresponds to the label key of a reservation resource. To target a
+    /// SPECIFIC_RESERVATION by name, specify "googleapis.com/reservation-name" as
+    /// the key and specify the name of your reservation as its value.
+    pub key: Option<String>,
+}
+
+impl Part for ReservationAffinity {}
 
 
 /// StatusCondition describes why a cluster or a node pool has a certain status
@@ -2390,7 +2932,7 @@ pub struct SetLegacyAbacRequest {
     /// This field has been deprecated and replaced by the name field.
     #[serde(rename="clusterId")]
     pub cluster_id: Option<String>,
-    /// Whether ABAC authorization will be enabled in the cluster.
+    /// Required. Whether ABAC authorization will be enabled in the cluster.
     pub enabled: Option<bool>,
     /// The name (project, location, cluster id) of the cluster to set legacy abac.
     /// Specified in the format 'projects/*/locations/*/clusters/*'.
@@ -2410,6 +2952,28 @@ pub struct SetLegacyAbacRequest {
 impl RequestValue for SetLegacyAbacRequest {}
 
 
+/// Progress metric is (string, int|float|string) pair.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Metric {
+    /// For metrics with custom values (ratios, visual progress, etc.).
+    #[serde(rename="stringValue")]
+    pub string_value: Option<String>,
+    /// For metrics with integer value.
+    #[serde(rename="intValue")]
+    pub int_value: Option<String>,
+    /// For metrics with floating point value.
+    #[serde(rename="doubleValue")]
+    pub double_value: Option<f64>,
+    /// Required. Metric name, e.g., "nodes total", "percent done".
+    pub name: Option<String>,
+}
+
+impl Part for Metric {}
+
+
 /// NodePoolAutoscaling contains information required by cluster autoscaler to
 /// adjust the size of the node pool to the current cluster usage.
 /// 
@@ -2421,6 +2985,8 @@ pub struct NodePoolAutoscaling {
     /// max_node_count.
     #[serde(rename="minNodeCount")]
     pub min_node_count: Option<i32>,
+    /// Can this node pool be deleted automatically.
+    pub autoprovisioned: Option<bool>,
     /// Is autoscaling enabled for this node pool.
     pub enabled: Option<bool>,
     /// Maximum number of nodes in the NodePool. Must be >= min_node_count. There
@@ -2500,7 +3066,7 @@ pub struct UpdateClusterRequest {
     /// resides.
     /// This field has been deprecated and replaced by the name field.
     pub zone: Option<String>,
-    /// A description of the update.
+    /// Required. A description of the update.
     pub update: Option<ClusterUpdate>,
 }
 
@@ -2527,7 +3093,7 @@ pub struct SetMasterAuthRequest {
     /// resides.
     /// This field has been deprecated and replaced by the name field.
     pub zone: Option<String>,
-    /// The exact form of action to be taken on the master auth.
+    /// Required. The exact form of action to be taken on the master auth.
     pub action: Option<String>,
     /// Deprecated. The Google Developers Console [project ID or project
     /// number](https://support.google.com/cloud/answer/6158840).
@@ -2538,7 +3104,7 @@ pub struct SetMasterAuthRequest {
     /// This field has been deprecated and replaced by the name field.
     #[serde(rename="clusterId")]
     pub cluster_id: Option<String>,
-    /// A description of the update.
+    /// Required. A description of the update.
     pub update: Option<MasterAuth>,
 }
 
@@ -2574,7 +3140,7 @@ pub struct SetNetworkPolicyRequest {
     /// resides.
     /// This field has been deprecated and replaced by the name field.
     pub zone: Option<String>,
-    /// Configuration options for the NetworkPolicy feature.
+    /// Required. Configuration options for the NetworkPolicy feature.
     #[serde(rename="networkPolicy")]
     pub network_policy: Option<NetworkPolicy>,
 }
@@ -2667,7 +3233,7 @@ pub struct SetNodePoolSizeRequest {
     /// resides.
     /// This field has been deprecated and replaced by the name field.
     pub zone: Option<String>,
-    /// The desired node count for the pool.
+    /// Required. The desired node count for the pool.
     #[serde(rename="nodeCount")]
     pub node_count: Option<i32>,
     /// Deprecated. The Google Developers Console [project ID or project
@@ -2746,7 +3312,27 @@ pub struct UpdateNodePoolRequest {
     /// This field has been deprecated and replaced by the name field.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
-    /// The Kubernetes version to change the nodes to (typically an
+    /// Deprecated. The name of the cluster to upgrade.
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="clusterId")]
+    pub cluster_id: Option<String>,
+    /// The desired list of Google Compute Engine
+    /// [zones](/compute/docs/zones#available) in which the node pool's nodes
+    /// should be located. Changing the locations for a node pool will result
+    /// in nodes being either created or removed from the node pool, depending
+    /// on whether locations are being added or removed.
+    pub locations: Option<Vec<String>>,
+    /// Deprecated. The name of the node pool to upgrade.
+    /// This field has been deprecated and replaced by the name field.
+    #[serde(rename="nodePoolId")]
+    pub node_pool_id: Option<String>,
+    /// The desired workload metadata config for the node pool.
+    #[serde(rename="workloadMetadataConfig")]
+    pub workload_metadata_config: Option<WorkloadMetadataConfig>,
+    /// Upgrade settings control disruption and speed of the upgrade.
+    #[serde(rename="upgradeSettings")]
+    pub upgrade_settings: Option<UpgradeSettings>,
+    /// Required. The Kubernetes version to change the nodes to (typically an
     /// upgrade).
     /// 
     /// Users may specify either explicit versions offered by Kubernetes Engine or
@@ -2759,17 +3345,9 @@ pub struct UpdateNodePoolRequest {
     /// - "-": picks the Kubernetes master version
     #[serde(rename="nodeVersion")]
     pub node_version: Option<String>,
-    /// Deprecated. The name of the cluster to upgrade.
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="clusterId")]
-    pub cluster_id: Option<String>,
-    /// The desired image type for the node pool.
+    /// Required. The desired image type for the node pool.
     #[serde(rename="imageType")]
     pub image_type: Option<String>,
-    /// Deprecated. The name of the node pool to upgrade.
-    /// This field has been deprecated and replaced by the name field.
-    #[serde(rename="nodePoolId")]
-    pub node_pool_id: Option<String>,
 }
 
 impl RequestValue for UpdateNodePoolRequest {}
@@ -3558,6 +4136,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Sets the locations for a specific cluster.
+    /// Deprecated. Use
+    /// [projects.locations.clusters.update](/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters/update)
+    /// instead.
     /// 
     /// # Arguments
     ///
@@ -3845,12 +4426,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - The Google Developers Console [project ID or project
+    /// * `projectId` - Required. The Google Developers Console [project ID or project
     ///                 number](https://support.google.com/cloud/answer/6158840).
-    /// * `zone` - The name of the Google Compute Engine
+    /// * `zone` - Required. The name of the Google Compute Engine
     ///            [zone](/compute/docs/zones#available) in which the cluster
     ///            resides.
-    /// * `clusterId` - The name of the cluster to update.
+    /// * `clusterId` - Required. The name of the cluster to update.
     pub fn zones_clusters_set_maintenance_policy(&self, request: SetMaintenancePolicyRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterSetMaintenancePolicyCall<'a, C, A> {
         ProjectZoneClusterSetMaintenancePolicyCall {
             hub: self.hub,
@@ -3940,6 +4521,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Sets the locations for a specific cluster.
+    /// Deprecated. Use
+    /// [projects.locations.clusters.update](/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters/update)
+    /// instead.
     /// 
     /// # Arguments
     ///
@@ -12808,6 +13392,9 @@ impl<'a, C, A> ProjectLocationClusterSetMonitoringCall<'a, C, A> where C: Borrow
 
 
 /// Sets the locations for a specific cluster.
+/// Deprecated. Use
+/// [projects.locations.clusters.update](/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters/update)
+/// instead.
 ///
 /// A builder for the *locations.clusters.setLocations* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -16228,7 +16815,7 @@ impl<'a, C, A> ProjectZoneClusterSetMaintenancePolicyCall<'a, C, A> where C: Bor
         self._request = new_value;
         self
     }
-    /// The Google Developers Console [project ID or project
+    /// Required. The Google Developers Console [project ID or project
     /// number](https://support.google.com/cloud/answer/6158840).
     ///
     /// Sets the *project id* path property to the given value.
@@ -16239,7 +16826,7 @@ impl<'a, C, A> ProjectZoneClusterSetMaintenancePolicyCall<'a, C, A> where C: Bor
         self._project_id = new_value.to_string();
         self
     }
-    /// The name of the Google Compute Engine
+    /// Required. The name of the Google Compute Engine
     /// [zone](/compute/docs/zones#available) in which the cluster
     /// resides.
     ///
@@ -16251,7 +16838,7 @@ impl<'a, C, A> ProjectZoneClusterSetMaintenancePolicyCall<'a, C, A> where C: Bor
         self._zone = new_value.to_string();
         self
     }
-    /// The name of the cluster to update.
+    /// Required. The name of the cluster to update.
     ///
     /// Sets the *cluster id* path property to the given value.
     ///
@@ -17188,6 +17775,9 @@ impl<'a, C, A> ProjectZoneClusterNodePoolDeleteCall<'a, C, A> where C: BorrowMut
 
 
 /// Sets the locations for a specific cluster.
+/// Deprecated. Use
+/// [projects.locations.clusters.update](/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters/update)
+/// instead.
 ///
 /// A builder for the *zones.clusters.locations* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.

@@ -369,12 +369,14 @@ fn main() {
         of a trace that you send matches that of an existing trace, any fields
         in the existing trace and its spans are overwritten by the provided values,
         and any new fields provided are merged with the existing trace data. If the
-        ID does not match, a new trace is created."##),
+        ID does not match, a new trace is created.
+        In this case, writing traces is not considered an active developer
+        method since traces are machine generated."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtrace1_cli/projects_patch-traces",
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"ID of the Cloud project where the trace data is stored."##),
+                     Some(r##"Required. ID of the Cloud project where the trace data is stored."##),
                      Some(true),
                      Some(false)),
         
@@ -397,18 +399,20 @@ fn main() {
                      Some(false)),
                   ]),
             ("traces-get",
-                    Some(r##"Gets a single trace by its ID."##),
+                    Some(r##"Gets a single trace by its ID.
+        In this case, getting for traces is considered an active developer method,
+        even though it is technically a read-only method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtrace1_cli/projects_traces-get",
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"ID of the Cloud project where the trace data is stored."##),
+                     Some(r##"Required. ID of the Cloud project where the trace data is stored."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"trace-id"##),
                      None,
-                     Some(r##"ID of the trace to return."##),
+                     Some(r##"Required. ID of the trace to return."##),
                      Some(true),
                      Some(false)),
         
@@ -425,12 +429,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("traces-list",
-                    Some(r##"Returns of a list of traces that match the specified filter conditions."##),
+                    Some(r##"Returns of a list of traces that match the specified filter conditions.
+        In this case, listing for traces is considered an active developer method,
+        even though it is technically a read-only method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtrace1_cli/projects_traces-list",
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"ID of the Cloud project where the trace data is stored."##),
+                     Some(r##"Required. ID of the Cloud project where the trace data is stored."##),
                      Some(true),
                      Some(false)),
         
@@ -452,8 +458,8 @@ fn main() {
     
     let mut app = App::new("cloudtrace1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190622")
-           .about("Sends application trace data to Stackdriver Trace for viewing. Trace data is collected for all App Engine applications by default. Trace data from other applications can be provided using this API. This library is used to interact with the Trace API directly. If you are looking to instrument your application for Stackdriver Trace, we recommend using OpenCensus.
+           .version("1.0.13+20200330")
+           .about("Sends application trace data to Cloud Trace for viewing. Trace data is collected for all App Engine applications by default. Trace data from other applications can be provided using this API. This library is used to interact with the Cloud Trace API directly. If you are looking to instrument your application for Cloud Trace, we recommend using OpenCensus.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtrace1_cli")
            .arg(Arg::with_name("url")

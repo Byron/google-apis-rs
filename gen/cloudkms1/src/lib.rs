@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud KMS* crate version *1.0.12+20190626*, where *20190626* is the exact revision of the *cloudkms:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Cloud KMS* crate version *1.0.13+20200313*, where *20200313* is the exact revision of the *cloudkms:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Cloud KMS* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/kms/).
@@ -340,7 +340,7 @@ impl<'a, C, A> CloudKMS<C, A>
         CloudKMS {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://cloudkms.googleapis.com/".to_string(),
             _root_url: "https://cloudkms.googleapis.com/".to_string(),
         }
@@ -351,7 +351,7 @@ impl<'a, C, A> CloudKMS<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -467,7 +467,7 @@ pub struct DecryptRequest {
     /// Required. The encrypted data originally returned in
     /// EncryptResponse.ciphertext.
     pub ciphertext: Option<String>,
-    /// Optional data that must match the data originally supplied in
+    /// Optional. Optional data that must match the data originally supplied in
     /// EncryptRequest.additional_authenticated_data.
     #[serde(rename="additionalAuthenticatedData")]
     pub additional_authenticated_data: Option<String>,
@@ -501,6 +501,11 @@ impl RequestValue for DecryptRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CryptoKeyVersion {
+    /// Output only. The time this CryptoKeyVersion's key material was
+    /// destroyed. Only present if state is
+    /// DESTROYED.
+    #[serde(rename="destroyEventTime")]
+    pub destroy_event_time: Option<String>,
     /// Output only. The time this CryptoKeyVersion's key material is scheduled
     /// for destruction. Only present if state is
     /// DESTROY_SCHEDULED.
@@ -511,9 +516,6 @@ pub struct CryptoKeyVersion {
     /// IMPORT_FAILED.
     #[serde(rename="importFailureReason")]
     pub import_failure_reason: Option<String>,
-    /// Output only. The resource name for this CryptoKeyVersion in the format
-    /// `projects/*/locations/*/keyRings/*/cryptoKeys/*/cryptoKeyVersions/*`.
-    pub name: Option<String>,
     /// Output only. The CryptoKeyVersionAlgorithm that this
     /// CryptoKeyVersion supports.
     pub algorithm: Option<String>,
@@ -528,15 +530,20 @@ pub struct CryptoKeyVersion {
     pub attestation: Option<KeyOperationAttestation>,
     /// The current state of the CryptoKeyVersion.
     pub state: Option<String>,
-    /// Output only. The time this CryptoKeyVersion's key material was
-    /// destroyed. Only present if state is
-    /// DESTROYED.
-    #[serde(rename="destroyEventTime")]
-    pub destroy_event_time: Option<String>,
+    /// Output only. The name of the ImportJob used to import this
+    /// CryptoKeyVersion. Only present if the underlying key material was
+    /// imported.
+    #[serde(rename="importJob")]
+    pub import_job: Option<String>,
     /// Output only. The time this CryptoKeyVersion's key material was
     /// generated.
     #[serde(rename="generateTime")]
     pub generate_time: Option<String>,
+    /// ExternalProtectionLevelOptions stores a group of additional fields for
+    /// configuring a CryptoKeyVersion that are specific to the
+    /// EXTERNAL protection level.
+    #[serde(rename="externalProtectionLevelOptions")]
+    pub external_protection_level_options: Option<ExternalProtectionLevelOptions>,
     /// Output only. The time at which this CryptoKeyVersion was created.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
@@ -544,11 +551,9 @@ pub struct CryptoKeyVersion {
     /// was imported.
     #[serde(rename="importTime")]
     pub import_time: Option<String>,
-    /// Output only. The name of the ImportJob used to import this
-    /// CryptoKeyVersion. Only present if the underlying key material was
-    /// imported.
-    #[serde(rename="importJob")]
-    pub import_job: Option<String>,
+    /// Output only. The resource name for this CryptoKeyVersion in the format
+    /// `projects/*/locations/*/keyRings/*/cryptoKeys/*/cryptoKeyVersions/*`.
+    pub name: Option<String>,
 }
 
 impl RequestValue for CryptoKeyVersion {}
@@ -661,8 +666,7 @@ pub struct ImportJob {
     /// Output only. The resource name for this ImportJob in the format
     /// `projects/*/locations/*/keyRings/*/importJobs/*`.
     pub name: Option<String>,
-    /// Required and immutable. The protection level of the ImportJob. This
-    /// must match the
+    /// Required. Immutable. The protection level of the ImportJob. This must match the
     /// protection_level of the
     /// version_template on the CryptoKey you
     /// attempt to import into.
@@ -690,8 +694,7 @@ pub struct ImportJob {
     /// Output only. The current state of the ImportJob, indicating if it can
     /// be used.
     pub state: Option<String>,
-    /// Required and immutable. The wrapping method to be used for incoming
-    /// key material.
+    /// Required. Immutable. The wrapping method to be used for incoming key material.
     #[serde(rename="importMethod")]
     pub import_method: Option<String>,
     /// Output only. The time this ImportJob's key material was generated.
@@ -706,37 +709,50 @@ impl RequestValue for ImportJob {}
 impl ResponseResult for ImportJob {}
 
 
-/// Defines an Identity and Access Management (IAM) policy. It is used to
-/// specify access control policies for Cloud Platform resources.
+/// An Identity and Access Management (IAM) policy, which specifies access
+/// controls for Google Cloud resources.
 /// 
-/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
-/// `members` to a `role`, where the members can be user accounts, Google groups,
-/// Google domains, and service accounts. A `role` is a named list of permissions
-/// defined by IAM.
+/// A `Policy` is a collection of `bindings`. A `binding` binds one or more
+/// `members` to a single `role`. Members can be user accounts, service accounts,
+/// Google groups, and domains (such as G Suite). A `role` is a named list of
+/// permissions; each `role` can be an IAM predefined role or a user-created
+/// custom role.
 /// 
-/// **JSON Example**
+/// Optionally, a `binding` can specify a `condition`, which is a logical
+/// expression that allows access to a resource only if the expression evaluates
+/// to `true`. A condition can add constraints based on attributes of the
+/// request, the resource, or both.
+/// 
+/// **JSON example:**
 /// 
 /// ````text
 /// {
 ///   "bindings": [
 ///     {
-///       "role": "roles/owner",
+///       "role": "roles/resourcemanager.organizationAdmin",
 ///       "members": [
 ///         "user:mike@example.com",
 ///         "group:admins@example.com",
 ///         "domain:google.com",
-///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
+///         "serviceAccount:my-project-id@appspot.gserviceaccount.com"
 ///       ]
 ///     },
 ///     {
-///       "role": "roles/viewer",
-///       "members": ["user:sean@example.com"]
+///       "role": "roles/resourcemanager.organizationViewer",
+///       "members": ["user:eve@example.com"],
+///       "condition": {
+///         "title": "expirable access",
+///         "description": "Does not grant access after Sep 2020",
+///         "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')",
+///       }
 ///     }
-///   ]
+///   ],
+///   "etag": "BwWWja0YfJA=",
+///   "version": 3
 /// }
 /// ````
 /// 
-/// **YAML Example**
+/// **YAML example:**
 /// 
 /// ````text
 /// bindings:
@@ -744,15 +760,21 @@ impl ResponseResult for ImportJob {}
 ///   - user:mike@example.com
 ///   - group:admins@example.com
 ///   - domain:google.com
-///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///   role: roles/owner
+///   - serviceAccount:my-project-id@appspot.gserviceaccount.com
+///   role: roles/resourcemanager.organizationAdmin
 /// - members:
-///   - user:sean@example.com
-///   role: roles/viewer
+///   - user:eve@example.com
+///   role: roles/resourcemanager.organizationViewer
+///   condition:
+///     title: expirable access
+///     description: Does not grant access after Sep 2020
+///     expression: request.time < timestamp('2020-10-01T00:00:00.000Z')
+/// - etag: BwWWja0YfJA=
+/// - version: 3
 /// ````
 /// 
 /// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam/docs).
+/// [IAM documentation](https://cloud.google.com/iam/docs/).
 /// 
 /// # Activities
 /// 
@@ -778,13 +800,36 @@ pub struct Policy {
     /// systems are expected to put that etag in the request to `setIamPolicy` to
     /// ensure that their change will be applied to the same version of the policy.
     /// 
-    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
-    /// policy is overwritten blindly.
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
     pub etag: Option<String>,
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
+    /// Associates a list of `members` to a `role`. Optionally, may specify a
+    /// `condition` that determines how and when the `bindings` are applied. Each
+    /// of the `bindings` must contain at least one member.
     pub bindings: Option<Vec<Binding>>,
-    /// Deprecated.
+    /// Specifies the format of the policy.
+    /// 
+    /// Valid values are `0`, `1`, and `3`. Requests that specify an invalid value
+    /// are rejected.
+    /// 
+    /// Any operation that affects conditional role bindings must specify version
+    /// `3`. This requirement applies to the following operations:
+    /// 
+    /// * Getting a policy that includes a conditional role binding
+    /// * Adding a conditional role binding to a policy
+    /// * Changing a conditional role binding in a policy
+    /// * Removing any role binding, with or without a condition, from a policy
+    ///   that includes conditions
+    /// 
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
+    /// 
+    /// If a policy does not include any conditions, operations on that policy may
+    /// specify any valid version or leave the field unset.
     pub version: Option<i32>,
 }
 
@@ -880,14 +925,14 @@ pub struct CryptoKey {
     /// The CryptoKey's primary version can be updated via
     /// UpdateCryptoKeyPrimaryVersion.
     /// 
-    /// All keys with purpose
-    /// ENCRYPT_DECRYPT have a
+    /// Keys with purpose
+    /// ENCRYPT_DECRYPT may have a
     /// primary. For other keys, this field will be omitted.
     pub primary: Option<CryptoKeyVersion>,
     /// Output only. The time at which this CryptoKey was created.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
-    /// The immutable purpose of this CryptoKey.
+    /// Immutable. The immutable purpose of this CryptoKey.
     pub purpose: Option<String>,
     /// A template describing settings for new CryptoKeyVersion instances.
     /// The properties of new CryptoKeyVersion instances created by either
@@ -1040,7 +1085,7 @@ impl ResponseResult for KeyRing {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UpdateCryptoKeyPrimaryVersionRequest {
-    /// The id of the child CryptoKeyVersion to use as primary.
+    /// Required. The id of the child CryptoKeyVersion to use as primary.
     #[serde(rename="cryptoKeyVersionId")]
     pub crypto_key_version_id: Option<String>,
 }
@@ -1057,7 +1102,7 @@ impl RequestValue for UpdateCryptoKeyPrimaryVersionRequest {}
 ///     {
 ///       "log_type": "DATA_READ",
 ///       "exempted_members": [
-///         "user:foo@gmail.com"
+///         "user:jose@example.com"
 ///       ]
 ///     },
 ///     {
@@ -1068,7 +1113,7 @@ impl RequestValue for UpdateCryptoKeyPrimaryVersionRequest {}
 /// ````
 /// 
 /// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
-/// foo@gmail.com from DATA_READ logging.
+/// jose@example.com from DATA_READ logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1131,7 +1176,7 @@ pub struct EncryptRequest {
     /// plaintext and additional_authenticated_data fields must be no larger than
     /// 8KiB.
     pub plaintext: Option<String>,
-    /// Optional data that, if specified, must also be provided during decryption
+    /// Optional. Optional data that, if specified, must also be provided during decryption
     /// through DecryptRequest.additional_authenticated_data.
     /// 
     /// The maximum size depends on the key version's
@@ -1188,30 +1233,59 @@ pub struct DecryptResponse {
 impl ResponseResult for DecryptResponse {}
 
 
-/// Represents an expression text. Example:
+/// Represents a textual expression in the Common Expression Language (CEL)
+/// syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+/// are documented at https://github.com/google/cel-spec.
+/// 
+/// Example (Comparison):
 /// 
 /// ````text
-/// title: "User account presence"
-/// description: "Determines whether the request has a user account"
-/// expression: "size(request.user) > 0"
+/// title: "Summary size limit"
+/// description: "Determines if a summary is less than 100 chars"
+/// expression: "document.summary.size() < 100"
 /// ````
+/// 
+/// Example (Equality):
+/// 
+/// ````text
+/// title: "Requestor is owner"
+/// description: "Determines if requestor is the document owner"
+/// expression: "document.owner == request.auth.claims.email"
+/// ````
+/// 
+/// Example (Logic):
+/// 
+/// ````text
+/// title: "Public documents"
+/// description: "Determine whether the document should be publicly visible"
+/// expression: "document.type != 'private' && document.type != 'internal'"
+/// ````
+/// 
+/// Example (Data Manipulation):
+/// 
+/// ````text
+/// title: "Notification string"
+/// description: "Create a notification string with a timestamp."
+/// expression: "'New message received at ' + string(document.create_time)"
+/// ````
+/// 
+/// The exact variables and functions that may be referenced within an expression
+/// are determined by the service that evaluates it. See the service
+/// documentation for additional information.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
-    /// An optional description of the expression. This is a longer text which
+    /// Optional. Description of the expression. This is a longer text which
     /// describes the expression, e.g. when hovered over it in a UI.
     pub description: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
+    /// Textual representation of an expression in Common Expression Language
+    /// syntax.
     pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error
+    /// Optional. String indicating the location of the expression for error
     /// reporting, e.g. a file name and a position in the file.
     pub location: Option<String>,
-    /// An optional title for the expression, i.e. a short string describing
+    /// Optional. Title for the expression, i.e. a short string describing
     /// its purpose. This can be used e.g. in UIs which allow to enter the
     /// expression.
     pub title: Option<String>,
@@ -1256,6 +1330,11 @@ pub struct ImportCryptoKeyVersionRequest {
     ///       using AES-KWP (RFC 5649).
     ///   </li>
     /// </ol>
+    /// 
+    /// If importing symmetric key material, it is expected that the unwrapped
+    /// key contains plain bytes. If importing asymmetric key material, it is
+    /// expected that the unwrapped key is in PKCS#8-encoded DER format (the
+    /// PrivateKeyInfo structure from RFC 5208).
     /// 
     /// This format is the same as the format produced by PKCS#11 mechanism
     /// CKM_RSA_AES_KEY_WRAP.
@@ -1334,7 +1413,7 @@ pub struct Binding {
     ///    who is authenticated with a Google account or a service account.
     /// 
     /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` .
+    ///    account. For example, `alice@example.com` .
     /// 
     /// 
     /// * `serviceAccount:{emailid}`: An email address that represents a service
@@ -1342,6 +1421,26 @@ pub struct Binding {
     /// 
     /// * `group:{emailid}`: An email address that represents a Google group.
     ///    For example, `admins@example.com`.
+    /// 
+    /// * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a user that has been recently deleted. For
+    ///    example, `alice@example.com?uid=123456789012345678901`. If the user is
+    ///    recovered, this value reverts to `user:{emailid}` and the recovered user
+    ///    retains the role in the binding.
+    /// 
+    /// * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus
+    ///    unique identifier) representing a service account that has been recently
+    ///    deleted. For example,
+    ///    `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.
+    ///    If the service account is undeleted, this value reverts to
+    ///    `serviceAccount:{emailid}` and the undeleted service account retains the
+    ///    role in the binding.
+    /// 
+    /// * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a Google group that has been recently
+    ///    deleted. For example, `admins@example.com?uid=123456789012345678901`. If
+    ///    the group is recovered, this value reverts to `group:{emailid}` and the
+    ///    recovered group retains the role in the binding.
     /// 
     /// 
     /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
@@ -1401,7 +1500,7 @@ impl ResponseResult for PublicKey {}
 ///         {
 ///           "log_type": "DATA_READ",
 ///           "exempted_members": [
-///             "user:foo@gmail.com"
+///             "user:jose@example.com"
 ///           ]
 ///         },
 ///         {
@@ -1413,7 +1512,7 @@ impl ResponseResult for PublicKey {}
 ///       ]
 ///     },
 ///     {
-///       "service": "fooservice.googleapis.com"
+///       "service": "sampleservice.googleapis.com"
 ///       "audit_log_configs": [
 ///         {
 ///           "log_type": "DATA_READ",
@@ -1421,7 +1520,7 @@ impl ResponseResult for PublicKey {}
 ///         {
 ///           "log_type": "DATA_WRITE",
 ///           "exempted_members": [
-///             "user:bar@gmail.com"
+///             "user:aliya@example.com"
 ///           ]
 ///         }
 ///       ]
@@ -1430,9 +1529,9 @@ impl ResponseResult for PublicKey {}
 /// }
 /// ````
 /// 
-/// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
-/// logging. It also exempts foo@gmail.com from DATA_READ logging, and
-/// bar@gmail.com from DATA_WRITE logging.
+/// For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
+/// logging. It also exempts jose@example.com from DATA_READ logging, and
+/// aliya@example.com from DATA_WRITE logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1449,6 +1548,22 @@ pub struct AuditConfig {
 impl Part for AuditConfig {}
 
 
+/// ExternalProtectionLevelOptions stores a group of additional fields for
+/// configuring a CryptoKeyVersion that are specific to the
+/// EXTERNAL protection level.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ExternalProtectionLevelOptions {
+    /// The URI for an external resource that this CryptoKeyVersion represents.
+    #[serde(rename="externalKeyUri")]
+    pub external_key_uri: Option<String>,
+}
+
+impl Part for ExternalProtectionLevelOptions {}
+
+
 /// Response message for KeyManagementService.Encrypt.
 /// 
 /// # Activities
@@ -1462,7 +1577,8 @@ impl Part for AuditConfig {}
 pub struct EncryptResponse {
     /// The encrypted data.
     pub ciphertext: Option<String>,
-    /// The resource name of the CryptoKeyVersion used in encryption.
+    /// The resource name of the CryptoKeyVersion used in encryption. Check
+    /// this field to verify that the intended resource was used for encryption.
     pub name: Option<String>,
 }
 
@@ -1600,7 +1716,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the CryptoKeyVersion public key to
+    /// * `name` - Required. The name of the CryptoKeyVersion public key to
     ///            get.
     pub fn locations_key_rings_crypto_keys_crypto_key_versions_get_public_key(&self, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a, C, A> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall {
@@ -1673,7 +1789,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the CryptoKeyVersion to destroy.
+    /// * `name` - Required. The resource name of the CryptoKeyVersion to destroy.
     pub fn locations_key_rings_crypto_keys_crypto_key_versions_destroy(&self, request: DestroyCryptoKeyVersionRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C, A> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall {
             hub: self.hub,
@@ -1715,7 +1831,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the KeyRing to get.
+    /// * `name` - Required. The name of the KeyRing to get.
     pub fn locations_key_rings_get(&self, name: &str) -> ProjectLocationKeyRingGetCall<'a, C, A> {
         ProjectLocationKeyRingGetCall {
             hub: self.hub,
@@ -1733,7 +1849,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the CryptoKey to get.
+    /// * `name` - Required. The name of the CryptoKey to get.
     pub fn locations_key_rings_crypto_keys_get(&self, name: &str) -> ProjectLocationKeyRingCryptoKeyGetCall<'a, C, A> {
         ProjectLocationKeyRingCryptoKeyGetCall {
             hub: self.hub,
@@ -1910,7 +2026,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the CryptoKey to update.
+    /// * `name` - Required. The resource name of the CryptoKey to update.
     pub fn locations_key_rings_crypto_keys_update_primary_version(&self, request: UpdateCryptoKeyPrimaryVersionRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C, A> {
         ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall {
             hub: self.hub,
@@ -2033,6 +2149,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
     /// 
+    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -2143,6 +2261,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
     /// 
+    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -2189,7 +2309,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the CryptoKeyVersion to get.
+    /// * `name` - Required. The name of the CryptoKeyVersion to get.
     pub fn locations_key_rings_crypto_keys_crypto_key_versions_get(&self, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C, A> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall {
             hub: self.hub,
@@ -2204,6 +2324,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
+    /// 
+    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
     /// 
     /// # Arguments
     ///
@@ -2234,7 +2356,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the CryptoKeyVersion to restore.
+    /// * `name` - Required. The resource name of the CryptoKeyVersion to restore.
     pub fn locations_key_rings_crypto_keys_crypto_key_versions_restore(&self, request: RestoreCryptoKeyVersionRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C, A> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall {
             hub: self.hub,
@@ -2278,7 +2400,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the ImportJob to get.
+    /// * `name` - Required. The name of the ImportJob to get.
     pub fn locations_key_rings_import_jobs_get(&self, name: &str) -> ProjectLocationKeyRingImportJobGetCall<'a, C, A> {
         ProjectLocationKeyRingImportJobGetCall {
             hub: self.hub,
@@ -2552,7 +2674,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C, A
         self._name = new_value.to_string();
         self
     }
-    /// Required list of fields to be updated in this request.
+    /// Required. List of fields to be updated in this request.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C, A> {
@@ -2800,7 +2922,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'
     }
 
 
-    /// The name of the CryptoKeyVersion public key to
+    /// Required. The name of the CryptoKeyVersion public key to
     /// get.
     ///
     /// Sets the *name* path property to the given value.
@@ -3373,7 +3495,7 @@ impl<'a, C, A> ProjectLocationKeyRingListCall<'a, C, A> where C: BorrowMut<hyper
         self._parent = new_value.to_string();
         self
     }
-    /// Optional pagination token, returned earlier via
+    /// Optional. Optional pagination token, returned earlier via
     /// ListKeyRingsResponse.next_page_token.
     ///
     /// Sets the *page token* query property to the given value.
@@ -3381,7 +3503,7 @@ impl<'a, C, A> ProjectLocationKeyRingListCall<'a, C, A> where C: BorrowMut<hyper
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional limit on the number of KeyRings to include in the
+    /// Optional. Optional limit on the number of KeyRings to include in the
     /// response.  Further KeyRings can subsequently be obtained by
     /// including the ListKeyRingsResponse.next_page_token in a subsequent
     /// request.  If unspecified, the server will pick an appropriate default.
@@ -3392,16 +3514,19 @@ impl<'a, C, A> ProjectLocationKeyRingListCall<'a, C, A> where C: BorrowMut<hyper
         self
     }
     /// Optional. Specify how the results should be sorted. If not specified, the
-    /// results will be sorted in the default order
-    /// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+    /// results will be sorted in the default order.  For more information, see
+    /// [Sorting and filtering list
+    /// results](https://cloud.google.com/kms/docs/sorting-and-filtering).
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> ProjectLocationKeyRingListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Optional. Only include resources that match the filter in the response
-    /// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+    /// Optional. Only include resources that match the filter in the response. For
+    /// more information, see
+    /// [Sorting and filtering list
+    /// results](https://cloud.google.com/kms/docs/sorting-and-filtering).
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectLocationKeyRingListCall<'a, C, A> {
@@ -3688,7 +3813,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C,
         self._request = new_value;
         self
     }
-    /// The resource name of the CryptoKeyVersion to destroy.
+    /// Required. The resource name of the CryptoKeyVersion to destroy.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4221,7 +4346,7 @@ impl<'a, C, A> ProjectLocationKeyRingGetCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// The name of the KeyRing to get.
+    /// Required. The name of the KeyRing to get.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4470,7 +4595,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyGetCall<'a, C, A> where C: BorrowM
     }
 
 
-    /// The name of the CryptoKey to get.
+    /// Required. The name of the CryptoKey to get.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -6449,9 +6574,13 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C, A> where C
         self
     }
     /// Optional. The policy format version to be returned.
-    /// Acceptable values are 0 and 1.
-    /// If the value is 0, or the field is omitted, policy format version 1 will be
-    /// returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
     ///
     /// Sets the *options.requested policy version* query property to the given value.
     pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C, A> {
@@ -6729,7 +6858,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C, A>
         self._request = new_value;
         self
     }
-    /// The resource name of the CryptoKey to update.
+    /// Required. The resource name of the CryptoKey to update.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -7024,7 +7153,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C, A> where C: Borro
         self._name = new_value.to_string();
         self
     }
-    /// Required list of fields to be updated in this request.
+    /// Required. List of fields to be updated in this request.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C, A> {
@@ -7569,9 +7698,13 @@ impl<'a, C, A> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, C, A> where C
         self
     }
     /// Optional. The policy format version to be returned.
-    /// Acceptable values are 0 and 1.
-    /// If the value is 0, or the field is omitted, policy format version 1 will be
-    /// returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
     ///
     /// Sets the *options.requested policy version* query property to the given value.
     pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, C, A> {
@@ -7847,7 +7980,7 @@ impl<'a, C, A> ProjectLocationKeyRingImportJobListCall<'a, C, A> where C: Borrow
         self._parent = new_value.to_string();
         self
     }
-    /// Optional pagination token, returned earlier via
+    /// Optional. Optional pagination token, returned earlier via
     /// ListImportJobsResponse.next_page_token.
     ///
     /// Sets the *page token* query property to the given value.
@@ -7855,7 +7988,7 @@ impl<'a, C, A> ProjectLocationKeyRingImportJobListCall<'a, C, A> where C: Borrow
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional limit on the number of ImportJobs to include in the
+    /// Optional. Optional limit on the number of ImportJobs to include in the
     /// response. Further ImportJobs can subsequently be obtained by
     /// including the ListImportJobsResponse.next_page_token in a subsequent
     /// request. If unspecified, the server will pick an appropriate default.
@@ -7866,16 +7999,19 @@ impl<'a, C, A> ProjectLocationKeyRingImportJobListCall<'a, C, A> where C: Borrow
         self
     }
     /// Optional. Specify how the results should be sorted. If not specified, the
-    /// results will be sorted in the default order
-    /// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+    /// results will be sorted in the default order. For more information, see
+    /// [Sorting and filtering list
+    /// results](https://cloud.google.com/kms/docs/sorting-and-filtering).
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Optional. Only include resources that match the filter in the response
-    /// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+    /// Optional. Only include resources that match the filter in the response. For
+    /// more information, see
+    /// [Sorting and filtering list
+    /// results](https://cloud.google.com/kms/docs/sorting-and-filtering).
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobListCall<'a, C, A> {
@@ -8139,9 +8275,13 @@ impl<'a, C, A> ProjectLocationKeyRingGetIamPolicyCall<'a, C, A> where C: BorrowM
         self
     }
     /// Optional. The policy format version to be returned.
-    /// Acceptable values are 0 and 1.
-    /// If the value is 0, or the field is omitted, policy format version 1 will be
-    /// returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
     ///
     /// Sets the *options.requested policy version* query property to the given value.
     pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationKeyRingGetIamPolicyCall<'a, C, A> {
@@ -8213,6 +8353,8 @@ impl<'a, C, A> ProjectLocationKeyRingGetIamPolicyCall<'a, C, A> where C: BorrowM
 
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
+/// 
+/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 ///
 /// A builder for the *locations.keyRings.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9244,7 +9386,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C, A>
         self._view = Some(new_value.to_string());
         self
     }
-    /// Optional pagination token, returned earlier via
+    /// Optional. Optional pagination token, returned earlier via
     /// ListCryptoKeyVersionsResponse.next_page_token.
     ///
     /// Sets the *page token* query property to the given value.
@@ -9252,7 +9394,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C, A>
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional limit on the number of CryptoKeyVersions to
+    /// Optional. Optional limit on the number of CryptoKeyVersions to
     /// include in the response. Further CryptoKeyVersions can
     /// subsequently be obtained by including the
     /// ListCryptoKeyVersionsResponse.next_page_token in a subsequent request.
@@ -9264,16 +9406,19 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C, A>
         self
     }
     /// Optional. Specify how the results should be sorted. If not specified, the
-    /// results will be sorted in the default order
-    /// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+    /// results will be sorted in the default order. For more information, see
+    /// [Sorting and filtering list
+    /// results](https://cloud.google.com/kms/docs/sorting-and-filtering).
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Optional. Only include resources that match the filter in the response
-    /// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+    /// Optional. Only include resources that match the filter in the response. For
+    /// more information, see
+    /// [Sorting and filtering list
+    /// results](https://cloud.google.com/kms/docs/sorting-and-filtering).
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C, A> {
@@ -9561,7 +9706,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyListCall<'a, C, A> where C: Borrow
         self._version_view = Some(new_value.to_string());
         self
     }
-    /// Optional pagination token, returned earlier via
+    /// Optional. Optional pagination token, returned earlier via
     /// ListCryptoKeysResponse.next_page_token.
     ///
     /// Sets the *page token* query property to the given value.
@@ -9569,7 +9714,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyListCall<'a, C, A> where C: Borrow
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional limit on the number of CryptoKeys to include in the
+    /// Optional. Optional limit on the number of CryptoKeys to include in the
     /// response.  Further CryptoKeys can subsequently be obtained by
     /// including the ListCryptoKeysResponse.next_page_token in a subsequent
     /// request.  If unspecified, the server will pick an appropriate default.
@@ -9580,16 +9725,19 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyListCall<'a, C, A> where C: Borrow
         self
     }
     /// Optional. Specify how the results should be sorted. If not specified, the
-    /// results will be sorted in the default order
-    /// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+    /// results will be sorted in the default order. For more information, see
+    /// [Sorting and filtering list
+    /// results](https://cloud.google.com/kms/docs/sorting-and-filtering).
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Optional. Only include resources that match the filter in the response
-    /// (https://cloud.google.com/kms/docs/sorting-and-filtering).
+    /// Optional. Only include resources that match the filter in the response. For
+    /// more information, see
+    /// [Sorting and filtering list
+    /// results](https://cloud.google.com/kms/docs/sorting-and-filtering).
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a, C, A> {
@@ -9661,6 +9809,8 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyListCall<'a, C, A> where C: Borrow
 
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
+/// 
+/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 ///
 /// A builder for the *locations.keyRings.importJobs.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10399,7 +10549,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C, A> 
     }
 
 
-    /// The name of the CryptoKeyVersion to get.
+    /// Required. The name of the CryptoKeyVersion to get.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -10474,6 +10624,8 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C, A> 
 
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
+/// 
+/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 ///
 /// A builder for the *locations.keyRings.cryptoKeys.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10965,7 +11117,7 @@ impl<'a, C, A> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C,
         self._request = new_value;
         self
     }
-    /// The resource name of the CryptoKeyVersion to restore.
+    /// Required. The resource name of the CryptoKeyVersion to restore.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -11499,7 +11651,7 @@ impl<'a, C, A> ProjectLocationKeyRingImportJobGetCall<'a, C, A> where C: BorrowM
     }
 
 
-    /// The name of the ImportJob to get.
+    /// Required. The name of the ImportJob to get.
     ///
     /// Sets the *name* path property to the given value.
     ///

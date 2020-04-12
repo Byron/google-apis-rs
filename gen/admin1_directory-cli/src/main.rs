@@ -597,6 +597,8 @@ impl<'n> Engine<'n> {
                     "annotated-asset-id" => Some(("annotatedAssetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "firmware-version" => Some(("firmwareVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "system-ram-total" => Some(("systemRamTotal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "auto-update-expiration" => Some(("autoUpdateExpiration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ethernet-mac-address0" => Some(("ethernetMacAddress0", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "boot-mode" => Some(("bootMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "org-unit-path" => Some(("orgUnitPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -608,10 +610,12 @@ impl<'n> Engine<'n> {
                     "device-id" => Some(("deviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "platform-version" => Some(("platformVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "os-version" => Some(("osVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dock-mac-address" => Some(("dockMacAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-enrollment-time" => Some(("lastEnrollmentTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notes" => Some(("notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "serial-number" => Some(("serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "manufacture-date" => Some(("manufactureDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "support-end-date" => Some(("supportEndDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tpm-version-info.spec-level" => Some(("tpmVersionInfo.specLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tpm-version-info.tpm-model" => Some(("tpmVersionInfo.tpmModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -621,7 +625,7 @@ impl<'n> Engine<'n> {
                     "tpm-version-info.manufacturer" => Some(("tpmVersionInfo.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "model" => Some(("model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotated-asset-id", "annotated-location", "annotated-user", "boot-mode", "device-id", "etag", "ethernet-mac-address", "family", "firmware-version", "kind", "last-enrollment-time", "last-sync", "mac-address", "manufacturer", "meid", "model", "notes", "order-number", "org-unit-path", "os-version", "platform-version", "serial-number", "spec-level", "status", "support-end-date", "system-ram-total", "tpm-model", "tpm-version-info", "vendor-specific", "will-auto-renew"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotated-asset-id", "annotated-location", "annotated-user", "auto-update-expiration", "boot-mode", "device-id", "dock-mac-address", "etag", "ethernet-mac-address", "ethernet-mac-address0", "family", "firmware-version", "kind", "last-enrollment-time", "last-sync", "mac-address", "manufacture-date", "manufacturer", "meid", "model", "notes", "order-number", "org-unit-path", "os-version", "platform-version", "serial-number", "spec-level", "status", "support-end-date", "system-ram-total", "tpm-model", "tpm-version-info", "vendor-specific", "will-auto-renew"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -715,6 +719,8 @@ impl<'n> Engine<'n> {
                     "annotated-asset-id" => Some(("annotatedAssetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "firmware-version" => Some(("firmwareVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "system-ram-total" => Some(("systemRamTotal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "auto-update-expiration" => Some(("autoUpdateExpiration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ethernet-mac-address0" => Some(("ethernetMacAddress0", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "boot-mode" => Some(("bootMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "org-unit-path" => Some(("orgUnitPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -726,10 +732,12 @@ impl<'n> Engine<'n> {
                     "device-id" => Some(("deviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "platform-version" => Some(("platformVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "os-version" => Some(("osVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dock-mac-address" => Some(("dockMacAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-enrollment-time" => Some(("lastEnrollmentTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notes" => Some(("notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "serial-number" => Some(("serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "manufacture-date" => Some(("manufactureDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "support-end-date" => Some(("supportEndDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tpm-version-info.spec-level" => Some(("tpmVersionInfo.specLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tpm-version-info.tpm-model" => Some(("tpmVersionInfo.tpmModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -739,7 +747,7 @@ impl<'n> Engine<'n> {
                     "tpm-version-info.manufacturer" => Some(("tpmVersionInfo.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "model" => Some(("model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotated-asset-id", "annotated-location", "annotated-user", "boot-mode", "device-id", "etag", "ethernet-mac-address", "family", "firmware-version", "kind", "last-enrollment-time", "last-sync", "mac-address", "manufacturer", "meid", "model", "notes", "order-number", "org-unit-path", "os-version", "platform-version", "serial-number", "spec-level", "status", "support-end-date", "system-ram-total", "tpm-model", "tpm-version-info", "vendor-specific", "will-auto-renew"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotated-asset-id", "annotated-location", "annotated-user", "auto-update-expiration", "boot-mode", "device-id", "dock-mac-address", "etag", "ethernet-mac-address", "ethernet-mac-address0", "family", "firmware-version", "kind", "last-enrollment-time", "last-sync", "mac-address", "manufacture-date", "manufacturer", "meid", "model", "notes", "order-number", "org-unit-path", "os-version", "platform-version", "serial-number", "spec-level", "status", "support-end-date", "system-ram-total", "tpm-model", "tpm-version-info", "vendor-specific", "will-auto-renew"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3722,104 +3730,6 @@ impl<'n> Engine<'n> {
             for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _resolved_app_access_settings_get_settings(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.resolved_app_access_settings().get_settings();
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _resolved_app_access_settings_list_trusted_apps(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.resolved_app_access_settings().list_trusted_apps();
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -6938,11 +6848,13 @@ impl<'n> Engine<'n> {
                     "name.full-name" => Some(("name.fullName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name.given-name" => Some(("name.givenName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name.family-name" => Some(("name.familyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "recovery-phone" => Some(("recoveryPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "change-password-at-next-login" => Some(("changePasswordAtNextLogin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "recovery-email" => Some(("recoveryEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agreed-to-terms", "aliases", "archived", "change-password-at-next-login", "creation-time", "customer-id", "deletion-time", "etag", "family-name", "full-name", "given-name", "hash-function", "id", "include-in-global-address-list", "ip-whitelisted", "is-admin", "is-delegated-admin", "is-enforced-in2-sv", "is-enrolled-in2-sv", "is-mailbox-setup", "kind", "last-login-time", "name", "non-editable-aliases", "org-unit-path", "password", "primary-email", "suspended", "suspension-reason", "thumbnail-photo-etag", "thumbnail-photo-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agreed-to-terms", "aliases", "archived", "change-password-at-next-login", "creation-time", "customer-id", "deletion-time", "etag", "family-name", "full-name", "given-name", "hash-function", "id", "include-in-global-address-list", "ip-whitelisted", "is-admin", "is-delegated-admin", "is-enforced-in2-sv", "is-enrolled-in2-sv", "is-mailbox-setup", "kind", "last-login-time", "name", "non-editable-aliases", "org-unit-path", "password", "primary-email", "recovery-email", "recovery-phone", "suspended", "suspension-reason", "thumbnail-photo-etag", "thumbnail-photo-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7218,11 +7130,13 @@ impl<'n> Engine<'n> {
                     "name.full-name" => Some(("name.fullName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name.given-name" => Some(("name.givenName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name.family-name" => Some(("name.familyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "recovery-phone" => Some(("recoveryPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "change-password-at-next-login" => Some(("changePasswordAtNextLogin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "recovery-email" => Some(("recoveryEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agreed-to-terms", "aliases", "archived", "change-password-at-next-login", "creation-time", "customer-id", "deletion-time", "etag", "family-name", "full-name", "given-name", "hash-function", "id", "include-in-global-address-list", "ip-whitelisted", "is-admin", "is-delegated-admin", "is-enforced-in2-sv", "is-enrolled-in2-sv", "is-mailbox-setup", "kind", "last-login-time", "name", "non-editable-aliases", "org-unit-path", "password", "primary-email", "suspended", "suspension-reason", "thumbnail-photo-etag", "thumbnail-photo-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agreed-to-terms", "aliases", "archived", "change-password-at-next-login", "creation-time", "customer-id", "deletion-time", "etag", "family-name", "full-name", "given-name", "hash-function", "id", "include-in-global-address-list", "ip-whitelisted", "is-admin", "is-delegated-admin", "is-enforced-in2-sv", "is-enrolled-in2-sv", "is-mailbox-setup", "kind", "last-login-time", "name", "non-editable-aliases", "org-unit-path", "password", "primary-email", "recovery-email", "recovery-phone", "suspended", "suspension-reason", "thumbnail-photo-etag", "thumbnail-photo-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7689,11 +7603,13 @@ impl<'n> Engine<'n> {
                     "name.full-name" => Some(("name.fullName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name.given-name" => Some(("name.givenName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name.family-name" => Some(("name.familyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "recovery-phone" => Some(("recoveryPhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "change-password-at-next-login" => Some(("changePasswordAtNextLogin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "recovery-email" => Some(("recoveryEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agreed-to-terms", "aliases", "archived", "change-password-at-next-login", "creation-time", "customer-id", "deletion-time", "etag", "family-name", "full-name", "given-name", "hash-function", "id", "include-in-global-address-list", "ip-whitelisted", "is-admin", "is-delegated-admin", "is-enforced-in2-sv", "is-enrolled-in2-sv", "is-mailbox-setup", "kind", "last-login-time", "name", "non-editable-aliases", "org-unit-path", "password", "primary-email", "suspended", "suspension-reason", "thumbnail-photo-etag", "thumbnail-photo-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agreed-to-terms", "aliases", "archived", "change-password-at-next-login", "creation-time", "customer-id", "deletion-time", "etag", "family-name", "full-name", "given-name", "hash-function", "id", "include-in-global-address-list", "ip-whitelisted", "is-admin", "is-delegated-admin", "is-enforced-in2-sv", "is-enrolled-in2-sv", "is-mailbox-setup", "kind", "last-login-time", "name", "non-editable-aliases", "org-unit-path", "password", "primary-email", "recovery-email", "recovery-phone", "suspended", "suspension-reason", "thumbnail-photo-etag", "thumbnail-photo-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -8280,20 +8196,6 @@ impl<'n> Engine<'n> {
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("privileges".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
-                }
-            },
-            ("resolved-app-access-settings", Some(opt)) => {
-                match opt.subcommand() {
-                    ("get-settings", Some(opt)) => {
-                        call_result = self._resolved_app_access_settings_get_settings(opt, dry_run, &mut err);
-                    },
-                    ("list-trusted-apps", Some(opt)) => {
-                        call_result = self._resolved_app_access_settings_list_trusted_apps(opt, dry_run, &mut err);
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("resolved-app-access-settings".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -10016,41 +9918,6 @@ fn main() {
                   ]),
             ]),
         
-        ("resolved-app-access-settings", "methods: 'get-settings' and 'list-trusted-apps'", vec![
-            ("get-settings",
-                    Some(r##"Retrieves resolved app access settings of the logged in user."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/resolved-app-access-settings_get-settings",
-                  vec![
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("list-trusted-apps",
-                    Some(r##"Retrieves the list of apps trusted by the admin of the logged in user."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/resolved-app-access-settings_list-trusted-apps",
-                  vec![
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ]),
-        
         ("resources", "methods: 'buildings-delete', 'buildings-get', 'buildings-insert', 'buildings-list', 'buildings-patch', 'buildings-update', 'calendars-delete', 'calendars-get', 'calendars-insert', 'calendars-list', 'calendars-patch', 'calendars-update', 'features-delete', 'features-get', 'features-insert', 'features-list', 'features-patch', 'features-rename' and 'features-update'", vec![
             ("buildings-delete",
                     Some(r##"Deletes a building."##),
@@ -11566,7 +11433,7 @@ fn main() {
     
     let mut app = App::new("admin1-directory")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190214")
+           .version("1.0.13+20200204")
            .about("Manages enterprise resources such as users and groups, administrative notifications, security features, and more.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_admin1_directory_cli")
            .arg(Arg::with_name("url")

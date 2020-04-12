@@ -25,12 +25,11 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Dialogflow* API at revision *20190629*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Dialogflow* API at revision *20200408*. The CLI is at version *1.0.13*.
 
 ```bash
 dialogflow2 [options]
         projects
-                agent <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 agent-entity-types-batch-delete <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 agent-entity-types-batch-update <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 agent-entity-types-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -41,7 +40,21 @@ dialogflow2 [options]
                 agent-entity-types-get <name> [-p <v>]... [-o <out>]
                 agent-entity-types-list <parent> [-p <v>]... [-o <out>]
                 agent-entity-types-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                agent-environments-users-sessions-contexts-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                agent-environments-users-sessions-contexts-delete <name> [-p <v>]... [-o <out>]
+                agent-environments-users-sessions-contexts-get <name> [-p <v>]... [-o <out>]
+                agent-environments-users-sessions-contexts-list <parent> [-p <v>]... [-o <out>]
+                agent-environments-users-sessions-contexts-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                agent-environments-users-sessions-delete-contexts <parent> [-p <v>]... [-o <out>]
+                agent-environments-users-sessions-detect-intent <session> (-r <kv>)... [-p <v>]... [-o <out>]
+                agent-environments-users-sessions-entity-types-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                agent-environments-users-sessions-entity-types-delete <name> [-p <v>]... [-o <out>]
+                agent-environments-users-sessions-entity-types-get <name> [-p <v>]... [-o <out>]
+                agent-environments-users-sessions-entity-types-list <parent> [-p <v>]... [-o <out>]
+                agent-environments-users-sessions-entity-types-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 agent-export <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                agent-get-fulfillment <name> [-p <v>]... [-o <out>]
+                agent-get-validation-result <parent> [-p <v>]... [-o <out>]
                 agent-import <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 agent-intents-batch-delete <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 agent-intents-batch-update <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -65,9 +78,16 @@ dialogflow2 [options]
                 agent-sessions-entity-types-list <parent> [-p <v>]... [-o <out>]
                 agent-sessions-entity-types-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 agent-train <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                agent-update-fulfillment <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete-agent <parent> [-p <v>]... [-o <out>]
                 get-agent <parent> [-p <v>]... [-o <out>]
+                locations-operations-cancel <name> [-p <v>]... [-o <out>]
+                locations-operations-get <name> [-p <v>]... [-o <out>]
+                locations-operations-list <name> [-p <v>]... [-o <out>]
+                operations-cancel <name> [-p <v>]... [-o <out>]
                 operations-get <name> [-p <v>]... [-o <out>]
+                operations-list <name> [-p <v>]... [-o <out>]
+                set-agent <parent> (-r <kv>)... [-p <v>]... [-o <out>]
   dialogflow2 --help
 
 Configuration:

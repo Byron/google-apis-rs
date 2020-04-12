@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *calendar* crate version *1.0.12+20190702*, where *20190702* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *calendar* crate version *1.0.13+20200405*, where *20200405* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *calendar* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/calendar/firstapp).
@@ -415,7 +415,7 @@ impl<'a, C, A> CalendarHub<C, A>
         CalendarHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://www.googleapis.com/calendar/v3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -447,7 +447,7 @@ impl<'a, C, A> CalendarHub<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -630,6 +630,7 @@ pub struct ConferenceSolutionKey {
     /// - "eventHangout" for Hangouts for consumers (http://hangouts.google.com)
     /// - "eventNamedHangout" for classic Hangouts for G Suite users (http://hangouts.google.com)
     /// - "hangoutsMeet" for Hangouts Meet (http://meet.google.com)
+    /// - "addOn" for 3P conference providers
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
@@ -944,8 +945,6 @@ pub struct EventReminder {
     pub minutes: Option<i32>,
     /// The method used by this reminder. Possible values are:  
     /// - "email" - Reminders are sent via email. 
-    /// - "sms" - Deprecated. Once this feature is shutdown, the API will no longer return reminders using this method. Any newly added SMS reminders will be ignored. See  Google Calendar SMS notifications to be removed for more information.
-    /// Reminders are sent via SMS. These are only available for G Suite customers. Requests to set SMS reminders for other account types are ignored. 
     /// - "popup" - Reminders are sent via a UI popup.  
     /// Required when adding a reminder.
     pub method: Option<String>,
@@ -984,10 +983,8 @@ pub struct CalendarNotification {
     /// Required when adding a notification.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// The method used to deliver the notification. Possible values are:  
-    /// - "email" - Notifications are sent via email. 
-    /// - "sms" - Deprecated. Once this feature is shutdown, the API will no longer return notifications using this method. Any newly added SMS notifications will be ignored. See  Google Calendar SMS notifications to be removed for more information.
-    /// Notifications are sent via SMS. This value is read-only and is ignored on inserts and updates. SMS notifications are only available for G Suite customers.  
+    /// The method used to deliver the notification. The possible value is:  
+    /// - "email" - Notifications are sent via email.  
     /// Required when adding a notification.
     pub method: Option<String>,
 }
@@ -1029,7 +1026,8 @@ pub struct ConferenceData {
     /// Values for solution types:  
     /// - "eventHangout": unset.
     /// - "eventNamedHangout": the name of the Hangout.
-    /// - "hangoutsMeet": the 10-letter meeting code, for example "aaa-bbbb-ccc".  Optional.
+    /// - "hangoutsMeet": the 10-letter meeting code, for example "aaa-bbbb-ccc".
+    /// - "addOn": defined by 3P conference provider.  Optional.
     #[serde(rename="conferenceId")]
     pub conference_id: Option<String>,
 }
@@ -1598,7 +1596,7 @@ pub struct Event {
     pub status: Option<String>,
     /// Last modification time of the event (as a RFC3339 timestamp). Read-only.
     pub updated: Option<String>,
-    /// Description of the event. Optional.
+    /// Description of the event. Can contain HTML. Optional.
     pub description: Option<String>,
     /// Event unique identifier as defined in RFC5545. It is used to uniquely identify events accross calendaring systems and must be supplied when importing events via the import method.
     /// Note that the icalUID and the id are not identical and only one of them should be supplied at event creation time. One difference in their semantics is that in recurring events, all occurrences of one event have different ids while they all share the same icalUIDs.
@@ -1651,7 +1649,7 @@ pub struct Event {
     /// - "opaque" - Default value. The event does block time on the calendar. This is equivalent to setting Show me as to Busy in the Calendar UI. 
     /// - "transparent" - The event does not block time on the calendar. This is equivalent to setting Show me as to Available in the Calendar UI.
     pub transparency: Option<String>,
-    /// Whether this is a private event copy where changes are not shared with other copies on other calendars. Optional. Immutable. The default is False.
+    /// If set to True, Event propagation is disabled. Note that it is not the same thing as Private event properties. Optional. Immutable. The default is False.
     #[serde(rename="privateCopy")]
     pub private_copy: Option<bool>,
     /// The conference-related information, such as details of a Hangouts Meet conference. To create new conference details use the createRequest field. To persist your changes, remember to set the conferenceDataVersion request parameter to 1 for all event modification requests.
@@ -10741,7 +10739,7 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._max_attendees = Some(new_value);
         self
     }
-    /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
+    /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
     ///
     /// Sets the *always include email* query property to the given value.
     pub fn always_include_email(mut self, new_value: bool) -> EventInstanceCall<'a, C, A> {
@@ -11029,7 +11027,7 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._max_attendees = Some(new_value);
         self
     }
-    /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
+    /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
     ///
     /// Sets the *always include email* query property to the given value.
     pub fn always_include_email(mut self, new_value: bool) -> EventGetCall<'a, C, A> {
@@ -11492,7 +11490,7 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._i_cal_uid = Some(new_value.to_string());
         self
     }
-    /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
+    /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
     ///
     /// Sets the *always include email* query property to the given value.
     pub fn always_include_email(mut self, new_value: bool) -> EventListCall<'a, C, A> {
@@ -11849,7 +11847,7 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._conference_data_version = Some(new_value);
         self
     }
-    /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
+    /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
     ///
     /// Sets the *always include email* query property to the given value.
     pub fn always_include_email(mut self, new_value: bool) -> EventPatchCall<'a, C, A> {
@@ -12496,7 +12494,7 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._conference_data_version = Some(new_value);
         self
     }
-    /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
+    /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
     ///
     /// Sets the *always include email* query property to the given value.
     pub fn always_include_email(mut self, new_value: bool) -> EventUpdateCall<'a, C, A> {
@@ -12990,7 +12988,7 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._i_cal_uid = Some(new_value.to_string());
         self
     }
-    /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
+    /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
     ///
     /// Sets the *always include email* query property to the given value.
     pub fn always_include_email(mut self, new_value: bool) -> EventWatchCall<'a, C, A> {

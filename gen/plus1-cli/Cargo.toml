@@ -4,7 +4,7 @@
 [package]
 
 name = "google-plus1-cli"
-version = "1.0.12+20190616"
+version = "1.0.13+20190616"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with plus (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/plus1-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-plus1]
 path = "../plus1"
-version = "1.0.12+20190616"
+version = "1.0.13+20190616"

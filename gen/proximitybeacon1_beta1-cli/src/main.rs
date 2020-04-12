@@ -1392,7 +1392,8 @@ fn main() {
             ("getforobserved",
                     Some(r##"Given one or more beacon observations, returns any beacon information
         and attachments accessible to your application. Authorize by using the
-        [API key](https://developers.google.com/beacons/proximity/get-started#request_a_browser_api_key)
+        [API
+        key](https://developers.google.com/beacons/proximity/get-started#request_a_browser_api_key)
         for the application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1_cli/beaconinfo_getforobserved",
                   vec![
@@ -1423,9 +1424,10 @@ fn main() {
         Calling this method on an already active beacon will do nothing (but
         will return a successful response code).
         
-        Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-        from a signed-in user with **Is owner** or **Can edit** permissions in the
-        Google Developers Console project."##),
+        Authenticate using an [OAuth access
+        token](https://developers.google.com/identity/protocols/OAuth2) from a
+        signed-in user with **Is owner** or **Can edit** permissions in the Google
+        Developers Console project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1_cli/beacons_activate",
                   vec![
                     (Some(r##"beacon-name"##),
@@ -1461,9 +1463,10 @@ fn main() {
         attachments on the given beacon will be deleted. You also may explicitly
         specify `*/*` to delete all.
         
-        Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-        from a signed-in user with **Is owner** or **Can edit** permissions in the
-        Google Developers Console project."##),
+        Authenticate using an [OAuth access
+        token](https://developers.google.com/identity/protocols/OAuth2) from a
+        signed-in user with **Is owner** or **Can edit** permissions in the Google
+        Developers Console project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1_cli/beacons_attachments-batch-delete",
                   vec![
                     (Some(r##"beacon-name"##),
@@ -1504,9 +1507,10 @@ fn main() {
         
         Attachment data can be up to 1024 bytes long.
         
-        Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-        from a signed-in user with **Is owner** or **Can edit** permissions in the
-        Google Developers Console project."##),
+        Authenticate using an [OAuth access
+        token](https://developers.google.com/identity/protocols/OAuth2) from a
+        signed-in user with **Is owner** or **Can edit** permissions in the Google
+        Developers Console project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1_cli/beacons_attachments-create",
                   vec![
                     (Some(r##"beacon-name"##),
@@ -1546,9 +1550,10 @@ fn main() {
         request to control which attachment is removed. This operation cannot be
         undone.
         
-        Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-        from a signed-in user with **Is owner** or **Can edit** permissions in the
-        Google Developers Console project."##),
+        Authenticate using an [OAuth access
+        token](https://developers.google.com/identity/protocols/OAuth2) from a
+        signed-in user with **Is owner** or **Can edit** permissions in the Google
+        Developers Console project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1_cli/beacons_attachments-delete",
                   vec![
                     (Some(r##"attachment-name"##),
@@ -1583,9 +1588,10 @@ fn main() {
         `*/*`, to return all attachments, or the namespace must be one of
         the ones returned from the  `namespaces` endpoint.
         
-        Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-        from a signed-in user with **viewer**, **Is owner** or **Can edit**
-        permissions in the Google Developers Console project."##),
+        Authenticate using an [OAuth access
+        token](https://developers.google.com/identity/protocols/OAuth2) from a
+        signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
+        the Google Developers Console project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1_cli/beacons_attachments-list",
                   vec![
                     (Some(r##"beacon-name"##),
@@ -1618,9 +1624,10 @@ fn main() {
         `beaconinfo.getforobserved`. Calling this method on an already inactive
         beacon will do nothing (but will return a successful response code).
         
-        Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-        from a signed-in user with **Is owner** or **Can edit** permissions in the
-        Google Developers Console project."##),
+        Authenticate using an [OAuth access
+        token](https://developers.google.com/identity/protocols/OAuth2) from a
+        signed-in user with **Is owner** or **Can edit** permissions in the Google
+        Developers Console project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1_cli/beacons_deactivate",
                   vec![
                     (Some(r##"beacon-name"##),
@@ -1653,9 +1660,10 @@ fn main() {
         permanent -- you will not be able to re-register a beacon with this ID
         again.
         
-        Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-        from a signed-in user with **Is owner** or **Can edit** permissions in the
-        Google Developers Console project."##),
+        Authenticate using an [OAuth access
+        token](https://developers.google.com/identity/protocols/OAuth2) from a
+        signed-in user with **Is owner** or **Can edit** permissions in the Google
+        Developers Console project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1_cli/beacons_decommission",
                   vec![
                     (Some(r##"beacon-name"##),
@@ -1687,9 +1695,10 @@ fn main() {
         as well as any attachments on the beacon (including those belonging to
         other projects). This operation cannot be undone.
         
-        Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-        from a signed-in user with **Is owner** or **Can edit** permissions in the
-        Google Developers Console project."##),
+        Authenticate using an [OAuth access
+        token](https://developers.google.com/identity/protocols/OAuth2) from a
+        signed-in user with **Is owner** or **Can edit** permissions in the Google
+        Developers Console project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1_cli/beacons_delete",
                   vec![
                     (Some(r##"beacon-name"##),
@@ -1721,9 +1730,10 @@ fn main() {
         all the beacons owned by your Google Developers Console project by using
         the beacon name `beacons/-`.
         
-        Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-        from a signed-in user with **viewer**, **Is owner** or **Can edit**
-        permissions in the Google Developers Console project."##),
+        Authenticate using an [OAuth access
+        token](https://developers.google.com/identity/protocols/OAuth2) from a
+        signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
+        the Google Developers Console project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1_cli/beacons_diagnostics-list",
                   vec![
                     (Some(r##"beacon-name"##),
@@ -1747,9 +1757,10 @@ fn main() {
             ("get",
                     Some(r##"Returns detailed information about the specified beacon.
         
-        Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-        from a signed-in user with **viewer**, **Is owner** or **Can edit**
-        permissions in the Google Developers Console project.
+        Authenticate using an [OAuth access
+        token](https://developers.google.com/identity/protocols/OAuth2) from a
+        signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
+        the Google Developers Console project.
         
         Requests may supply an Eddystone-EID beacon name in the form:
         `beacons/4!beaconId` where the `beaconId` is the base16 ephemeral ID
@@ -1787,9 +1798,10 @@ fn main() {
         criteria. Only those beacons that the client has permission to list
         will be returned.
         
-        Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-        from a signed-in user with **viewer**, **Is owner** or **Can edit**
-        permissions in the Google Developers Console project."##),
+        Authenticate using an [OAuth access
+        token](https://developers.google.com/identity/protocols/OAuth2) from a
+        signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
+        the Google Developers Console project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1_cli/beacons_list",
                   vec![
                     (Some(r##"v"##),
@@ -1808,9 +1820,10 @@ fn main() {
                     Some(r##"Registers a previously unregistered beacon given its `advertisedId`.
         These IDs are unique within the system. An ID can be registered only once.
         
-        Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-        from a signed-in user with **Is owner** or **Can edit** permissions in the
-        Google Developers Console project."##),
+        Authenticate using an [OAuth access
+        token](https://developers.google.com/identity/protocols/OAuth2) from a
+        signed-in user with **Is owner** or **Can edit** permissions in the Google
+        Developers Console project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1_cli/beacons_register",
                   vec![
                     (Some(r##"kv"##),
@@ -1840,9 +1853,10 @@ fn main() {
         Changes to the beacon status via this method will be  silently ignored.
         To update beacon status, use the separate methods on this API for
         activation, deactivation, and decommissioning.
-        Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-        from a signed-in user with **Is owner** or **Can edit** permissions in the
-        Google Developers Console project."##),
+        Authenticate using an [OAuth access
+        token](https://developers.google.com/identity/protocols/OAuth2) from a
+        signed-in user with **Is owner** or **Can edit** permissions in the Google
+        Developers Console project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1_cli/beacons_update",
                   vec![
                     (Some(r##"beacon-name"##),
@@ -1908,9 +1922,10 @@ fn main() {
         project. Attachment data associated with a beacon must include a
         namespaced type, and the namespace must be owned by your project.
         
-        Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-        from a signed-in user with **viewer**, **Is owner** or **Can edit**
-        permissions in the Google Developers Console project."##),
+        Authenticate using an [OAuth access
+        token](https://developers.google.com/identity/protocols/OAuth2) from a
+        signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
+        the Google Developers Console project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1_cli/namespaces_list",
                   vec![
                     (Some(r##"v"##),
@@ -1961,7 +1976,7 @@ fn main() {
     
     let mut app = App::new("proximitybeacon1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190323")
+           .version("1.0.13+20200127")
            .about("Registers, manages, indexes, and searches beacons.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1_cli")
            .arg(Arg::with_name("url")

@@ -46,6 +46,574 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
+    fn _projects_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().operations_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_sites_channels_releases_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.status" => Some(("version.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.delete-user.image-url" => Some(("version.deleteUser.imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.delete-user.email" => Some(("version.deleteUser.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.name" => Some(("version.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.version-bytes" => Some(("version.versionBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.labels" => Some(("version.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "version.finalize-user.image-url" => Some(("version.finalizeUser.imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.finalize-user.email" => Some(("version.finalizeUser.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.finalize-time" => Some(("version.finalizeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.create-user.image-url" => Some(("version.createUser.imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.create-user.email" => Some(("version.createUser.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.config.clean-urls" => Some(("version.config.cleanUrls", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "version.config.trailing-slash-behavior" => Some(("version.config.trailingSlashBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.config.app-association" => Some(("version.config.appAssociation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.preview.active" => Some(("version.preview.active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "version.preview.expire-time" => Some(("version.preview.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.delete-time" => Some(("version.deleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.create-time" => Some(("version.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.file-count" => Some(("version.fileCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "release-user.image-url" => Some(("releaseUser.imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "release-user.email" => Some(("releaseUser.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message" => Some(("message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "release-time" => Some(("releaseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active", "app-association", "clean-urls", "config", "create-time", "create-user", "delete-time", "delete-user", "email", "expire-time", "file-count", "finalize-time", "finalize-user", "image-url", "labels", "message", "name", "preview", "release-time", "release-user", "status", "trailing-slash-behavior", "type", "version", "version-bytes"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Release = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().sites_channels_releases_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "version-name" => {
+                    call = call.version_name(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["version-name"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_sites_channels_releases_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().sites_channels_releases_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_sites_releases_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.status" => Some(("version.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.delete-user.image-url" => Some(("version.deleteUser.imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.delete-user.email" => Some(("version.deleteUser.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.name" => Some(("version.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.version-bytes" => Some(("version.versionBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.labels" => Some(("version.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "version.finalize-user.image-url" => Some(("version.finalizeUser.imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.finalize-user.email" => Some(("version.finalizeUser.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.finalize-time" => Some(("version.finalizeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.create-user.image-url" => Some(("version.createUser.imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.create-user.email" => Some(("version.createUser.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.config.clean-urls" => Some(("version.config.cleanUrls", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "version.config.trailing-slash-behavior" => Some(("version.config.trailingSlashBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.config.app-association" => Some(("version.config.appAssociation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.preview.active" => Some(("version.preview.active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "version.preview.expire-time" => Some(("version.preview.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.delete-time" => Some(("version.deleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.create-time" => Some(("version.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.file-count" => Some(("version.fileCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "release-user.image-url" => Some(("releaseUser.imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "release-user.email" => Some(("releaseUser.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message" => Some(("message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "release-time" => Some(("releaseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active", "app-association", "clean-urls", "config", "create-time", "create-user", "delete-time", "delete-user", "email", "expire-time", "file-count", "finalize-time", "finalize-user", "image-url", "labels", "message", "name", "preview", "release-time", "release-user", "status", "trailing-slash-behavior", "type", "version", "version-bytes"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Release = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().sites_releases_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "version-name" => {
+                    call = call.version_name(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["version-name"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_sites_releases_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().sites_releases_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _sites_channels_releases_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.status" => Some(("version.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.delete-user.image-url" => Some(("version.deleteUser.imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.delete-user.email" => Some(("version.deleteUser.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.name" => Some(("version.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.version-bytes" => Some(("version.versionBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.labels" => Some(("version.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "version.finalize-user.image-url" => Some(("version.finalizeUser.imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.finalize-user.email" => Some(("version.finalizeUser.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.finalize-time" => Some(("version.finalizeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.create-user.image-url" => Some(("version.createUser.imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.create-user.email" => Some(("version.createUser.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.config.clean-urls" => Some(("version.config.cleanUrls", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "version.config.trailing-slash-behavior" => Some(("version.config.trailingSlashBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.config.app-association" => Some(("version.config.appAssociation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.preview.active" => Some(("version.preview.active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "version.preview.expire-time" => Some(("version.preview.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.delete-time" => Some(("version.deleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.create-time" => Some(("version.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.file-count" => Some(("version.fileCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "release-user.image-url" => Some(("releaseUser.imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "release-user.email" => Some(("releaseUser.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message" => Some(("message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "release-time" => Some(("releaseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active", "app-association", "clean-urls", "config", "create-time", "create-user", "delete-time", "delete-user", "email", "expire-time", "file-count", "finalize-time", "finalize-user", "image-url", "labels", "message", "name", "preview", "release-time", "release-user", "status", "trailing-slash-behavior", "type", "version", "version-bytes"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Release = json::value::from_value(object).unwrap();
+        let mut call = self.hub.sites().channels_releases_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "version-name" => {
+                    call = call.version_name(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["version-name"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _sites_channels_releases_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.sites().channels_releases_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _sites_domains_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -499,6 +1067,8 @@ impl<'n> Engine<'n> {
                     "version.config.clean-urls" => Some(("version.config.cleanUrls", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "version.config.trailing-slash-behavior" => Some(("version.config.trailingSlashBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version.config.app-association" => Some(("version.config.appAssociation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version.preview.active" => Some(("version.preview.active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "version.preview.expire-time" => Some(("version.preview.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version.delete-time" => Some(("version.deleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version.create-time" => Some(("version.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version.file-count" => Some(("version.fileCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -508,7 +1078,7 @@ impl<'n> Engine<'n> {
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "release-time" => Some(("releaseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-association", "clean-urls", "config", "create-time", "create-user", "delete-time", "delete-user", "email", "file-count", "finalize-time", "finalize-user", "image-url", "labels", "message", "name", "release-time", "release-user", "status", "trailing-slash-behavior", "type", "version", "version-bytes"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active", "app-association", "clean-urls", "config", "create-time", "create-user", "delete-time", "delete-user", "email", "expire-time", "file-count", "finalize-time", "finalize-user", "image-url", "labels", "message", "name", "preview", "release-time", "release-user", "status", "trailing-slash-behavior", "type", "version", "version-bytes"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -720,6 +1290,91 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _sites_versions_clone(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "source-version" => Some(("sourceVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude.regexes" => Some(("exclude.regexes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "include.regexes" => Some(("include.regexes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "finalize" => Some(("finalize", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["exclude", "finalize", "include", "regexes", "source-version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CloneVersionRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.sites().versions_clone(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _sites_versions_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -757,11 +1412,13 @@ impl<'n> Engine<'n> {
                     "config.clean-urls" => Some(("config.cleanUrls", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.trailing-slash-behavior" => Some(("config.trailingSlashBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.app-association" => Some(("config.appAssociation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "preview.active" => Some(("preview.active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "preview.expire-time" => Some(("preview.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delete-time" => Some(("deleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "file-count" => Some(("fileCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-association", "clean-urls", "config", "create-time", "create-user", "delete-time", "delete-user", "email", "file-count", "finalize-time", "finalize-user", "image-url", "labels", "name", "status", "trailing-slash-behavior", "version-bytes"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active", "app-association", "clean-urls", "config", "create-time", "create-user", "delete-time", "delete-user", "email", "expire-time", "file-count", "finalize-time", "finalize-user", "image-url", "labels", "name", "preview", "status", "trailing-slash-behavior", "version-bytes"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -942,6 +1599,65 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _sites_versions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.sites().versions_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _sites_versions_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -979,11 +1695,13 @@ impl<'n> Engine<'n> {
                     "config.clean-urls" => Some(("config.cleanUrls", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.trailing-slash-behavior" => Some(("config.trailingSlashBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.app-association" => Some(("config.appAssociation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "preview.active" => Some(("preview.active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "preview.expire-time" => Some(("preview.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delete-time" => Some(("deleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "file-count" => Some(("fileCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-association", "clean-urls", "config", "create-time", "create-user", "delete-time", "delete-user", "email", "file-count", "finalize-time", "finalize-user", "image-url", "labels", "name", "status", "trailing-slash-behavior", "version-bytes"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active", "app-association", "clean-urls", "config", "create-time", "create-user", "delete-time", "delete-user", "email", "expire-time", "file-count", "finalize-time", "finalize-user", "image-url", "labels", "name", "preview", "status", "trailing-slash-behavior", "version-bytes"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1137,8 +1855,37 @@ impl<'n> Engine<'n> {
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
+            ("projects", Some(opt)) => {
+                match opt.subcommand() {
+                    ("operations-get", Some(opt)) => {
+                        call_result = self._projects_operations_get(opt, dry_run, &mut err);
+                    },
+                    ("sites-channels-releases-create", Some(opt)) => {
+                        call_result = self._projects_sites_channels_releases_create(opt, dry_run, &mut err);
+                    },
+                    ("sites-channels-releases-list", Some(opt)) => {
+                        call_result = self._projects_sites_channels_releases_list(opt, dry_run, &mut err);
+                    },
+                    ("sites-releases-create", Some(opt)) => {
+                        call_result = self._projects_sites_releases_create(opt, dry_run, &mut err);
+                    },
+                    ("sites-releases-list", Some(opt)) => {
+                        call_result = self._projects_sites_releases_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("projects".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("sites", Some(opt)) => {
                 match opt.subcommand() {
+                    ("channels-releases-create", Some(opt)) => {
+                        call_result = self._sites_channels_releases_create(opt, dry_run, &mut err);
+                    },
+                    ("channels-releases-list", Some(opt)) => {
+                        call_result = self._sites_channels_releases_list(opt, dry_run, &mut err);
+                    },
                     ("domains-create", Some(opt)) => {
                         call_result = self._sites_domains_create(opt, dry_run, &mut err);
                     },
@@ -1166,6 +1913,9 @@ impl<'n> Engine<'n> {
                     ("update-config", Some(opt)) => {
                         call_result = self._sites_update_config(opt, dry_run, &mut err);
                     },
+                    ("versions-clone", Some(opt)) => {
+                        call_result = self._sites_versions_clone(opt, dry_run, &mut err);
+                    },
                     ("versions-create", Some(opt)) => {
                         call_result = self._sites_versions_create(opt, dry_run, &mut err);
                     },
@@ -1174,6 +1924,9 @@ impl<'n> Engine<'n> {
                     },
                     ("versions-files-list", Some(opt)) => {
                         call_result = self._sites_versions_files_list(opt, dry_run, &mut err);
+                    },
+                    ("versions-list", Some(opt)) => {
+                        call_result = self._sites_versions_list(opt, dry_run, &mut err);
                     },
                     ("versions-patch", Some(opt)) => {
                         call_result = self._sites_versions_patch(opt, dry_run, &mut err);
@@ -1272,7 +2025,193 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("sites", "methods: 'domains-create', 'domains-delete', 'domains-get', 'domains-list', 'domains-update', 'get-config', 'releases-create', 'releases-list', 'update-config', 'versions-create', 'versions-delete', 'versions-files-list', 'versions-patch' and 'versions-populate-files'", vec![
+        ("projects", "methods: 'operations-get', 'sites-channels-releases-create', 'sites-channels-releases-list', 'sites-releases-create' and 'sites-releases-list'", vec![
+            ("operations-get",
+                    Some(r##"Gets the latest state of a long-running operation.  Clients can use this
+        method to poll the operation result at intervals as recommended by the API
+        service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firebasehosting1_beta1_cli/projects_operations-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the operation resource."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("sites-channels-releases-create",
+                    Some(r##"Creates a new release which makes the content of the specified version
+        actively display on the appropriate URL(s)."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firebasehosting1_beta1_cli/projects_sites-channels-releases-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The site that the release belongs to, in the format:
+        <code>sites/<var>site-name</var></code>"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("sites-channels-releases-list",
+                    Some(r##"Lists the releases that have been created on the specified site."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firebasehosting1_beta1_cli/projects_sites-channels-releases-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent for which to list files, in the format:
+        <code>sites/<var>site-name</var></code>"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("sites-releases-create",
+                    Some(r##"Creates a new release which makes the content of the specified version
+        actively display on the appropriate URL(s)."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firebasehosting1_beta1_cli/projects_sites-releases-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The site that the release belongs to, in the format:
+        <code>sites/<var>site-name</var></code>"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("sites-releases-list",
+                    Some(r##"Lists the releases that have been created on the specified site."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firebasehosting1_beta1_cli/projects_sites-releases-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent for which to list files, in the format:
+        <code>sites/<var>site-name</var></code>"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("sites", "methods: 'channels-releases-create', 'channels-releases-list', 'domains-create', 'domains-delete', 'domains-get', 'domains-list', 'domains-update', 'get-config', 'releases-create', 'releases-list', 'update-config', 'versions-clone', 'versions-create', 'versions-delete', 'versions-files-list', 'versions-list', 'versions-patch' and 'versions-populate-files'", vec![
+            ("channels-releases-create",
+                    Some(r##"Creates a new release which makes the content of the specified version
+        actively display on the appropriate URL(s)."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firebasehosting1_beta1_cli/sites_channels-releases-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The site that the release belongs to, in the format:
+        <code>sites/<var>site-name</var></code>"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("channels-releases-list",
+                    Some(r##"Lists the releases that have been created on the specified site."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firebasehosting1_beta1_cli/sites_channels-releases-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent for which to list files, in the format:
+        <code>sites/<var>site-name</var></code>"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("domains-create",
                     Some(r##"Creates a domain mapping on the specified site."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebasehosting1_beta1_cli/sites_domains-create",
@@ -1424,7 +2363,7 @@ fn main() {
                   ]),
             ("releases-create",
                     Some(r##"Creates a new release which makes the content of the specified version
-        actively display on the site."##),
+        actively display on the appropriate URL(s)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebasehosting1_beta1_cli/sites_releases-create",
                   vec![
                     (Some(r##"parent"##),
@@ -1483,6 +2422,36 @@ fn main() {
                      None,
                      Some(r##"Required. The site for which to update the SiteConfig, in the format:
         <code>sites/<var>site-name</var>/config</code>"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("versions-clone",
+                    Some(r##"Creates a new version on the target site using the content
+        of the specified version."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firebasehosting1_beta1_cli/sites_versions-clone",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The target site where the cloned version will reside,
+        in the format: `sites/{site}`"##),
                      Some(true),
                      Some(false)),
         
@@ -1579,6 +2548,30 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("versions-list",
+                    Some(r##"Lists the versions that have been created on the specified site.
+        Will include filtering in the future."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firebasehosting1_beta1_cli/sites_versions-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent for which to list files, in the format:
+        <code>sites/<var>site-name</var></code>"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("versions-patch",
                     Some(r##"Updates the specified metadata for a version. Note that this method will
         fail with `FAILED_PRECONDITION` in the event of an invalid state
@@ -1650,7 +2643,7 @@ fn main() {
     
     let mut app = App::new("firebasehosting1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190626")
+           .version("1.0.13+20200325")
            .about("The Firebase Hosting REST API enables programmatic and customizable deployments to your Firebase-hosted sites. Use this REST API to deploy new or updated hosting configurations and content files.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebasehosting1_beta1_cli")
            .arg(Arg::with_name("url")

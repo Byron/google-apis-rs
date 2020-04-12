@@ -3558,7 +3558,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name/identifier of the Lien to delete."##),
+                     Some(r##"Required. The name/identifier of the Lien to delete."##),
                      Some(true),
                      Some(false)),
         
@@ -3585,7 +3585,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name/identifier of the Lien."##),
+                     Some(r##"Required. The name/identifier of the Lien."##),
                      Some(true),
                      Some(false)),
         
@@ -4018,13 +4018,10 @@ fn main() {
                   ]),
             ("create",
                     Some(r##"Request that a new Project be created. The result is an Operation which
-        can be used to track the creation process. It is automatically deleted
-        after a few hours, so there is no need to call DeleteOperation.
-        
-        Our SLO permits Project creation to take up to 30 seconds at the 90th
-        percentile. As of 2016-08-29, we are observing 6 seconds 50th percentile
-        latency. 95th percentile latency is around 11 seconds. We recommend
-        polling at the 5th second with an exponential backoff.
+        can be used to track the creation process. This process usually takes a few
+        seconds, but can sometimes take much longer. The tracking Operation is
+        automatically deleted after a few hours, so there is no need to call
+        DeleteOperation.
         
         Authorization requires the Google IAM permission
         `resourcemanager.projects.create` on the specified parent for the new
@@ -4356,7 +4353,11 @@ fn main() {
         + Project does not support `allUsers` and `allAuthenticatedUsers` as
         `members` in a `Binding` of a `Policy`.
         
-        + The owner role can be granted only to `user` and `serviceAccount`.
+        + The owner role can be granted to a `user`, `serviceAccount`, or a group
+        that is part of an organization. For example,
+        group@myownpersonaldomain.com could be added as an owner to a project in
+        the myownpersonaldomain.com organization, but not the examplepetstore.com
+        organization.
         
         + Service accounts can be made owners of a project directly
         without any restrictions. However, to be added as an owner, a user must be
@@ -4558,7 +4559,7 @@ fn main() {
     
     let mut app = App::new("cloudresourcemanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190701")
+           .version("1.0.13+20200408")
            .about("Creates, reads, and updates metadata for Google Cloud Platform resource containers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli")
            .arg(Arg::with_name("url")

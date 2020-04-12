@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Access Approval* API at revision *20190628*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Access Approval* API at revision *20200409*. The CLI is at version *1.0.13*.
 
 ```bash
 accessapproval1-beta1 [options]
@@ -34,6 +34,7 @@ accessapproval1-beta1 [options]
                 approval-requests-dismiss <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 approval-requests-get <name> [-p <v>]... [-o <out>]
                 approval-requests-list <parent> [-p <v>]... [-o <out>]
+                delete-access-approval-settings <name> [-p <v>]... [-o <out>]
                 get-access-approval-settings <name> [-p <v>]... [-o <out>]
                 update-access-approval-settings <name> (-r <kv>)... [-p <v>]... [-o <out>]
         organizations
@@ -41,6 +42,7 @@ accessapproval1-beta1 [options]
                 approval-requests-dismiss <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 approval-requests-get <name> [-p <v>]... [-o <out>]
                 approval-requests-list <parent> [-p <v>]... [-o <out>]
+                delete-access-approval-settings <name> [-p <v>]... [-o <out>]
                 get-access-approval-settings <name> [-p <v>]... [-o <out>]
                 update-access-approval-settings <name> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
@@ -48,6 +50,7 @@ accessapproval1-beta1 [options]
                 approval-requests-dismiss <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 approval-requests-get <name> [-p <v>]... [-o <out>]
                 approval-requests-list <parent> [-p <v>]... [-o <out>]
+                delete-access-approval-settings <name> [-p <v>]... [-o <out>]
                 get-access-approval-settings <name> [-p <v>]... [-o <out>]
                 update-access-approval-settings <name> (-r <kv>)... [-p <v>]... [-o <out>]
   accessapproval1-beta1 --help

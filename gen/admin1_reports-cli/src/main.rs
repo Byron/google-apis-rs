@@ -682,12 +682,12 @@ fn main() {
     let arg_data = [
         ("activities", "methods: 'list' and 'watch'", vec![
             ("list",
-                    Some(r##"Retrieves a list of activities for a specific customer and application."##),
+                    Some(r##"Retrieves a list of activities for a specific customer's account and application such as the Admin console application or the Google Drive application. For more information, see the guides for administrator and Google Drive activity reports. For more information about the activity report's parameters, see the activity parameters reference guides."##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_reports_cli/activities_list",
                   vec![
                     (Some(r##"user-key"##),
                      None,
-                     Some(r##"Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users."##),
+                     Some(r##"Represents the profile ID or the user email for which the data should be filtered. Can be all for all information, or userKey for a user's unique G Suite profile ID or their primary email address."##),
                      Some(true),
                      Some(false)),
         
@@ -710,12 +710,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("watch",
-                    Some(r##"Push changes to activities"##),
+                    Some(r##"Start receiving notifications for account activities. For more information, see Receiving Push Notifications."##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_reports_cli/activities_watch",
                   vec![
                     (Some(r##"user-key"##),
                      None,
-                     Some(r##"Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users."##),
+                     Some(r##"Represents the profile ID or the user email for which the data should be filtered. Can be all for all information, or userKey for a user's unique G Suite profile ID or their primary email address."##),
                      Some(true),
                      Some(false)),
         
@@ -766,12 +766,12 @@ fn main() {
         
         ("customer-usage-reports", "methods: 'get'", vec![
             ("get",
-                    Some(r##"Retrieves a report which is a collection of properties / statistics for a specific customer."##),
+                    Some(r##"Retrieves a report which is a collection of properties and statistics for a specific customer's account. For more information, see the Customers Usage Report guide. For more information about the customer report's parameters, see the Customers Usage parameters reference guides."##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_reports_cli/customer-usage-reports_get",
                   vec![
                     (Some(r##"date"##),
                      None,
-                     Some(r##"Represents the date in yyyy-mm-dd format for which the data is to be fetched."##),
+                     Some(r##"Represents the date the usage occurred. The timestamp is in the ISO 8601 format, yyyy-mm-dd. We recommend you use your account's time zone for this."##),
                      Some(true),
                      Some(false)),
         
@@ -791,24 +791,24 @@ fn main() {
         
         ("entity-usage-reports", "methods: 'get'", vec![
             ("get",
-                    Some(r##"Retrieves a report which is a collection of properties / statistics for a set of objects."##),
+                    Some(r##"Retrieves a report which is a collection of properties and statistics for entities used by users within the account. For more information, see the Entities Usage Report guide. For more information about the entities report's parameters, see the Entities Usage parameters reference guides."##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_reports_cli/entity-usage-reports_get",
                   vec![
                     (Some(r##"entity-type"##),
                      None,
-                     Some(r##"Type of object. Should be one of - gplus_communities."##),
+                     Some(r##"Represents the type of entity for the report."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"entity-key"##),
                      None,
-                     Some(r##"Represents the key of object for which the data should be filtered."##),
+                     Some(r##"Represents the key of the object to filter the data with."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"date"##),
                      None,
-                     Some(r##"Represents the date in yyyy-mm-dd format for which the data is to be fetched."##),
+                     Some(r##"Represents the date the usage occurred. The timestamp is in the ISO 8601 format, yyyy-mm-dd. We recommend you use your account's time zone for this."##),
                      Some(true),
                      Some(false)),
         
@@ -828,18 +828,18 @@ fn main() {
         
         ("user-usage-report", "methods: 'get'", vec![
             ("get",
-                    Some(r##"Retrieves a report which is a collection of properties / statistics for a set of users."##),
+                    Some(r##"Retrieves a report which is a collection of properties and statistics for a set of users with the account. For more information, see the User Usage Report guide. For more information about the user report's parameters, see the Users Usage parameters reference guides."##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_reports_cli/user-usage-report_get",
                   vec![
                     (Some(r##"user-key"##),
                      None,
-                     Some(r##"Represents the profile id or the user email for which the data should be filtered."##),
+                     Some(r##"Represents the profile ID or the user email for which the data should be filtered. Can be all for all information, or userKey for a user's unique G Suite profile ID or their primary email address."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"date"##),
                      None,
-                     Some(r##"Represents the date in yyyy-mm-dd format for which the data is to be fetched."##),
+                     Some(r##"Represents the date the usage occurred. The timestamp is in the ISO 8601 format, yyyy-mm-dd. We recommend you use your account's time zone for this."##),
                      Some(true),
                      Some(false)),
         
@@ -861,7 +861,7 @@ fn main() {
     
     let mut app = App::new("admin1-reports")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190521")
+           .version("1.0.13+20191014")
            .about("Fetches reports for the administrators of G Suite customers about the usage, collaboration, security, and risk for their users.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_admin1_reports_cli")
            .arg(Arg::with_name("url")

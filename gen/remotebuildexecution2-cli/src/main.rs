@@ -1229,6 +1229,9 @@ fn main() {
         Clients can use this API before uploading blobs to determine which ones are
         already present in the CAS and do not need to be uploaded again.
         
+        Servers SHOULD increase the TTLs of the referenced blobs if necessary and
+        applicable.
+        
         There are no method-specific errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_remotebuildexecution2_cli/blobs_find-missing",
                   vec![
@@ -1280,6 +1283,8 @@ fn main() {
         
         If part of the tree is missing from the CAS, the server will return the
         portion present and omit the rest.
+        
+        Errors:
         
         * `NOT_FOUND`: The requested tree root is not present in the CAS."##),
                     "Details at http://byron.github.io/google-apis-rs/google_remotebuildexecution2_cli/blobs_get-tree",
@@ -1398,7 +1403,7 @@ fn main() {
     
     let mut app = App::new("remotebuildexecution2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190702")
+           .version("1.0.13+20200408")
            .about("Supplies a Remote Execution API service for tools such as bazel.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_remotebuildexecution2_cli")
            .arg(Arg::with_name("url")

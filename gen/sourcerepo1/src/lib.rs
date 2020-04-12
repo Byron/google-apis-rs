@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Source Repositories* crate version *1.0.12+20190611*, where *20190611* is the exact revision of the *sourcerepo:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Cloud Source Repositories* crate version *1.0.13+20200121*, where *20200121* is the exact revision of the *sourcerepo:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Cloud Source Repositories* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/source-repositories/docs/apis).
@@ -343,7 +343,7 @@ impl<'a, C, A> CloudSourceRepositories<C, A>
         CloudSourceRepositories {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://sourcerepo.googleapis.com/".to_string(),
             _root_url: "https://sourcerepo.googleapis.com/".to_string(),
         }
@@ -354,7 +354,7 @@ impl<'a, C, A> CloudSourceRepositories<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -391,7 +391,7 @@ impl<'a, C, A> CloudSourceRepositories<C, A>
 ///     {
 ///       "log_type": "DATA_READ",
 ///       "exempted_members": [
-///         "user:foo@gmail.com"
+///         "user:jose@example.com"
 ///       ]
 ///     },
 ///     {
@@ -402,7 +402,7 @@ impl<'a, C, A> CloudSourceRepositories<C, A>
 /// ````
 /// 
 /// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
-/// foo@gmail.com from DATA_READ logging.
+/// jose@example.com from DATA_READ logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -469,30 +469,59 @@ pub struct SetIamPolicyRequest {
 impl RequestValue for SetIamPolicyRequest {}
 
 
-/// Represents an expression text. Example:
+/// Represents a textual expression in the Common Expression Language (CEL)
+/// syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+/// are documented at https://github.com/google/cel-spec.
+/// 
+/// Example (Comparison):
 /// 
 /// ````text
-/// title: "User account presence"
-/// description: "Determines whether the request has a user account"
-/// expression: "size(request.user) > 0"
+/// title: "Summary size limit"
+/// description: "Determines if a summary is less than 100 chars"
+/// expression: "document.summary.size() < 100"
 /// ````
+/// 
+/// Example (Equality):
+/// 
+/// ````text
+/// title: "Requestor is owner"
+/// description: "Determines if requestor is the document owner"
+/// expression: "document.owner == request.auth.claims.email"
+/// ````
+/// 
+/// Example (Logic):
+/// 
+/// ````text
+/// title: "Public documents"
+/// description: "Determine whether the document should be publicly visible"
+/// expression: "document.type != 'private' && document.type != 'internal'"
+/// ````
+/// 
+/// Example (Data Manipulation):
+/// 
+/// ````text
+/// title: "Notification string"
+/// description: "Create a notification string with a timestamp."
+/// expression: "'New message received at ' + string(document.create_time)"
+/// ````
+/// 
+/// The exact variables and functions that may be referenced within an expression
+/// are determined by the service that evaluates it. See the service
+/// documentation for additional information.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
-    /// An optional description of the expression. This is a longer text which
+    /// Optional. Description of the expression. This is a longer text which
     /// describes the expression, e.g. when hovered over it in a UI.
     pub description: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
+    /// Textual representation of an expression in Common Expression Language
+    /// syntax.
     pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error
+    /// Optional. String indicating the location of the expression for error
     /// reporting, e.g. a file name and a position in the file.
     pub location: Option<String>,
-    /// An optional title for the expression, i.e. a short string describing
+    /// Optional. Title for the expression, i.e. a short string describing
     /// its purpose. This can be used e.g. in UIs which allow to enter the
     /// expression.
     pub title: Option<String>,
@@ -526,37 +555,50 @@ pub struct MirrorConfig {
 impl Part for MirrorConfig {}
 
 
-/// Defines an Identity and Access Management (IAM) policy. It is used to
-/// specify access control policies for Cloud Platform resources.
+/// An Identity and Access Management (IAM) policy, which specifies access
+/// controls for Google Cloud resources.
 /// 
-/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
-/// `members` to a `role`, where the members can be user accounts, Google groups,
-/// Google domains, and service accounts. A `role` is a named list of permissions
-/// defined by IAM.
+/// A `Policy` is a collection of `bindings`. A `binding` binds one or more
+/// `members` to a single `role`. Members can be user accounts, service accounts,
+/// Google groups, and domains (such as G Suite). A `role` is a named list of
+/// permissions; each `role` can be an IAM predefined role or a user-created
+/// custom role.
 /// 
-/// **JSON Example**
+/// Optionally, a `binding` can specify a `condition`, which is a logical
+/// expression that allows access to a resource only if the expression evaluates
+/// to `true`. A condition can add constraints based on attributes of the
+/// request, the resource, or both.
+/// 
+/// **JSON example:**
 /// 
 /// ````text
 /// {
 ///   "bindings": [
 ///     {
-///       "role": "roles/owner",
+///       "role": "roles/resourcemanager.organizationAdmin",
 ///       "members": [
 ///         "user:mike@example.com",
 ///         "group:admins@example.com",
 ///         "domain:google.com",
-///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
+///         "serviceAccount:my-project-id@appspot.gserviceaccount.com"
 ///       ]
 ///     },
 ///     {
-///       "role": "roles/viewer",
-///       "members": ["user:sean@example.com"]
+///       "role": "roles/resourcemanager.organizationViewer",
+///       "members": ["user:eve@example.com"],
+///       "condition": {
+///         "title": "expirable access",
+///         "description": "Does not grant access after Sep 2020",
+///         "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')",
+///       }
 ///     }
-///   ]
+///   ],
+///   "etag": "BwWWja0YfJA=",
+///   "version": 3
 /// }
 /// ````
 /// 
-/// **YAML Example**
+/// **YAML example:**
 /// 
 /// ````text
 /// bindings:
@@ -564,15 +606,21 @@ impl Part for MirrorConfig {}
 ///   - user:mike@example.com
 ///   - group:admins@example.com
 ///   - domain:google.com
-///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///   role: roles/owner
+///   - serviceAccount:my-project-id@appspot.gserviceaccount.com
+///   role: roles/resourcemanager.organizationAdmin
 /// - members:
-///   - user:sean@example.com
-///   role: roles/viewer
+///   - user:eve@example.com
+///   role: roles/resourcemanager.organizationViewer
+///   condition:
+///     title: expirable access
+///     description: Does not grant access after Sep 2020
+///     expression: request.time < timestamp('2020-10-01T00:00:00.000Z')
+/// - etag: BwWWja0YfJA=
+/// - version: 3
 /// ````
 /// 
 /// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam/docs).
+/// [IAM documentation](https://cloud.google.com/iam/docs/).
 /// 
 /// # Activities
 /// 
@@ -594,13 +642,36 @@ pub struct Policy {
     /// systems are expected to put that etag in the request to `setIamPolicy` to
     /// ensure that their change will be applied to the same version of the policy.
     /// 
-    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
-    /// policy is overwritten blindly.
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
     pub etag: Option<String>,
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
+    /// Associates a list of `members` to a `role`. Optionally, may specify a
+    /// `condition` that determines how and when the `bindings` are applied. Each
+    /// of the `bindings` must contain at least one member.
     pub bindings: Option<Vec<Binding>>,
-    /// Deprecated.
+    /// Specifies the format of the policy.
+    /// 
+    /// Valid values are `0`, `1`, and `3`. Requests that specify an invalid value
+    /// are rejected.
+    /// 
+    /// Any operation that affects conditional role bindings must specify version
+    /// `3`. This requirement applies to the following operations:
+    /// 
+    /// * Getting a policy that includes a conditional role binding
+    /// * Adding a conditional role binding to a policy
+    /// * Changing a conditional role binding in a policy
+    /// * Removing any role binding, with or without a condition, from a policy
+    ///   that includes conditions
+    /// 
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
+    /// 
+    /// If a policy does not include any conditions, operations on that policy may
+    /// specify any valid version or leave the field unset.
     pub version: Option<i32>,
 }
 
@@ -763,7 +834,7 @@ pub struct Binding {
     ///    who is authenticated with a Google account or a service account.
     /// 
     /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` .
+    ///    account. For example, `alice@example.com` .
     /// 
     /// 
     /// * `serviceAccount:{emailid}`: An email address that represents a service
@@ -771,6 +842,26 @@ pub struct Binding {
     /// 
     /// * `group:{emailid}`: An email address that represents a Google group.
     ///    For example, `admins@example.com`.
+    /// 
+    /// * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a user that has been recently deleted. For
+    ///    example, `alice@example.com?uid=123456789012345678901`. If the user is
+    ///    recovered, this value reverts to `user:{emailid}` and the recovered user
+    ///    retains the role in the binding.
+    /// 
+    /// * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus
+    ///    unique identifier) representing a service account that has been recently
+    ///    deleted. For example,
+    ///    `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.
+    ///    If the service account is undeleted, this value reverts to
+    ///    `serviceAccount:{emailid}` and the undeleted service account retains the
+    ///    role in the binding.
+    /// 
+    /// * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a Google group that has been recently
+    ///    deleted. For example, `admins@example.com?uid=123456789012345678901`. If
+    ///    the group is recovered, this value reverts to `group:{emailid}` and the
+    ///    recovered group retains the role in the binding.
     /// 
     /// 
     /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
@@ -841,7 +932,7 @@ impl ResponseResult for Repo {}
 ///         {
 ///           "log_type": "DATA_READ",
 ///           "exempted_members": [
-///             "user:foo@gmail.com"
+///             "user:jose@example.com"
 ///           ]
 ///         },
 ///         {
@@ -853,7 +944,7 @@ impl ResponseResult for Repo {}
 ///       ]
 ///     },
 ///     {
-///       "service": "fooservice.googleapis.com"
+///       "service": "sampleservice.googleapis.com"
 ///       "audit_log_configs": [
 ///         {
 ///           "log_type": "DATA_READ",
@@ -861,7 +952,7 @@ impl ResponseResult for Repo {}
 ///         {
 ///           "log_type": "DATA_WRITE",
 ///           "exempted_members": [
-///             "user:bar@gmail.com"
+///             "user:aliya@example.com"
 ///           ]
 ///         }
 ///       ]
@@ -870,9 +961,9 @@ impl ResponseResult for Repo {}
 /// }
 /// ````
 /// 
-/// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
-/// logging. It also exempts foo@gmail.com from DATA_READ logging, and
-/// bar@gmail.com from DATA_WRITE logging.
+/// For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
+/// logging. It also exempts jose@example.com from DATA_READ logging, and
+/// aliya@example.com from DATA_WRITE logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1162,6 +1253,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectRepoGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2681,6 +2773,7 @@ impl<'a, C, A> ProjectRepoPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().repos_get_iam_policy("resource")
+///              .options_requested_policy_version(-70)
 ///              .doit();
 /// # }
 /// ```
@@ -2689,6 +2782,7 @@ pub struct ProjectRepoGetIamPolicyCall<'a, C, A>
 
     hub: &'a CloudSourceRepositories<C, A>,
     _resource: String,
+    _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -2711,9 +2805,12 @@ impl<'a, C, A> ProjectRepoGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "sourcerepo.projects.repos.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        if let Some(value) = self._options_requested_policy_version {
+            params.push(("options.requestedPolicyVersion", value.to_string()));
+        }
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2837,6 +2934,20 @@ impl<'a, C, A> ProjectRepoGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::C
     /// we provide this method for API completeness.
     pub fn resource(mut self, new_value: &str) -> ProjectRepoGetIamPolicyCall<'a, C, A> {
         self._resource = new_value.to_string();
+        self
+    }
+    /// Optional. The policy format version to be returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectRepoGetIamPolicyCall<'a, C, A> {
+        self._options_requested_policy_version = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -3214,8 +3325,8 @@ impl<'a, C, A> ProjectRepoCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().repos_list("name")
-///              .page_token("erat")
-///              .page_size(-35)
+///              .page_token("labore")
+///              .page_size(-9)
 ///              .doit();
 /// # }
 /// ```

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Ad Exchange Buyer* crate version *1.0.12+20190614*, where *20190614* is the exact revision of the *adexchangebuyer:v1.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Ad Exchange Buyer* crate version *1.0.13+20191204*, where *20191204* is the exact revision of the *adexchangebuyer:v1.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Ad Exchange Buyer* *v1d3* API can be found at the
 //! [official documentation site](https://developers.google.com/ad-exchange/buyer-rest).
@@ -344,7 +344,7 @@ impl<'a, C, A> AdExchangeBuyer<C, A>
         AdExchangeBuyer {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://www.googleapis.com/adexchangebuyer/v1.3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -373,7 +373,7 @@ impl<'a, C, A> AdExchangeBuyer<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -639,10 +639,10 @@ impl ResponseResult for AccountsList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeAdTechnologyProviders {
-    /// no description provided
+    /// Whether the creative contains an unidentified ad technology provider. If true, a bid submitted for a European Economic Area (EEA) user with this creative is not compliant with the GDPR policies as mentioned in the "Third-party Ad Technology Vendors" section of Authorized Buyers Program Guidelines.
     #[serde(rename="hasUnidentifiedProvider")]
     pub has_unidentified_provider: Option<bool>,
-    /// no description provided
+    /// The detected ad technology provider IDs for this creative. See https://storage.googleapis.com/adx-rtb-dictionaries/providers.csv for mapping of provider ID to provided name, a privacy policy URL, and a list of domains which can be attributed to the provider. If this creative contains provider IDs that are outside of those listed in the `BidRequest.adslot.consented_providers_settings.consented_providers` field on the  Authorized Buyers Real-Time Bidding protocol or the `BidRequest.user.ext.consented_providers_settings.consented_providers` field on the OpenRTB protocol, a bid submitted for a European Economic Area (EEA) user with this creative is not compliant with the GDPR policies as mentioned in the "Third-party Ad Technology Vendors" section of Authorized Buyers Program Guidelines.
     #[serde(rename="detectedProviderIds")]
     pub detected_provider_ids: Option<Vec<String>>,
 }
@@ -1040,6 +1040,9 @@ impl ResponseResult for BillingInfoList {}
 pub struct PretargetingConfig {
     /// The kind of the resource, i.e. "adexchangebuyer#pretargetingConfig".
     pub kind: Option<String>,
+    /// The maximum QPS allocated to this pretargeting configuration, used for pretargeting-level QPS limits. By default, this is not set, which indicates that there is no QPS limit at the configuration level (a global or account-level limit may still be imposed).
+    #[serde(rename="maximumQps")]
+    pub maximum_qps: Option<String>,
     /// Requests containing any of these vertical ids will match.
     pub verticals: Option<Vec<String>>,
     /// Requests matching any of these platforms will match. Possible values are PRETARGETING_PLATFORM_MOBILE, PRETARGETING_PLATFORM_DESKTOP, and PRETARGETING_PLATFORM_TABLET.

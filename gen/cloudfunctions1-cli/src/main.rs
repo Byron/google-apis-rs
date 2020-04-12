@@ -274,28 +274,30 @@ impl<'n> Engine<'n> {
                     "event-trigger.event-type" => Some(("eventTrigger.eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.resource" => Some(("eventTrigger.resource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.service" => Some(("eventTrigger.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "max-instances" => Some(("maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-repository.url" => Some(("sourceRepository.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-repository.deployed-url" => Some(("sourceRepository.deployedUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "available-memory-mb" => Some(("availableMemoryMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "https-trigger.url" => Some(("httpsTrigger.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-archive-url" => Some(("sourceArchiveUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "environment-variables" => Some(("environmentVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "source-upload-url" => Some(("sourceUploadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vpc-connector-egress-settings" => Some(("vpcConnectorEgressSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "available-memory-mb" => Some(("availableMemoryMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-instances" => Some(("maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "version-id" => Some(("versionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entry-point" => Some(("entryPoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vpc-connector" => Some(("vpcConnector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-variables" => Some(("environmentVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "source-upload-url" => Some(("sourceUploadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account-email" => Some(("serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ingress-settings" => Some(("ingressSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime" => Some(("runtime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "vpc-connector" => Some(("vpcConnector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "deployed-url", "description", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "labels", "max-instances", "name", "network", "resource", "runtime", "service", "service-account-email", "source-archive-url", "source-repository", "source-upload-url", "status", "timeout", "update-time", "url", "version-id", "vpc-connector"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "deployed-url", "description", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "ingress-settings", "labels", "max-instances", "name", "network", "resource", "runtime", "service", "service-account-email", "source-archive-url", "source-repository", "source-upload-url", "status", "timeout", "update-time", "url", "version-id", "vpc-connector", "vpc-connector-egress-settings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -634,6 +636,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -647,6 +652,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["options-requested-policy-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -765,28 +771,30 @@ impl<'n> Engine<'n> {
                     "event-trigger.event-type" => Some(("eventTrigger.eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.resource" => Some(("eventTrigger.resource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.service" => Some(("eventTrigger.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "max-instances" => Some(("maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-repository.url" => Some(("sourceRepository.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-repository.deployed-url" => Some(("sourceRepository.deployedUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "available-memory-mb" => Some(("availableMemoryMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "https-trigger.url" => Some(("httpsTrigger.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-archive-url" => Some(("sourceArchiveUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "environment-variables" => Some(("environmentVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "source-upload-url" => Some(("sourceUploadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vpc-connector-egress-settings" => Some(("vpcConnectorEgressSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "available-memory-mb" => Some(("availableMemoryMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-instances" => Some(("maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "version-id" => Some(("versionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entry-point" => Some(("entryPoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vpc-connector" => Some(("vpcConnector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-variables" => Some(("environmentVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "source-upload-url" => Some(("sourceUploadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account-email" => Some(("serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ingress-settings" => Some(("ingressSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime" => Some(("runtime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "vpc-connector" => Some(("vpcConnector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "deployed-url", "description", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "labels", "max-instances", "name", "network", "resource", "runtime", "service", "service-account-email", "source-archive-url", "source-repository", "source-upload-url", "status", "timeout", "update-time", "url", "version-id", "vpc-connector"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "deployed-url", "description", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "ingress-settings", "labels", "max-instances", "name", "network", "resource", "runtime", "service", "service-account-email", "source-archive-url", "source-repository", "source-upload-url", "status", "timeout", "update-time", "url", "version-id", "vpc-connector", "vpc-connector-egress-settings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1294,7 +1302,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the function to be called."##),
+                     Some(r##"Required. The name of the function to be called."##),
                      Some(true),
                      Some(false)),
         
@@ -1324,7 +1332,7 @@ fn main() {
                   vec![
                     (Some(r##"location"##),
                      None,
-                     Some(r##"The project and location in which the function should be created, specified
+                     Some(r##"Required. The project and location in which the function should be created, specified
         in the format `projects/*/locations/*`"##),
                      Some(true),
                      Some(false)),
@@ -1355,7 +1363,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the function which should be deleted."##),
+                     Some(r##"Required. The name of the function which should be deleted."##),
                      Some(true),
                      Some(false)),
         
@@ -1463,7 +1471,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the function which details should be obtained."##),
+                     Some(r##"Required. The name of the function which details should be obtained."##),
                      Some(true),
                      Some(false)),
         
@@ -1513,7 +1521,9 @@ fn main() {
                      Some(r##"The project and location from which the function should be listed,
         specified in the format `projects/*/locations/*`
         If you want to list functions in all locations, use "-" in place of a
-        location."##),
+        location. When listing functions in all locations, if one or more
+        location(s) are unreachable, the response will contain functions from all
+        reachable locations along with the names of any unreachable locations."##),
                      Some(true),
                      Some(false)),
         
@@ -1648,7 +1658,7 @@ fn main() {
     
     let mut app = App::new("cloudfunctions1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190620")
+           .version("1.0.13+20200401")
            .about("Manages lightweight user-provided functions executed in response to events.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli")
            .arg(Arg::with_name("url")

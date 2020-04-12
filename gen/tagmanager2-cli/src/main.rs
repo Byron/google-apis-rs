@@ -211,8 +211,7 @@ impl<'n> Engine<'n> {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-id" => Some(("environmentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "url" => Some(("url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "authorization-timestamp.nanos" => Some(("authorizationTimestamp.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "authorization-timestamp.seconds" => Some(("authorizationTimestamp.seconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "authorization-timestamp" => Some(("authorizationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enable-debug" => Some(("enableDebug", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -224,7 +223,7 @@ impl<'n> Engine<'n> {
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "authorization-code", "authorization-timestamp", "container-id", "container-version-id", "description", "enable-debug", "environment-id", "fingerprint", "name", "nanos", "path", "seconds", "tag-manager-url", "type", "url", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "authorization-code", "authorization-timestamp", "container-id", "container-version-id", "description", "enable-debug", "environment-id", "fingerprint", "name", "path", "tag-manager-url", "type", "url", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -463,8 +462,7 @@ impl<'n> Engine<'n> {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-id" => Some(("environmentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "url" => Some(("url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "authorization-timestamp.nanos" => Some(("authorizationTimestamp.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "authorization-timestamp.seconds" => Some(("authorizationTimestamp.seconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "authorization-timestamp" => Some(("authorizationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enable-debug" => Some(("enableDebug", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -476,7 +474,7 @@ impl<'n> Engine<'n> {
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "authorization-code", "authorization-timestamp", "container-id", "container-version-id", "description", "enable-debug", "environment-id", "fingerprint", "name", "nanos", "path", "seconds", "tag-manager-url", "type", "url", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "authorization-code", "authorization-timestamp", "container-id", "container-version-id", "description", "enable-debug", "environment-id", "fingerprint", "name", "path", "tag-manager-url", "type", "url", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -563,8 +561,7 @@ impl<'n> Engine<'n> {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-id" => Some(("environmentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "url" => Some(("url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "authorization-timestamp.nanos" => Some(("authorizationTimestamp.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "authorization-timestamp.seconds" => Some(("authorizationTimestamp.seconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "authorization-timestamp" => Some(("authorizationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enable-debug" => Some(("enableDebug", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -576,7 +573,7 @@ impl<'n> Engine<'n> {
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "authorization-code", "authorization-timestamp", "container-id", "container-version-id", "description", "enable-debug", "environment-id", "fingerprint", "name", "nanos", "path", "seconds", "tag-manager-url", "type", "url", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "authorization-code", "authorization-timestamp", "container-id", "container-version-id", "description", "enable-debug", "environment-id", "fingerprint", "name", "path", "tag-manager-url", "type", "url", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2689,29 +2686,33 @@ impl<'n> Engine<'n> {
                     "trigger.check-validation.type" => Some(("trigger.checkValidation.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.check-validation.value" => Some(("trigger.checkValidation.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.check-validation.key" => Some(("trigger.checkValidation.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag.fingerprint" => Some(("tag.fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag.paused" => Some(("tag.paused", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "tag.firing-rule-id" => Some(("tag.firingRuleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "tag.account-id" => Some(("tag.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.priority.type" => Some(("tag.priority.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.priority.value" => Some(("tag.priority.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.priority.key" => Some(("tag.priority.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag.workspace-id" => Some(("tag.workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag.type" => Some(("tag.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag.parent-folder-id" => Some(("tag.parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.schedule-start-ms" => Some(("tag.scheduleStartMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.schedule-end-ms" => Some(("tag.scheduleEndMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.container-id" => Some(("tag.containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "tag.blocking-trigger-id" => Some(("tag.blockingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "tag.tag-firing-option" => Some(("tag.tagFiringOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.tag-id" => Some(("tag.tagId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "tag.parent-folder-id" => Some(("tag.parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "tag.name" => Some(("tag.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "tag.paused" => Some(("tag.paused", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "tag.blocking-rule-id" => Some(("tag.blockingRuleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "tag.workspace-id" => Some(("tag.workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "tag.live-only" => Some(("tag.liveOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "tag.tag-manager-url" => Some(("tag.tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "tag.fingerprint" => Some(("tag.fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "tag.firing-rule-id" => Some(("tag.firingRuleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "tag.monitoring-metadata.type" => Some(("tag.monitoringMetadata.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag.monitoring-metadata.value" => Some(("tag.monitoringMetadata.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag.monitoring-metadata.key" => Some(("tag.monitoringMetadata.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.path" => Some(("tag.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.firing-trigger-id" => Some(("tag.firingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "tag.type" => Some(("tag.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag.monitoring-metadata-tag-name-key" => Some(("tag.monitoringMetadataTagNameKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag.name" => Some(("tag.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.notes" => Some(("tag.notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "tag.account-id" => Some(("tag.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag.live-only" => Some(("tag.liveOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "tag.blocking-trigger-id" => Some(("tag.blockingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "folder.container-id" => Some(("folder.containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "folder.notes" => Some(("folder.notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "folder.workspace-id" => Some(("folder.workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2722,7 +2723,7 @@ impl<'n> Engine<'n> {
                     "folder.account-id" => Some(("folder.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "folder.name" => Some(("folder.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "case-conversion-type", "change-status", "check-validation", "container-id", "continuous-time-min-milliseconds", "convert-false-to-value", "convert-null-to-value", "convert-true-to-value", "convert-undefined-to-value", "disabling-trigger-id", "enabling-trigger-id", "event-name", "fingerprint", "firing-rule-id", "firing-trigger-id", "folder", "folder-id", "format-value", "horizontal-scroll-percentage-list", "interval", "interval-seconds", "key", "limit", "live-only", "max-timer-length-seconds", "name", "notes", "parent-folder-id", "path", "paused", "priority", "schedule-end-ms", "schedule-start-ms", "selector", "tag", "tag-firing-option", "tag-id", "tag-manager-url", "total-time-min-milliseconds", "trigger", "trigger-id", "type", "unique-trigger-id", "value", "variable", "variable-id", "vertical-scroll-percentage-list", "visibility-selector", "visible-percentage-max", "visible-percentage-min", "wait-for-tags", "wait-for-tags-timeout", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "case-conversion-type", "change-status", "check-validation", "container-id", "continuous-time-min-milliseconds", "convert-false-to-value", "convert-null-to-value", "convert-true-to-value", "convert-undefined-to-value", "disabling-trigger-id", "enabling-trigger-id", "event-name", "fingerprint", "firing-rule-id", "firing-trigger-id", "folder", "folder-id", "format-value", "horizontal-scroll-percentage-list", "interval", "interval-seconds", "key", "limit", "live-only", "max-timer-length-seconds", "monitoring-metadata", "monitoring-metadata-tag-name-key", "name", "notes", "parent-folder-id", "path", "paused", "priority", "schedule-end-ms", "schedule-start-ms", "selector", "tag", "tag-firing-option", "tag-id", "tag-manager-url", "total-time-min-milliseconds", "trigger", "trigger-id", "type", "unique-trigger-id", "value", "variable", "variable-id", "vertical-scroll-percentage-list", "visibility-selector", "visible-percentage-max", "visible-percentage-min", "wait-for-tags", "wait-for-tags-timeout", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2853,31 +2854,35 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "paused" => Some(("paused", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "firing-rule-id" => Some(("firingRuleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "priority.type" => Some(("priority.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "priority.value" => Some(("priority.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "priority.key" => Some(("priority.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-folder-id" => Some(("parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-start-ms" => Some(("scheduleStartMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-end-ms" => Some(("scheduleEndMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "blocking-trigger-id" => Some(("blockingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "tag-firing-option" => Some(("tagFiringOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag-id" => Some(("tagId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent-folder-id" => Some(("parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "paused" => Some(("paused", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "blocking-rule-id" => Some(("blockingRuleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "live-only" => Some(("liveOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "tag-manager-url" => Some(("tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "firing-rule-id" => Some(("firingRuleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "monitoring-metadata.type" => Some(("monitoringMetadata.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "monitoring-metadata.value" => Some(("monitoringMetadata.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "monitoring-metadata.key" => Some(("monitoringMetadata.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "path" => Some(("path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "firing-trigger-id" => Some(("firingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "monitoring-metadata-tag-name-key" => Some(("monitoringMetadataTagNameKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notes" => Some(("notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "live-only" => Some(("liveOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "blocking-trigger-id" => Some(("blockingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "container-id", "fingerprint", "firing-rule-id", "firing-trigger-id", "key", "live-only", "name", "notes", "parent-folder-id", "path", "paused", "priority", "schedule-end-ms", "schedule-start-ms", "tag-firing-option", "tag-id", "tag-manager-url", "type", "value", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "container-id", "fingerprint", "firing-rule-id", "firing-trigger-id", "key", "live-only", "monitoring-metadata", "monitoring-metadata-tag-name-key", "name", "notes", "parent-folder-id", "path", "paused", "priority", "schedule-end-ms", "schedule-start-ms", "tag-firing-option", "tag-id", "tag-manager-url", "type", "value", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3168,31 +3173,35 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "paused" => Some(("paused", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "firing-rule-id" => Some(("firingRuleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "priority.type" => Some(("priority.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "priority.value" => Some(("priority.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "priority.key" => Some(("priority.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-folder-id" => Some(("parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-start-ms" => Some(("scheduleStartMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-end-ms" => Some(("scheduleEndMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "blocking-trigger-id" => Some(("blockingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "tag-firing-option" => Some(("tagFiringOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag-id" => Some(("tagId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent-folder-id" => Some(("parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "paused" => Some(("paused", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "blocking-rule-id" => Some(("blockingRuleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "live-only" => Some(("liveOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "tag-manager-url" => Some(("tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "firing-rule-id" => Some(("firingRuleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "monitoring-metadata.type" => Some(("monitoringMetadata.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "monitoring-metadata.value" => Some(("monitoringMetadata.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "monitoring-metadata.key" => Some(("monitoringMetadata.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "path" => Some(("path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "firing-trigger-id" => Some(("firingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "monitoring-metadata-tag-name-key" => Some(("monitoringMetadataTagNameKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notes" => Some(("notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "live-only" => Some(("liveOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "blocking-trigger-id" => Some(("blockingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "container-id", "fingerprint", "firing-rule-id", "firing-trigger-id", "key", "live-only", "name", "notes", "parent-folder-id", "path", "paused", "priority", "schedule-end-ms", "schedule-start-ms", "tag-firing-option", "tag-id", "tag-manager-url", "type", "value", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "container-id", "fingerprint", "firing-rule-id", "firing-trigger-id", "key", "live-only", "monitoring-metadata", "monitoring-metadata-tag-name-key", "name", "notes", "parent-folder-id", "path", "paused", "priority", "schedule-end-ms", "schedule-start-ms", "tag-firing-option", "tag-id", "tag-manager-url", "type", "value", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3281,6 +3290,12 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "template-data" => Some(("templateData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gallery-reference.repository" => Some(("galleryReference.repository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gallery-reference.is-modified" => Some(("galleryReference.isModified", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gallery-reference.host" => Some(("galleryReference.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gallery-reference.version" => Some(("galleryReference.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gallery-reference.signature" => Some(("galleryReference.signature", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gallery-reference.owner" => Some(("galleryReference.owner", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template-id" => Some(("templateId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag-manager-url" => Some(("tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3289,7 +3304,7 @@ impl<'n> Engine<'n> {
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "container-id", "fingerprint", "name", "path", "tag-manager-url", "template-data", "template-id", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "container-id", "fingerprint", "gallery-reference", "host", "is-modified", "name", "owner", "path", "repository", "signature", "tag-manager-url", "template-data", "template-id", "version", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3582,6 +3597,12 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "template-data" => Some(("templateData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gallery-reference.repository" => Some(("galleryReference.repository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gallery-reference.is-modified" => Some(("galleryReference.isModified", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gallery-reference.host" => Some(("galleryReference.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gallery-reference.version" => Some(("galleryReference.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gallery-reference.signature" => Some(("galleryReference.signature", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gallery-reference.owner" => Some(("galleryReference.owner", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template-id" => Some(("templateId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag-manager-url" => Some(("tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3590,7 +3611,7 @@ impl<'n> Engine<'n> {
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "container-id", "fingerprint", "name", "path", "tag-manager-url", "template-data", "template-id", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "container-id", "fingerprint", "gallery-reference", "host", "is-modified", "name", "owner", "path", "repository", "signature", "tag-manager-url", "template-data", "template-id", "version", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5932,12 +5953,15 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::TagManager::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
+                    ("upload-type", "uploadType"),
+                    ("upload-protocol", "upload_protocol"),
                 ]
         };
 
@@ -5966,7 +5990,8 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Account's API relative path. Example: accounts/{account_id}."##),
+                     Some(r##"GTM Account's API relative path.
+        Example: accounts/{account_id}."##),
                      Some(true),
                      Some(false)),
         
@@ -5994,7 +6019,8 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM Container's API relative path.
+        Example: accounts/{account_id}/containers/{container_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6010,7 +6036,8 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM Container's API relative path.
+        Example: accounts/{account_id}/containers/{container_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6038,7 +6065,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}"##),
+                     Some(r##"GTM Environment's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/environments/{environment_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6054,7 +6083,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}"##),
+                     Some(r##"GTM Environment's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/environments/{environment_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6076,7 +6107,8 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM Container's API relative path.
+        Example: accounts/{account_id}/containers/{container_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6098,7 +6130,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}"##),
+                     Some(r##"GTM Environment's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/environments/{environment_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6126,7 +6160,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}"##),
+                     Some(r##"GTM Environment's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/environments/{environment_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6154,7 +6190,8 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM Container's API relative path.
+        Example: accounts/{account_id}/containers/{container_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6176,7 +6213,8 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Accounts's API relative path. Example: accounts/{account_id}."##),
+                     Some(r##"GTM Accounts's API relative path.
+        Example: accounts/{account_id}."##),
                      Some(true),
                      Some(false)),
         
@@ -6198,7 +6236,8 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM Container's API relative path.
+        Example: accounts/{account_id}/containers/{container_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6226,7 +6265,8 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM Container's API relative path.
+        Example: accounts/{account_id}/containers/{container_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6248,7 +6288,8 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM Container's API relative path.
+        Example: accounts/{account_id}/containers/{container_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6270,7 +6311,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}"##),
+                     Some(r##"GTM ContainerVersion's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/versions/{version_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6286,7 +6329,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}"##),
+                     Some(r##"GTM ContainerVersion's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/versions/{version_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6308,7 +6353,8 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM Container's API relative path.
+        Example: accounts/{account_id}/containers/{container_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6330,7 +6376,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}"##),
+                     Some(r##"GTM ContainerVersion's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/versions/{version_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6347,12 +6395,15 @@ fn main() {
                      Some(false)),
                   ]),
             ("containers-versions-set-latest",
-                    Some(r##"Sets the latest version used for synchronization of workspaces when detecting conflicts and errors."##),
+                    Some(r##"Sets the latest version used for synchronization of workspaces when
+        detecting conflicts and errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-versions-set-latest",
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}"##),
+                     Some(r##"GTM ContainerVersion's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/versions/{version_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6374,7 +6425,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}"##),
+                     Some(r##"GTM ContainerVersion's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/versions/{version_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6396,7 +6449,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}"##),
+                     Some(r##"GTM ContainerVersion's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/versions/{version_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6424,7 +6479,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6446,7 +6503,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM BuiltInVariable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/built_in_variables"##),
+                     Some(r##"GTM BuiltInVariable's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/built_in_variables"##),
                      Some(true),
                      Some(false)),
         
@@ -6462,7 +6521,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6484,7 +6545,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM BuiltInVariable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/built_in_variables"##),
+                     Some(r##"GTM BuiltInVariable's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/built_in_variables"##),
                      Some(true),
                      Some(false)),
         
@@ -6506,7 +6569,8 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM parent Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM parent Container's API relative path.
+        Example: accounts/{account_id}/containers/{container_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6529,12 +6593,16 @@ fn main() {
                      Some(false)),
                   ]),
             ("containers-workspaces-create-version",
-                    Some(r##"Creates a Container Version from the entities present in the workspace, deletes the workspace, and sets the base container version to the newly created version."##),
+                    Some(r##"Creates a Container Version from the entities present in the workspace,
+        deletes the workspace, and sets the base container version to the newly
+        created version."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-create-version",
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6562,7 +6630,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6578,7 +6648,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6606,7 +6678,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}"##),
+                     Some(r##"GTM Folder's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6622,7 +6696,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}"##),
+                     Some(r##"GTM Folder's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6644,7 +6720,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}"##),
+                     Some(r##"GTM Folder's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6666,7 +6744,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6688,7 +6768,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}"##),
+                     Some(r##"GTM Folder's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6710,7 +6792,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}"##),
+                     Some(r##"GTM Folder's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6732,7 +6816,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}"##),
+                     Some(r##"GTM Folder's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6760,7 +6846,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6782,7 +6870,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6804,7 +6894,8 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM parent Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM parent Container's API relative path.
+        Example: accounts/{account_id}/containers/{container_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6821,12 +6912,15 @@ fn main() {
                      Some(false)),
                   ]),
             ("containers-workspaces-quick-preview",
-                    Some(r##"Quick previews a workspace by creating a fake container version from all entities in the provided workspace."##),
+                    Some(r##"Quick previews a workspace by creating a fake container version from all
+        entities in the provided workspace."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-quick-preview",
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6843,12 +6937,15 @@ fn main() {
                      Some(false)),
                   ]),
             ("containers-workspaces-resolve-conflict",
-                    Some(r##"Resolves a merge conflict for a workspace entity by updating it to the resolved entity passed in the request."##),
+                    Some(r##"Resolves a merge conflict for a workspace entity by updating it to the
+        resolved entity passed in the request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-resolve-conflict",
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6865,12 +6962,16 @@ fn main() {
                      Some(true)),
                   ]),
             ("containers-workspaces-sync",
-                    Some(r##"Syncs a workspace to the latest container version by updating all unmodified workspace entities and displaying conflicts for modified entities."##),
+                    Some(r##"Syncs a workspace to the latest container version by updating all
+        unmodified workspace entities and displaying conflicts for modified
+        entities."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-sync",
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6892,7 +6993,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6920,7 +7023,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}"##),
+                     Some(r##"GTM Tag's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6936,7 +7041,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}"##),
+                     Some(r##"GTM Tag's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6958,7 +7065,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -6980,7 +7089,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}"##),
+                     Some(r##"GTM Tag's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7002,7 +7113,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}"##),
+                     Some(r##"GTM Tag's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7030,7 +7143,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7058,7 +7173,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}"##),
+                     Some(r##"GTM Custom Template's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7074,7 +7191,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}"##),
+                     Some(r##"GTM Custom Template's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7096,7 +7215,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7118,7 +7239,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}"##),
+                     Some(r##"GTM Custom Template's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7140,7 +7263,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}"##),
+                     Some(r##"GTM Custom Template's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7168,7 +7293,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspaces's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspaces's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7196,7 +7323,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}"##),
+                     Some(r##"GTM Trigger's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7212,7 +7341,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}"##),
+                     Some(r##"GTM Trigger's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7234,7 +7365,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspaces's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspaces's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7256,7 +7389,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}"##),
+                     Some(r##"GTM Trigger's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7278,7 +7413,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}"##),
+                     Some(r##"GTM Trigger's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7306,7 +7443,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7334,7 +7473,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7362,7 +7503,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}"##),
+                     Some(r##"GTM Variable's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7378,7 +7521,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}"##),
+                     Some(r##"GTM Variable's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7400,7 +7545,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7422,7 +7569,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}"##),
+                     Some(r##"GTM Variable's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7444,7 +7593,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}"##),
+                     Some(r##"GTM Variable's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7472,7 +7623,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7500,7 +7653,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}"##),
+                     Some(r##"GTM Zone's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7516,7 +7671,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}"##),
+                     Some(r##"GTM Zone's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7538,7 +7695,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7560,7 +7719,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}"##),
+                     Some(r##"GTM Zone's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7582,7 +7743,9 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}"##),
+                     Some(r##"GTM Zone's API relative path.
+        Example:
+        accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7610,7 +7773,8 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Accounts's API relative path. Example: accounts/{account_id}"##),
+                     Some(r##"GTM Accounts's API relative path.
+        Example: accounts/{account_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7648,7 +7812,8 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Accounts's API relative path. Example: accounts/{account_id}"##),
+                     Some(r##"GTM Accounts's API relative path.
+        Example: accounts/{account_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7676,7 +7841,8 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Account's API relative path. Example: accounts/{account_id}"##),
+                     Some(r##"GTM Account's API relative path.
+        Example: accounts/{account_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7699,12 +7865,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("user-permissions-delete",
-                    Some(r##"Removes a user from the account, revoking access to it and all of its containers."##),
+                    Some(r##"Removes a user from the account, revoking access to it and all of its
+        containers."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_user-permissions-delete",
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM UserPermission's API relative path. Example: accounts/{account_id}/user_permissions/{user_permission_id}"##),
+                     Some(r##"GTM UserPermission's API relative path.
+        Example: accounts/{account_id}/user_permissions/{user_permission_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7720,7 +7888,8 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM UserPermission's API relative path. Example: accounts/{account_id}/user_permissions/{user_permission_id}"##),
+                     Some(r##"GTM UserPermission's API relative path.
+        Example: accounts/{account_id}/user_permissions/{user_permission_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7737,12 +7906,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("user-permissions-list",
-                    Some(r##"List all users that have access to the account along with Account and Container user access granted to each of them."##),
+                    Some(r##"List all users that have access to the account along with Account and
+        Container user access granted to each of them."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_user-permissions-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Accounts's API relative path. Example: accounts/{account_id}"##),
+                     Some(r##"GTM Accounts's API relative path.
+        Example: accounts/{account_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7764,7 +7935,8 @@ fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM UserPermission's API relative path. Example: accounts/{account_id}/user_permissions/{user_permission_id}"##),
+                     Some(r##"GTM UserPermission's API relative path.
+        Example: accounts/{account_id}/user_permissions/{user_permission_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7792,8 +7964,9 @@ fn main() {
     
     let mut app = App::new("tagmanager2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190516")
-           .about("Accesses Tag Manager accounts and containers.")
+           .version("1.0.13+20200408")
+           .about("This API allows clients to access and modify container and tag
+                configuration.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_tagmanager2_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

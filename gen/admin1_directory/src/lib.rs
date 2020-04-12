@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *directory* crate version *1.0.12+20190214*, where *20190214* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *directory* crate version *1.0.13+20200204*, where *20200204* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *directory* *v1_directory* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/directory/).
@@ -35,8 +35,6 @@
 //!  * [*delete*](struct.OrgunitDeleteCall.html), [*get*](struct.OrgunitGetCall.html), [*insert*](struct.OrgunitInsertCall.html), [*list*](struct.OrgunitListCall.html), [*patch*](struct.OrgunitPatchCall.html) and [*update*](struct.OrgunitUpdateCall.html)
 //! * [privileges](struct.Privilege.html)
 //!  * [*list*](struct.PrivilegeListCall.html)
-//! * resolved app access settings
-//!  * [*get settings*](struct.ResolvedAppAccessSettingGetSettingCall.html) and [*list trusted apps*](struct.ResolvedAppAccessSettingListTrustedAppCall.html)
 //! * resources
 //!  * [*buildings delete*](struct.ResourceBuildingDeleteCall.html), [*buildings get*](struct.ResourceBuildingGetCall.html), [*buildings insert*](struct.ResourceBuildingInsertCall.html), [*buildings list*](struct.ResourceBuildingListCall.html), [*buildings patch*](struct.ResourceBuildingPatchCall.html), [*buildings update*](struct.ResourceBuildingUpdateCall.html), [*calendars delete*](struct.ResourceCalendarDeleteCall.html), [*calendars get*](struct.ResourceCalendarGetCall.html), [*calendars insert*](struct.ResourceCalendarInsertCall.html), [*calendars list*](struct.ResourceCalendarListCall.html), [*calendars patch*](struct.ResourceCalendarPatchCall.html), [*calendars update*](struct.ResourceCalendarUpdateCall.html), [*features delete*](struct.ResourceFeatureDeleteCall.html), [*features get*](struct.ResourceFeatureGetCall.html), [*features insert*](struct.ResourceFeatureInsertCall.html), [*features list*](struct.ResourceFeatureListCall.html), [*features patch*](struct.ResourceFeaturePatchCall.html), [*features rename*](struct.ResourceFeatureRenameCall.html) and [*features update*](struct.ResourceFeatureUpdateCall.html)
 //! * [role assignments](struct.RoleAssignment.html)
@@ -56,8 +54,8 @@
 //! Subscription supported by ...
 //! 
 //! * [*list users*](struct.UserListCall.html)
-//! * [*aliases watch users*](struct.UserAliaseWatchCall.html)
 //! * [*watch users*](struct.UserWatchCall.html)
+//! * [*aliases watch users*](struct.UserAliaseWatchCall.html)
 //! * [*aliases list users*](struct.UserAliaseListCall.html)
 //! * [*aliases list groups*](struct.GroupAliaseListCall.html)
 //! 
@@ -312,8 +310,8 @@ pub enum Scope {
     /// Manage data access permissions for users on your domain
     DirectoryUserSecurity,
 
-    /// Manage delegated admin roles for your domain
-    DirectoryRolemanagement,
+    /// View and manage your data across Google Cloud Platform services
+    CloudPlatform,
 
     /// View groups on your domain
     DirectoryGroupReadonly,
@@ -378,6 +376,9 @@ pub enum Scope {
     /// View user schemas on your domain
     DirectoryUserschemaReadonly,
 
+    /// Manage delegated admin roles for your domain
+    DirectoryRolemanagement,
+
     /// View and manage organization units on your domain
     DirectoryOrgunit,
 
@@ -391,7 +392,7 @@ impl AsRef<str> for Scope {
             Scope::DirectoryUser => "https://www.googleapis.com/auth/admin.directory.user",
             Scope::DirectoryResourceCalendarReadonly => "https://www.googleapis.com/auth/admin.directory.resource.calendar.readonly",
             Scope::DirectoryUserSecurity => "https://www.googleapis.com/auth/admin.directory.user.security",
-            Scope::DirectoryRolemanagement => "https://www.googleapis.com/auth/admin.directory.rolemanagement",
+            Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
             Scope::DirectoryGroupReadonly => "https://www.googleapis.com/auth/admin.directory.group.readonly",
             Scope::DirectoryCustomer => "https://www.googleapis.com/auth/admin.directory.customer",
             Scope::DirectoryDomain => "https://www.googleapis.com/auth/admin.directory.domain",
@@ -413,6 +414,7 @@ impl AsRef<str> for Scope {
             Scope::DirectoryUserAliaReadonly => "https://www.googleapis.com/auth/admin.directory.user.alias.readonly",
             Scope::DirectoryGroup => "https://www.googleapis.com/auth/admin.directory.group",
             Scope::DirectoryUserschemaReadonly => "https://www.googleapis.com/auth/admin.directory.userschema.readonly",
+            Scope::DirectoryRolemanagement => "https://www.googleapis.com/auth/admin.directory.rolemanagement",
             Scope::DirectoryOrgunit => "https://www.googleapis.com/auth/admin.directory.orgunit",
             Scope::DirectoryRolemanagementReadonly => "https://www.googleapis.com/auth/admin.directory.rolemanagement.readonly",
         }
@@ -519,7 +521,7 @@ impl<'a, C, A> Directory<C, A>
         Directory {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://www.googleapis.com/admin/directory/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -561,9 +563,6 @@ impl<'a, C, A> Directory<C, A>
     pub fn privileges(&'a self) -> PrivilegeMethods<'a, C, A> {
         PrivilegeMethods { hub: &self }
     }
-    pub fn resolved_app_access_settings(&'a self) -> ResolvedAppAccessSettingMethods<'a, C, A> {
-        ResolvedAppAccessSettingMethods { hub: &self }
-    }
     pub fn resources(&'a self) -> ResourceMethods<'a, C, A> {
         ResourceMethods { hub: &self }
     }
@@ -587,7 +586,7 @@ impl<'a, C, A> Directory<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -780,13 +779,35 @@ pub struct Member {
     /// Type of member (Immutable)
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Unique identifier of customer member (Read-only) Unique identifier of group (Read-only) Unique identifier of member (Read-only)
+    /// The unique ID of the group member. A member id can be used as a member request URI's memberKey. Unique identifier of group (Read-only) Unique identifier of member (Read-only)
     pub id: Option<String>,
 }
 
 impl RequestValue for Member {}
 impl Resource for Member {}
 impl ResponseResult for Member {}
+
+
+/// JSON response template for List Schema operation in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list schemas](struct.SchemaListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Schemas {
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// List of UserSchema objects.
+    pub schemas: Option<Vec<Schema>>,
+}
+
+impl ResponseResult for Schemas {}
 
 
 /// JSON template for role resource in Directory API.
@@ -847,7 +868,7 @@ impl ResponseResult for Role {}
 pub struct Privilege {
     /// The type of the API resource. This is always admin#directory#privilege.
     pub kind: Option<String>,
-    /// The obfuscated ID of the service this privilege is for.
+    /// The obfuscated ID of the service this privilege is for. This value is returned with Privileges.list().
     #[serde(rename="serviceId")]
     pub service_id: Option<String>,
     /// The name of the privilege.
@@ -1134,6 +1155,9 @@ pub struct User {
     /// User's last login time. (Read-only)
     #[serde(rename="lastLoginTime")]
     pub last_login_time: Option<String>,
+    /// CustomerId of User (Read-only)
+    #[serde(rename="customerId")]
+    pub customer_id: Option<String>,
     /// OrgUnit of User
     #[serde(rename="orgUnitPath")]
     pub org_unit_path: Option<String>,
@@ -1186,9 +1210,12 @@ pub struct User {
     pub change_password_at_next_login: Option<bool>,
     /// no description provided
     pub ims: Option<String>,
-    /// CustomerId of User (Read-only)
-    #[serde(rename="customerId")]
-    pub customer_id: Option<String>,
+    /// Recovery email of the user.
+    #[serde(rename="recoveryEmail")]
+    pub recovery_email: Option<String>,
+    /// Recovery phone of the user. The phone number must be in the E.164 format, starting with the plus sign (+). Example: +16506661212.
+    #[serde(rename="recoveryPhone")]
+    pub recovery_phone: Option<String>,
 }
 
 impl RequestValue for User {}
@@ -1234,90 +1261,102 @@ impl ResponseResult for Groups {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChromeOsDevice {
-    /// List of recent device users, in descending order by last login time (Read-only)
-    #[serde(rename="recentUsers")]
-    pub recent_users: Option<Vec<ChromeOsDeviceRecentUsers>>,
     /// Chromebook Mac Address on wifi network interface (Read-only)
     #[serde(rename="macAddress")]
     pub mac_address: Option<String>,
-    /// Chromebook serial number (Read-only)
-    #[serde(rename="serialNumber")]
-    pub serial_number: Option<String>,
     /// Date and time the device was last synchronized with the policy settings in the G Suite administrator control panel (Read-only)
     #[serde(rename="lastSync")]
     pub last_sync: Option<String>,
     /// Chromebook order number (Read-only)
     #[serde(rename="orderNumber")]
     pub order_number: Option<String>,
-    /// Mobile Equipment identifier for the 3G mobile card in the Chromebook (Read-only)
-    pub meid: Option<String>,
     /// Address or location of the device as noted by the administrator
     #[serde(rename="annotatedLocation")]
     pub annotated_location: Option<String>,
-    /// User of the device
-    #[serde(rename="annotatedUser")]
-    pub annotated_user: Option<String>,
-    /// Chromebook platform version (Read-only)
-    #[serde(rename="platformVersion")]
-    pub platform_version: Option<String>,
+    /// Reports of disk space and other info about mounted/connected volumes.
+    #[serde(rename="diskVolumeReports")]
+    pub disk_volume_reports: Option<Vec<ChromeOsDeviceDiskVolumeReports>>,
     /// List of active time ranges (Read-only)
     #[serde(rename="activeTimeRanges")]
     pub active_time_ranges: Option<Vec<ChromeOsDeviceActiveTimeRanges>>,
     /// Reports of amounts of available RAM memory (Read-only)
     #[serde(rename="systemRamFreeReports")]
     pub system_ram_free_reports: Option<Vec<ChromeOsDeviceSystemRamFreeReports>>,
-    /// Reports of CPU utilization and temperature (Read-only)
-    #[serde(rename="cpuStatusReports")]
-    pub cpu_status_reports: Option<Vec<ChromeOsDeviceCpuStatusReports>>,
-    /// Chromebook Mac Address on ethernet network interface (Read-only)
-    #[serde(rename="ethernetMacAddress")]
-    pub ethernet_mac_address: Option<String>,
-    /// Total RAM on the device [in bytes] (Read-only)
-    #[serde(rename="systemRamTotal")]
-    pub system_ram_total: Option<String>,
-    /// Reports of disk space and other info about mounted/connected volumes.
-    #[serde(rename="diskVolumeReports")]
-    pub disk_volume_reports: Option<Vec<ChromeOsDeviceDiskVolumeReports>>,
-    /// Chromebook Os Version (Read-only)
-    #[serde(rename="osVersion")]
-    pub os_version: Option<String>,
-    /// Chromebook firmware version (Read-only)
-    #[serde(rename="firmwareVersion")]
-    pub firmware_version: Option<String>,
-    /// Date and time the device was last enrolled (Read-only)
-    #[serde(rename="lastEnrollmentTime")]
-    pub last_enrollment_time: Option<String>,
-    /// Kind of resource this is.
-    pub kind: Option<String>,
     /// AssetId specified during enrollment or through later annotation
     #[serde(rename="annotatedAssetId")]
     pub annotated_asset_id: Option<String>,
-    /// List of device files to download (Read-only)
-    #[serde(rename="deviceFiles")]
-    pub device_files: Option<Vec<ChromeOsDeviceDeviceFiles>>,
-    /// Notes added by the administrator
-    pub notes: Option<String>,
-    /// Will Chromebook auto renew after support end date (Read-only)
-    #[serde(rename="willAutoRenew")]
-    pub will_auto_renew: Option<bool>,
+    /// Chromebook firmware version (Read-only)
+    #[serde(rename="firmwareVersion")]
+    pub firmware_version: Option<String>,
+    /// Total RAM on the device [in bytes] (Read-only)
+    #[serde(rename="systemRamTotal")]
+    pub system_ram_total: Option<String>,
+    /// (Read-only) The timestamp after which the device will stop receiving Chrome updates or support
+    #[serde(rename="autoUpdateExpiration")]
+    pub auto_update_expiration: Option<String>,
+    /// (Read-only) MAC address used by the Chromebook’s internal ethernet port, and for onboard network (ethernet) interface. The format is twelve (12) hexadecimal digits without any delimiter (uppercase letters). This is only relevant for some devices.
+    #[serde(rename="ethernetMacAddress0")]
+    pub ethernet_mac_address0: Option<String>,
     /// Chromebook boot mode (Read-only)
     #[serde(rename="bootMode")]
     pub boot_mode: Option<String>,
     /// ETag of the resource.
     pub etag: Option<String>,
-    /// status of the device (Read-only)
-    pub status: Option<String>,
     /// OrgUnit of the device
     #[serde(rename="orgUnitPath")]
     pub org_unit_path: Option<String>,
+    /// List of recent device users, in descending order by last login time (Read-only)
+    #[serde(rename="recentUsers")]
+    pub recent_users: Option<Vec<ChromeOsDeviceRecentUsers>>,
+    /// Date and time the device was last enrolled (Read-only)
+    #[serde(rename="lastEnrollmentTime")]
+    pub last_enrollment_time: Option<String>,
+    /// Chromebook Mac Address on ethernet network interface (Read-only)
+    #[serde(rename="ethernetMacAddress")]
+    pub ethernet_mac_address: Option<String>,
+    /// Contains either the Mobile Equipment identifier (MEID) or the International Mobile Equipment Identity (IMEI) for the 3G mobile card in the Chromebook (Read-only)
+    pub meid: Option<String>,
+    /// User of the device
+    #[serde(rename="annotatedUser")]
+    pub annotated_user: Option<String>,
+    /// Reports of CPU utilization and temperature (Read-only)
+    #[serde(rename="cpuStatusReports")]
+    pub cpu_status_reports: Option<Vec<ChromeOsDeviceCpuStatusReports>>,
+    /// Chromebook platform version (Read-only)
+    #[serde(rename="platformVersion")]
+    pub platform_version: Option<String>,
+    /// Chromebook Os Version (Read-only)
+    #[serde(rename="osVersion")]
+    pub os_version: Option<String>,
+    /// (Read-only) Built-in MAC address for the docking station that the device connected to. Factory sets Media access control address (MAC address) assigned for use by a dock. Currently this is only supported on the Dell Arcada / Sarien devices and the Dell WD19 / WD19TB Docking Station. It is reserved specifically for MAC pass through device policy. The format is twelve (12) hexadecimal digits without any delimiter (uppercase letters). This is only relevant for Dell devices.
+    #[serde(rename="dockMacAddress")]
+    pub dock_mac_address: Option<String>,
+    /// Will Chromebook auto renew after support end date (Read-only)
+    #[serde(rename="willAutoRenew")]
+    pub will_auto_renew: Option<bool>,
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// List of device files to download (Read-only)
+    #[serde(rename="deviceFiles")]
+    pub device_files: Option<Vec<ChromeOsDeviceDeviceFiles>>,
+    /// Notes added by the administrator
+    pub notes: Option<String>,
+    /// Chromebook serial number (Read-only)
+    #[serde(rename="serialNumber")]
+    pub serial_number: Option<String>,
+    /// (Read-only) The date the device was manufactured in yyyy-mm-dd format.
+    #[serde(rename="manufactureDate")]
+    pub manufacture_date: Option<String>,
+    /// status of the device (Read-only)
+    pub status: Option<String>,
+    /// Final date the device will be supported (Read-only)
+    #[serde(rename="supportEndDate")]
+    pub support_end_date: Option<String>,
     /// Trusted Platform Module (TPM) (Read-only)
     #[serde(rename="tpmVersionInfo")]
     pub tpm_version_info: Option<ChromeOsDeviceTpmVersionInfo>,
     /// Chromebook Model (Read-only)
     pub model: Option<String>,
-    /// Final date the device will be supported (Read-only)
-    #[serde(rename="supportEndDate")]
-    pub support_end_date: Option<String>,
     /// Unique identifier of Chrome OS Device (Read-only)
     #[serde(rename="deviceId")]
     pub device_id: Option<String>,
@@ -1328,28 +1367,32 @@ impl Resource for ChromeOsDevice {}
 impl ResponseResult for ChromeOsDevice {}
 
 
-/// JSON template for Trusted App Ids Resource object in Directory API.
+/// Trusted Platform Module (TPM) (Read-only)
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TrustedAppId {
-    /// Android package name.
-    #[serde(rename="androidPackageName")]
-    pub android_package_name: Option<String>,
-    /// Identifies the resource as a trusted AppId.
-    pub kind: Option<String>,
-    /// no description provided
-    pub etag: Option<String>,
-    /// SHA1 signature of the app certificate.
-    #[serde(rename="certificateHashSHA1")]
-    pub certificate_hash_sha1: Option<String>,
-    /// SHA256 signature of the app certificate.
-    #[serde(rename="certificateHashSHA256")]
-    pub certificate_hash_sha256: Option<String>,
+pub struct ChromeOsDeviceTpmVersionInfo {
+    /// TPM specification level.
+    #[serde(rename="specLevel")]
+    pub spec_level: Option<String>,
+    /// TPM model number.
+    #[serde(rename="tpmModel")]
+    pub tpm_model: Option<String>,
+    /// Vendor-specific information such as Vendor ID.
+    #[serde(rename="vendorSpecific")]
+    pub vendor_specific: Option<String>,
+    /// TPM family.
+    pub family: Option<String>,
+    /// TPM firmware version.
+    #[serde(rename="firmwareVersion")]
+    pub firmware_version: Option<String>,
+    /// TPM manufacturer code.
+    pub manufacturer: Option<String>,
 }
 
-impl Part for TrustedAppId {}
+impl NestedType for ChromeOsDeviceTpmVersionInfo {}
+impl Part for ChromeOsDeviceTpmVersionInfo {}
 
 
 /// Disk volumes
@@ -1533,29 +1576,29 @@ pub struct VerificationCodes {
 impl ResponseResult for VerificationCodes {}
 
 
-/// JSON response template for List Mobile Devices operation in Directory API.
+/// JSON response template for List Chrome OS Devices operation in Directory API.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list mobiledevices](struct.MobiledeviceListCall.html) (response)
+/// * [list chromeosdevices](struct.ChromeosdeviceListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MobileDevices {
+pub struct ChromeOsDevices {
     /// Token used to access next page of this result.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// Kind of resource this is.
-    pub kind: Option<String>,
+    /// List of Chrome OS Device objects.
+    pub chromeosdevices: Option<Vec<ChromeOsDevice>>,
     /// ETag of the resource.
     pub etag: Option<String>,
-    /// List of Mobile Device objects.
-    pub mobiledevices: Option<Vec<MobileDevice>>,
+    /// Kind of resource this is.
+    pub kind: Option<String>,
 }
 
-impl ResponseResult for MobileDevices {}
+impl ResponseResult for ChromeOsDevices {}
 
 
 /// List of active time ranges (Read-only)
@@ -1712,136 +1755,6 @@ pub struct BuildingAddress {
 impl Part for BuildingAddress {}
 
 
-/// JSON template for token resource in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list tokens](struct.TokenListCall.html) (none)
-/// * [delete tokens](struct.TokenDeleteCall.html) (none)
-/// * [get tokens](struct.TokenGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Token {
-    /// A list of authorization scopes the application is granted.
-    pub scopes: Option<Vec<String>>,
-    /// The type of the API resource. This is always admin#directory#token.
-    pub kind: Option<String>,
-    /// The Client ID of the application the token is issued to.
-    #[serde(rename="clientId")]
-    pub client_id: Option<String>,
-    /// Whether the token is issued to an installed application. The value is true if the application is installed to a desktop or mobile device.
-    #[serde(rename="nativeApp")]
-    pub native_app: Option<bool>,
-    /// The displayable name of the application the token is issued to.
-    #[serde(rename="displayText")]
-    pub display_text: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-    /// Whether the application is registered with Google. The value is true if the application has an anonymous Client ID.
-    pub anonymous: Option<bool>,
-    /// The unique ID of the user that issued the token.
-    #[serde(rename="userKey")]
-    pub user_key: Option<String>,
-}
-
-impl Resource for Token {}
-impl ResponseResult for Token {}
-
-
-/// JSON response template to list Domains in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list domains](struct.DomainListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Domains2 {
-    /// List of domain objects.
-    pub domains: Option<Vec<Domains>>,
-    /// Kind of resource this is.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-}
-
-impl ResponseResult for Domains2 {}
-
-
-/// JSON template for Trusted Apps response object of a user in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list trusted apps resolved app access settings](struct.ResolvedAppAccessSettingListTrustedAppCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TrustedApps {
-    /// no description provided
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// Identifies the resource as trusted apps response.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-    /// Trusted Apps list.
-    #[serde(rename="trustedApps")]
-    pub trusted_apps: Option<Vec<TrustedAppId>>,
-}
-
-impl ResponseResult for TrustedApps {}
-
-
-/// JSON template for coordinates of a building in Directory API.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BuildingCoordinates {
-    /// Latitude in decimal degrees.
-    pub latitude: Option<f64>,
-    /// Longitude in decimal degrees.
-    pub longitude: Option<f64>,
-}
-
-impl Part for BuildingCoordinates {}
-
-
-/// Trusted Platform Module (TPM) (Read-only)
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ChromeOsDeviceTpmVersionInfo {
-    /// TPM specification level.
-    #[serde(rename="specLevel")]
-    pub spec_level: Option<String>,
-    /// TPM model number.
-    #[serde(rename="tpmModel")]
-    pub tpm_model: Option<String>,
-    /// Vendor-specific information such as Vendor ID.
-    #[serde(rename="vendorSpecific")]
-    pub vendor_specific: Option<String>,
-    /// TPM family.
-    pub family: Option<String>,
-    /// TPM firmware version.
-    #[serde(rename="firmwareVersion")]
-    pub firmware_version: Option<String>,
-    /// TPM manufacturer code.
-    pub manufacturer: Option<String>,
-}
-
-impl NestedType for ChromeOsDeviceTpmVersionInfo {}
-impl Part for ChromeOsDeviceTpmVersionInfo {}
-
-
 /// JSON template for Mobile Device resource in Directory API.
 /// 
 /// # Activities
@@ -1965,6 +1878,43 @@ impl Resource for MobileDevice {}
 impl ResponseResult for MobileDevice {}
 
 
+/// JSON response template to list Domains in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list domains](struct.DomainListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Domains2 {
+    /// List of domain objects.
+    pub domains: Option<Vec<Domains>>,
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+}
+
+impl ResponseResult for Domains2 {}
+
+
+/// JSON template for coordinates of a building in Directory API.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BuildingCoordinates {
+    /// Latitude in decimal degrees.
+    pub latitude: Option<f64>,
+    /// Longitude in decimal degrees.
+    pub longitude: Option<f64>,
+}
+
+impl Part for BuildingCoordinates {}
+
+
 /// List of device files to download (Read-only)
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1986,66 +1936,6 @@ pub struct ChromeOsDeviceDeviceFiles {
 
 impl NestedType for ChromeOsDeviceDeviceFiles {}
 impl Part for ChromeOsDeviceDeviceFiles {}
-
-
-/// JSON response template for List Schema operation in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list schemas](struct.SchemaListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Schemas {
-    /// Kind of resource this is.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-    /// List of UserSchema objects.
-    pub schemas: Option<Vec<Schema>>,
-}
-
-impl ResponseResult for Schemas {}
-
-
-/// JSON template for App Access Collections Resource object in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get settings resolved app access settings](struct.ResolvedAppAccessSettingGetSettingCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AppAccessCollections {
-    /// Identifies the resource as an app access collection. Value: admin#directory#appaccesscollection
-    pub kind: Option<String>,
-    /// Boolean that indicates whether to trust domain owned apps.
-    #[serde(rename="trustDomainOwnedApps")]
-    pub trust_domain_owned_apps: Option<bool>,
-    /// Unique ID of app access collection. (Readonly)
-    #[serde(rename="resourceId")]
-    pub resource_id: Option<String>,
-    /// Error message provided by the Admin that will be shown to the user when an app is blocked.
-    #[serde(rename="errorMessage")]
-    pub error_message: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-    /// List of blocked api access buckets.
-    #[serde(rename="blockedApiAccessBuckets")]
-    pub blocked_api_access_buckets: Option<Vec<String>>,
-    /// Resource name given by the customer while creating/updating. Should be unique under given customer.
-    #[serde(rename="resourceName")]
-    pub resource_name: Option<String>,
-    /// Boolean to indicate whether to enforce app access settings on Android Drive or not.
-    #[serde(rename="enforceSettingsForAndroidDrive")]
-    pub enforce_settings_for_android_drive: Option<bool>,
-}
-
-impl ResponseResult for AppAccessCollections {}
 
 
 /// JSON template for Has Member response in Directory API.
@@ -2460,6 +2350,31 @@ impl NestedType for ChromeOsDeviceRecentUsers {}
 impl Part for ChromeOsDeviceRecentUsers {}
 
 
+/// JSON response template for List Mobile Devices operation in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list mobiledevices](struct.MobiledeviceListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MobileDevices {
+    /// Token used to access next page of this result.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// List of Mobile Device objects.
+    pub mobiledevices: Option<Vec<MobileDevice>>,
+}
+
+impl ResponseResult for MobileDevices {}
+
+
 /// JSON request template for renaming a feature.
 /// 
 /// # Activities
@@ -2595,7 +2510,7 @@ impl RequestValue for UserUndelete {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RoleRolePrivileges {
-    /// The obfuscated ID of the service this privilege is for.
+    /// The obfuscated ID of the service this privilege is for. This value is returned with Privileges.list().
     #[serde(rename="serviceId")]
     pub service_id: Option<String>,
     /// The name of the privilege.
@@ -2685,29 +2600,43 @@ pub struct DomainAliases {
 impl ResponseResult for DomainAliases {}
 
 
-/// JSON response template for List Chrome OS Devices operation in Directory API.
+/// JSON template for token resource in Directory API.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list chromeosdevices](struct.ChromeosdeviceListCall.html) (response)
+/// * [list tokens](struct.TokenListCall.html) (none)
+/// * [delete tokens](struct.TokenDeleteCall.html) (none)
+/// * [get tokens](struct.TokenGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ChromeOsDevices {
-    /// Token used to access next page of this result.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// List of Chrome OS Device objects.
-    pub chromeosdevices: Option<Vec<ChromeOsDevice>>,
+pub struct Token {
+    /// A list of authorization scopes the application is granted.
+    pub scopes: Option<Vec<String>>,
+    /// The type of the API resource. This is always admin#directory#token.
+    pub kind: Option<String>,
+    /// The Client ID of the application the token is issued to.
+    #[serde(rename="clientId")]
+    pub client_id: Option<String>,
+    /// Whether the token is issued to an installed application. The value is true if the application is installed to a desktop or mobile device.
+    #[serde(rename="nativeApp")]
+    pub native_app: Option<bool>,
+    /// The displayable name of the application the token is issued to.
+    #[serde(rename="displayText")]
+    pub display_text: Option<String>,
     /// ETag of the resource.
     pub etag: Option<String>,
-    /// Kind of resource this is.
-    pub kind: Option<String>,
+    /// Whether the application is registered with Google. The value is true if the application has an anonymous Client ID.
+    pub anonymous: Option<bool>,
+    /// The unique ID of the user that issued the token.
+    #[serde(rename="userKey")]
+    pub user_key: Option<String>,
 }
 
-impl ResponseResult for ChromeOsDevices {}
+impl Resource for Token {}
+impl ResponseResult for Token {}
 
 
 /// JSON template for Org Unit resource in Directory API.
@@ -3791,7 +3720,7 @@ impl<'a, C, A> PrivilegeMethods<'a, C, A> {
 
 
 
-/// A builder providing access to all methods supported on *resolvedAppAccessSetting* resources.
+/// A builder providing access to all methods supported on *channel* resources.
 /// It is not used directly, but through the `Directory` hub.
 ///
 /// # Example
@@ -3815,39 +3744,34 @@ impl<'a, C, A> PrivilegeMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get_settings(...)` and `list_trusted_apps(...)`
+/// // like `stop(...)`
 /// // to build up your call.
-/// let rb = hub.resolved_app_access_settings();
+/// let rb = hub.channels();
 /// # }
 /// ```
-pub struct ResolvedAppAccessSettingMethods<'a, C, A>
+pub struct ChannelMethods<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Directory<C, A>,
 }
 
-impl<'a, C, A> MethodsBuilder for ResolvedAppAccessSettingMethods<'a, C, A> {}
+impl<'a, C, A> MethodsBuilder for ChannelMethods<'a, C, A> {}
 
-impl<'a, C, A> ResolvedAppAccessSettingMethods<'a, C, A> {
+impl<'a, C, A> ChannelMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves resolved app access settings of the logged in user.
-    pub fn get_settings(&self) -> ResolvedAppAccessSettingGetSettingCall<'a, C, A> {
-        ResolvedAppAccessSettingGetSettingCall {
-            hub: self.hub,
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
+    /// Stop watching resources through this channel
+    /// 
+    /// # Arguments
     ///
-    /// Retrieves the list of apps trusted by the admin of the logged in user.
-    pub fn list_trusted_apps(&self) -> ResolvedAppAccessSettingListTrustedAppCall<'a, C, A> {
-        ResolvedAppAccessSettingListTrustedAppCall {
+    /// * `request` - No description provided.
+    pub fn stop(&self, request: Channel) -> ChannelStopCall<'a, C, A> {
+        ChannelStopCall {
             hub: self.hub,
+            _request: request,
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -3971,65 +3895,6 @@ impl<'a, C, A> MobiledeviceMethods<'a, C, A> {
             _request: request,
             _customer_id: customer_id.to_string(),
             _resource_id: resource_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-}
-
-
-
-/// A builder providing access to all methods supported on *channel* resources.
-/// It is not used directly, but through the `Directory` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_admin1_directory as admin1_directory;
-/// 
-/// # #[test] fn egal() {
-/// use std::default::Default;
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use admin1_directory::Directory;
-/// 
-/// let secret: ApplicationSecret = Default::default();
-/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `stop(...)`
-/// // to build up your call.
-/// let rb = hub.channels();
-/// # }
-/// ```
-pub struct ChannelMethods<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Directory<C, A>,
-}
-
-impl<'a, C, A> MethodsBuilder for ChannelMethods<'a, C, A> {}
-
-impl<'a, C, A> ChannelMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Stop watching resources through this channel
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn stop(&self, request: Channel) -> ChannelStopCall<'a, C, A> {
-        ChannelStopCall {
-            hub: self.hub,
-            _request: request,
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4882,24 +4747,6 @@ impl<'a, C, A> DomainAliaseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the domain aliases of the customer.
-    /// 
-    /// # Arguments
-    ///
-    /// * `customer` - Immutable ID of the G Suite account.
-    pub fn list(&self, customer: &str) -> DomainAliaseListCall<'a, C, A> {
-        DomainAliaseListCall {
-            hub: self.hub,
-            _customer: customer.to_string(),
-            _parent_domain_name: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Retrieves a domain alias of the customer.
     /// 
     /// # Arguments
@@ -4911,6 +4758,24 @@ impl<'a, C, A> DomainAliaseMethods<'a, C, A> {
             hub: self.hub,
             _customer: customer.to_string(),
             _domain_alias_name: domain_alias_name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists the domain aliases of the customer.
+    /// 
+    /// # Arguments
+    ///
+    /// * `customer` - Immutable ID of the G Suite account.
+    pub fn list(&self, customer: &str) -> DomainAliaseListCall<'a, C, A> {
+        DomainAliaseListCall {
+            hub: self.hub,
+            _customer: customer.to_string(),
+            _parent_domain_name: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -5636,6 +5501,26 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Watch for changes in user aliases list
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userKey` - Email or immutable ID of the user
+    pub fn aliases_watch(&self, request: Channel, user_key: &str) -> UserAliaseWatchCall<'a, C, A> {
+        UserAliaseWatchCall {
+            hub: self.hub,
+            _request: request,
+            _user_key: user_key.to_string(),
+            _event: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Add a photo for the user
     /// 
     /// # Arguments
@@ -5850,26 +5735,6 @@ impl<'a, C, A> UserMethods<'a, C, A> {
             hub: self.hub,
             _user_key: user_key.to_string(),
             _alias: alias.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Watch for changes in user aliases list
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `userKey` - Email or immutable ID of the user
-    pub fn aliases_watch(&self, request: Channel, user_key: &str) -> UserAliaseWatchCall<'a, C, A> {
-        UserAliaseWatchCall {
-            hub: self.hub,
-            _request: request,
-            _user_key: user_key.to_string(),
-            _event: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -9413,7 +9278,7 @@ impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// Email or immutable Id of the user if only those groups are to be listed, the given user is a member of. If Id, it should match with id of user object
+    /// Email or immutable ID of the user if only those groups are to be listed, the given user is a member of. If it's an ID, it should match with the ID of the user object.
     ///
     /// Sets the *user key* query property to the given value.
     pub fn user_key(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
@@ -9448,7 +9313,7 @@ impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Maximum number of results to return. Default is 200
+    /// Maximum number of results to return. Max allowed value is 200.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> GroupListCall<'a, C, A> {
@@ -14469,10 +14334,10 @@ impl<'a, C, A> PrivilegeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Retrieves resolved app access settings of the logged in user.
+/// Stop watching resources through this channel
 ///
-/// A builder for the *GetSettings* method supported by a *resolvedAppAccessSetting* resource.
-/// It is not used directly, but through a `ResolvedAppAccessSettingMethods` instance.
+/// A builder for the *stop* method supported by a *channel* resource.
+/// It is not used directly, but through a `ChannelMethods` instance.
 ///
 /// # Example
 ///
@@ -14483,6 +14348,7 @@ impl<'a, C, A> PrivilegeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_admin1_directory as admin1_directory;
+/// use admin1_directory::Channel;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -14493,28 +14359,35 @@ impl<'a, C, A> PrivilegeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Channel::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.resolved_app_access_settings().get_settings()
+/// let result = hub.channels().stop(req)
 ///              .doit();
 /// # }
 /// ```
-pub struct ResolvedAppAccessSettingGetSettingCall<'a, C, A>
+pub struct ChannelStopCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Directory<C, A>,
+    _request: Channel,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ResolvedAppAccessSettingGetSettingCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ChannelStopCall<'a, C, A> {}
 
-impl<'a, C, A> ResolvedAppAccessSettingGetSettingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, AppAccessCollections)> {
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -14522,10 +14395,10 @@ impl<'a, C, A> ResolvedAppAccessSettingGetSettingCall<'a, C, A> where C: BorrowM
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "directory.resolvedAppAccessSettings.GetSettings",
-                               http_method: hyper::method::Method::Get });
+        dlg.begin(MethodInfo { id: "admin.channels.stop",
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
-        for &field in ["alt"].iter() {
+        for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -14535,32 +14408,51 @@ impl<'a, C, A> ResolvedAppAccessSettingGetSettingCall<'a, C, A> where C: BorrowM
             params.push((&name, value.clone()));
         }
 
-        params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "resolvedappaccesssettings";
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        let mut url = self.hub._base_url.clone() + "/admin/directory_v1/channels/stop";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
         }
 
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()));
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -14591,17 +14483,7 @@ impl<'a, C, A> ResolvedAppAccessSettingGetSettingCall<'a, C, A> where C: BorrowM
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
+                    let result_value = res;
 
                     dlg.finished(true);
                     return Ok(result_value)
@@ -14611,13 +14493,22 @@ impl<'a, C, A> ResolvedAppAccessSettingGetSettingCall<'a, C, A> where C: BorrowM
     }
 
 
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Channel) -> ChannelStopCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ResolvedAppAccessSettingGetSettingCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ChannelStopCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14638,190 +14529,35 @@ impl<'a, C, A> ResolvedAppAccessSettingGetSettingCall<'a, C, A> where C: BorrowM
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ResolvedAppAccessSettingGetSettingCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
-}
-
-
-/// Retrieves the list of apps trusted by the admin of the logged in user.
-///
-/// A builder for the *ListTrustedApps* method supported by a *resolvedAppAccessSetting* resource.
-/// It is not used directly, but through a `ResolvedAppAccessSettingMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_admin1_directory as admin1_directory;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use admin1_directory::Directory;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.resolved_app_access_settings().list_trusted_apps()
-///              .doit();
-/// # }
-/// ```
-pub struct ResolvedAppAccessSettingListTrustedAppCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Directory<C, A>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-}
-
-impl<'a, C, A> CallBuilder for ResolvedAppAccessSettingListTrustedAppCall<'a, C, A> {}
-
-impl<'a, C, A> ResolvedAppAccessSettingListTrustedAppCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, TrustedApps)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUser`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelStopCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
         };
-        dlg.begin(MethodInfo { id: "directory.resolvedAppAccessSettings.ListTrustedApps",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
-        for &field in ["alt"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "trustedapps";
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
-        }
-
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()));
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ResolvedAppAccessSettingListTrustedAppCall<'a, C, A> {
-        self._delegate = Some(new_value);
         self
     }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ResolvedAppAccessSettingListTrustedAppCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
 }
 
 
@@ -15335,7 +15071,7 @@ impl<'a, C, A> MobiledeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Maximum number of results to return. Default is 100
+    /// Maximum number of results to return. Max allowed value is 100.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> MobiledeviceListCall<'a, C, A> {
@@ -15903,233 +15639,6 @@ impl<'a, C, A> MobiledeviceActionCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> MobiledeviceActionCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Stop watching resources through this channel
-///
-/// A builder for the *stop* method supported by a *channel* resource.
-/// It is not used directly, but through a `ChannelMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_admin1_directory as admin1_directory;
-/// use admin1_directory::Channel;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use admin1_directory::Directory;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Channel::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.channels().stop(req)
-///              .doit();
-/// # }
-/// ```
-pub struct ChannelStopCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Directory<C, A>,
-    _request: Channel,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ChannelStopCall<'a, C, A> {}
-
-impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "admin.channels.stop",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
-        for &field in [].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = self.hub._base_url.clone() + "/admin/directory_v1/channels/stop";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
-        }
-
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> ChannelStopCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ChannelStopCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::DirectoryUser`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelStopCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18184,7 +17693,7 @@ impl<'a, C, A> ChromeosdeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Maximum number of results to return. Default is 100
+    /// Maximum number of results to return. Max allowed value is 200.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ChromeosdeviceListCall<'a, C, A> {
@@ -20952,7 +20461,7 @@ impl<'a, C, A> MemberListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of results to return. Default is 200
+    /// Maximum number of results to return. Max allowed value is 200.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> MemberListCall<'a, C, A> {
@@ -23526,258 +23035,6 @@ impl<'a, C, A> DomainAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Lists the domain aliases of the customer.
-///
-/// A builder for the *list* method supported by a *domainAliase* resource.
-/// It is not used directly, but through a `DomainAliaseMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_admin1_directory as admin1_directory;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use admin1_directory::Directory;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.domain_aliases().list("customer")
-///              .parent_domain_name("et")
-///              .doit();
-/// # }
-/// ```
-pub struct DomainAliaseListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Directory<C, A>,
-    _customer: String,
-    _parent_domain_name: Option<String>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for DomainAliaseListCall<'a, C, A> {}
-
-impl<'a, C, A> DomainAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, DomainAliases)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "directory.domainAliases.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("customer", self._customer.to_string()));
-        if let Some(value) = self._parent_domain_name {
-            params.push(("parentDomainName", value.to_string()));
-        }
-        for &field in ["alt", "customer", "parentDomainName"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "customer/{customer}/domainaliases";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDomainReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{customer}", "customer")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["customer"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Immutable ID of the G Suite account.
-    ///
-    /// Sets the *customer* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn customer(mut self, new_value: &str) -> DomainAliaseListCall<'a, C, A> {
-        self._customer = new_value.to_string();
-        self
-    }
-    /// Name of the parent domain for which domain aliases are to be fetched.
-    ///
-    /// Sets the *parent domain name* query property to the given value.
-    pub fn parent_domain_name(mut self, new_value: &str) -> DomainAliaseListCall<'a, C, A> {
-        self._parent_domain_name = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> DomainAliaseListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DomainAliaseListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::DirectoryDomainReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DomainAliaseListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Retrieves a domain alias of the customer.
 ///
 /// A builder for the *get* method supported by a *domainAliase* resource.
@@ -24019,6 +23276,258 @@ impl<'a, C, A> DomainAliaseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> DomainAliaseGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists the domain aliases of the customer.
+///
+/// A builder for the *list* method supported by a *domainAliase* resource.
+/// It is not used directly, but through a `DomainAliaseMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_directory::Directory;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.domain_aliases().list("customer")
+///              .parent_domain_name("vero")
+///              .doit();
+/// # }
+/// ```
+pub struct DomainAliaseListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+    _customer: String,
+    _parent_domain_name: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for DomainAliaseListCall<'a, C, A> {}
+
+impl<'a, C, A> DomainAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, DomainAliases)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "directory.domainAliases.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("customer", self._customer.to_string()));
+        if let Some(value) = self._parent_domain_name {
+            params.push(("parentDomainName", value.to_string()));
+        }
+        for &field in ["alt", "customer", "parentDomainName"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/domainaliases";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DirectoryDomainReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{customer}", "customer")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["customer"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Immutable ID of the G Suite account.
+    ///
+    /// Sets the *customer* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn customer(mut self, new_value: &str) -> DomainAliaseListCall<'a, C, A> {
+        self._customer = new_value.to_string();
+        self
+    }
+    /// Name of the parent domain for which domain aliases are to be fetched.
+    ///
+    /// Sets the *parent domain name* query property to the given value.
+    pub fn parent_domain_name(mut self, new_value: &str) -> DomainAliaseListCall<'a, C, A> {
+        self._parent_domain_name = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> DomainAliaseListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> DomainAliaseListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryDomainReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> DomainAliaseListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -31957,6 +31466,289 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
+/// Watch for changes in user aliases list
+///
+/// A builder for the *aliases.watch* method supported by a *user* resource.
+/// It is not used directly, but through a `UserMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
+/// use admin1_directory::Channel;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_directory::Directory;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Channel::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.users().aliases_watch(req, "userKey")
+///              .event("eos")
+///              .doit();
+/// # }
+/// ```
+pub struct UserAliaseWatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+    _request: Channel,
+    _user_key: String,
+    _event: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for UserAliaseWatchCall<'a, C, A> {}
+
+impl<'a, C, A> UserAliaseWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Channel)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "directory.users.aliases.watch",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("userKey", self._user_key.to_string()));
+        if let Some(value) = self._event {
+            params.push(("event", value.to_string()));
+        }
+        for &field in ["alt", "userKey", "event"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/aliases/watch";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["userKey"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Channel) -> UserAliaseWatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Email or immutable ID of the user
+    ///
+    /// Sets the *user key* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn user_key(mut self, new_value: &str) -> UserAliaseWatchCall<'a, C, A> {
+        self._user_key = new_value.to_string();
+        self
+    }
+    /// Event on which subscription is intended (if subscribing)
+    ///
+    /// Sets the *event* query property to the given value.
+    pub fn event(mut self, new_value: &str) -> UserAliaseWatchCall<'a, C, A> {
+        self._event = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> UserAliaseWatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> UserAliaseWatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUser`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserAliaseWatchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Add a photo for the user
 ///
 /// A builder for the *photos.update* method supported by a *user* resource.
@@ -32262,18 +32054,18 @@ impl<'a, C, A> UserPhotoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().watch(req)
-///              .view_type("eos")
-///              .sort_order("justo")
-///              .show_deleted("tempor")
-///              .query("gubergren")
+///              .view_type("tempor")
+///              .sort_order("gubergren")
+///              .show_deleted("dolore")
+///              .query("amet.")
 ///              .projection("dolore")
-///              .page_token("amet.")
-///              .order_by("dolore")
-///              .max_results(-83)
-///              .event("elitr")
-///              .domain("magna")
-///              .customer("ipsum")
-///              .custom_field_mask("invidunt")
+///              .page_token("magna")
+///              .order_by("elitr")
+///              .max_results(-82)
+///              .event("ipsum")
+///              .domain("invidunt")
+///              .customer("accusam")
+///              .custom_field_mask("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -32481,7 +32273,7 @@ impl<'a, C, A> UserWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// If set to true retrieves the list of deleted users. Default is false
+    /// If set to true, retrieves the list of deleted users. (Default: false)
     ///
     /// Sets the *show deleted* query property to the given value.
     pub fn show_deleted(mut self, new_value: &str) -> UserWatchCall<'a, C, A> {
@@ -32516,7 +32308,7 @@ impl<'a, C, A> UserWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Maximum number of results to return. Default is 100. Max allowed is 500
+    /// Maximum number of results to return.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> UserWatchCall<'a, C, A> {
@@ -33149,18 +32941,18 @@ impl<'a, C, A> UserPhotoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().list()
-///              .view_type("diam")
-///              .sort_order("nonumy")
-///              .show_deleted("sed")
-///              .query("diam")
-///              .projection("magna")
+///              .view_type("sed")
+///              .sort_order("diam")
+///              .show_deleted("magna")
+///              .query("dolor")
+///              .projection("Lorem")
 ///              .page_token("dolor")
-///              .order_by("Lorem")
-///              .max_results(-49)
-///              .event("vero")
-///              .domain("nonumy")
-///              .customer("takimata")
-///              .custom_field_mask("dolores")
+///              .order_by("vero")
+///              .max_results(-91)
+///              .event("takimata")
+///              .domain("dolores")
+///              .customer("consetetur")
+///              .custom_field_mask("erat")
 ///              .doit();
 /// # }
 /// ```
@@ -33343,7 +33135,7 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._sort_order = Some(new_value.to_string());
         self
     }
-    /// If set to true retrieves the list of deleted users. Default is false
+    /// If set to true, retrieves the list of deleted users. (Default: false)
     ///
     /// Sets the *show deleted* query property to the given value.
     pub fn show_deleted(mut self, new_value: &str) -> UserListCall<'a, C, A> {
@@ -33378,7 +33170,7 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Maximum number of results to return. Default is 100. Max allowed is 500
+    /// Maximum number of results to return.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> UserListCall<'a, C, A> {
@@ -33500,9 +33292,9 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().get("userKey")
-///              .view_type("erat")
-///              .projection("amet.")
-///              .custom_field_mask("dolores")
+///              .view_type("dolores")
+///              .projection("dolores")
+///              .custom_field_mask("et")
 ///              .doit();
 /// # }
 /// ```
@@ -34047,7 +33839,7 @@ impl<'a, C, A> UserAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().aliases_list("userKey")
-///              .event("sed")
+///              .event("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -35032,289 +34824,6 @@ impl<'a, C, A> UserAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> UserAliaseDeleteCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Watch for changes in user aliases list
-///
-/// A builder for the *aliases.watch* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_admin1_directory as admin1_directory;
-/// use admin1_directory::Channel;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use admin1_directory::Directory;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Channel::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.users().aliases_watch(req, "userKey")
-///              .event("sadipscing")
-///              .doit();
-/// # }
-/// ```
-pub struct UserAliaseWatchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Directory<C, A>,
-    _request: Channel,
-    _user_key: String,
-    _event: Option<String>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for UserAliaseWatchCall<'a, C, A> {}
-
-impl<'a, C, A> UserAliaseWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Channel)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "directory.users.aliases.watch",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("userKey", self._user_key.to_string()));
-        if let Some(value) = self._event {
-            params.push(("event", value.to_string()));
-        }
-        for &field in ["alt", "userKey", "event"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "users/{userKey}/aliases/watch";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["userKey"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> UserAliaseWatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Email or immutable ID of the user
-    ///
-    /// Sets the *user key* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn user_key(mut self, new_value: &str) -> UserAliaseWatchCall<'a, C, A> {
-        self._user_key = new_value.to_string();
-        self
-    }
-    /// Event on which subscription is intended (if subscribing)
-    ///
-    /// Sets the *event* query property to the given value.
-    pub fn event(mut self, new_value: &str) -> UserAliaseWatchCall<'a, C, A> {
-        self._event = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> UserAliaseWatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserAliaseWatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::DirectoryUser`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserAliaseWatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

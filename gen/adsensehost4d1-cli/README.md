@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *AdSense Host* API at revision *20190703*. The CLI is at version *1.0.12*.
+This documentation was generated from the *AdSense Host* API at revision *20200407*. The CLI is at version *1.0.13*.
 
 ```bash
 adsensehost4d1 [options]

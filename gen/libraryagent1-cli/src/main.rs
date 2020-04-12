@@ -498,7 +498,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the book to borrow."##),
+                     Some(r##"Required. The name of the book to borrow."##),
                      Some(true),
                      Some(false)),
         
@@ -520,7 +520,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the book to retrieve."##),
+                     Some(r##"Required. The name of the book to retrieve."##),
                      Some(true),
                      Some(false)),
         
@@ -544,7 +544,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the shelf whose books we'd like to list."##),
+                     Some(r##"Required. The name of the shelf whose books we'd like to list."##),
                      Some(true),
                      Some(false)),
         
@@ -569,7 +569,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the book to return."##),
+                     Some(r##"Required. The name of the book to return."##),
                      Some(true),
                      Some(false)),
         
@@ -591,7 +591,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the shelf to retrieve."##),
+                     Some(r##"Required. The name of the shelf to retrieve."##),
                      Some(true),
                      Some(false)),
         
@@ -630,7 +630,7 @@ fn main() {
     
     let mut app = App::new("libraryagent1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190703")
+           .version("1.0.13+20200409")
            .about("A simple Google Example Library API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_libraryagent1_cli")
            .arg(Arg::with_name("url")

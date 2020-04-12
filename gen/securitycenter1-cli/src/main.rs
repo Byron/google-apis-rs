@@ -439,6 +439,355 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _organizations_notification_configs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "pubsub-topic" => Some(("pubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "streaming-config.filter" => Some(("streamingConfig.filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "filter", "name", "pubsub-topic", "service-account", "streaming-config"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::NotificationConfig = json::value::from_value(object).unwrap();
+        let mut call = self.hub.organizations().notification_configs_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "config-id" => {
+                    call = call.config_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["config-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _organizations_notification_configs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().notification_configs_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _organizations_notification_configs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().notification_configs_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _organizations_notification_configs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().notification_configs_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _organizations_notification_configs_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "pubsub-topic" => Some(("pubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "streaming-config.filter" => Some(("streamingConfig.filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "filter", "name", "pubsub-topic", "service-account", "streaming-config"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::NotificationConfig = json::value::from_value(object).unwrap();
+        let mut call = self.hub.organizations().notification_configs_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _organizations_operations_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.organizations().operations_cancel(opt.value_of("name").unwrap_or(""));
@@ -1856,6 +2205,21 @@ impl<'n> Engine<'n> {
                     ("get-organization-settings", Some(opt)) => {
                         call_result = self._organizations_get_organization_settings(opt, dry_run, &mut err);
                     },
+                    ("notification-configs-create", Some(opt)) => {
+                        call_result = self._organizations_notification_configs_create(opt, dry_run, &mut err);
+                    },
+                    ("notification-configs-delete", Some(opt)) => {
+                        call_result = self._organizations_notification_configs_delete(opt, dry_run, &mut err);
+                    },
+                    ("notification-configs-get", Some(opt)) => {
+                        call_result = self._organizations_notification_configs_get(opt, dry_run, &mut err);
+                    },
+                    ("notification-configs-list", Some(opt)) => {
+                        call_result = self._organizations_notification_configs_list(opt, dry_run, &mut err);
+                    },
+                    ("notification-configs-patch", Some(opt)) => {
+                        call_result = self._organizations_notification_configs_patch(opt, dry_run, &mut err);
+                    },
                     ("operations-cancel", Some(opt)) => {
                         call_result = self._organizations_operations_cancel(opt, dry_run, &mut err);
                     },
@@ -2001,7 +2365,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("organizations", "methods: 'assets-group', 'assets-list', 'assets-run-discovery', 'assets-update-security-marks', 'get-organization-settings', 'operations-cancel', 'operations-delete', 'operations-get', 'operations-list', 'sources-create', 'sources-findings-create', 'sources-findings-group', 'sources-findings-list', 'sources-findings-patch', 'sources-findings-set-state', 'sources-findings-update-security-marks', 'sources-get', 'sources-get-iam-policy', 'sources-list', 'sources-patch', 'sources-set-iam-policy', 'sources-test-iam-permissions' and 'update-organization-settings'", vec![
+        ("organizations", "methods: 'assets-group', 'assets-list', 'assets-run-discovery', 'assets-update-security-marks', 'get-organization-settings', 'notification-configs-create', 'notification-configs-delete', 'notification-configs-get', 'notification-configs-list', 'notification-configs-patch', 'operations-cancel', 'operations-delete', 'operations-get', 'operations-list', 'sources-create', 'sources-findings-create', 'sources-findings-group', 'sources-findings-list', 'sources-findings-patch', 'sources-findings-set-state', 'sources-findings-update-security-marks', 'sources-get', 'sources-get-iam-policy', 'sources-list', 'sources-patch', 'sources-set-iam-policy', 'sources-test-iam-permissions' and 'update-organization-settings'", vec![
             ("assets-group",
                     Some(r##"Filters an organization's assets and  groups them by their specified
         properties."##),
@@ -2009,7 +2373,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Name of the organization to groupBy. Its format is
+                     Some(r##"Required. Name of the organization to groupBy. Its format is
         "organizations/[organization_id]"."##),
                      Some(true),
                      Some(false)),
@@ -2038,7 +2402,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Name of the organization assets should belong to. Its format is
+                     Some(r##"Required. Name of the organization assets should belong to. Its format is
         "organizations/[organization_id]"."##),
                      Some(true),
                      Some(false)),
@@ -2066,7 +2430,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Name of the organization to run asset discovery for. Its format is
+                     Some(r##"Required. Name of the organization to run asset discovery for. Its format is
         "organizations/[organization_id]"."##),
                      Some(true),
                      Some(false)),
@@ -2098,8 +2462,8 @@ fn main() {
                      Some(r##"The relative resource name of the SecurityMarks. See:
         https://cloud.google.com/apis/design/resource_names#relative_resource_name
         Examples:
-        "organizations/123/assets/456/securityMarks"
-        "organizations/123/sources/456/findings/789/securityMarks"."##),
+        "organizations/{organization_id}/assets/{asset_id}/securityMarks"
+        "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}/securityMarks"."##),
                      Some(true),
                      Some(false)),
         
@@ -2127,10 +2491,140 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Name of the organization to get organization settings for. Its format is
+                     Some(r##"Required. Name of the organization to get organization settings for. Its format is
         "organizations/[organization_id]/organizationSettings"."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("notification-configs-create",
+                    Some(r##"Creates a notification config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_notification-configs-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the new notification config's parent. Its format is
+        "organizations/[organization_id]"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("notification-configs-delete",
+                    Some(r##"Deletes a notification config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_notification-configs-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the notification config to delete. Its format is
+        "organizations/[organization_id]/notificationConfigs/[config_id]"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("notification-configs-get",
+                    Some(r##"Gets a notification config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_notification-configs-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the notification config to get. Its format is
+        "organizations/[organization_id]/notificationConfigs/[config_id]"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("notification-configs-list",
+                    Some(r##"Lists notification configs."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_notification-configs-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of the organization to list notification configs.
+        Its format is "organizations/[organization_id]"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("notification-configs-patch",
+                    Some(r##"
+        Updates a notification config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_notification-configs-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The relative resource name of this notification config. See:
+        https://cloud.google.com/apis/design/resource_names#relative_resource_name
+        Example:
+        "organizations/{organization_id}/notificationConfigs/notify_public_bucket"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -2261,7 +2755,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Resource name of the new source's parent. Its format should be
+                     Some(r##"Required. Resource name of the new source's parent. Its format should be
         "organizations/[organization_id]"."##),
                      Some(true),
                      Some(false)),
@@ -2291,7 +2785,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Resource name of the new finding's parent. Its format should be
+                     Some(r##"Required. Resource name of the new finding's parent. Its format should be
         "organizations/[organization_id]/sources/[source_id]"."##),
                      Some(true),
                      Some(false)),
@@ -2319,15 +2813,15 @@ fn main() {
         specified properties.
         
         To group across all sources provide a `-` as the source id.
-        Example: /v1/organizations/123/sources/-/findings"##),
+        Example: /v1/organizations/{organization_id}/sources/-/findings"##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_sources-findings-group",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Name of the source to groupBy. Its format is
+                     Some(r##"Required. Name of the source to groupBy. Its format is
         "organizations/[organization_id]/sources/[source_id]". To groupBy across
         all sources provide a source_id of `-`. For example:
-        organizations/123/sources/-"##),
+        organizations/{organization_id}/sources/-"##),
                      Some(true),
                      Some(false)),
         
@@ -2353,15 +2847,15 @@ fn main() {
                     Some(r##"Lists an organization or source's findings.
         
         To list across all sources provide a `-` as the source id.
-        Example: /v1/organizations/123/sources/-/findings"##),
+        Example: /v1/organizations/{organization_id}/sources/-/findings"##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_sources-findings-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Name of the source the findings belong to. Its format is
+                     Some(r##"Required. Name of the source the findings belong to. Its format is
         "organizations/[organization_id]/sources/[source_id]". To list across all
         sources provide a source_id of `-`. For example:
-        organizations/123/sources/-"##),
+        organizations/{organization_id}/sources/-"##),
                      Some(true),
                      Some(false)),
         
@@ -2387,7 +2881,7 @@ fn main() {
                      Some(r##"The relative resource name of this finding. See:
         https://cloud.google.com/apis/design/resource_names#relative_resource_name
         Example:
-        "organizations/123/sources/456/findings/789""##),
+        "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}""##),
                      Some(true),
                      Some(false)),
         
@@ -2415,10 +2909,10 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The relative resource name of the finding. See:
+                     Some(r##"Required. The relative resource name of the finding. See:
         https://cloud.google.com/apis/design/resource_names#relative_resource_name
         Example:
-        "organizations/123/sources/456/finding/789"."##),
+        "organizations/{organization_id}/sources/{source_id}/finding/{finding_id}"."##),
                      Some(true),
                      Some(false)),
         
@@ -2449,8 +2943,8 @@ fn main() {
                      Some(r##"The relative resource name of the SecurityMarks. See:
         https://cloud.google.com/apis/design/resource_names#relative_resource_name
         Examples:
-        "organizations/123/assets/456/securityMarks"
-        "organizations/123/sources/456/findings/789/securityMarks"."##),
+        "organizations/{organization_id}/assets/{asset_id}/securityMarks"
+        "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}/securityMarks"."##),
                      Some(true),
                      Some(false)),
         
@@ -2478,7 +2972,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Relative resource name of the source. Its format is
+                     Some(r##"Required. Relative resource name of the source. Its format is
         "organizations/[organization_id]/source/[source_id]"."##),
                      Some(true),
                      Some(false)),
@@ -2530,7 +3024,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Resource name of the parent of sources to list. Its format should be
+                     Some(r##"Required. Resource name of the parent of sources to list. Its format should be
         "organizations/[organization_id]"."##),
                      Some(true),
                      Some(false)),
@@ -2556,7 +3050,7 @@ fn main() {
                      Some(r##"The relative resource name of this source. See:
         https://cloud.google.com/apis/design/resource_names#relative_resource_name
         Example:
-        "organizations/123/sources/456""##),
+        "organizations/{organization_id}/sources/{source_id}""##),
                      Some(true),
                      Some(false)),
         
@@ -2645,7 +3139,7 @@ fn main() {
                      Some(r##"The relative resource name of the settings. See:
         https://cloud.google.com/apis/design/resource_names#relative_resource_name
         Example:
-        "organizations/123/organizationSettings"."##),
+        "organizations/{organization_id}/organizationSettings"."##),
                      Some(true),
                      Some(false)),
         
@@ -2673,8 +3167,8 @@ fn main() {
     
     let mut app = App::new("securitycenter1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190628")
-           .about("Cloud Security Command Center API provides access to temporal views of assets and findings within an organization.")
+           .version("1.0.13+20200406")
+           .about("Security Command Center API provides access to temporal views of assets and findings within an organization.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_securitycenter1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

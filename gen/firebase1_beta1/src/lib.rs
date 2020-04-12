@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Management* crate version *1.0.12+20190703*, where *20190703* is the exact revision of the *firebase:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Firebase Management* crate version *1.0.13+20200407*, where *20200407* is the exact revision of the *firebase:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Firebase Management* *v1_beta1* API can be found at the
 //! [official documentation site](https://firebase.google.com).
@@ -16,7 +16,7 @@
 //! * [operations](struct.Operation.html)
 //!  * [*get*](struct.OperationGetCall.html)
 //! * projects
-//!  * [*add firebase*](struct.ProjectAddFirebaseCall.html), [*android apps create*](struct.ProjectAndroidAppCreateCall.html), [*android apps get*](struct.ProjectAndroidAppGetCall.html), [*android apps get config*](struct.ProjectAndroidAppGetConfigCall.html), [*android apps list*](struct.ProjectAndroidAppListCall.html), [*android apps patch*](struct.ProjectAndroidAppPatchCall.html), [*android apps sha create*](struct.ProjectAndroidAppShaCreateCall.html), [*android apps sha delete*](struct.ProjectAndroidAppShaDeleteCall.html), [*android apps sha list*](struct.ProjectAndroidAppShaListCall.html), [*available locations list*](struct.ProjectAvailableLocationListCall.html), [*default location finalize*](struct.ProjectDefaultLocationFinalizeCall.html), [*get*](struct.ProjectGetCall.html), [*get admin sdk config*](struct.ProjectGetAdminSdkConfigCall.html), [*ios apps create*](struct.ProjectIosAppCreateCall.html), [*ios apps get*](struct.ProjectIosAppGetCall.html), [*ios apps get config*](struct.ProjectIosAppGetConfigCall.html), [*ios apps list*](struct.ProjectIosAppListCall.html), [*ios apps patch*](struct.ProjectIosAppPatchCall.html), [*list*](struct.ProjectListCall.html), [*patch*](struct.ProjectPatchCall.html), [*search apps*](struct.ProjectSearchAppCall.html), [*web apps create*](struct.ProjectWebAppCreateCall.html), [*web apps get*](struct.ProjectWebAppGetCall.html), [*web apps get config*](struct.ProjectWebAppGetConfigCall.html), [*web apps list*](struct.ProjectWebAppListCall.html) and [*web apps patch*](struct.ProjectWebAppPatchCall.html)
+//!  * [*add firebase*](struct.ProjectAddFirebaseCall.html), [*add google analytics*](struct.ProjectAddGoogleAnalyticCall.html), [*android apps create*](struct.ProjectAndroidAppCreateCall.html), [*android apps get*](struct.ProjectAndroidAppGetCall.html), [*android apps get config*](struct.ProjectAndroidAppGetConfigCall.html), [*android apps list*](struct.ProjectAndroidAppListCall.html), [*android apps patch*](struct.ProjectAndroidAppPatchCall.html), [*android apps sha create*](struct.ProjectAndroidAppShaCreateCall.html), [*android apps sha delete*](struct.ProjectAndroidAppShaDeleteCall.html), [*android apps sha list*](struct.ProjectAndroidAppShaListCall.html), [*available locations list*](struct.ProjectAvailableLocationListCall.html), [*default location finalize*](struct.ProjectDefaultLocationFinalizeCall.html), [*get*](struct.ProjectGetCall.html), [*get admin sdk config*](struct.ProjectGetAdminSdkConfigCall.html), [*get analytics details*](struct.ProjectGetAnalyticsDetailCall.html), [*ios apps create*](struct.ProjectIosAppCreateCall.html), [*ios apps get*](struct.ProjectIosAppGetCall.html), [*ios apps get config*](struct.ProjectIosAppGetConfigCall.html), [*ios apps list*](struct.ProjectIosAppListCall.html), [*ios apps patch*](struct.ProjectIosAppPatchCall.html), [*list*](struct.ProjectListCall.html), [*patch*](struct.ProjectPatchCall.html), [*remove analytics*](struct.ProjectRemoveAnalyticCall.html), [*search apps*](struct.ProjectSearchAppCall.html), [*web apps create*](struct.ProjectWebAppCreateCall.html), [*web apps get*](struct.ProjectWebAppGetCall.html), [*web apps get config*](struct.ProjectWebAppGetConfigCall.html), [*web apps list*](struct.ProjectWebAppListCall.html) and [*web apps patch*](struct.ProjectWebAppPatchCall.html)
 //! 
 //! 
 //! 
@@ -55,6 +55,7 @@
 //! let r = hub.projects().default_location_finalize(...).doit()
 //! let r = hub.operations().get(...).doit()
 //! let r = hub.projects().ios_apps_create(...).doit()
+//! let r = hub.projects().add_google_analytics(...).doit()
 //! let r = hub.projects().android_apps_create(...).doit()
 //! let r = hub.projects().web_apps_create(...).doit()
 //! ```
@@ -350,7 +351,7 @@ impl<'a, C, A> FirebaseManagement<C, A>
         FirebaseManagement {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://firebase.googleapis.com/".to_string(),
             _root_url: "https://firebase.googleapis.com/".to_string(),
         }
@@ -367,7 +368,7 @@ impl<'a, C, A> FirebaseManagement<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -541,51 +542,55 @@ pub struct WebAppConfig {
     /// <br><code><var>projectId</var>.firebaseapp.com</code>
     #[serde(rename="authDomain")]
     pub auth_domain: Option<String>,
+    /// The unique Google-assigned identifier of the Google Analytics web stream
+    /// associated with the Firebase Web App. Firebase SDKs use this ID to interact
+    /// with Google Analytics APIs.
+    /// <br>
+    /// <br>This field is only present if the App is linked to a web stream in a
+    /// Google Analytics App + Web property. Learn more about this ID and Google
+    /// Analytics web streams in the [Analytics
+    /// documentation](https://support.google.com/analytics/topic/9303475).
+    /// <br>
+    /// <br>To generate a `measurementId` and link the Web App with a Google
+    /// Analytics web stream, call
+    /// [`AddGoogleAnalytics`](../../v1beta1/projects/addGoogleAnalytics).
+    #[serde(rename="measurementId")]
+    pub measurement_id: Option<String>,
 }
 
 impl ResponseResult for WebAppConfig {}
 
 
-/// Details of a Firebase App for iOS.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [ios apps create projects](struct.ProjectIosAppCreateCall.html) (request)
-/// * [ios apps patch projects](struct.ProjectIosAppPatchCall.html) (request|response)
-/// * [ios apps get projects](struct.ProjectIosAppGetCall.html) (response)
+/// * [get analytics details projects](struct.ProjectGetAnalyticsDetailCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IosApp {
-    /// The user-assigned display name of the App.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The fully qualified resource name of the App, in the format:
-    /// <br><code>projects/<var>projectId</var>/iosApps/<var>appId</var></code>
-    pub name: Option<String>,
-    /// The automatically generated Apple ID assigned to the App by Apple in the
-    /// iOS App Store.
-    #[serde(rename="appStoreId")]
-    pub app_store_id: Option<String>,
-    /// Immutable. The globally unique, Firebase-assigned identifier of the App.
+pub struct AnalyticsDetails {
+    /// The Analytics Property object associated with the specified
+    /// `FirebaseProject`.
     /// <br>
-    /// <br>This identifier should be treated as an opaque token, as the data
-    /// format is not specified.
-    #[serde(rename="appId")]
-    pub app_id: Option<String>,
-    /// The globally unique, user-assigned ID of the parent Project for the App.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// The canonical bundle ID of the iOS App as it would appear in the iOS
-    /// AppStore.
-    #[serde(rename="bundleId")]
-    pub bundle_id: Option<String>,
+    /// <br>This object contains the details of the Google Analytics property
+    /// associated with the specified `FirebaseProject`.
+    #[serde(rename="analyticsProperty")]
+    pub analytics_property: Option<AnalyticsProperty>,
+    /// For Android Apps and iOS Apps: A map of `app` to `streamId` for each
+    /// Firebase App in the specified `FirebaseProject`. Each `app` and
+    /// `streamId` appears only once.<br>
+    /// <br>
+    /// For Web Apps: A map of `app` to `streamId` and `measurementId` for each
+    /// Firebase App in the specified `FirebaseProject`. Each `app`, `streamId`,
+    /// and `measurementId` appears only once.
+    #[serde(rename="streamMappings")]
+    pub stream_mappings: Option<Vec<StreamMapping>>,
 }
 
-impl RequestValue for IosApp {}
-impl ResponseResult for IosApp {}
+impl ResponseResult for AnalyticsDetails {}
 
 
 /// There is no detailed description.
@@ -617,36 +622,6 @@ pub struct ListAvailableProjectsResponse {
 impl ResponseResult for ListAvailableProjectsResponse {}
 
 
-/// A reference to a Google Cloud Platform (GCP) `Project`.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ProjectInfo {
-    /// The resource name of the GCP `Project` to which Firebase resources can be
-    /// added, in the format:
-    /// <br><code>projects/<var>projectId</var></code>
-    pub project: Option<String>,
-    /// The user-assigned display name of the GCP `Project`, for example:
-    /// <code>My App</code>
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The ID of the project's default GCP resource location. The location is one
-    /// of the available
-    /// [GCP resource
-    /// locations](https://firebase.google.com/docs/projects/locations). <br> <br>
-    /// Not all projects will have this field populated. If it is not populated, it
-    /// means that the project does not yet have a default GCP resource location.
-    /// To set your project's default GCP resource location, call
-    /// [`FinalizeDefaultLocation`](../projects.defaultLocation/finalize) after you
-    /// add Firebase services to your project.
-    #[serde(rename="locationId")]
-    pub location_id: Option<String>,
-}
-
-impl Part for ProjectInfo {}
-
-
 /// There is no detailed description.
 /// 
 /// # Activities
@@ -675,62 +650,28 @@ pub struct ListAndroidAppsResponse {
 impl ResponseResult for ListAndroidAppsResponse {}
 
 
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [android apps sha list projects](struct.ProjectAndroidAppShaListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListShaCertificatesResponse {
-    /// The list of SHA certificates associated with the App.
-    pub certificates: Option<Vec<ShaCertificate>>,
-}
-
-impl ResponseResult for ListShaCertificatesResponse {}
-
-
 /// A GCP resource location that can be selected for a Project.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Location {
-    /// The ID of the default GCP resource location. It must be one of the
-    /// available
-    /// [GCP resource
-    /// locations](https://firebase.google.com/docs/projects/locations).
+    /// The ID of the GCP resource location. It will be one of the available [GCP
+    /// resource
+    /// locations](https://firebase.google.com/docs/projects/locations#types).
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
+    /// Indicates whether the GCP resource location is a [regional or
+    /// multi-regional
+    /// location](https://firebase.google.com/docs/projects/locations#types)
+    /// for data replication.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Products and services that are available in the GCP resource location.
+    pub features: Option<Vec<String>>,
 }
 
 impl Part for Location {}
-
-
-/// Configuration metadata of a single Firebase App for Android.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [android apps get config projects](struct.ProjectAndroidAppGetConfigCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AndroidAppConfig {
-    /// The contents of the JSON configuration file.
-    #[serde(rename="configFileContents")]
-    pub config_file_contents: Option<String>,
-    /// The filename that the configuration artifact is typically saved as.
-    /// <br>For example: `google-services.json`
-    #[serde(rename="configFilename")]
-    pub config_filename: Option<String>,
-}
-
-impl ResponseResult for AndroidAppConfig {}
 
 
 /// Details of a Firebase App for the web.
@@ -770,78 +711,33 @@ impl RequestValue for WebApp {}
 impl ResponseResult for WebApp {}
 
 
-/// Configuration metadata of a single Firebase App for iOS.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [ios apps get config projects](struct.ProjectIosAppGetConfigCall.html) (response)
+/// * [add google analytics projects](struct.ProjectAddGoogleAnalyticCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IosAppConfig {
-    /// The content of the XML configuration file.
-    #[serde(rename="configFileContents")]
-    pub config_file_contents: Option<String>,
-    /// The filename that the configuration artifact is typically saved as.
-    /// <br>For example: `GoogleService-Info.plist`
-    #[serde(rename="configFilename")]
-    pub config_filename: Option<String>,
-}
-
-impl ResponseResult for IosAppConfig {}
-
-
-/// A high-level summary of an App.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FirebaseAppInfo {
-    /// The platform of the Firebase App.
-    pub platform: Option<String>,
-    /// The user-assigned display name of the Firebase App.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The fully qualified resource name of the Firebase App, in the format:
-    /// <br><code>projects/<var>projectId</var>/iosApps/<var>appId</var></code>
-    /// or <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var>
-    /// </code>
-    pub name: Option<String>,
-    /// Immutable. The globally unique, Firebase-assigned identifier of the App.
+pub struct AddGoogleAnalyticsRequest {
+    /// The ID for the existing
+    /// [Google Analytics account](http://www.google.com/analytics/) that you
+    /// want to link with your `FirebaseProject`.
     /// <br>
-    /// <br>This identifier should be treated as an opaque token, as the data
-    /// format is not specified.
-    #[serde(rename="appId")]
-    pub app_id: Option<String>,
+    /// <br>Specifying this field will provision a new Google Analytics
+    /// property in your Google Analytics account and associate the new property
+    /// with your `FirebaseProject`.
+    #[serde(rename="analyticsAccountId")]
+    pub analytics_account_id: Option<String>,
+    /// The ID for the existing Google Analytics property that you want to
+    /// associate with your `FirebaseProject`.
+    #[serde(rename="analyticsPropertyId")]
+    pub analytics_property_id: Option<String>,
 }
 
-impl Part for FirebaseAppInfo {}
-
-
-/// A generic empty message that you can re-use to avoid defining duplicated
-/// empty messages in your APIs. A typical example is to use it as the request
-/// or the response type of an API method. For instance:
-/// 
-/// ````text
-/// service Foo {
-///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-/// }
-/// ````
-/// 
-/// The JSON representation for `Empty` is empty JSON object `{}`.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [android apps sha delete projects](struct.ProjectAndroidAppShaDeleteCall.html) (response)
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty { _never_set: Option<bool> }
-
-impl ResponseResult for Empty {}
+impl RequestValue for AddGoogleAnalyticsRequest {}
 
 
 /// The `Status` type defines a logical error model that is suitable for
@@ -944,6 +840,333 @@ impl RequestValue for AndroidApp {}
 impl ResponseResult for AndroidApp {}
 
 
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [ios apps list projects](struct.ProjectIosAppListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListIosAppsResponse {
+    /// If the result list is too large to fit in a single response, then a token
+    /// is returned. If the string is empty, then this response is the last page of
+    /// results.
+    /// <br>
+    /// <br>This token can be used in a subsequent call to `ListIosApps` to find
+    /// the next group of Apps.
+    /// <br>
+    /// <br>Page tokens are short-lived and should not be persisted.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// List of each IosApp that is in the parent Firebase Project.
+    pub apps: Option<Vec<IosApp>>,
+}
+
+impl ResponseResult for ListIosAppsResponse {}
+
+
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
+/// 
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [android apps sha delete projects](struct.ProjectAndroidAppShaDeleteCall.html) (response)
+/// * [remove analytics projects](struct.ProjectRemoveAnalyticCall.html) (response)
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Empty { _never_set: Option<bool> }
+
+impl ResponseResult for Empty {}
+
+
+/// Details of a Firebase App for iOS.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [ios apps create projects](struct.ProjectIosAppCreateCall.html) (request)
+/// * [ios apps patch projects](struct.ProjectIosAppPatchCall.html) (request|response)
+/// * [ios apps get projects](struct.ProjectIosAppGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IosApp {
+    /// The user-assigned display name of the App.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The fully qualified resource name of the App, in the format:
+    /// <br><code>projects/<var>projectId</var>/iosApps/<var>appId</var></code>
+    pub name: Option<String>,
+    /// The automatically generated Apple ID assigned to the App by Apple in the
+    /// iOS App Store.
+    #[serde(rename="appStoreId")]
+    pub app_store_id: Option<String>,
+    /// Immutable. The globally unique, Firebase-assigned identifier of the App.
+    /// <br>
+    /// <br>This identifier should be treated as an opaque token, as the data
+    /// format is not specified.
+    #[serde(rename="appId")]
+    pub app_id: Option<String>,
+    /// The globally unique, user-assigned ID of the parent Project for the App.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// The canonical bundle ID of the iOS App as it would appear in the iOS
+    /// AppStore.
+    #[serde(rename="bundleId")]
+    pub bundle_id: Option<String>,
+}
+
+impl RequestValue for IosApp {}
+impl ResponseResult for IosApp {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [default location finalize projects](struct.ProjectDefaultLocationFinalizeCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FinalizeDefaultLocationRequest {
+    /// The ID of the default GCP resource location for the Project. The location
+    /// must be one of the available
+    /// [GCP resource
+    /// locations](https://firebase.google.com/docs/projects/locations).
+    #[serde(rename="locationId")]
+    pub location_id: Option<String>,
+}
+
+impl RequestValue for FinalizeDefaultLocationRequest {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [web apps list projects](struct.ProjectWebAppListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListWebAppsResponse {
+    /// If the result list is too large to fit in a single response, then a token
+    /// is returned. If the string is empty, then this response is the last page of
+    /// results.
+    /// <br>
+    /// <br>This token can be used in a subsequent call to `ListWebApps` to find
+    /// the next group of Apps.
+    /// <br>
+    /// <br>Page tokens are short-lived and should not be persisted.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// List of each WebApp that is in the parent Firebase Project.
+    pub apps: Option<Vec<WebApp>>,
+}
+
+impl ResponseResult for ListWebAppsResponse {}
+
+
+/// A mapping of a Firebase App to a Google Analytics data stream
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StreamMapping {
+    /// The fully qualified resource name of the Firebase App associated with the
+    /// Google Analytics data stream, in the format:
+    /// <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var></code>
+    /// or
+    /// <code>projects/<var>projectId</var>/iosApps/<var>appId</var></code>
+    /// or
+    /// <code>projects/<var>projectId</var>/webApps/<var>appId</var></code>
+    pub app: Option<String>,
+    /// Applicable for Firebase Web Apps only.<br>
+    /// <br>The unique Google-assigned identifier of the Google Analytics web
+    /// stream associated with the Firebase Web App. Firebase SDKs use this ID to
+    /// interact with Google Analytics APIs.
+    /// <br>
+    /// <br>Learn more about this ID and Google Analytics web streams in the
+    /// [Analytics
+    /// documentation](https://support.google.com/analytics/topic/9303475).
+    #[serde(rename="measurementId")]
+    pub measurement_id: Option<String>,
+    /// The unique Google-assigned identifier of the Google Analytics data stream
+    /// associated with the Firebase App.
+    /// <br>
+    /// <br>Learn more about Google Analytics data streams in the
+    /// [Analytics
+    /// documentation](https://support.google.com/analytics/answer/9303323).
+    #[serde(rename="streamId")]
+    pub stream_id: Option<String>,
+}
+
+impl Part for StreamMapping {}
+
+
+/// Configuration metadata of a single Firebase App for Android.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [android apps get config projects](struct.ProjectAndroidAppGetConfigCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AndroidAppConfig {
+    /// The contents of the JSON configuration file.
+    #[serde(rename="configFileContents")]
+    pub config_file_contents: Option<String>,
+    /// The filename that the configuration artifact is typically saved as.
+    /// <br>For example: `google-services.json`
+    #[serde(rename="configFilename")]
+    pub config_filename: Option<String>,
+}
+
+impl ResponseResult for AndroidAppConfig {}
+
+
+/// A reference to a Google Cloud Platform (GCP) `Project`.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ProjectInfo {
+    /// The resource name of the GCP `Project` to which Firebase resources can be
+    /// added, in the format:
+    /// <br><code>projects/<var>projectId</var></code>
+    pub project: Option<String>,
+    /// The user-assigned display name of the GCP `Project`, for example:
+    /// <code>My App</code>
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The ID of the project's default GCP resource location. The location is one
+    /// of the available
+    /// [GCP resource
+    /// locations](https://firebase.google.com/docs/projects/locations). <br> <br>
+    /// Not all projects will have this field populated. If it is not populated, it
+    /// means that the project does not yet have a default GCP resource location.
+    /// To set your project's default GCP resource location, call
+    /// [`FinalizeDefaultLocation`](../projects.defaultLocation/finalize) after you
+    /// add Firebase resources to your project.
+    #[serde(rename="locationId")]
+    pub location_id: Option<String>,
+}
+
+impl Part for ProjectInfo {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [android apps sha list projects](struct.ProjectAndroidAppShaListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListShaCertificatesResponse {
+    /// The list of SHA certificates associated with the App.
+    pub certificates: Option<Vec<ShaCertificate>>,
+}
+
+impl ResponseResult for ListShaCertificatesResponse {}
+
+
+/// Configuration metadata of a single Firebase App for iOS.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [ios apps get config projects](struct.ProjectIosAppGetConfigCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IosAppConfig {
+    /// The content of the XML configuration file.
+    #[serde(rename="configFileContents")]
+    pub config_file_contents: Option<String>,
+    /// The filename that the configuration artifact is typically saved as.
+    /// <br>For example: `GoogleService-Info.plist`
+    #[serde(rename="configFilename")]
+    pub config_filename: Option<String>,
+}
+
+impl ResponseResult for IosAppConfig {}
+
+
+/// A high-level summary of an App.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FirebaseAppInfo {
+    /// The platform of the Firebase App.
+    pub platform: Option<String>,
+    /// The user-assigned display name of the Firebase App.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The fully qualified resource name of the Firebase App, in the format:
+    /// <br><code>projects/<var>projectId</var>/iosApps/<var>appId</var></code>
+    /// or <br><code>projects/<var>projectId</var>/androidApps/<var>appId</var>
+    /// </code>
+    pub name: Option<String>,
+    /// Immutable. The globally unique, Firebase-assigned identifier of the App.
+    /// <br>
+    /// <br>This identifier should be treated as an opaque token, as the data
+    /// format is not specified.
+    #[serde(rename="appId")]
+    pub app_id: Option<String>,
+}
+
+impl Part for FirebaseAppInfo {}
+
+
+/// Details of a Google Analytics property
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AnalyticsProperty {
+    /// The display name of the Google Analytics property associated with the
+    /// specified `FirebaseProject`.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The globally unique, Google-assigned identifier of the Google Analytics
+    /// property associated with the specified `FirebaseProject`.
+    /// <br>
+    /// <br>If you called
+    /// [`AddGoogleAnalytics`](../../v1beta1/projects/addGoogleAnalytics) to link
+    /// your `FirebaseProject` with a Google Analytics account, the value in this
+    /// `id` field is the same as the ID of the property either specified or
+    /// provisioned with that call to `AddGoogleAnalytics`.
+    pub id: Option<String>,
+}
+
+impl Part for AnalyticsProperty {}
+
+
 /// The default resources associated with a `FirebaseProject`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1002,75 +1225,24 @@ impl Part for DefaultResources {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [ios apps list projects](struct.ProjectIosAppListCall.html) (response)
+/// * [remove analytics projects](struct.ProjectRemoveAnalyticCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListIosAppsResponse {
-    /// If the result list is too large to fit in a single response, then a token
-    /// is returned. If the string is empty, then this response is the last page of
-    /// results.
-    /// <br>
-    /// <br>This token can be used in a subsequent call to `ListIosApps` to find
-    /// the next group of Apps.
-    /// <br>
-    /// <br>Page tokens are short-lived and should not be persisted.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// List of each IosApp that is in the parent Firebase Project.
-    pub apps: Option<Vec<IosApp>>,
+pub struct RemoveAnalyticsRequest {
+    /// Optional. The ID of the Google Analytics property associated with the
+    /// specified `FirebaseProject`.
+    /// <ul>
+    /// <li>If not set, then the Google Analytics property that is currently
+    /// associated with the specified `FirebaseProject` is removed.</li>
+    /// <li>If set, and the specified `FirebaseProject` is currently associated
+    /// with a <em>different</em> Google Analytics property, then the response is a
+    /// `412 Precondition Failed` error.</li>
+    /// </ul>
+    #[serde(rename="analyticsPropertyId")]
+    pub analytics_property_id: Option<String>,
 }
 
-impl ResponseResult for ListIosAppsResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [web apps list projects](struct.ProjectWebAppListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListWebAppsResponse {
-    /// If the result list is too large to fit in a single response, then a token
-    /// is returned. If the string is empty, then this response is the last page of
-    /// results.
-    /// <br>
-    /// <br>This token can be used in a subsequent call to `ListWebApps` to find
-    /// the next group of Apps.
-    /// <br>
-    /// <br>Page tokens are short-lived and should not be persisted.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// List of each WebApp that is in the parent Firebase Project.
-    pub apps: Option<Vec<WebApp>>,
-}
-
-impl ResponseResult for ListWebAppsResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [default location finalize projects](struct.ProjectDefaultLocationFinalizeCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FinalizeDefaultLocationRequest {
-    /// The ID of the default GCP resource location for the Project. The location
-    /// must be one of the available
-    /// [GCP resource
-    /// locations](https://firebase.google.com/docs/projects/locations).
-    #[serde(rename="locationId")]
-    pub location_id: Option<String>,
-}
-
-impl RequestValue for FinalizeDefaultLocationRequest {}
+impl RequestValue for RemoveAnalyticsRequest {}
 
 
 /// All fields are required.
@@ -1084,7 +1256,11 @@ impl RequestValue for FinalizeDefaultLocationRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AddFirebaseRequest {
-    /// The region code (CLDR) that the account will use for Firebase Analytics
+    /// Deprecated. Instead, to link your Project with a Google Analytics account,
+    /// call [`AddGoogleAnalytics`](../../v1beta1/projects/addGoogleAnalytics)
+    /// after you add Firebase resources to your Project.
+    /// <br>
+    /// <br>The region code (CLDR) that the account will use for Firebase Analytics
     /// data.
     /// <br>For example: US, GB, or DE
     /// <br>
@@ -1093,7 +1269,7 @@ pub struct AddFirebaseRequest {
     pub region_code: Option<String>,
     /// Deprecated. Instead, to set your project's default GCP resource location,
     /// call [`FinalizeDefaultLocation`](../projects.defaultLocation/finalize)
-    /// after you add Firebase services to your project.
+    /// after you add Firebase resources to your project.
     /// <br>
     /// <br>The ID of the project's default GCP resource location. The location
     /// must be one of the available
@@ -1101,7 +1277,11 @@ pub struct AddFirebaseRequest {
     /// locations](https://firebase.google.com/docs/projects/locations).
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
-    /// The time zone that the account will use for Firebase Analytics data.
+    /// Deprecated. Instead, to link your Project with a Google Analytics account,
+    /// call [`AddGoogleAnalytics`](../../v1beta1/projects/addGoogleAnalytics)
+    /// after you add Firebase resources to your Project.
+    /// <br>
+    /// <br>The time zone that the account will use for Firebase Analytics data.
     /// <br>For example: America/Los_Angeles or Africa/Abidjan
     #[serde(rename="timeZone")]
     pub time_zone: Option<String>,
@@ -1122,6 +1302,7 @@ impl RequestValue for AddFirebaseRequest {}
 /// * [default location finalize projects](struct.ProjectDefaultLocationFinalizeCall.html) (response)
 /// * [get operations](struct.OperationGetCall.html) (response)
 /// * [ios apps create projects](struct.ProjectIosAppCreateCall.html) (response)
+/// * [add google analytics projects](struct.ProjectAddGoogleAnalyticCall.html) (response)
 /// * [android apps create projects](struct.ProjectAndroidAppCreateCall.html) (response)
 /// * [web apps create projects](struct.ProjectWebAppCreateCall.html) (response)
 /// 
@@ -1370,7 +1551,7 @@ impl<'a, C, A> AvailableProjectMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = FirebaseManagement::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `add_firebase(...)`, `android_apps_create(...)`, `android_apps_get(...)`, `android_apps_get_config(...)`, `android_apps_list(...)`, `android_apps_patch(...)`, `android_apps_sha_create(...)`, `android_apps_sha_delete(...)`, `android_apps_sha_list(...)`, `available_locations_list(...)`, `default_location_finalize(...)`, `get(...)`, `get_admin_sdk_config(...)`, `ios_apps_create(...)`, `ios_apps_get(...)`, `ios_apps_get_config(...)`, `ios_apps_list(...)`, `ios_apps_patch(...)`, `list(...)`, `patch(...)`, `search_apps(...)`, `web_apps_create(...)`, `web_apps_get(...)`, `web_apps_get_config(...)`, `web_apps_list(...)` and `web_apps_patch(...)`
+/// // like `add_firebase(...)`, `add_google_analytics(...)`, `android_apps_create(...)`, `android_apps_get(...)`, `android_apps_get_config(...)`, `android_apps_list(...)`, `android_apps_patch(...)`, `android_apps_sha_create(...)`, `android_apps_sha_delete(...)`, `android_apps_sha_list(...)`, `available_locations_list(...)`, `default_location_finalize(...)`, `get(...)`, `get_admin_sdk_config(...)`, `get_analytics_details(...)`, `ios_apps_create(...)`, `ios_apps_get(...)`, `ios_apps_get_config(...)`, `ios_apps_list(...)`, `ios_apps_patch(...)`, `list(...)`, `patch(...)`, `remove_analytics(...)`, `search_apps(...)`, `web_apps_create(...)`, `web_apps_get(...)`, `web_apps_get_config(...)`, `web_apps_list(...)` and `web_apps_patch(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1601,8 +1782,6 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// <br>This method does not modify any billing account information on the
     /// underlying GCP `Project`.
     /// <br>
-    /// <br>All fields listed in the [request body](#request-body) are required.
-    /// <br>
     /// <br>To call `AddFirebase`, a member must be an Editor or Owner for the
     /// existing GCP `Project`. Service accounts cannot call `AddFirebase`.
     /// 
@@ -1677,6 +1856,28 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Gets the Google Analytics details currently associated with a
+    /// FirebaseProject.
+    /// <br>
+    /// <br>If the `FirebaseProject` is not yet linked to Google Analytics, then
+    /// the response to `GetAnalyticsDetails` is NOT_FOUND.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The fully qualified resource name, in the format:
+    ///            <br><code>projects/<var>projectId</var>/analyticsDetails</code>
+    pub fn get_analytics_details(&self, name: &str) -> ProjectGetAnalyticsDetailCall<'a, C, A> {
+        ProjectGetAnalyticsDetailCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Updates the attributes of the WebApp identified by the specified
     /// resource name.
     /// 
@@ -1723,6 +1924,79 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Links a FirebaseProject with an existing
+    /// [Google Analytics account](http://www.google.com/analytics/).
+    /// <br>
+    /// <br>Using this call, you can either:
+    /// <ul>
+    /// <li>Specify an `analyticsAccountId` to provision a new Google Analytics
+    /// property within the specified account and associate the new property with
+    /// your `FirebaseProject`.</li>
+    /// <li>Specify an existing `analyticsPropertyId` to associate the property
+    /// with your `FirebaseProject`.</li>
+    /// </ul>
+    /// <br>
+    /// Note that when you call `AddGoogleAnalytics`:
+    /// <ol>
+    /// <li>The first check determines if any existing data streams in the
+    /// Google Analytics property correspond to any existing Firebase Apps in your
+    /// `FirebaseProject` (based on the `packageName` or `bundleId` associated with
+    /// the data stream). Then, as applicable, the data streams and apps are
+    /// linked. Note that this auto-linking only applies to Android Apps and iOS
+    /// Apps.</li>
+    /// <li>If no corresponding data streams are found for your Firebase Apps,
+    /// new data streams are provisioned in the Google Analytics property
+    /// for each of your Firebase Apps. Note that a new data stream is always
+    /// provisioned for a Web App even if it was previously associated with a
+    /// data stream in your Analytics property.</li>
+    /// </ol>
+    /// Learn more about the hierarchy and structure of Google Analytics
+    /// accounts in the
+    /// [Analytics
+    /// documentation](https://support.google.com/analytics/answer/9303323).
+    /// <br>
+    /// <br>The result of this call is an [`Operation`](../../v1beta1/operations).
+    /// Poll the `Operation` to track the provisioning process by calling
+    /// GetOperation until
+    /// [`done`](../../v1beta1/operations#Operation.FIELDS.done) is `true`. When
+    /// `done` is `true`, the `Operation` has either succeeded or failed. If the
+    /// `Operation` succeeded, its
+    /// [`response`](../../v1beta1/operations#Operation.FIELDS.response) is set to
+    /// an AnalyticsDetails; if the `Operation` failed, its
+    /// [`error`](../../v1beta1/operations#Operation.FIELDS.error) is set to a
+    /// google.rpc.Status.
+    /// <br>
+    /// <br>To call `AddGoogleAnalytics`, a member must be an Owner for
+    /// the existing `FirebaseProject` and have the
+    /// [`Edit` permission](https://support.google.com/analytics/answer/2884495)
+    /// for the Google Analytics account.
+    /// <br>
+    /// <br>If a `FirebaseProject` already has Google Analytics enabled, and you
+    /// call `AddGoogleAnalytics` using an `analyticsPropertyId` that's different
+    /// from the currently associated property, then the call will fail. Analytics
+    /// may have already been enabled in the Firebase console or by specifying
+    /// `timeZone` and `regionCode` in the call to
+    /// [`AddFirebase`](../../v1beta1/projects/addFirebase).
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - The parent `FirebaseProject` to link to an existing Google Analytics
+    ///              account, in the format:
+    ///              <br><code>projects/<var>projectId</var></code>
+    pub fn add_google_analytics(&self, request: AddGoogleAnalyticsRequest, parent: &str) -> ProjectAddGoogleAnalyticCall<'a, C, A> {
+        ProjectAddGoogleAnalyticCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets the IosApp identified by the specified resource name.
     /// 
     /// # Arguments
@@ -1753,7 +2027,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The parent Project for which to list Apps, in the format:
+    /// * `parent` - The parent Project in which to create an App, in the format:
     ///              <br><code>projects/<var>projectId</var></code>
     pub fn web_apps_create(&self, request: WebApp, parent: &str) -> ProjectWebAppCreateCall<'a, C, A> {
         ProjectWebAppCreateCall {
@@ -1814,18 +2088,20 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Returns a list of valid Google Cloud Platform (GCP) resource locations for
     /// the specified Project (including a FirebaseProject).
     /// <br>
-    /// <br>The default GCP resource location of a project defines the geographical
-    /// location where project resources, such as Cloud Firestore, will be
-    /// provisioned by default.
+    /// <br>One of these locations can be selected as the Project's [_default_ GCP
+    /// resource location](https://firebase.google.com/docs/projects/locations),
+    /// which is the geographical location where project resources, such as Cloud
+    /// Firestore, will be provisioned by default. However, if the default GCP
+    /// resource location has already been set for the Project, then this setting
+    /// cannot be changed.
     /// <br>
-    /// <br>The returned list are the available
-    /// [GCP resource
-    /// locations](https://firebase.google.com/docs/projects/locations). <br>
-    /// <br>This call checks for any location restrictions for the specified
-    /// Project and, thus, might return a subset of all possible GCP resource
-    /// locations. To list all GCP resource locations (regardless of any
-    /// restrictions), call the endpoint without specifying a `projectId` (that is,
-    /// `/v1beta1/{parent=projects/-}/listAvailableLocations`).
+    /// <br>This call checks for any possible
+    /// [location
+    /// restrictions](https://cloud.google.com/resource-manager/docs/organization-policy/defining-locations)
+    /// for the specified Project and, thus, might return a subset of all possible
+    /// GCP resource locations. To list all GCP resource locations (regardless of
+    /// any restrictions), call the endpoint without specifying a `projectId` (that
+    /// is, `/v1beta1/{parent=projects/-}/listAvailableLocations`).
     /// <br>
     /// <br>To call `ListAvailableLocations` with a specified project, a member
     /// must be at minimum a Viewer of the project. Calls without a specified
@@ -1861,7 +2137,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The parent Project for which to list Apps, in the format:
+    /// * `parent` - The parent Project in which to create an App, in the format:
     ///              <br><code>projects/<var>projectId</var></code>
     pub fn ios_apps_create(&self, request: IosApp, parent: &str) -> ProjectIosAppCreateCall<'a, C, A> {
         ProjectIosAppCreateCall {
@@ -1974,7 +2250,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The parent Project for which to list Apps, in the format:
+    /// * `parent` - The parent Project in which to create an App, in the format:
     ///              <br><code>projects/<var>projectId</var></code>
     pub fn android_apps_create(&self, request: AndroidApp, parent: &str) -> ProjectAndroidAppCreateCall<'a, C, A> {
         ProjectAndroidAppCreateCall {
@@ -2048,6 +2324,43 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectIosAppGetConfigCall {
             hub: self.hub,
             _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Unlinks the specified `FirebaseProject` from its Google Analytics account.
+    /// <br>
+    /// <br>This call removes the association of the specified `FirebaseProject`
+    /// with its current Google Analytics property. However, this call does not
+    /// delete the Google Analytics resources, such as the Google Analytics
+    /// property or any data streams.
+    /// <br>
+    /// <br>These resources may be re-associated later to the `FirebaseProject` by
+    /// calling
+    /// [`AddGoogleAnalytics`](../../v1beta1/projects/addGoogleAnalytics) and
+    /// specifying the same `analyticsPropertyId`. For Android Apps and iOS Apps,
+    /// this call re-links data streams with their corresponding apps. However,
+    /// for Web Apps, this call provisions a <em>new</em> data stream for each Web
+    /// App.
+    /// <br>
+    /// <br>To call `RemoveAnalytics`, a member must be an Owner for
+    /// the `FirebaseProject`.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - The parent `FirebaseProject` to unlink from its Google Analytics account,
+    ///              in the format:
+    ///              <br><code>projects/<var>projectId</var></code>
+    pub fn remove_analytics(&self, request: RemoveAnalyticsRequest, parent: &str) -> ProjectRemoveAnalyticCall<'a, C, A> {
+        ProjectRemoveAnalyticCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4509,8 +4822,6 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// <br>This method does not modify any billing account information on the
 /// underlying GCP `Project`.
 /// <br>
-/// <br>All fields listed in the [request body](#request-body) are required.
-/// <br>
 /// <br>To call `AddFirebase`, a member must be an Editor or Owner for the
 /// existing GCP `Project`. Service accounts cannot call `AddFirebase`.
 ///
@@ -5363,6 +5674,259 @@ impl<'a, C, A> ProjectIosAppListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
+/// Gets the Google Analytics details currently associated with a
+/// FirebaseProject.
+/// <br>
+/// <br>If the `FirebaseProject` is not yet linked to Google Analytics, then
+/// the response to `GetAnalyticsDetails` is NOT_FOUND.
+///
+/// A builder for the *getAnalyticsDetails* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebase1_beta1 as firebase1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebase1_beta1::FirebaseManagement;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().get_analytics_details("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectGetAnalyticsDetailCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseManagement<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectGetAnalyticsDetailCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectGetAnalyticsDetailCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, AnalyticsDetails)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebase.projects.getAnalyticsDetails",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The fully qualified resource name, in the format:
+    /// <br><code>projects/<var>projectId</var>/analyticsDetails</code>
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectGetAnalyticsDetailCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectGetAnalyticsDetailCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetAnalyticsDetailCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Readonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectGetAnalyticsDetailCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Updates the attributes of the WebApp identified by the specified
 /// resource name.
 ///
@@ -5398,7 +5962,7 @@ impl<'a, C, A> ProjectIosAppListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().web_apps_patch(req, "name")
-///              .update_mask("et")
+///              .update_mask("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -5690,8 +6254,8 @@ impl<'a, C, A> ProjectWebAppPatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().web_apps_list("parent")
-///              .page_token("ipsum")
-///              .page_size(-5)
+///              .page_token("Lorem")
+///              .page_size(-21)
 ///              .doit();
 /// # }
 /// ```
@@ -5929,6 +6493,339 @@ impl<'a, C, A> ProjectWebAppListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectWebAppListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Links a FirebaseProject with an existing
+/// [Google Analytics account](http://www.google.com/analytics/).
+/// <br>
+/// <br>Using this call, you can either:
+/// <ul>
+/// <li>Specify an `analyticsAccountId` to provision a new Google Analytics
+/// property within the specified account and associate the new property with
+/// your `FirebaseProject`.</li>
+/// <li>Specify an existing `analyticsPropertyId` to associate the property
+/// with your `FirebaseProject`.</li>
+/// </ul>
+/// <br>
+/// Note that when you call `AddGoogleAnalytics`:
+/// <ol>
+/// <li>The first check determines if any existing data streams in the
+/// Google Analytics property correspond to any existing Firebase Apps in your
+/// `FirebaseProject` (based on the `packageName` or `bundleId` associated with
+/// the data stream). Then, as applicable, the data streams and apps are
+/// linked. Note that this auto-linking only applies to Android Apps and iOS
+/// Apps.</li>
+/// <li>If no corresponding data streams are found for your Firebase Apps,
+/// new data streams are provisioned in the Google Analytics property
+/// for each of your Firebase Apps. Note that a new data stream is always
+/// provisioned for a Web App even if it was previously associated with a
+/// data stream in your Analytics property.</li>
+/// </ol>
+/// Learn more about the hierarchy and structure of Google Analytics
+/// accounts in the
+/// [Analytics
+/// documentation](https://support.google.com/analytics/answer/9303323).
+/// <br>
+/// <br>The result of this call is an [`Operation`](../../v1beta1/operations).
+/// Poll the `Operation` to track the provisioning process by calling
+/// GetOperation until
+/// [`done`](../../v1beta1/operations#Operation.FIELDS.done) is `true`. When
+/// `done` is `true`, the `Operation` has either succeeded or failed. If the
+/// `Operation` succeeded, its
+/// [`response`](../../v1beta1/operations#Operation.FIELDS.response) is set to
+/// an AnalyticsDetails; if the `Operation` failed, its
+/// [`error`](../../v1beta1/operations#Operation.FIELDS.error) is set to a
+/// google.rpc.Status.
+/// <br>
+/// <br>To call `AddGoogleAnalytics`, a member must be an Owner for
+/// the existing `FirebaseProject` and have the
+/// [`Edit` permission](https://support.google.com/analytics/answer/2884495)
+/// for the Google Analytics account.
+/// <br>
+/// <br>If a `FirebaseProject` already has Google Analytics enabled, and you
+/// call `AddGoogleAnalytics` using an `analyticsPropertyId` that's different
+/// from the currently associated property, then the call will fail. Analytics
+/// may have already been enabled in the Firebase console or by specifying
+/// `timeZone` and `regionCode` in the call to
+/// [`AddFirebase`](../../v1beta1/projects/addFirebase).
+///
+/// A builder for the *addGoogleAnalytics* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebase1_beta1 as firebase1_beta1;
+/// use firebase1_beta1::AddGoogleAnalyticsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebase1_beta1::FirebaseManagement;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AddGoogleAnalyticsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().add_google_analytics(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectAddGoogleAnalyticCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseManagement<C, A>,
+    _request: AddGoogleAnalyticsRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectAddGoogleAnalyticCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectAddGoogleAnalyticCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebase.projects.addGoogleAnalytics",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}:addGoogleAnalytics";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AddGoogleAnalyticsRequest) -> ProjectAddGoogleAnalyticCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The parent `FirebaseProject` to link to an existing Google Analytics
+    /// account, in the format:
+    /// <br><code>projects/<var>projectId</var></code>
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectAddGoogleAnalyticCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectAddGoogleAnalyticCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAddGoogleAnalyticCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAddGoogleAnalyticCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6402,7 +7299,7 @@ impl<'a, C, A> ProjectWebAppCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._request = new_value;
         self
     }
-    /// The parent Project for which to list Apps, in the format:
+    /// The parent Project in which to create an App, in the format:
     /// <br><code>projects/<var>projectId</var></code>
     ///
     /// Sets the *parent* path property to the given value.
@@ -6550,7 +7447,7 @@ impl<'a, C, A> ProjectWebAppGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -6705,7 +7602,7 @@ impl<'a, C, A> ProjectWebAppGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6803,7 +7700,7 @@ impl<'a, C, A> ProjectAndroidAppGetConfigCall<'a, C, A> where C: BorrowMut<hyper
 
         let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -6958,7 +7855,7 @@ impl<'a, C, A> ProjectAndroidAppGetConfigCall<'a, C, A> where C: BorrowMut<hyper
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6984,18 +7881,20 @@ impl<'a, C, A> ProjectAndroidAppGetConfigCall<'a, C, A> where C: BorrowMut<hyper
 /// Returns a list of valid Google Cloud Platform (GCP) resource locations for
 /// the specified Project (including a FirebaseProject).
 /// <br>
-/// <br>The default GCP resource location of a project defines the geographical
-/// location where project resources, such as Cloud Firestore, will be
-/// provisioned by default.
+/// <br>One of these locations can be selected as the Project's [_default_ GCP
+/// resource location](https://firebase.google.com/docs/projects/locations),
+/// which is the geographical location where project resources, such as Cloud
+/// Firestore, will be provisioned by default. However, if the default GCP
+/// resource location has already been set for the Project, then this setting
+/// cannot be changed.
 /// <br>
-/// <br>The returned list are the available
-/// [GCP resource
-/// locations](https://firebase.google.com/docs/projects/locations). <br>
-/// <br>This call checks for any location restrictions for the specified
-/// Project and, thus, might return a subset of all possible GCP resource
-/// locations. To list all GCP resource locations (regardless of any
-/// restrictions), call the endpoint without specifying a `projectId` (that is,
-/// `/v1beta1/{parent=projects/-}/listAvailableLocations`).
+/// <br>This call checks for any possible
+/// [location
+/// restrictions](https://cloud.google.com/resource-manager/docs/organization-policy/defining-locations)
+/// for the specified Project and, thus, might return a subset of all possible
+/// GCP resource locations. To list all GCP resource locations (regardless of
+/// any restrictions), call the endpoint without specifying a `projectId` (that
+/// is, `/v1beta1/{parent=projects/-}/listAvailableLocations`).
 /// <br>
 /// <br>To call `ListAvailableLocations` with a specified project, a member
 /// must be at minimum a Viewer of the project. Calls without a specified
@@ -7027,8 +7926,8 @@ impl<'a, C, A> ProjectAndroidAppGetConfigCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().available_locations_list("parent")
-///              .page_token("eos")
-///              .page_size(-81)
+///              .page_token("sadipscing")
+///              .page_size(-48)
 ///              .doit();
 /// # }
 /// ```
@@ -7492,7 +8391,7 @@ impl<'a, C, A> ProjectIosAppCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._request = new_value;
         self
     }
-    /// The parent Project for which to list Apps, in the format:
+    /// The parent Project in which to create an App, in the format:
     /// <br><code>projects/<var>projectId</var></code>
     ///
     /// Sets the *parent* path property to the given value.
@@ -8390,7 +9289,7 @@ impl<'a, C, A> ProjectAndroidAppShaCreateCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().patch(req, "name")
-///              .update_mask("no")
+///              .update_mask("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -8862,7 +9761,7 @@ impl<'a, C, A> ProjectAndroidAppCreateCall<'a, C, A> where C: BorrowMut<hyper::C
         self._request = new_value;
         self
     }
-    /// The parent Project for which to list Apps, in the format:
+    /// The parent Project in which to create an App, in the format:
     /// <br><code>projects/<var>projectId</var></code>
     ///
     /// Sets the *parent* path property to the given value.
@@ -9221,8 +10120,8 @@ impl<'a, C, A> ProjectGetAdminSdkConfigCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().android_apps_list("parent")
-///              .page_token("invidunt")
-///              .page_size(-82)
+///              .page_token("accusam")
+///              .page_size(-56)
 ///              .doit();
 /// # }
 /// ```
@@ -9545,7 +10444,7 @@ impl<'a, C, A> ProjectIosAppGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         let mut url = self.hub._base_url.clone() + "v1beta1/{+name}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -9700,7 +10599,7 @@ impl<'a, C, A> ProjectIosAppGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9712,6 +10611,303 @@ impl<'a, C, A> ProjectIosAppGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectIosAppGetConfigCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Unlinks the specified `FirebaseProject` from its Google Analytics account.
+/// <br>
+/// <br>This call removes the association of the specified `FirebaseProject`
+/// with its current Google Analytics property. However, this call does not
+/// delete the Google Analytics resources, such as the Google Analytics
+/// property or any data streams.
+/// <br>
+/// <br>These resources may be re-associated later to the `FirebaseProject` by
+/// calling
+/// [`AddGoogleAnalytics`](../../v1beta1/projects/addGoogleAnalytics) and
+/// specifying the same `analyticsPropertyId`. For Android Apps and iOS Apps,
+/// this call re-links data streams with their corresponding apps. However,
+/// for Web Apps, this call provisions a <em>new</em> data stream for each Web
+/// App.
+/// <br>
+/// <br>To call `RemoveAnalytics`, a member must be an Owner for
+/// the `FirebaseProject`.
+///
+/// A builder for the *removeAnalytics* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebase1_beta1 as firebase1_beta1;
+/// use firebase1_beta1::RemoveAnalyticsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebase1_beta1::FirebaseManagement;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = RemoveAnalyticsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().remove_analytics(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectRemoveAnalyticCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseManagement<C, A>,
+    _request: RemoveAnalyticsRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectRemoveAnalyticCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectRemoveAnalyticCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebase.projects.removeAnalytics",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+parent}:removeAnalytics";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: RemoveAnalyticsRequest) -> ProjectRemoveAnalyticCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The parent `FirebaseProject` to unlink from its Google Analytics account,
+    /// in the format:
+    /// <br><code>projects/<var>projectId</var></code>
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectRemoveAnalyticCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectRemoveAnalyticCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRemoveAnalyticCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRemoveAnalyticCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

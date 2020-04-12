@@ -4,9 +4,9 @@
 [package]
 
 name = "google-acceleratedmobilepageurl1-cli"
-version = "1.0.12+20190619"
+version = "1.0.13+20200409"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
-description = "A complete library to interact with acceleratedmobilepageurl (protocol v1)"
+description = "A complete library to interact with Acceleratedmobilepageurl (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/acceleratedmobilepageurl1-cli"
 homepage = "https://developers.google.com/amp/cache/"
 documentation = "http://byron.github.io/google-apis-rs/google_acceleratedmobilepageurl1_cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-acceleratedmobilepageurl1]
 path = "../acceleratedmobilepageurl1"
-version = "1.0.12+20190619"
+version = "1.0.13+20200409"

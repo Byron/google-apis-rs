@@ -3,15 +3,15 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/cli/README.md.mako'
 DO NOT EDIT !
 -->
-The `pagespeedonline5` command-line interface *(CLI)* allows to use most features of the *Google pagespeedonline* service from the comfort of your terminal.
+The `pagespeedonline5` command-line interface *(CLI)* allows to use most features of the *Google Pagespeed Insights* service from the comfort of your terminal.
 
 By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
-Everything else about the *pagespeedonline* API can be found at the
-[official documentation site](https://developers.google.com/speed/docs/insights/v5/get-started).
+Everything else about the *Pagespeed Insights* API can be found at the
+[official documentation site](https://developers.google.com/speed/docs/insights/v5/about).
 
 # Installation and Source Code
 
@@ -25,15 +25,19 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *pagespeedonline* API at revision *20190507*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Pagespeed Insights* API at revision *20200318*. The CLI is at version *1.0.13*.
 
 ```bash
 pagespeedonline5 [options]
         pagespeedapi
-                runpagespeed <url> [-p <v>]... [-o <out>]
+                runpagespeed [-p <v>]... [-o <out>]
   pagespeedonline5 --help
 
 Configuration:
+  [--scope <url>]...
+            Specify the authentication a method should be executed in. Each scope
+            requires the user to grant this application permission to use it.
+            If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.

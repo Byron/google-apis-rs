@@ -216,16 +216,17 @@ impl<'n> Engine<'n> {
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "primary.destroy-time" => Some(("primary.destroyTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.import-failure-reason" => Some(("primary.importFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.name" => Some(("primary.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.algorithm" => Some(("primary.algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.protection-level" => Some(("primary.protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.algorithm" => Some(("primary.algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.name" => Some(("primary.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.attestation.content" => Some(("primary.attestation.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.attestation.format" => Some(("primary.attestation.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.state" => Some(("primary.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.destroy-event-time" => Some(("primary.destroyEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.generate-time" => Some(("primary.generateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.create-time" => Some(("primary.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.import-time" => Some(("primary.importTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.create-time" => Some(("primary.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.external-protection-level-options.external-key-uri" => Some(("primary.externalProtectionLevelOptions.externalKeyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.import-job" => Some(("primary.importJob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-template.protection-level" => Some(("versionTemplate.protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-template.algorithm" => Some(("versionTemplate.algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -233,7 +234,7 @@ impl<'n> Engine<'n> {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "next-rotation-time" => Some(("nextRotationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "attestation", "content", "create-time", "destroy-event-time", "destroy-time", "format", "generate-time", "import-failure-reason", "import-job", "import-time", "labels", "name", "next-rotation-time", "primary", "protection-level", "purpose", "rotation-period", "state", "version-template"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "attestation", "content", "create-time", "destroy-event-time", "destroy-time", "external-key-uri", "external-protection-level-options", "format", "generate-time", "import-failure-reason", "import-job", "import-time", "labels", "name", "next-rotation-time", "primary", "protection-level", "purpose", "rotation-period", "state", "version-template"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -497,19 +498,20 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "destroy-time" => Some(("destroyTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "import-failure-reason" => Some(("importFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "algorithm" => Some(("algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "protection-level" => Some(("protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "algorithm" => Some(("algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attestation.content" => Some(("attestation.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attestation.format" => Some(("attestation.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destroy-event-time" => Some(("destroyEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generate-time" => Some(("generateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "import-time" => Some(("importTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "external-protection-level-options.external-key-uri" => Some(("externalProtectionLevelOptions.externalKeyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "import-job" => Some(("importJob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "attestation", "content", "create-time", "destroy-event-time", "destroy-time", "format", "generate-time", "import-failure-reason", "import-job", "import-time", "name", "protection-level", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "attestation", "content", "create-time", "destroy-event-time", "destroy-time", "external-key-uri", "external-protection-level-options", "format", "generate-time", "import-failure-reason", "import-job", "import-time", "name", "protection-level", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -937,19 +939,20 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "destroy-time" => Some(("destroyTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "import-failure-reason" => Some(("importFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "algorithm" => Some(("algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "protection-level" => Some(("protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "algorithm" => Some(("algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attestation.content" => Some(("attestation.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attestation.format" => Some(("attestation.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destroy-event-time" => Some(("destroyEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generate-time" => Some(("generateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "import-time" => Some(("importTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "external-protection-level-options.external-key-uri" => Some(("externalProtectionLevelOptions.externalKeyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "import-job" => Some(("importJob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "attestation", "content", "create-time", "destroy-event-time", "destroy-time", "format", "generate-time", "import-failure-reason", "import-job", "import-time", "name", "protection-level", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "attestation", "content", "create-time", "destroy-event-time", "destroy-time", "external-key-uri", "external-protection-level-options", "format", "generate-time", "import-failure-reason", "import-job", "import-time", "name", "protection-level", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1473,16 +1476,17 @@ impl<'n> Engine<'n> {
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "primary.destroy-time" => Some(("primary.destroyTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.import-failure-reason" => Some(("primary.importFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.name" => Some(("primary.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.algorithm" => Some(("primary.algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.protection-level" => Some(("primary.protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.algorithm" => Some(("primary.algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.name" => Some(("primary.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.attestation.content" => Some(("primary.attestation.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.attestation.format" => Some(("primary.attestation.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.state" => Some(("primary.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.destroy-event-time" => Some(("primary.destroyEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.generate-time" => Some(("primary.generateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary.create-time" => Some(("primary.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.import-time" => Some(("primary.importTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.create-time" => Some(("primary.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary.external-protection-level-options.external-key-uri" => Some(("primary.externalProtectionLevelOptions.externalKeyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary.import-job" => Some(("primary.importJob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-template.protection-level" => Some(("versionTemplate.protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-template.algorithm" => Some(("versionTemplate.algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1490,7 +1494,7 @@ impl<'n> Engine<'n> {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "next-rotation-time" => Some(("nextRotationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "attestation", "content", "create-time", "destroy-event-time", "destroy-time", "format", "generate-time", "import-failure-reason", "import-job", "import-time", "labels", "name", "next-rotation-time", "primary", "protection-level", "purpose", "rotation-period", "state", "version-template"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "attestation", "content", "create-time", "destroy-event-time", "destroy-time", "external-key-uri", "external-protection-level-options", "format", "generate-time", "import-failure-reason", "import-job", "import-time", "labels", "name", "next-rotation-time", "primary", "protection-level", "purpose", "rotation-period", "state", "version-template"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3058,7 +3062,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the CryptoKeyVersion to destroy."##),
+                     Some(r##"Required. The resource name of the CryptoKeyVersion to destroy."##),
                      Some(true),
                      Some(false)),
         
@@ -3086,7 +3090,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the CryptoKeyVersion to get."##),
+                     Some(r##"Required. The name of the CryptoKeyVersion to get."##),
                      Some(true),
                      Some(false)),
         
@@ -3111,7 +3115,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the CryptoKeyVersion public key to
+                     Some(r##"Required. The name of the CryptoKeyVersion public key to
         get."##),
                      Some(true),
                      Some(false)),
@@ -3231,7 +3235,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the CryptoKeyVersion to restore."##),
+                     Some(r##"Required. The resource name of the CryptoKeyVersion to restore."##),
                      Some(true),
                      Some(false)),
         
@@ -3324,7 +3328,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the CryptoKey to get."##),
+                     Some(r##"Required. The name of the CryptoKey to get."##),
                      Some(true),
                      Some(false)),
         
@@ -3419,7 +3423,9 @@ fn main() {
                   ]),
             ("locations-key-rings-crypto-keys-set-iam-policy",
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
-        existing policy."##),
+        existing policy.
+        
+        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-crypto-keys-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3490,7 +3496,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the CryptoKey to update."##),
+                     Some(r##"Required. The resource name of the CryptoKey to update."##),
                      Some(true),
                      Some(false)),
         
@@ -3518,7 +3524,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the KeyRing to get."##),
+                     Some(r##"Required. The name of the KeyRing to get."##),
                      Some(true),
                      Some(false)),
         
@@ -3596,7 +3602,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the ImportJob to get."##),
+                     Some(r##"Required. The name of the ImportJob to get."##),
                      Some(true),
                      Some(false)),
         
@@ -3662,7 +3668,9 @@ fn main() {
                   ]),
             ("locations-key-rings-import-jobs-set-iam-policy",
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
-        existing policy."##),
+        existing policy.
+        
+        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-import-jobs-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3750,7 +3758,9 @@ fn main() {
                   ]),
             ("locations-key-rings-set-iam-policy",
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
-        existing policy."##),
+        existing policy.
+        
+        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-rings-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3841,7 +3851,7 @@ fn main() {
     
     let mut app = App::new("cloudkms1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190626")
+           .version("1.0.13+20200313")
            .about("Manages keys and performs cryptographic operations in a central cloud service, for direct use by other cloud resources and applications.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudkms1_cli")

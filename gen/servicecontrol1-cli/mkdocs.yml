@@ -1,4 +1,4 @@
-site_name: Service Control v1.0.12+20190622
+site_name: Service Control v1.0.13+20200407
 site_url: http://byron.github.io/google-apis-rs/google-servicecontrol1-cli
 site_description: A complete library to interact with Service Control (protocol v1)
 

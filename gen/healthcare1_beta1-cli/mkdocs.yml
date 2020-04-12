@@ -1,4 +1,4 @@
-site_name: Cloud Healthcare v1.0.12+20190628
+site_name: Cloud Healthcare v1.0.13+20200327
 site_url: http://byron.github.io/google-apis-rs/google-healthcare1_beta1-cli
 site_description: A complete library to interact with Cloud Healthcare (protocol v1beta1)
 
@@ -9,10 +9,14 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['projects_locations-datasets-annotation-stores-get-iam-policy.md', 'Projects', 'Locations Datasets Annotation Stores Get Iam Policy']
+- ['projects_locations-datasets-annotation-stores-set-iam-policy.md', 'Projects', 'Locations Datasets Annotation Stores Set Iam Policy']
+- ['projects_locations-datasets-annotation-stores-test-iam-permissions.md', 'Projects', 'Locations Datasets Annotation Stores Test Iam Permissions']
 - ['projects_locations-datasets-create.md', 'Projects', 'Locations Datasets Create']
 - ['projects_locations-datasets-deidentify.md', 'Projects', 'Locations Datasets Deidentify']
 - ['projects_locations-datasets-delete.md', 'Projects', 'Locations Datasets Delete']
 - ['projects_locations-datasets-dicom-stores-create.md', 'Projects', 'Locations Datasets Dicom Stores Create']
+- ['projects_locations-datasets-dicom-stores-deidentify.md', 'Projects', 'Locations Datasets Dicom Stores Deidentify']
 - ['projects_locations-datasets-dicom-stores-delete.md', 'Projects', 'Locations Datasets Dicom Stores Delete']
 - ['projects_locations-datasets-dicom-stores-export.md', 'Projects', 'Locations Datasets Dicom Stores Export']
 - ['projects_locations-datasets-dicom-stores-get.md', 'Projects', 'Locations Datasets Dicom Stores Get']
@@ -43,6 +47,7 @@ pages:
 - ['projects_locations-datasets-dicom-stores-studies-store-instances.md', 'Projects', 'Locations Datasets Dicom Stores Studies Store Instances']
 - ['projects_locations-datasets-dicom-stores-test-iam-permissions.md', 'Projects', 'Locations Datasets Dicom Stores Test Iam Permissions']
 - ['projects_locations-datasets-fhir-stores-create.md', 'Projects', 'Locations Datasets Fhir Stores Create']
+- ['projects_locations-datasets-fhir-stores-deidentify.md', 'Projects', 'Locations Datasets Fhir Stores Deidentify']
 - ['projects_locations-datasets-fhir-stores-delete.md', 'Projects', 'Locations Datasets Fhir Stores Delete']
 - ['projects_locations-datasets-fhir-stores-export.md', 'Projects', 'Locations Datasets Fhir Stores Export']
 - ['projects_locations-datasets-fhir-stores-fhir--observation-lastn.md', 'Projects', 'Locations Datasets Fhir Stores Fhir  Observation Lastn']
@@ -66,6 +71,7 @@ pages:
 - ['projects_locations-datasets-fhir-stores-import.md', 'Projects', 'Locations Datasets Fhir Stores Import']
 - ['projects_locations-datasets-fhir-stores-list.md', 'Projects', 'Locations Datasets Fhir Stores List']
 - ['projects_locations-datasets-fhir-stores-patch.md', 'Projects', 'Locations Datasets Fhir Stores Patch']
+- ['projects_locations-datasets-fhir-stores-search.md', 'Projects', 'Locations Datasets Fhir Stores Search']
 - ['projects_locations-datasets-fhir-stores-set-iam-policy.md', 'Projects', 'Locations Datasets Fhir Stores Set Iam Policy']
 - ['projects_locations-datasets-fhir-stores-test-iam-permissions.md', 'Projects', 'Locations Datasets Fhir Stores Test Iam Permissions']
 - ['projects_locations-datasets-get.md', 'Projects', 'Locations Datasets Get']
@@ -85,6 +91,7 @@ pages:
 - ['projects_locations-datasets-hl7-v2-stores-set-iam-policy.md', 'Projects', 'Locations Datasets Hl7 V2 Stores Set Iam Policy']
 - ['projects_locations-datasets-hl7-v2-stores-test-iam-permissions.md', 'Projects', 'Locations Datasets Hl7 V2 Stores Test Iam Permissions']
 - ['projects_locations-datasets-list.md', 'Projects', 'Locations Datasets List']
+- ['projects_locations-datasets-operations-cancel.md', 'Projects', 'Locations Datasets Operations Cancel']
 - ['projects_locations-datasets-operations-get.md', 'Projects', 'Locations Datasets Operations Get']
 - ['projects_locations-datasets-operations-list.md', 'Projects', 'Locations Datasets Operations List']
 - ['projects_locations-datasets-patch.md', 'Projects', 'Locations Datasets Patch']

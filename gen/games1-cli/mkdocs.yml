@@ -1,4 +1,4 @@
-site_name: Games v1.0.12+20190627
+site_name: Games v1.0.13+20200402
 site_url: http://byron.github.io/google-apis-rs/google-games1-cli
 site_description: A complete library to interact with Games (protocol v1)
 
@@ -30,9 +30,6 @@ pages:
 - ['players_list.md', 'Players', 'List']
 - ['pushtokens_remove.md', 'Pushtokens', 'Remove']
 - ['pushtokens_update.md', 'Pushtokens', 'Update']
-- ['quest-milestones_claim.md', 'Quest Milestones', 'Claim']
-- ['quests_accept.md', 'Quests', 'Accept']
-- ['quests_list.md', 'Quests', 'List']
 - ['revisions_check.md', 'Revisions', 'Check']
 - ['rooms_create.md', 'Rooms', 'Create']
 - ['rooms_decline.md', 'Rooms', 'Decline']

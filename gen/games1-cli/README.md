@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Games* API at revision *20190627*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Games* API at revision *20200402*. The CLI is at version *1.0.13*.
 
 ```bash
 games1 [options]
@@ -58,11 +58,6 @@ games1 [options]
         pushtokens
                 remove (-r <kv>)... [-p <v>]...
                 update (-r <kv>)... [-p <v>]...
-        quest-milestones
-                claim <quest-id> <milestone-id> <request-id> [-p <v>]...
-        quests
-                accept <quest-id> [-p <v>]... [-o <out>]
-                list <player-id> [-p <v>]... [-o <out>]
         revisions
                 check <client-revision> [-p <v>]... [-o <out>]
         rooms

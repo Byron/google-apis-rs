@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AdSense Host* crate version *1.0.12+20190703*, where *20190703* is the exact revision of the *adsensehost:v4.1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *AdSense Host* crate version *1.0.13+20200407*, where *20200407* is the exact revision of the *adsensehost:v4.1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *AdSense Host* *v4d1* API can be found at the
 //! [official documentation site](https://developers.google.com/adsense/host/).
@@ -352,7 +352,7 @@ impl<'a, C, A> AdSenseHost<C, A>
         AdSenseHost {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://www.googleapis.com/adsensehost/v4.1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -378,7 +378,7 @@ impl<'a, C, A> AdSenseHost<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1162,6 +1162,7 @@ impl<'a, C, A> AssociationsessionMethods<'a, C, A> {
             _website_url: website_url.to_string(),
             _website_locale: Default::default(),
             _user_locale: Default::default(),
+            _callback_url: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3001,6 +3002,7 @@ impl<'a, C, A> AdclientGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// let result = hub.associationsessions().start("productCode", "websiteUrl")
 ///              .website_locale("labore")
 ///              .user_locale("eirmod")
+///              .callback_url("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -3012,6 +3014,7 @@ pub struct AssociationsessionStartCall<'a, C, A>
     _website_url: String,
     _website_locale: Option<String>,
     _user_locale: Option<String>,
+    _callback_url: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -3033,7 +3036,7 @@ impl<'a, C, A> AssociationsessionStartCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "adsensehost.associationsessions.start",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         if self._product_code.len() > 0 {
             for f in self._product_code.iter() {
                 params.push(("productCode", f.to_string()));
@@ -3046,7 +3049,10 @@ impl<'a, C, A> AssociationsessionStartCall<'a, C, A> where C: BorrowMut<hyper::C
         if let Some(value) = self._user_locale {
             params.push(("userLocale", value.to_string()));
         }
-        for &field in ["alt", "productCode", "websiteUrl", "websiteLocale", "userLocale"].iter() {
+        if let Some(value) = self._callback_url {
+            params.push(("callbackUrl", value.to_string()));
+        }
+        for &field in ["alt", "productCode", "websiteUrl", "websiteLocale", "userLocale", "callbackUrl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -3170,6 +3176,13 @@ impl<'a, C, A> AssociationsessionStartCall<'a, C, A> where C: BorrowMut<hyper::C
     /// Sets the *user locale* query property to the given value.
     pub fn user_locale(mut self, new_value: &str) -> AssociationsessionStartCall<'a, C, A> {
         self._user_locale = Some(new_value.to_string());
+        self
+    }
+    /// The URL to redirect the user to once association is completed. It receives a token parameter that can then be used to retrieve the associated account.
+    ///
+    /// Sets the *callback url* query property to the given value.
+    pub fn callback_url(mut self, new_value: &str) -> AssociationsessionStartCall<'a, C, A> {
+        self._callback_url = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -3478,13 +3491,13 @@ impl<'a, C, A> AssociationsessionVerifyCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.reports().generate("startDate", "endDate")
-///              .start_index(28)
-///              .add_sort("Lorem")
-///              .add_metric("sea")
-///              .max_results(80)
-///              .locale("duo")
-///              .add_filter("et")
-///              .add_dimension("eirmod")
+///              .start_index(45)
+///              .add_sort("sea")
+///              .add_metric("et")
+///              .max_results(31)
+///              .locale("et")
+///              .add_filter("eirmod")
+///              .add_dimension("sanctus")
 ///              .doit();
 /// # }
 /// ```
@@ -3805,8 +3818,8 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().adunits_list("accountId", "adClientId")
-///              .page_token("amet")
-///              .max_results(78)
+///              .page_token("et")
+///              .max_results(56)
 ///              .include_inactive(true)
 ///              .doit();
 /// # }
@@ -4596,13 +4609,13 @@ impl<'a, C, A> AccountAdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().reports_generate("accountId", "startDate", "endDate")
-///              .start_index(49)
-///              .add_sort("voluptua.")
-///              .add_metric("Lorem")
-///              .max_results(90)
-///              .locale("justo")
-///              .add_filter("sit")
-///              .add_dimension("vero")
+///              .start_index(74)
+///              .add_sort("Lorem")
+///              .add_metric("gubergren")
+///              .max_results(81)
+///              .locale("sit")
+///              .add_filter("vero")
+///              .add_dimension("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -5220,8 +5233,8 @@ impl<'a, C, A> AccountAdunitDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().adclients_list("accountId")
-///              .page_token("vero")
-///              .max_results(6)
+///              .page_token("sadipscing")
+///              .max_results(13)
 ///              .doit();
 /// # }
 /// ```
@@ -7876,8 +7889,8 @@ impl<'a, C, A> CustomchannelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.customchannels().list("adClientId")
-///              .page_token("rebum.")
-///              .max_results(68)
+///              .page_token("dolore")
+///              .max_results(60)
 ///              .doit();
 /// # }
 /// ```

@@ -623,6 +623,263 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_instances_clusters_backups_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "options.requested-policy-version" => Some(("options.requestedPolicyVersion", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["options", "requested-policy-version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().instances_clusters_backups_get_iam_policy(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_instances_clusters_backups_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "update-mask", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().instances_clusters_backups_set_iam_policy(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_instances_clusters_backups_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "permissions" => Some(("permissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["permissions"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TestIamPermissionsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().instances_clusters_backups_test_iam_permissions(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_instances_clusters_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1183,8 +1440,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "options.requested-policy-version" => Some(("options.requestedPolicyVersion", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["options", "requested-policy-version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1953,8 +2211,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "options.requested-policy-version" => Some(("options.requestedPolicyVersion", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["options", "requested-policy-version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2662,6 +2921,15 @@ impl<'n> Engine<'n> {
                     ("instances-app-profiles-patch", Some(opt)) => {
                         call_result = self._projects_instances_app_profiles_patch(opt, dry_run, &mut err);
                     },
+                    ("instances-clusters-backups-get-iam-policy", Some(opt)) => {
+                        call_result = self._projects_instances_clusters_backups_get_iam_policy(opt, dry_run, &mut err);
+                    },
+                    ("instances-clusters-backups-set-iam-policy", Some(opt)) => {
+                        call_result = self._projects_instances_clusters_backups_set_iam_policy(opt, dry_run, &mut err);
+                    },
+                    ("instances-clusters-backups-test-iam-permissions", Some(opt)) => {
+                        call_result = self._projects_instances_clusters_backups_test_iam_permissions(opt, dry_run, &mut err);
+                    },
                     ("instances-clusters-create", Some(opt)) => {
                         call_result = self._projects_instances_clusters_create(opt, dry_run, &mut err);
                     },
@@ -2948,16 +3216,16 @@ fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'instances-app-profiles-create', 'instances-app-profiles-delete', 'instances-app-profiles-get', 'instances-app-profiles-list', 'instances-app-profiles-patch', 'instances-clusters-create', 'instances-clusters-delete', 'instances-clusters-get', 'instances-clusters-list', 'instances-clusters-update', 'instances-create', 'instances-delete', 'instances-get', 'instances-get-iam-policy', 'instances-list', 'instances-partial-update-instance', 'instances-set-iam-policy', 'instances-tables-check-consistency', 'instances-tables-create', 'instances-tables-delete', 'instances-tables-drop-row-range', 'instances-tables-generate-consistency-token', 'instances-tables-get', 'instances-tables-get-iam-policy', 'instances-tables-list', 'instances-tables-modify-column-families', 'instances-tables-set-iam-policy', 'instances-tables-test-iam-permissions', 'instances-test-iam-permissions', 'instances-update', 'locations-get' and 'locations-list'", vec![
+        ("projects", "methods: 'instances-app-profiles-create', 'instances-app-profiles-delete', 'instances-app-profiles-get', 'instances-app-profiles-list', 'instances-app-profiles-patch', 'instances-clusters-backups-get-iam-policy', 'instances-clusters-backups-set-iam-policy', 'instances-clusters-backups-test-iam-permissions', 'instances-clusters-create', 'instances-clusters-delete', 'instances-clusters-get', 'instances-clusters-list', 'instances-clusters-update', 'instances-create', 'instances-delete', 'instances-get', 'instances-get-iam-policy', 'instances-list', 'instances-partial-update-instance', 'instances-set-iam-policy', 'instances-tables-check-consistency', 'instances-tables-create', 'instances-tables-delete', 'instances-tables-drop-row-range', 'instances-tables-generate-consistency-token', 'instances-tables-get', 'instances-tables-get-iam-policy', 'instances-tables-list', 'instances-tables-modify-column-families', 'instances-tables-set-iam-policy', 'instances-tables-test-iam-permissions', 'instances-test-iam-permissions', 'instances-update', 'locations-get' and 'locations-list'", vec![
             ("instances-app-profiles-create",
                     Some(r##"Creates an app profile within an instance."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-app-profiles-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The unique name of the instance in which to create the new app profile.
+                     Some(r##"Required. The unique name of the instance in which to create the new app profile.
         Values are of the form
-        `projects/<project>/instances/<instance>`."##),
+        `projects/{project}/instances/{instance}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2985,8 +3253,8 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The unique name of the app profile to be deleted. Values are of the form
-        `projects/<project>/instances/<instance>/appProfiles/<app_profile>`."##),
+                     Some(r##"Required. The unique name of the app profile to be deleted. Values are of the form
+        `projects/{project}/instances/{instance}/appProfiles/{app_profile}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3008,8 +3276,8 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The unique name of the requested app profile. Values are of the form
-        `projects/<project>/instances/<instance>/appProfiles/<app_profile>`."##),
+                     Some(r##"Required. The unique name of the requested app profile. Values are of the form
+        `projects/{project}/instances/{instance}/appProfiles/{app_profile}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3031,10 +3299,10 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The unique name of the instance for which a list of app profiles is
+                     Some(r##"Required. The unique name of the instance for which a list of app profiles is
         requested. Values are of the form
-        `projects/<project>/instances/<instance>`.
-        Use `<instance> = '-'` to list AppProfiles for all Instances in a project,
+        `projects/{project}/instances/{instance}`.
+        Use `{instance} = '-'` to list AppProfiles for all Instances in a project,
         e.g., `projects/myproject/instances/-`."##),
                      Some(true),
                      Some(false)),
@@ -3081,15 +3349,105 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("instances-clusters-backups-get-iam-policy",
+                    Some(r##"Gets the access control policy for a Table or Backup resource.
+        Returns an empty policy if the resource exists but does not have a policy
+        set."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-clusters-backups-get-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being requested.
+        See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("instances-clusters-backups-set-iam-policy",
+                    Some(r##"Sets the access control policy on a Table or Backup resource.
+        Replaces any existing policy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-clusters-backups-set-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being specified.
+        See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("instances-clusters-backups-test-iam-permissions",
+                    Some(r##"Returns permissions that the caller has on the specified table resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-clusters-backups-test-iam-permissions",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
+        See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("instances-clusters-create",
                     Some(r##"Creates a cluster within an instance."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-clusters-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The unique name of the instance in which to create the new cluster.
+                     Some(r##"Required. The unique name of the instance in which to create the new cluster.
         Values are of the form
-        `projects/<project>/instances/<instance>`."##),
+        `projects/{project}/instances/{instance}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3117,8 +3475,8 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The unique name of the cluster to be deleted. Values are of the form
-        `projects/<project>/instances/<instance>/clusters/<cluster>`."##),
+                     Some(r##"Required. The unique name of the cluster to be deleted. Values are of the form
+        `projects/{project}/instances/{instance}/clusters/{cluster}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3140,8 +3498,8 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The unique name of the requested cluster. Values are of the form
-        `projects/<project>/instances/<instance>/clusters/<cluster>`."##),
+                     Some(r##"Required. The unique name of the requested cluster. Values are of the form
+        `projects/{project}/instances/{instance}/clusters/{cluster}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3163,9 +3521,9 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The unique name of the instance for which a list of clusters is requested.
-        Values are of the form `projects/<project>/instances/<instance>`.
-        Use `<instance> = '-'` to list Clusters for all Instances in a project,
+                     Some(r##"Required. The unique name of the instance for which a list of clusters is requested.
+        Values are of the form `projects/{project}/instances/{instance}`.
+        Use `{instance} = '-'` to list Clusters for all Instances in a project,
         e.g., `projects/myproject/instances/-`."##),
                      Some(true),
                      Some(false)),
@@ -3188,9 +3546,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"(`OutputOnly`)
+                     Some(r##"Required. (`OutputOnly`)
         The unique name of the cluster. Values are of the form
-        `projects/<project>/instances/<instance>/clusters/a-z*`."##),
+        `projects/{project}/instances/{instance}/clusters/a-z*`."##),
                      Some(true),
                      Some(false)),
         
@@ -3218,8 +3576,8 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The unique name of the project in which to create the new instance.
-        Values are of the form `projects/<project>`."##),
+                     Some(r##"Required. The unique name of the project in which to create the new instance.
+        Values are of the form `projects/{project}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3247,8 +3605,8 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The unique name of the instance to be deleted.
-        Values are of the form `projects/<project>/instances/<instance>`."##),
+                     Some(r##"Required. The unique name of the instance to be deleted.
+        Values are of the form `projects/{project}/instances/{instance}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3270,8 +3628,8 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The unique name of the requested instance. Values are of the form
-        `projects/<project>/instances/<instance>`."##),
+                     Some(r##"Required. The unique name of the requested instance. Values are of the form
+        `projects/{project}/instances/{instance}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3323,8 +3681,8 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The unique name of the project for which a list of instances is requested.
-        Values are of the form `projects/<project>`."##),
+                     Some(r##"Required. The unique name of the project for which a list of instances is requested.
+        Values are of the form `projects/{project}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3347,9 +3705,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"(`OutputOnly`)
+                     Some(r##"Required. (`OutputOnly`)
         The unique name of the instance. Values are of the form
-        `projects/<project>/instances/a-z+[a-z0-9]`."##),
+        `projects/{project}/instances/a-z+[a-z0-9]`."##),
                      Some(true),
                      Some(false)),
         
@@ -3409,9 +3767,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The unique name of the Table for which to check replication consistency.
+                     Some(r##"Required. The unique name of the Table for which to check replication consistency.
         Values are of the form
-        `projects/<project>/instances/<instance>/tables/<table>`."##),
+        `projects/{project}/instances/{instance}/tables/{table}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3441,8 +3799,8 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The unique name of the instance in which to create the table.
-        Values are of the form `projects/<project>/instances/<instance>`."##),
+                     Some(r##"Required. The unique name of the instance in which to create the table.
+        Values are of the form `projects/{project}/instances/{instance}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3470,9 +3828,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The unique name of the table to be deleted.
+                     Some(r##"Required. The unique name of the table to be deleted.
         Values are of the form
-        `projects/<project>/instances/<instance>/tables/<table>`."##),
+        `projects/{project}/instances/{instance}/tables/{table}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3496,9 +3854,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The unique name of the table on which to drop a range of rows.
+                     Some(r##"Required. The unique name of the table on which to drop a range of rows.
         Values are of the form
-        `projects/<project>/instances/<instance>/tables/<table>`."##),
+        `projects/{project}/instances/{instance}/tables/{table}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3529,9 +3887,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The unique name of the Table for which to create a consistency token.
+                     Some(r##"Required. The unique name of the Table for which to create a consistency token.
         Values are of the form
-        `projects/<project>/instances/<instance>/tables/<table>`."##),
+        `projects/{project}/instances/{instance}/tables/{table}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3559,9 +3917,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The unique name of the requested table.
+                     Some(r##"Required. The unique name of the requested table.
         Values are of the form
-        `projects/<project>/instances/<instance>/tables/<table>`."##),
+        `projects/{project}/instances/{instance}/tables/{table}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3578,8 +3936,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("instances-tables-get-iam-policy",
-                    Some(r##"Gets the access control policy for an instance resource. Returns an empty
-        policy if an table exists but does not have a policy set."##),
+                    Some(r##"Gets the access control policy for a Table or Backup resource.
+        Returns an empty policy if the resource exists but does not have a policy
+        set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-tables-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3613,8 +3972,8 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The unique name of the instance for which tables should be listed.
-        Values are of the form `projects/<project>/instances/<instance>`."##),
+                     Some(r##"Required. The unique name of the instance for which tables should be listed.
+        Values are of the form `projects/{project}/instances/{instance}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3639,9 +3998,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The unique name of the table whose families should be modified.
+                     Some(r##"Required. The unique name of the table whose families should be modified.
         Values are of the form
-        `projects/<project>/instances/<instance>/tables/<table>`."##),
+        `projects/{project}/instances/{instance}/tables/{table}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3664,8 +4023,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("instances-tables-set-iam-policy",
-                    Some(r##"Sets the access control policy on a table resource. Replaces any existing
-        policy."##),
+                    Some(r##"Sets the access control policy on a Table or Backup resource.
+        Replaces any existing policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-tables-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3759,9 +4118,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"(`OutputOnly`)
+                     Some(r##"Required. (`OutputOnly`)
         The unique name of the instance. Values are of the form
-        `projects/<project>/instances/a-z+[a-z0-9]`."##),
+        `projects/{project}/instances/a-z+[a-z0-9]`."##),
                      Some(true),
                      Some(false)),
         
@@ -3833,7 +4192,7 @@ fn main() {
     
     let mut app = App::new("bigtableadmin2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190506")
+           .version("1.0.13+20200211")
            .about("Administer your Cloud Bigtable tables and instances.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli")
            .arg(Arg::with_name("url")

@@ -69,14 +69,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "basic.combining-function" => Some(("basic.combiningFunction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom.expr.title" => Some(("custom.expr.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom.expr.expression" => Some(("custom.expr.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom.expr.description" => Some(("custom.expr.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom.expr.location" => Some(("custom.expr.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "basic.combining-function" => Some(("basic.combiningFunction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["basic", "combining-function", "create-time", "description", "name", "title", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["basic", "combining-function", "custom", "description", "expr", "expression", "location", "name", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -329,14 +331,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "basic.combining-function" => Some(("basic.combiningFunction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom.expr.title" => Some(("custom.expr.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom.expr.expression" => Some(("custom.expr.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom.expr.description" => Some(("custom.expr.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom.expr.location" => Some(("custom.expr.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "basic.combining-function" => Some(("basic.combiningFunction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["basic", "combining-function", "create-time", "description", "name", "title", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["basic", "combining-function", "custom", "description", "expr", "expression", "location", "name", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -423,13 +427,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "name", "parent", "title", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "parent", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -678,13 +680,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "name", "parent", "title", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "parent", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -771,24 +771,18 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "status.ingress-service-restriction.enable-restriction" => Some(("status.ingressServiceRestriction.enableRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "status.ingress-service-restriction.allowed-services" => Some(("status.ingressServiceRestriction.allowedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "status.bridge-service-restriction.enable-restriction" => Some(("status.bridgeServiceRestriction.enableRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "status.bridge-service-restriction.allowed-services" => Some(("status.bridgeServiceRestriction.allowedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "status.access-levels" => Some(("status.accessLevels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "status.unrestricted-services" => Some(("status.unrestrictedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "status.vpc-service-restriction.enable-restriction" => Some(("status.vpcServiceRestriction.enableRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "status.vpc-service-restriction.allowed-services" => Some(("status.vpcServiceRestriction.allowedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "status.restricted-services" => Some(("status.restrictedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "status.vpc-accessible-services.enable-restriction" => Some(("status.vpcAccessibleServices.enableRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status.vpc-accessible-services.allowed-services" => Some(("status.vpcAccessibleServices.allowedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "status.unrestricted-services" => Some(("status.unrestrictedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "status.resources" => Some(("status.resources", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.access-levels" => Some(("status.accessLevels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "perimeter-type" => Some(("perimeterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-levels", "allowed-services", "bridge-service-restriction", "create-time", "description", "enable-restriction", "ingress-service-restriction", "name", "perimeter-type", "resources", "restricted-services", "status", "title", "unrestricted-services", "update-time", "vpc-service-restriction"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-levels", "allowed-services", "description", "enable-restriction", "name", "perimeter-type", "resources", "restricted-services", "status", "title", "unrestricted-services", "vpc-accessible-services"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1034,24 +1028,18 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "status.ingress-service-restriction.enable-restriction" => Some(("status.ingressServiceRestriction.enableRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "status.ingress-service-restriction.allowed-services" => Some(("status.ingressServiceRestriction.allowedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "status.bridge-service-restriction.enable-restriction" => Some(("status.bridgeServiceRestriction.enableRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "status.bridge-service-restriction.allowed-services" => Some(("status.bridgeServiceRestriction.allowedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "status.access-levels" => Some(("status.accessLevels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "status.unrestricted-services" => Some(("status.unrestrictedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "status.vpc-service-restriction.enable-restriction" => Some(("status.vpcServiceRestriction.enableRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "status.vpc-service-restriction.allowed-services" => Some(("status.vpcServiceRestriction.allowedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "status.restricted-services" => Some(("status.restrictedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "status.vpc-accessible-services.enable-restriction" => Some(("status.vpcAccessibleServices.enableRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status.vpc-accessible-services.allowed-services" => Some(("status.vpcAccessibleServices.allowedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "status.unrestricted-services" => Some(("status.unrestrictedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "status.resources" => Some(("status.resources", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.access-levels" => Some(("status.accessLevels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "perimeter-type" => Some(("perimeterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-levels", "allowed-services", "bridge-service-restriction", "create-time", "description", "enable-restriction", "ingress-service-restriction", "name", "perimeter-type", "resources", "restricted-services", "status", "title", "unrestricted-services", "update-time", "vpc-service-restriction"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-levels", "allowed-services", "description", "enable-restriction", "name", "perimeter-type", "resources", "restricted-services", "status", "title", "unrestricted-services", "vpc-accessible-services"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1449,7 +1437,8 @@ fn main() {
                      None,
                      Some(r##"Required. Resource name for the Access Level. The `short_name` component
         must begin with a letter and only include alphanumeric and '_'. Format:
-        `accessPolicies/{policy_id}/accessLevels/{short_name}`"##),
+        `accessPolicies/{policy_id}/accessLevels/{short_name}`. The maximum length
+         // of the `short_name` component is 50 characters."##),
                      Some(true),
                      Some(false)),
         
@@ -1599,7 +1588,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("service-perimeters-create",
-                    Some(r##"Create an Service Perimeter. The
+                    Some(r##"Create a Service Perimeter. The
         longrunning operation from this RPC will have a successful status once the
         Service Perimeter has
         propagated to long-lasting storage. Service Perimeters containing
@@ -1634,7 +1623,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("service-perimeters-delete",
-                    Some(r##"Delete an Service Perimeter by resource
+                    Some(r##"Delete a Service Perimeter by resource
         name. The longrunning operation from this RPC will have a successful status
         once the Service Perimeter has been
         removed from long-lasting storage."##),
@@ -1662,7 +1651,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("service-perimeters-get",
-                    Some(r##"Get an Service Perimeter by resource
+                    Some(r##"Get a Service Perimeter by resource
         name."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accesscontextmanager1_beta_cli/access-policies_service-perimeters-get",
                   vec![
@@ -1714,7 +1703,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("service-perimeters-patch",
-                    Some(r##"Update an Service Perimeter. The
+                    Some(r##"Update a Service Perimeter. The
         longrunning operation from this RPC will have a successful status once the
         changes to the Service Perimeter have
         propagated to long-lasting storage. Service Perimeter containing
@@ -1780,7 +1769,7 @@ fn main() {
     
     let mut app = App::new("accesscontextmanager1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190626")
+           .version("1.0.13+20200405")
            .about("An API for setting attribute based access control to requests to GCP services.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_accesscontextmanager1_beta_cli")
            .arg(Arg::with_name("url")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Data Fusion* crate version *1.0.12+20190617*, where *20190617* is the exact revision of the *datafusion:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Data Fusion* crate version *1.0.13+20200318*, where *20200318* is the exact revision of the *datafusion:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Data Fusion* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/data-fusion/docs).
@@ -336,7 +336,7 @@ impl<'a, C, A> DataFusion<C, A>
         DataFusion {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://datafusion.googleapis.com/".to_string(),
             _root_url: "https://datafusion.googleapis.com/".to_string(),
         }
@@ -347,7 +347,7 @@ impl<'a, C, A> DataFusion<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -399,42 +399,42 @@ pub struct ListInstancesResponse {
 impl ResponseResult for ListInstancesResponse {}
 
 
-/// Increment a streamz counter with the specified metric and field names.
+/// Provides the configuration for logging a type of permissions.
+/// Example:
 /// 
-/// Metric names should start with a '/', generally be lowercase-only,
-/// and end in "_count". Field names should not contain an initial slash.
-/// The actual exported metric names will have "/iam/policy" prepended.
+/// ````text
+/// {
+///   "audit_log_configs": [
+///     {
+///       "log_type": "DATA_READ",
+///       "exempted_members": [
+///         "user:jose@example.com"
+///       ]
+///     },
+///     {
+///       "log_type": "DATA_WRITE",
+///     }
+///   ]
+/// }
+/// ````
 /// 
-/// Field names correspond to IAM request parameters and field values are
-/// their respective values.
-/// 
-/// Supported field names:
-/// 
-/// * "authority", which is "[token]" if IAMContext.token is present,
-///   otherwise the value of IAMContext.authority_selector if present, and
-///   otherwise a representation of IAMContext.principal; or
-/// * "iam_principal", a representation of IAMContext.principal even if a
-///   token or authority selector is present; or
-/// * "" (empty string), resulting in a counter with no fields.
-/// 
-/// Examples:
-/// counter { metric: "/debug_access_count"  field: "iam_principal" }
-/// ==> increment counter /iam/policy/backend_debug_access_count
-/// {iam_principal=[value of IAMContext.principal]}
-/// 
-/// At this time we do not support multiple field names (though this may be
-/// supported in the future).
+/// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
+/// jose@example.com from DATA_READ logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CounterOptions {
-    /// The field value to attribute.
-    pub field: Option<String>,
-    /// The metric to update.
-    pub metric: Option<String>,
+pub struct AuditLogConfig {
+    /// Specifies the identities that do not cause logging for this type of
+    /// permission.
+    /// Follows the same format of Binding.members.
+    #[serde(rename="exemptedMembers")]
+    pub exempted_members: Option<Vec<String>>,
+    /// The log type that this config enables.
+    #[serde(rename="logType")]
+    pub log_type: Option<String>,
 }
 
-impl Part for CounterOptions {}
+impl Part for AuditLogConfig {}
 
 
 /// Request message for restarting a Data Fusion instance.
@@ -480,74 +480,65 @@ pub struct SetIamPolicyRequest {
 impl RequestValue for SetIamPolicyRequest {}
 
 
-/// Represents an expression text. Example:
+/// Represents a textual expression in the Common Expression Language (CEL)
+/// syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+/// are documented at https://github.com/google/cel-spec.
+/// 
+/// Example (Comparison):
 /// 
 /// ````text
-/// title: "User account presence"
-/// description: "Determines whether the request has a user account"
-/// expression: "size(request.user) > 0"
+/// title: "Summary size limit"
+/// description: "Determines if a summary is less than 100 chars"
+/// expression: "document.summary.size() < 100"
 /// ````
+/// 
+/// Example (Equality):
+/// 
+/// ````text
+/// title: "Requestor is owner"
+/// description: "Determines if requestor is the document owner"
+/// expression: "document.owner == request.auth.claims.email"
+/// ````
+/// 
+/// Example (Logic):
+/// 
+/// ````text
+/// title: "Public documents"
+/// description: "Determine whether the document should be publicly visible"
+/// expression: "document.type != 'private' && document.type != 'internal'"
+/// ````
+/// 
+/// Example (Data Manipulation):
+/// 
+/// ````text
+/// title: "Notification string"
+/// description: "Create a notification string with a timestamp."
+/// expression: "'New message received at ' + string(document.create_time)"
+/// ````
+/// 
+/// The exact variables and functions that may be referenced within an expression
+/// are determined by the service that evaluates it. See the service
+/// documentation for additional information.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
-    /// An optional description of the expression. This is a longer text which
+    /// Optional. Description of the expression. This is a longer text which
     /// describes the expression, e.g. when hovered over it in a UI.
     pub description: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
+    /// Textual representation of an expression in Common Expression Language
+    /// syntax.
     pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error
+    /// Optional. String indicating the location of the expression for error
     /// reporting, e.g. a file name and a position in the file.
     pub location: Option<String>,
-    /// An optional title for the expression, i.e. a short string describing
+    /// Optional. Title for the expression, i.e. a short string describing
     /// its purpose. This can be used e.g. in UIs which allow to enter the
     /// expression.
     pub title: Option<String>,
 }
 
 impl Part for Expr {}
-
-
-/// Provides the configuration for logging a type of permissions.
-/// Example:
-/// 
-/// ````text
-/// {
-///   "audit_log_configs": [
-///     {
-///       "log_type": "DATA_READ",
-///       "exempted_members": [
-///         "user:foo@gmail.com"
-///       ]
-///     },
-///     {
-///       "log_type": "DATA_WRITE",
-///     }
-///   ]
-/// }
-/// ````
-/// 
-/// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
-/// foo@gmail.com from DATA_READ logging.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AuditLogConfig {
-    /// Specifies the identities that do not cause logging for this type of
-    /// permission.
-    /// Follows the same format of Binding.members.
-    #[serde(rename="exemptedMembers")]
-    pub exempted_members: Option<Vec<String>>,
-    /// The log type that this config enables.
-    #[serde(rename="logType")]
-    pub log_type: Option<String>,
-}
-
-impl Part for AuditLogConfig {}
 
 
 /// Network configuration for a Data Fusion instance. These configurations
@@ -567,50 +558,17 @@ pub struct NetworkConfig {
     #[serde(rename="ipAllocation")]
     pub ip_allocation: Option<String>,
     /// Name of the network in the customer project with which the Tenant Project
-    /// will be peered for executing pipelines.
+    /// will be peered for executing pipelines. In case of shared VPC where the
+    /// network resides in another host project the network should specified in
+    /// the form of projects/{host-project-id}/global/networks/{network}
     pub network: Option<String>,
 }
 
 impl Part for NetworkConfig {}
 
 
-/// A rule to be applied in a Policy.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Rule {
-    /// If one or more 'not_in' clauses are specified, the rule matches
-    /// if the PRINCIPAL/AUTHORITY_SELECTOR is in none of the entries.
-    /// The format for in and not_in entries can be found at in the Local IAM
-    /// documentation (see go/local-iam#features).
-    #[serde(rename="notIn")]
-    pub not_in: Option<Vec<String>>,
-    /// Human-readable description of the rule.
-    pub description: Option<String>,
-    /// If one or more 'in' clauses are specified, the rule matches if
-    /// the PRINCIPAL/AUTHORITY_SELECTOR is in at least one of these entries.
-    #[serde(rename="in")]
-    pub in_: Option<Vec<String>>,
-    /// Required
-    pub action: Option<String>,
-    /// Additional restrictions that must be met. All conditions must pass for the
-    /// rule to match.
-    pub conditions: Option<Vec<Condition>>,
-    /// The config returned to callers of tech.iam.IAM.CheckPolicy for any entries
-    /// that match the LOG action.
-    #[serde(rename="logConfig")]
-    pub log_config: Option<Vec<LogConfig>>,
-    /// A permission is a string of form '<service>.<resource type>.<verb>'
-    /// (e.g., 'storage.buckets.list'). A value of '*' matches all permissions,
-    /// and a verb part of '*' (e.g., 'storage.buckets.*') matches all verbs.
-    pub permissions: Option<Vec<String>>,
-}
-
-impl Part for Rule {}
-
-
 /// Represents a Data Fusion instance.
+/// Next available ID: 23
 /// 
 /// # Activities
 /// 
@@ -626,7 +584,7 @@ pub struct Instance {
     /// Output only. The time the instance was last updated.
     #[serde(rename="updateTime")]
     pub update_time: Option<String>,
-    /// An optional description of this instance.
+    /// Optional. An optional description of this instance.
     pub description: Option<String>,
     /// Specifies whether the Data Fusion instance should be private. If set to
     /// true, all Data Fusion nodes will have private IP addresses and will not be
@@ -634,19 +592,27 @@ pub struct Instance {
     #[serde(rename="privateInstance")]
     pub private_instance: Option<bool>,
     /// The resource labels for instance to use to annotate any related underlying
-    /// resources such as GCE VMs. The character '=' is not allowed to be used
-    /// within the labels.
+    /// resources such as Compute Engine VMs. The character '=' is not allowed to
+    /// be used within the labels.
     pub labels: Option<HashMap<String, String>>,
     /// Option to enable Stackdriver Logging.
     #[serde(rename="enableStackdriverLogging")]
     pub enable_stackdriver_logging: Option<bool>,
+    /// Output only. Endpoint on which the REST APIs is accessible.
+    #[serde(rename="apiEndpoint")]
+    pub api_endpoint: Option<String>,
+    /// List of accelerators enabled for this CDF instance.
+    pub accelerators: Option<Vec<Accelerator>>,
+    /// Output only. Cloud Storage bucket generated by Data Fusion in the customer project.
+    #[serde(rename="gcsBucket")]
+    pub gcs_bucket: Option<String>,
+    /// Output only. The time the instance was created.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
     /// Output only. Additional information about the current state of this Data
     /// Fusion instance if available.
     #[serde(rename="stateMessage")]
     pub state_message: Option<String>,
-    /// Output only. The time the instance was created.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
     /// Display name for an instance.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
@@ -666,14 +632,17 @@ pub struct Instance {
     /// Fusion instance is to be created.
     #[serde(rename="networkConfig")]
     pub network_config: Option<NetworkConfig>,
-    /// Output only. Endpoint on which the Data Fusion UI and REST APIs are
-    /// accessible.
+    /// Output only. Endpoint on which the Data Fusion UI is accessible.
     #[serde(rename="serviceEndpoint")]
     pub service_endpoint: Option<String>,
     /// Output only. The current state of this Data Fusion instance.
     pub state: Option<String>,
-    /// Output only. Current version of the Data Fusion.
+    /// Current version of Data Fusion.
     pub version: Option<String>,
+    /// Available versions that the instance can be upgraded to using
+    /// UpdateInstanceRequest.
+    #[serde(rename="availableVersion")]
+    pub available_version: Option<Vec<Version>>,
     /// Required. Instance type.
     #[serde(rename="type")]
     pub type_: Option<String>,
@@ -686,25 +655,18 @@ impl RequestValue for Instance {}
 impl ResponseResult for Instance {}
 
 
-/// Request message for `TestIamPermissions` method.
+/// The Data Fusion version.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations instances test iam permissions projects](struct.ProjectLocationInstanceTestIamPermissionCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TestIamPermissionsRequest {
-    /// The set of permissions to check for the `resource`. Permissions with
-    /// wildcards (such as '*' or 'storage.*') are not allowed. For more
-    /// information see
-    /// [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
-    pub permissions: Option<Vec<String>>,
+pub struct Version {
+    /// The version number of the Data Fusion instance, such as '6.0.1.0'.
+    #[serde(rename="versionNumber")]
+    pub version_number: Option<String>,
 }
 
-impl RequestValue for TestIamPermissionsRequest {}
+impl Part for Version {}
 
 
 /// The response message for Locations.ListLocations.
@@ -762,37 +724,50 @@ pub struct Location {
 impl ResponseResult for Location {}
 
 
-/// Defines an Identity and Access Management (IAM) policy. It is used to
-/// specify access control policies for Cloud Platform resources.
+/// An Identity and Access Management (IAM) policy, which specifies access
+/// controls for Google Cloud resources.
 /// 
-/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
-/// `members` to a `role`, where the members can be user accounts, Google groups,
-/// Google domains, and service accounts. A `role` is a named list of permissions
-/// defined by IAM.
+/// A `Policy` is a collection of `bindings`. A `binding` binds one or more
+/// `members` to a single `role`. Members can be user accounts, service accounts,
+/// Google groups, and domains (such as G Suite). A `role` is a named list of
+/// permissions; each `role` can be an IAM predefined role or a user-created
+/// custom role.
 /// 
-/// **JSON Example**
+/// Optionally, a `binding` can specify a `condition`, which is a logical
+/// expression that allows access to a resource only if the expression evaluates
+/// to `true`. A condition can add constraints based on attributes of the
+/// request, the resource, or both.
+/// 
+/// **JSON example:**
 /// 
 /// ````text
 /// {
 ///   "bindings": [
 ///     {
-///       "role": "roles/owner",
+///       "role": "roles/resourcemanager.organizationAdmin",
 ///       "members": [
 ///         "user:mike@example.com",
 ///         "group:admins@example.com",
 ///         "domain:google.com",
-///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
+///         "serviceAccount:my-project-id@appspot.gserviceaccount.com"
 ///       ]
 ///     },
 ///     {
-///       "role": "roles/viewer",
-///       "members": ["user:sean@example.com"]
+///       "role": "roles/resourcemanager.organizationViewer",
+///       "members": ["user:eve@example.com"],
+///       "condition": {
+///         "title": "expirable access",
+///         "description": "Does not grant access after Sep 2020",
+///         "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')",
+///       }
 ///     }
-///   ]
+///   ],
+///   "etag": "BwWWja0YfJA=",
+///   "version": 3
 /// }
 /// ````
 /// 
-/// **YAML Example**
+/// **YAML example:**
 /// 
 /// ````text
 /// bindings:
@@ -800,15 +775,21 @@ impl ResponseResult for Location {}
 ///   - user:mike@example.com
 ///   - group:admins@example.com
 ///   - domain:google.com
-///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///   role: roles/owner
+///   - serviceAccount:my-project-id@appspot.gserviceaccount.com
+///   role: roles/resourcemanager.organizationAdmin
 /// - members:
-///   - user:sean@example.com
-///   role: roles/viewer
+///   - user:eve@example.com
+///   role: roles/resourcemanager.organizationViewer
+///   condition:
+///     title: expirable access
+///     description: Does not grant access after Sep 2020
+///     expression: request.time < timestamp('2020-10-01T00:00:00.000Z')
+/// - etag: BwWWja0YfJA=
+/// - version: 3
 /// ````
 /// 
 /// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam/docs).
+/// [IAM documentation](https://cloud.google.com/iam/docs/).
 /// 
 /// # Activities
 /// 
@@ -822,8 +803,6 @@ pub struct Policy {
     /// Specifies cloud audit logging configuration for this policy.
     #[serde(rename="auditConfigs")]
     pub audit_configs: Option<Vec<AuditConfig>>,
-    /// Deprecated.
-    pub version: Option<i32>,
     /// `etag` is used for optimistic concurrency control as a way to help
     /// prevent simultaneous updates of a policy from overwriting each other.
     /// It is strongly suggested that systems make use of the `etag` in the
@@ -832,25 +811,37 @@ pub struct Policy {
     /// systems are expected to put that etag in the request to `setIamPolicy` to
     /// ensure that their change will be applied to the same version of the policy.
     /// 
-    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
-    /// policy is overwritten blindly.
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
     pub etag: Option<String>,
-    /// If more than one rule is specified, the rules are applied in the following
-    /// manner:
-    /// - All matching LOG rules are always applied.
-    /// - If any DENY/DENY_WITH_LOG rule matches, permission is denied.
-    ///   Logging will be applied if one or more matching rule requires logging.
-    /// - Otherwise, if any ALLOW/ALLOW_WITH_LOG rule matches, permission is
-    ///   granted.
-    ///   Logging will be applied if one or more matching rule requires logging.
-    /// - Otherwise, if no rule applies, permission is denied.
-    pub rules: Option<Vec<Rule>>,
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
+    /// Associates a list of `members` to a `role`. Optionally, may specify a
+    /// `condition` that determines how and when the `bindings` are applied. Each
+    /// of the `bindings` must contain at least one member.
     pub bindings: Option<Vec<Binding>>,
-    /// no description provided
-    #[serde(rename="iamOwned")]
-    pub iam_owned: Option<bool>,
+    /// Specifies the format of the policy.
+    /// 
+    /// Valid values are `0`, `1`, and `3`. Requests that specify an invalid value
+    /// are rejected.
+    /// 
+    /// Any operation that affects conditional role bindings must specify version
+    /// `3`. This requirement applies to the following operations:
+    /// 
+    /// * Getting a policy that includes a conditional role binding
+    /// * Adding a conditional role binding to a policy
+    /// * Changing a conditional role binding in a policy
+    /// * Removing any role binding, with or without a condition, from a policy
+    ///   that includes conditions
+    /// 
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
+    /// 
+    /// If a policy does not include any conditions, operations on that policy may
+    /// specify any valid version or leave the field unset.
+    pub version: Option<i32>,
 }
 
 impl ResponseResult for Policy {}
@@ -879,6 +870,27 @@ impl ResponseResult for Policy {}
 pub struct Empty { _never_set: Option<bool> }
 
 impl ResponseResult for Empty {}
+
+
+/// Request message for `TestIamPermissions` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations instances test iam permissions projects](struct.ProjectLocationInstanceTestIamPermissionCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TestIamPermissionsRequest {
+    /// The set of permissions to check for the `resource`. Permissions with
+    /// wildcards (such as '*' or 'storage.*') are not allowed. For more
+    /// information see
+    /// [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
+    pub permissions: Option<Vec<String>>,
+}
+
+impl RequestValue for TestIamPermissionsRequest {}
 
 
 /// The `Status` type defines a logical error model that is suitable for
@@ -947,18 +959,18 @@ pub struct ListOperationsResponse {
 impl ResponseResult for ListOperationsResponse {}
 
 
-/// Authorization-related information used by Cloud Audit Logging.
+/// Identifies Data Fusion accelerators for an instance.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AuthorizationLoggingOptions {
-    /// The type of the permission that was checked.
-    #[serde(rename="permissionType")]
-    pub permission_type: Option<String>,
+pub struct Accelerator {
+    /// The type of an accelator for a CDF instance.
+    #[serde(rename="acceleratorType")]
+    pub accelerator_type: Option<String>,
 }
 
-impl Part for AuthorizationLoggingOptions {}
+impl Part for Accelerator {}
 
 
 /// Associates `members` with a `role`.
@@ -985,7 +997,7 @@ pub struct Binding {
     ///    who is authenticated with a Google account or a service account.
     /// 
     /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` .
+    ///    account. For example, `alice@example.com` .
     /// 
     /// 
     /// * `serviceAccount:{emailid}`: An email address that represents a service
@@ -993,6 +1005,26 @@ pub struct Binding {
     /// 
     /// * `group:{emailid}`: An email address that represents a Google group.
     ///    For example, `admins@example.com`.
+    /// 
+    /// * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a user that has been recently deleted. For
+    ///    example, `alice@example.com?uid=123456789012345678901`. If the user is
+    ///    recovered, this value reverts to `user:{emailid}` and the recovered user
+    ///    retains the role in the binding.
+    /// 
+    /// * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus
+    ///    unique identifier) representing a service account that has been recently
+    ///    deleted. For example,
+    ///    `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.
+    ///    If the service account is undeleted, this value reverts to
+    ///    `serviceAccount:{emailid}` and the undeleted service account retains the
+    ///    role in the binding.
+    /// 
+    /// * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a Google group that has been recently
+    ///    deleted. For example, `admins@example.com?uid=123456789012345678901`. If
+    ///    the group is recovered, this value reverts to `group:{emailid}` and the
+    ///    recovered group retains the role in the binding.
     /// 
     /// 
     /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
@@ -1003,21 +1035,6 @@ pub struct Binding {
 }
 
 impl Part for Binding {}
-
-
-/// Write a Data Access (Gin) log
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DataAccessOptions {
-    /// Whether Gin logging should happen in a fail-closed manner at the caller.
-    /// This is relevant only in the LocalIAM implementation, for now.
-    #[serde(rename="logMode")]
-    pub log_mode: Option<String>,
-}
-
-impl Part for DataAccessOptions {}
 
 
 /// Request message for upgrading a Data Fusion instance.
@@ -1057,7 +1074,7 @@ impl RequestValue for UpgradeInstanceRequest {}
 ///         {
 ///           "log_type": "DATA_READ",
 ///           "exempted_members": [
-///             "user:foo@gmail.com"
+///             "user:jose@example.com"
 ///           ]
 ///         },
 ///         {
@@ -1069,7 +1086,7 @@ impl RequestValue for UpgradeInstanceRequest {}
 ///       ]
 ///     },
 ///     {
-///       "service": "fooservice.googleapis.com"
+///       "service": "sampleservice.googleapis.com"
 ///       "audit_log_configs": [
 ///         {
 ///           "log_type": "DATA_READ",
@@ -1077,7 +1094,7 @@ impl RequestValue for UpgradeInstanceRequest {}
 ///         {
 ///           "log_type": "DATA_WRITE",
 ///           "exempted_members": [
-///             "user:bar@gmail.com"
+///             "user:aliya@example.com"
 ///           ]
 ///         }
 ///       ]
@@ -1086,16 +1103,13 @@ impl RequestValue for UpgradeInstanceRequest {}
 /// }
 /// ````
 /// 
-/// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
-/// logging. It also exempts foo@gmail.com from DATA_READ logging, and
-/// bar@gmail.com from DATA_WRITE logging.
+/// For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
+/// logging. It also exempts jose@example.com from DATA_READ logging, and
+/// aliya@example.com from DATA_WRITE logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditConfig {
-    /// no description provided
-    #[serde(rename="exemptedMembers")]
-    pub exempted_members: Option<Vec<String>>,
     /// The configuration for logging of each type of permission.
     #[serde(rename="auditLogConfigs")]
     pub audit_log_configs: Option<Vec<AuditLogConfig>>,
@@ -1167,64 +1181,6 @@ pub struct Operation {
 }
 
 impl ResponseResult for Operation {}
-
-
-/// Write a Cloud Audit log
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CloudAuditOptions {
-    /// The log_name to populate in the Cloud Audit Record.
-    #[serde(rename="logName")]
-    pub log_name: Option<String>,
-    /// Information used by the Cloud Audit Logging pipeline.
-    #[serde(rename="authorizationLoggingOptions")]
-    pub authorization_logging_options: Option<AuthorizationLoggingOptions>,
-}
-
-impl Part for CloudAuditOptions {}
-
-
-/// Specifies what kind of log the caller must write
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LogConfig {
-    /// Counter options.
-    pub counter: Option<CounterOptions>,
-    /// Data access options.
-    #[serde(rename="dataAccess")]
-    pub data_access: Option<DataAccessOptions>,
-    /// Cloud audit options.
-    #[serde(rename="cloudAudit")]
-    pub cloud_audit: Option<CloudAuditOptions>,
-}
-
-impl Part for LogConfig {}
-
-
-/// A condition to be met.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Condition {
-    /// Trusted attributes supplied by the IAM system.
-    pub iam: Option<String>,
-    /// Trusted attributes supplied by any service that owns resources and uses
-    /// the IAM system for access control.
-    pub sys: Option<String>,
-    /// The objects of the condition.
-    pub values: Option<Vec<String>>,
-    /// Trusted attributes discharged by the service.
-    pub svc: Option<String>,
-    /// An operator to apply the subject with.
-    pub op: Option<String>,
-}
-
-impl Part for Condition {}
 
 
 
@@ -1313,6 +1269,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
     /// 
+    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -1389,6 +1347,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _name: name.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _include_unrevealed_locations: Default::default(),
             _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1457,6 +1416,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectLocationInstanceGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2127,6 +2087,8 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
 
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
+/// 
+/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 ///
 /// A builder for the *locations.instances.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2974,7 +2936,8 @@ impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<h
 /// let result = hub.projects().locations_list("name")
 ///              .page_token("labore")
 ///              .page_size(-9)
-///              .filter("nonumy")
+///              .include_unrevealed_locations(false)
+///              .filter("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -2985,6 +2948,7 @@ pub struct ProjectLocationListCall<'a, C, A>
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
+    _include_unrevealed_locations: Option<bool>,
     _filter: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
@@ -3008,7 +2972,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "datafusion.projects.locations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -3016,10 +2980,13 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
         }
+        if let Some(value) = self._include_unrevealed_locations {
+            params.push(("includeUnrevealedLocations", value.to_string()));
+        }
         if let Some(value) = self._filter {
             params.push(("filter", value.to_string()));
         }
-        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
+        for &field in ["alt", "name", "pageToken", "pageSize", "includeUnrevealedLocations", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -3158,6 +3125,14 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._page_size = Some(new_value);
         self
     }
+    /// If true, the returned list will include locations which are not yet
+    /// revealed.
+    ///
+    /// Sets the *include unrevealed locations* query property to the given value.
+    pub fn include_unrevealed_locations(mut self, new_value: bool) -> ProjectLocationListCall<'a, C, A> {
+        self._include_unrevealed_locations = Some(new_value);
+        self
+    }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
@@ -3262,7 +3237,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_instances_patch(req, "name")
-///              .update_mask("gubergren")
+///              .update_mask("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -3841,6 +3816,7 @@ impl<'a, C, A> ProjectLocationInstanceTestIamPermissionCall<'a, C, A> where C: B
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_instances_get_iam_policy("resource")
+///              .options_requested_policy_version(-61)
 ///              .doit();
 /// # }
 /// ```
@@ -3849,6 +3825,7 @@ pub struct ProjectLocationInstanceGetIamPolicyCall<'a, C, A>
 
     hub: &'a DataFusion<C, A>,
     _resource: String,
+    _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -3871,9 +3848,12 @@ impl<'a, C, A> ProjectLocationInstanceGetIamPolicyCall<'a, C, A> where C: Borrow
         };
         dlg.begin(MethodInfo { id: "datafusion.projects.locations.instances.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        if let Some(value) = self._options_requested_policy_version {
+            params.push(("options.requestedPolicyVersion", value.to_string()));
+        }
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -3999,6 +3979,20 @@ impl<'a, C, A> ProjectLocationInstanceGetIamPolicyCall<'a, C, A> where C: Borrow
         self._resource = new_value.to_string();
         self
     }
+    /// Optional. The policy format version to be returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationInstanceGetIamPolicyCall<'a, C, A> {
+        self._options_requested_policy_version = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -4096,7 +4090,7 @@ impl<'a, C, A> ProjectLocationInstanceGetIamPolicyCall<'a, C, A> where C: Borrow
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_instances_create(req, "parent")
-///              .instance_id("no")
+///              .instance_id("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -4391,9 +4385,9 @@ impl<'a, C, A> ProjectLocationInstanceCreateCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("name")
-///              .page_token("justo")
-///              .page_size(-34)
-///              .filter("et")
+///              .page_token("et")
+///              .page_size(-41)
+///              .filter("ipsum")
 ///              .doit();
 /// # }
 /// ```
@@ -4675,10 +4669,10 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_instances_list("parent")
-///              .page_token("ipsum")
-///              .page_size(-5)
-///              .order_by("et")
-///              .filter("duo")
+///              .page_token("et")
+///              .page_size(-70)
+///              .order_by("aliquyam")
+///              .filter("sea")
 ///              .doit();
 /// # }
 /// ```

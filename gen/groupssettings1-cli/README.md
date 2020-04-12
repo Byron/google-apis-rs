@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *groupssettings* API at revision *20190315*. The CLI is at version *1.0.12*.
+This documentation was generated from the *groupssettings* API at revision *20190725*. The CLI is at version *1.0.13*.
 
 ```bash
 groupssettings1 [options]

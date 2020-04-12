@@ -4,7 +4,7 @@
 [package]
 
 name = "google-logging2-cli"
-version = "1.0.12+20190629"
+version = "1.0.13+20200407"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Logging (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/logging2-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-logging2]
 path = "../logging2"
-version = "1.0.12+20190629"
+version = "1.0.13+20200407"

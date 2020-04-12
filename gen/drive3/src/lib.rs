@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *1.0.12+20190620*, where *20190620* is the exact revision of the *drive:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *drive* crate version *1.0.13+20200326*, where *20200326* is the exact revision of the *drive:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *drive* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
@@ -418,7 +418,7 @@ impl<'a, C, A> DriveHub<C, A>
         DriveHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://www.googleapis.com/drive/v3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -456,7 +456,7 @@ impl<'a, C, A> DriveHub<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -506,7 +506,7 @@ pub struct Comment {
     /// The last time the comment or any of its replies was modified (RFC 3339 date-time).
     #[serde(rename="modifiedTime")]
     pub modified_time: Option<String>,
-    /// The user who created the comment.
+    /// The author of the comment. The author's email address and permission ID will not be populated.
     pub author: Option<User>,
     /// Whether the comment has been deleted. A deleted comment has no content.
     pub deleted: Option<bool>,
@@ -947,7 +947,7 @@ pub struct FileImageMediaMetadata {
     pub lens: Option<String>,
     /// The aperture used to create the photo (f-number).
     pub aperture: Option<f32>,
-    /// The rotation in clockwise degrees from the image's original orientation.
+    /// The number of clockwise 90 degree rotations applied from the image's original orientation.
     pub rotation: Option<i32>,
     /// The white balance mode used to create the photo.
     #[serde(rename="whiteBalance")]
@@ -1031,7 +1031,7 @@ pub struct Reply {
     /// The last time the reply was modified (RFC 3339 date-time).
     #[serde(rename="modifiedTime")]
     pub modified_time: Option<String>,
-    /// The user who created the reply.
+    /// The author of the reply. The author's email address and permission ID will not be populated.
     pub author: Option<User>,
     /// Whether the reply has been deleted. A deleted reply has no content.
     pub deleted: Option<bool>,
@@ -1217,6 +1217,24 @@ pub struct CommentList {
 impl ResponseResult for CommentList {}
 
 
+/// Shortcut file details. Only populated for shortcut files, which have the mimeType field set to application/vnd.google-apps.shortcut.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FileShortcutDetails {
+    /// The ID of the file that this shortcut points to.
+    #[serde(rename="targetId")]
+    pub target_id: Option<String>,
+    /// The MIME type of the file that this shortcut points to. The value of this field is a snapshot of the target's MIME type, captured when the shortcut is created.
+    #[serde(rename="targetMimeType")]
+    pub target_mime_type: Option<String>,
+}
+
+impl NestedType for FileShortcutDetails {}
+impl Part for FileShortcutDetails {}
+
+
 /// Additional information about the content of the file. These fields are never populated in responses.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1317,7 +1335,11 @@ impl Part for DriveCapabilities {}
 pub struct Permission {
     /// The domain to which this permission refers.
     pub domain: Option<String>,
-    /// A displayable name for users, groups or domains.
+    /// The "pretty" name of the value of the permission. The following is a list of examples for each type of permission:  
+    /// - user - User's full name, as defined for their Google account, such as "Joe Smith." 
+    /// - group - Name of the Google Group, such as "The Company Administrators." 
+    /// - domain - String domain name, such as "thecompany.com." 
+    /// - anyone - No displayName is present.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
     /// Whether the permission allows the file to be discovered through search. This is only applicable for permissions of type domain or anyone.
@@ -1357,10 +1379,10 @@ pub struct Permission {
     /// - user 
     /// - group 
     /// - domain 
-    /// - anyone
+    /// - anyone  When creating a permission, if type is user or group, you must provide an emailAddress for the user or group. When type is domain, you must provide a domain. There isn't extra information required for a anyone type.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// The ID of this permission. This is a unique identifier for the grantee, and is published in User resources as permissionId.
+    /// The ID of this permission. This is a unique identifier for the grantee, and is published in User resources as permissionId. IDs should be treated as opaque values.
     pub id: Option<String>,
 }
 
@@ -1381,60 +1403,27 @@ pub struct FileCapabilities {
     /// Whether the current user can restore this file from trash.
     #[serde(rename="canUntrash")]
     pub can_untrash: Option<bool>,
-    /// Whether the current user can copy this file. For an item in a shared drive, whether the current user can copy non-folder descendants of this item, or this item itself if it is not a folder.
-    #[serde(rename="canCopy")]
-    pub can_copy: Option<bool>,
-    /// Whether the current user can move this item within this shared drive. Note that a request to change the parent of the item may still fail depending on the new parent that is being added. Only populated for items in shared drives.
-    #[serde(rename="canMoveItemWithinDrive")]
-    pub can_move_item_within_drive: Option<bool>,
-    /// Whether the current user can read the revisions resource of this file. For a shared drive item, whether revisions of non-folder descendants of this item, or this item itself if it is not a folder, can be read.
-    #[serde(rename="canReadRevisions")]
-    pub can_read_revisions: Option<bool>,
-    /// Deprecated - use canMoveItemOutOfDrive instead.
-    #[serde(rename="canMoveItemIntoTeamDrive")]
-    pub can_move_item_into_team_drive: Option<bool>,
     /// Deprecated - use canMoveItemWithinDrive instead.
     #[serde(rename="canMoveItemWithinTeamDrive")]
     pub can_move_item_within_team_drive: Option<bool>,
-    /// Deprecated - use canMoveItemOutOfDrive instead.
-    #[serde(rename="canMoveItemOutOfTeamDrive")]
-    pub can_move_item_out_of_team_drive: Option<bool>,
     /// Whether the current user can delete children of this folder. This is false when the item is not a folder. Only populated for items in shared drives.
     #[serde(rename="canDeleteChildren")]
     pub can_delete_children: Option<bool>,
-    /// Whether the current user can change the copyRequiresWriterPermission restriction of this file.
-    #[serde(rename="canChangeCopyRequiresWriterPermission")]
-    pub can_change_copy_requires_writer_permission: Option<bool>,
-    /// Whether the current user can download this file.
-    #[serde(rename="canDownload")]
-    pub can_download: Option<bool>,
-    /// Whether the current user can edit this file.
-    #[serde(rename="canEdit")]
-    pub can_edit: Option<bool>,
     /// Deprecated - use canMoveChildrenWithinDrive instead.
     #[serde(rename="canMoveChildrenWithinTeamDrive")]
     pub can_move_children_within_team_drive: Option<bool>,
-    /// Whether the current user can comment on this file.
-    #[serde(rename="canComment")]
-    pub can_comment: Option<bool>,
     /// Whether the current user can list the children of this folder. This is always false when the item is not a folder.
     #[serde(rename="canListChildren")]
     pub can_list_children: Option<bool>,
     /// Whether the current user can rename this file.
     #[serde(rename="canRename")]
     pub can_rename: Option<bool>,
-    /// Whether the current user can move this file to trash.
-    #[serde(rename="canTrash")]
-    pub can_trash: Option<bool>,
-    /// Whether the current user can delete this file.
-    #[serde(rename="canDelete")]
-    pub can_delete: Option<bool>,
+    /// Whether the current user can modify the content of this file.
+    #[serde(rename="canModifyContent")]
+    pub can_modify_content: Option<bool>,
     /// Whether the current user can read the shared drive to which this file belongs. Only populated for items in shared drives.
     #[serde(rename="canReadDrive")]
     pub can_read_drive: Option<bool>,
-    /// Deprecated - use canMoveItemWithinDrive or canMoveItemOutOfDrive instead.
-    #[serde(rename="canMoveTeamDriveItem")]
-    pub can_move_team_drive_item: Option<bool>,
     /// Whether the current user can add children to this folder. This is always false when the item is not a folder.
     #[serde(rename="canAddChildren")]
     pub can_add_children: Option<bool>,
@@ -1444,12 +1433,54 @@ pub struct FileCapabilities {
     /// Whether the current user can trash children of this folder. This is false when the item is not a folder. Only populated for items in shared drives.
     #[serde(rename="canTrashChildren")]
     pub can_trash_children: Option<bool>,
-    /// Deprecated
-    #[serde(rename="canChangeViewersCanCopyContent")]
-    pub can_change_viewers_can_copy_content: Option<bool>,
+    /// Whether the current user can add a parent for the item without removing an existing parent in the same request. Not populated for shared drive files.
+    #[serde(rename="canAddMyDriveParent")]
+    pub can_add_my_drive_parent: Option<bool>,
+    /// Whether the current user can move children of this folder within the shared drive. This is false when the item is not a folder. Only populated for items in shared drives.
+    #[serde(rename="canMoveChildrenWithinDrive")]
+    pub can_move_children_within_drive: Option<bool>,
+    /// Whether the current user can read the revisions resource of this file. For a shared drive item, whether revisions of non-folder descendants of this item, or this item itself if it is not a folder, can be read.
+    #[serde(rename="canReadRevisions")]
+    pub can_read_revisions: Option<bool>,
+    /// Whether the current user can move this item within this shared drive. Note that a request to change the parent of the item may still fail depending on the new parent that is being added. Only populated for items in shared drives.
+    #[serde(rename="canMoveItemWithinDrive")]
+    pub can_move_item_within_drive: Option<bool>,
+    /// Whether the current user can copy this file. For an item in a shared drive, whether the current user can copy non-folder descendants of this item, or this item itself if it is not a folder.
+    #[serde(rename="canCopy")]
+    pub can_copy: Option<bool>,
+    /// Deprecated - use canMoveItemOutOfDrive instead.
+    #[serde(rename="canMoveItemIntoTeamDrive")]
+    pub can_move_item_into_team_drive: Option<bool>,
+    /// Deprecated - use canMoveItemOutOfDrive instead.
+    #[serde(rename="canMoveItemOutOfTeamDrive")]
+    pub can_move_item_out_of_team_drive: Option<bool>,
+    /// Whether the current user can comment on this file.
+    #[serde(rename="canComment")]
+    pub can_comment: Option<bool>,
     /// Whether the current user can move children of this folder outside of the shared drive. This is false when the item is not a folder. Only populated for items in shared drives.
     #[serde(rename="canMoveChildrenOutOfDrive")]
     pub can_move_children_out_of_drive: Option<bool>,
+    /// Deprecated
+    #[serde(rename="canChangeViewersCanCopyContent")]
+    pub can_change_viewers_can_copy_content: Option<bool>,
+    /// Whether the current user can move this file to trash.
+    #[serde(rename="canTrash")]
+    pub can_trash: Option<bool>,
+    /// Whether the current user can delete this file.
+    #[serde(rename="canDelete")]
+    pub can_delete: Option<bool>,
+    /// Whether the current user can remove a parent from the item without adding another parent in the same request. Not populated for shared drive files.
+    #[serde(rename="canRemoveMyDriveParent")]
+    pub can_remove_my_drive_parent: Option<bool>,
+    /// Deprecated - use canMoveItemWithinDrive or canMoveItemOutOfDrive instead.
+    #[serde(rename="canMoveTeamDriveItem")]
+    pub can_move_team_drive_item: Option<bool>,
+    /// Whether the current user can download this file.
+    #[serde(rename="canDownload")]
+    pub can_download: Option<bool>,
+    /// Whether the current user can change the copyRequiresWriterPermission restriction of this file.
+    #[serde(rename="canChangeCopyRequiresWriterPermission")]
+    pub can_change_copy_requires_writer_permission: Option<bool>,
     /// Deprecated - use canMoveChildrenOutOfDrive instead.
     #[serde(rename="canMoveChildrenOutOfTeamDrive")]
     pub can_move_children_out_of_team_drive: Option<bool>,
@@ -1459,9 +1490,9 @@ pub struct FileCapabilities {
     /// Deprecated - use canReadDrive instead.
     #[serde(rename="canReadTeamDrive")]
     pub can_read_team_drive: Option<bool>,
-    /// Whether the current user can move children of this folder within the shared drive. This is false when the item is not a folder. Only populated for items in shared drives.
-    #[serde(rename="canMoveChildrenWithinDrive")]
-    pub can_move_children_within_drive: Option<bool>,
+    /// Whether the current user can edit this file. Other factors may limit the type of changes a user can make to a file. For example, see canChangeCopyRequiresWriterPermission or canModifyContent.
+    #[serde(rename="canEdit")]
+    pub can_edit: Option<bool>,
 }
 
 impl NestedType for FileCapabilities {}
@@ -1582,7 +1613,7 @@ pub struct PermissionPermissionDetails {
     /// - commenter 
     /// - reader
     pub role: Option<String>,
-    /// The ID of the item from which this permission is inherited. This is an output-only field and is only populated for members of the shared drive.
+    /// The ID of the item from which this permission is inherited. This is an output-only field.
     #[serde(rename="inheritedFrom")]
     pub inherited_from: Option<String>,
 }
@@ -1720,8 +1751,9 @@ pub struct File {
     /// The user who shared the file with the requesting user, if applicable.
     #[serde(rename="sharingUser")]
     pub sharing_user: Option<User>,
-    /// The size of the file's content in bytes. This is only applicable to files with binary content in Google Drive.
-    pub size: Option<String>,
+    /// Shortcut file details. Only populated for shortcut files, which have the mimeType field set to application/vnd.google-apps.shortcut.
+    #[serde(rename="shortcutDetails")]
+    pub shortcut_details: Option<FileShortcutDetails>,
     /// Additional metadata about video media. This may not be available immediately upon upload.
     #[serde(rename="videoMediaMetadata")]
     pub video_media_metadata: Option<FileVideoMediaMetadata>,
@@ -1757,9 +1789,8 @@ pub struct File {
     pub export_links: Option<HashMap<String, String>>,
     /// Whether the file has been shared. Not populated for items in shared drives.
     pub shared: Option<bool>,
-    /// Whether the options to copy, print, or download this file, should be disabled for readers and commenters.
-    #[serde(rename="copyRequiresWriterPermission")]
-    pub copy_requires_writer_permission: Option<bool>,
+    /// The size of the file's content in bytes. This is only applicable to files with binary content in Google Drive.
+    pub size: Option<String>,
     /// The full file extension extracted from the name field. May contain multiple concatenated extensions, such as "tar.gz". This is only available for files with binary content in Google Drive.
     /// This is automatically updated when the name field changes, however it is not cleared if the new name does not contain a valid extension.
     #[serde(rename="fullFileExtension")]
@@ -1807,6 +1838,9 @@ pub struct File {
     pub viewers_can_copy_content: Option<bool>,
     /// The owners of the file. Currently, only certain legacy files may have more than one owner. Not populated for items in shared drives.
     pub owners: Option<Vec<User>>,
+    /// Whether the options to copy, print, or download this file, should be disabled for readers and commenters.
+    #[serde(rename="copyRequiresWriterPermission")]
+    pub copy_requires_writer_permission: Option<bool>,
     /// The name of the file. This is not necessarily unique within a folder. Note that for immutable items such as the top level folders of shared drives, My Drive root folder, and Application Data folder the name is constant.
     pub name: Option<String>,
     /// A link for downloading the content of the file in a browser. This is only available for files with binary content in Google Drive.
@@ -1831,7 +1865,7 @@ pub struct File {
     /// The final component of fullFileExtension. This is only available for files with binary content in Google Drive.
     #[serde(rename="fileExtension")]
     pub file_extension: Option<String>,
-    /// Whether any users are granted file access directly on this file. This field is only populated for shared drive files.
+    /// Whether there are permissions directly on this file. This field is only populated for items in shared drives.
     #[serde(rename="hasAugmentedPermissions")]
     pub has_augmented_permissions: Option<bool>,
     /// Whether the user has starred the file.
@@ -2102,6 +2136,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             _ocr_language: Default::default(),
             _keep_revision_forever: Default::default(),
             _ignore_default_visibility: Default::default(),
+            _enforce_single_parent: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2176,6 +2211,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             _ocr_language: Default::default(),
             _keep_revision_forever: Default::default(),
             _ignore_default_visibility: Default::default(),
+            _enforce_single_parent: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2201,6 +2237,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             _remove_parents: Default::default(),
             _ocr_language: Default::default(),
             _keep_revision_forever: Default::default(),
+            _enforce_single_parent: Default::default(),
             _add_parents: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3084,6 +3121,8 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
             _supports_team_drives: Default::default(),
             _supports_all_drives: Default::default(),
             _send_notification_email: Default::default(),
+            _move_to_new_owners_root: Default::default(),
+            _enforce_single_parent: Default::default(),
             _email_message: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -4201,6 +4240,7 @@ impl<'a, C, A> FileDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 ///              .ocr_language("et")
 ///              .keep_revision_forever(true)
 ///              .ignore_default_visibility(false)
+///              .enforce_single_parent(true)
 ///              .doit();
 /// # }
 /// ```
@@ -4215,6 +4255,7 @@ pub struct FileCopyCall<'a, C, A>
     _ocr_language: Option<String>,
     _keep_revision_forever: Option<bool>,
     _ignore_default_visibility: Option<bool>,
+    _enforce_single_parent: Option<bool>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -4236,7 +4277,7 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "drive.files.copy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
@@ -4253,7 +4294,10 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         if let Some(value) = self._ignore_default_visibility {
             params.push(("ignoreDefaultVisibility", value.to_string()));
         }
-        for &field in ["alt", "fileId", "supportsTeamDrives", "supportsAllDrives", "ocrLanguage", "keepRevisionForever", "ignoreDefaultVisibility"].iter() {
+        if let Some(value) = self._enforce_single_parent {
+            params.push(("enforceSingleParent", value.to_string()));
+        }
+        for &field in ["alt", "fileId", "supportsTeamDrives", "supportsAllDrives", "ocrLanguage", "keepRevisionForever", "ignoreDefaultVisibility", "enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4420,7 +4464,7 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._ocr_language = Some(new_value.to_string());
         self
     }
-    /// Whether to set the 'keepForever' field in the new head revision. This is only applicable to files with binary content in Google Drive.
+    /// Whether to set the 'keepForever' field in the new head revision. This is only applicable to files with binary content in Google Drive. Only 200 revisions for the file can be kept forever. If the limit is reached, try deleting pinned revisions.
     ///
     /// Sets the *keep revision forever* query property to the given value.
     pub fn keep_revision_forever(mut self, new_value: bool) -> FileCopyCall<'a, C, A> {
@@ -4432,6 +4476,13 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// Sets the *ignore default visibility* query property to the given value.
     pub fn ignore_default_visibility(mut self, new_value: bool) -> FileCopyCall<'a, C, A> {
         self._ignore_default_visibility = Some(new_value);
+        self
+    }
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. Requests that specify more than one parent will fail.
+    ///
+    /// Sets the *enforce single parent* query property to the given value.
+    pub fn enforce_single_parent(mut self, new_value: bool) -> FileCopyCall<'a, C, A> {
+        self._enforce_single_parent = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -4717,19 +4768,19 @@ impl<'a, C, A> FileEmptyTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().list()
-///              .team_drive_id("et")
+///              .team_drive_id("amet")
 ///              .supports_team_drives(true)
 ///              .supports_all_drives(true)
-///              .spaces("consetetur")
-///              .q("ut")
-///              .page_token("ea")
-///              .page_size(-80)
+///              .spaces("ut")
+///              .q("ea")
+///              .page_token("sed")
+///              .page_size(-3)
 ///              .order_by("dolor")
 ///              .include_team_drive_items(true)
 ///              .include_items_from_all_drives(true)
-///              .drive_id("et")
-///              .corpus("consetetur")
-///              .corpora("amet.")
+///              .drive_id("consetetur")
+///              .corpus("amet.")
+///              .corpora("voluptua.")
 ///              .doit();
 /// # }
 /// ```
@@ -5080,8 +5131,8 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().generate_ids()
-///              .space("voluptua.")
-///              .count(-56)
+///              .space("Lorem")
+///              .count(-11)
 ///              .doit();
 /// # }
 /// ```
@@ -5319,11 +5370,12 @@ impl<'a, C, A> FileGenerateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().create(req)
 ///              .use_content_as_indexable_text(true)
-///              .supports_team_drives(true)
-///              .supports_all_drives(false)
-///              .ocr_language("vero")
-///              .keep_revision_forever(true)
-///              .ignore_default_visibility(false)
+///              .supports_team_drives(false)
+///              .supports_all_drives(true)
+///              .ocr_language("diam")
+///              .keep_revision_forever(false)
+///              .ignore_default_visibility(true)
+///              .enforce_single_parent(true)
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -5338,6 +5390,7 @@ pub struct FileCreateCall<'a, C, A>
     _ocr_language: Option<String>,
     _keep_revision_forever: Option<bool>,
     _ignore_default_visibility: Option<bool>,
+    _enforce_single_parent: Option<bool>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5360,7 +5413,7 @@ impl<'a, C, A> FileCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "drive.files.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
         if let Some(value) = self._use_content_as_indexable_text {
             params.push(("useContentAsIndexableText", value.to_string()));
         }
@@ -5379,7 +5432,10 @@ impl<'a, C, A> FileCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._ignore_default_visibility {
             params.push(("ignoreDefaultVisibility", value.to_string()));
         }
-        for &field in ["alt", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "ocrLanguage", "keepRevisionForever", "ignoreDefaultVisibility"].iter() {
+        if let Some(value) = self._enforce_single_parent {
+            params.push(("enforceSingleParent", value.to_string()));
+        }
+        for &field in ["alt", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "ocrLanguage", "keepRevisionForever", "ignoreDefaultVisibility", "enforceSingleParent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5634,7 +5690,7 @@ impl<'a, C, A> FileCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._ocr_language = Some(new_value.to_string());
         self
     }
-    /// Whether to set the 'keepForever' field in the new head revision. This is only applicable to files with binary content in Google Drive.
+    /// Whether to set the 'keepForever' field in the new head revision. This is only applicable to files with binary content in Google Drive. Only 200 revisions for the file can be kept forever. If the limit is reached, try deleting pinned revisions.
     ///
     /// Sets the *keep revision forever* query property to the given value.
     pub fn keep_revision_forever(mut self, new_value: bool) -> FileCreateCall<'a, C, A> {
@@ -5646,6 +5702,13 @@ impl<'a, C, A> FileCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// Sets the *ignore default visibility* query property to the given value.
     pub fn ignore_default_visibility(mut self, new_value: bool) -> FileCreateCall<'a, C, A> {
         self._ignore_default_visibility = Some(new_value);
+        self
+    }
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. Requests that specify more than one parent will fail.
+    ///
+    /// Sets the *enforce single parent* query property to the given value.
+    pub fn enforce_single_parent(mut self, new_value: bool) -> FileCreateCall<'a, C, A> {
+        self._enforce_single_parent = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5742,13 +5805,14 @@ impl<'a, C, A> FileCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().update(req, "fileId")
-///              .use_content_as_indexable_text(true)
+///              .use_content_as_indexable_text(false)
 ///              .supports_team_drives(false)
 ///              .supports_all_drives(false)
-///              .remove_parents("invidunt")
-///              .ocr_language("consetetur")
+///              .remove_parents("dolore")
+///              .ocr_language("duo")
 ///              .keep_revision_forever(false)
-///              .add_parents("duo")
+///              .enforce_single_parent(true)
+///              .add_parents("et")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -5764,6 +5828,7 @@ pub struct FileUpdateCall<'a, C, A>
     _remove_parents: Option<String>,
     _ocr_language: Option<String>,
     _keep_revision_forever: Option<bool>,
+    _enforce_single_parent: Option<bool>,
     _add_parents: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
@@ -5787,7 +5852,7 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "drive.files.update",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._use_content_as_indexable_text {
             params.push(("useContentAsIndexableText", value.to_string()));
@@ -5807,10 +5872,13 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._keep_revision_forever {
             params.push(("keepRevisionForever", value.to_string()));
         }
+        if let Some(value) = self._enforce_single_parent {
+            params.push(("enforceSingleParent", value.to_string()));
+        }
         if let Some(value) = self._add_parents {
             params.push(("addParents", value.to_string()));
         }
-        for &field in ["alt", "fileId", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "removeParents", "ocrLanguage", "keepRevisionForever", "addParents"].iter() {
+        for &field in ["alt", "fileId", "useContentAsIndexableText", "supportsTeamDrives", "supportsAllDrives", "removeParents", "ocrLanguage", "keepRevisionForever", "enforceSingleParent", "addParents"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6103,11 +6171,18 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._ocr_language = Some(new_value.to_string());
         self
     }
-    /// Whether to set the 'keepForever' field in the new head revision. This is only applicable to files with binary content in Google Drive.
+    /// Whether to set the 'keepForever' field in the new head revision. This is only applicable to files with binary content in Google Drive. Only 200 revisions for the file can be kept forever. If the limit is reached, try deleting pinned revisions.
     ///
     /// Sets the *keep revision forever* query property to the given value.
     pub fn keep_revision_forever(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
         self._keep_revision_forever = Some(new_value);
+        self
+    }
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. If the item's owner makes a request to add a single parent, the item will be removed from all current folders and placed in the requested folder. Other requests that increase the number of parents will fail, except when the canAddMyDriveParent file capability is true and a single parent is being added.
+    ///
+    /// Sets the *enforce single parent* query property to the given value.
+    pub fn enforce_single_parent(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
+        self._enforce_single_parent = Some(new_value);
         self
     }
     /// A comma-separated list of parent IDs to add.
@@ -6210,7 +6285,7 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().get("fileId")
 ///              .supports_team_drives(true)
-///              .supports_all_drives(true)
+///              .supports_all_drives(false)
 ///              .acknowledge_abuse(true)
 ///              .doit();
 /// # }
@@ -6501,7 +6576,7 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.teamdrives().get("teamDriveId")
-///              .use_domain_admin_access(false)
+///              .use_domain_admin_access(true)
 ///              .doit();
 /// # }
 /// ```
@@ -7004,9 +7079,9 @@ impl<'a, C, A> TeamdriveCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.teamdrives().list()
 ///              .use_domain_admin_access(true)
-///              .q("sanctus")
-///              .page_token("takimata")
-///              .page_size(-27)
+///              .q("labore")
+///              .page_token("invidunt")
+///              .page_size(-66)
 ///              .doit();
 /// # }
 /// ```
@@ -7493,7 +7568,7 @@ impl<'a, C, A> TeamdriveDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.teamdrives().update(req, "teamDriveId")
-///              .use_domain_admin_access(false)
+///              .use_domain_admin_access(true)
 ///              .doit();
 /// # }
 /// ```
@@ -8026,7 +8101,7 @@ impl<'a, C, A> DriveCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.drives().update(req, "driveId")
-///              .use_domain_admin_access(true)
+///              .use_domain_admin_access(false)
 ///              .doit();
 /// # }
 /// ```
@@ -8772,10 +8847,10 @@ impl<'a, C, A> DriveDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.drives().list()
-///              .use_domain_admin_access(false)
-///              .q("sit")
-///              .page_token("eirmod")
-///              .page_size(-46)
+///              .use_domain_admin_access(true)
+///              .q("labore")
+///              .page_token("sed")
+///              .page_size(-16)
 ///              .doit();
 /// # }
 /// ```
@@ -9027,7 +9102,7 @@ impl<'a, C, A> DriveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.drives().get("driveId")
-///              .use_domain_admin_access(true)
+///              .use_domain_admin_access(false)
 ///              .doit();
 /// # }
 /// ```
@@ -9760,7 +9835,7 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().get("fileId", "commentId")
-///              .include_deleted(false)
+///              .include_deleted(true)
 ///              .doit();
 /// # }
 /// ```
@@ -10578,10 +10653,10 @@ impl<'a, C, A> CommentCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().list("fileId")
-///              .start_modified_time("sit")
-///              .page_token("diam")
-///              .page_size(-37)
-///              .include_deleted(false)
+///              .start_modified_time("justo")
+///              .page_token("est")
+///              .page_size(-46)
+///              .include_deleted(true)
 ///              .doit();
 /// # }
 /// ```
@@ -11376,8 +11451,8 @@ impl<'a, C, A> ReplyCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.replies().list("fileId", "commentId")
-///              .page_token("diam")
-///              .page_size(-71)
+///              .page_token("clita")
+///              .page_size(-37)
 ///              .include_deleted(false)
 ///              .doit();
 /// # }
@@ -12695,9 +12770,9 @@ impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().delete("fileId", "permissionId")
-///              .use_domain_admin_access(true)
+///              .use_domain_admin_access(false)
 ///              .supports_team_drives(true)
-///              .supports_all_drives(false)
+///              .supports_all_drives(true)
 ///              .doit();
 /// # }
 /// ```
@@ -12978,10 +13053,10 @@ impl<'a, C, A> PermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().update(req, "fileId", "permissionId")
-///              .use_domain_admin_access(true)
+///              .use_domain_admin_access(false)
 ///              .transfer_ownership(false)
-///              .supports_team_drives(true)
-///              .supports_all_drives(false)
+///              .supports_team_drives(false)
+///              .supports_all_drives(true)
 ///              .remove_expiration(false)
 ///              .doit();
 /// # }
@@ -13316,10 +13391,10 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().list("fileId")
 ///              .use_domain_admin_access(true)
-///              .supports_team_drives(false)
-///              .supports_all_drives(true)
-///              .page_token("takimata")
-///              .page_size(-43)
+///              .supports_team_drives(true)
+///              .supports_all_drives(false)
+///              .page_token("rebum.")
+///              .page_size(-6)
 ///              .doit();
 /// # }
 /// ```
@@ -13617,7 +13692,7 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// let result = hub.permissions().get("fileId", "permissionId")
 ///              .use_domain_admin_access(true)
 ///              .supports_team_drives(true)
-///              .supports_all_drives(true)
+///              .supports_all_drives(false)
 ///              .doit();
 /// # }
 /// ```
@@ -13909,12 +13984,14 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().create(req, "fileId")
-///              .use_domain_admin_access(true)
-///              .transfer_ownership(false)
-///              .supports_team_drives(false)
-///              .supports_all_drives(false)
+///              .use_domain_admin_access(false)
+///              .transfer_ownership(true)
+///              .supports_team_drives(true)
+///              .supports_all_drives(true)
 ///              .send_notification_email(true)
-///              .email_message("sea")
+///              .move_to_new_owners_root(true)
+///              .enforce_single_parent(true)
+///              .email_message("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -13929,6 +14006,8 @@ pub struct PermissionCreateCall<'a, C, A>
     _supports_team_drives: Option<bool>,
     _supports_all_drives: Option<bool>,
     _send_notification_email: Option<bool>,
+    _move_to_new_owners_root: Option<bool>,
+    _enforce_single_parent: Option<bool>,
     _email_message: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
@@ -13951,7 +14030,7 @@ impl<'a, C, A> PermissionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "drive.permissions.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._use_domain_admin_access {
             params.push(("useDomainAdminAccess", value.to_string()));
@@ -13968,10 +14047,16 @@ impl<'a, C, A> PermissionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         if let Some(value) = self._send_notification_email {
             params.push(("sendNotificationEmail", value.to_string()));
         }
+        if let Some(value) = self._move_to_new_owners_root {
+            params.push(("moveToNewOwnersRoot", value.to_string()));
+        }
+        if let Some(value) = self._enforce_single_parent {
+            params.push(("enforceSingleParent", value.to_string()));
+        }
         if let Some(value) = self._email_message {
             params.push(("emailMessage", value.to_string()));
         }
-        for &field in ["alt", "fileId", "useDomainAdminAccess", "transferOwnership", "supportsTeamDrives", "supportsAllDrives", "sendNotificationEmail", "emailMessage"].iter() {
+        for &field in ["alt", "fileId", "useDomainAdminAccess", "transferOwnership", "supportsTeamDrives", "supportsAllDrives", "sendNotificationEmail", "moveToNewOwnersRoot", "enforceSingleParent", "emailMessage"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -14152,6 +14237,20 @@ impl<'a, C, A> PermissionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._send_notification_email = Some(new_value);
         self
     }
+    /// This parameter will only take effect if the item is not in a shared drive and the request is attempting to transfer the ownership of the item. When set to true, the item will be moved to the new owner's My Drive root folder and all prior parents removed. If set to false, when enforceSingleParent=true, parents are not changed. If set to false, when enforceSingleParent=false, existing parents are not changed; however, the file will be added to the new owner's My Drive root folder, unless it is already in the new owner's My Drive.
+    ///
+    /// Sets the *move to new owners root* query property to the given value.
+    pub fn move_to_new_owners_root(mut self, new_value: bool) -> PermissionCreateCall<'a, C, A> {
+        self._move_to_new_owners_root = Some(new_value);
+        self
+    }
+    /// Set to true to opt in to API behavior that aims for all items to have exactly one parent. This parameter will only take effect if the item is not in a shared drive. See moveToNewOwnersRoot for details.
+    ///
+    /// Sets the *enforce single parent* query property to the given value.
+    pub fn enforce_single_parent(mut self, new_value: bool) -> PermissionCreateCall<'a, C, A> {
+        self._enforce_single_parent = Some(new_value);
+        self
+    }
     /// A plain text custom message to include in the notification email.
     ///
     /// Sets the *email message* query property to the given value.
@@ -14246,17 +14345,17 @@ impl<'a, C, A> PermissionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().list("pageToken")
-///              .team_drive_id("eirmod")
+///              .team_drive_id("et")
 ///              .supports_team_drives(true)
 ///              .supports_all_drives(true)
-///              .spaces("dolor")
+///              .spaces("sed")
 ///              .restrict_to_my_drive(true)
-///              .page_size(-85)
+///              .page_size(-55)
 ///              .include_team_drive_items(true)
 ///              .include_removed(true)
 ///              .include_items_from_all_drives(true)
-///              .include_corpus_removals(true)
-///              .drive_id("ipsum")
+///              .include_corpus_removals(false)
+///              .drive_id("takimata")
 ///              .doit();
 /// # }
 /// ```
@@ -14597,10 +14696,10 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().get_start_page_token()
-///              .team_drive_id("justo")
-///              .supports_team_drives(true)
-///              .supports_all_drives(true)
-///              .drive_id("dolor")
+///              .team_drive_id("et")
+///              .supports_team_drives(false)
+///              .supports_all_drives(false)
+///              .drive_id("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -14858,16 +14957,16 @@ impl<'a, C, A> ChangeGetStartPageTokenCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().watch(req, "pageToken")
-///              .team_drive_id("et")
-///              .supports_team_drives(false)
+///              .team_drive_id("invidunt")
+///              .supports_team_drives(true)
 ///              .supports_all_drives(false)
-///              .spaces("sed")
-///              .restrict_to_my_drive(true)
-///              .page_size(-38)
+///              .spaces("aliquyam")
+///              .restrict_to_my_drive(false)
+///              .page_size(-46)
 ///              .include_team_drive_items(true)
-///              .include_removed(false)
+///              .include_removed(true)
 ///              .include_items_from_all_drives(false)
-///              .include_corpus_removals(false)
+///              .include_corpus_removals(true)
 ///              .drive_id("consetetur")
 ///              .doit();
 /// # }
@@ -16043,8 +16142,8 @@ impl<'a, C, A> RevisionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.revisions().list("fileId")
-///              .page_token("consetetur")
-///              .page_size(-54)
+///              .page_token("et")
+///              .page_size(-65)
 ///              .doit();
 /// # }
 /// ```

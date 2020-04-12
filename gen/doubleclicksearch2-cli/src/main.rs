@@ -200,95 +200,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _conversion_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["kind"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::ConversionList = json::value::from_value(object).unwrap();
-        let end_date: i32 = arg_from_str(&opt.value_of("end-date").unwrap_or(""), err, "<end-date>", "integer");
-        let row_count: i32 = arg_from_str(&opt.value_of("row-count").unwrap_or(""), err, "<row-count>", "integer");
-        let start_date: i32 = arg_from_str(&opt.value_of("start-date").unwrap_or(""), err, "<start-date>", "integer");
-        let start_row: u32 = arg_from_str(&opt.value_of("start-row").unwrap_or(""), err, "<start-row>", "integer");
-        let mut call = self.hub.conversion().patch(request, opt.value_of("advertiser-id").unwrap_or(""), opt.value_of("agency-id").unwrap_or(""), end_date, opt.value_of("engine-account-id").unwrap_or(""), row_count, start_date, start_row);
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _conversion_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -841,9 +752,6 @@ impl<'n> Engine<'n> {
                     ("insert", Some(opt)) => {
                         call_result = self._conversion_insert(opt, dry_run, &mut err);
                     },
-                    ("patch", Some(opt)) => {
-                        call_result = self._conversion_patch(opt, dry_run, &mut err);
-                    },
                     ("update", Some(opt)) => {
                         call_result = self._conversion_update(opt, dry_run, &mut err);
                     },
@@ -969,7 +877,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("conversion", "methods: 'get', 'insert', 'patch', 'update' and 'update-availability'", vec![
+        ("conversion", "methods: 'get', 'insert', 'update' and 'update-availability'", vec![
             ("get",
                     Some(r##"Retrieves a list of conversions from a DoubleClick Search engine account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_doubleclicksearch2_cli/conversion_get",
@@ -1032,70 +940,6 @@ fn main() {
                     Some(r##"Inserts a batch of new conversions into DoubleClick Search."##),
                     "Details at http://byron.github.io/google-apis-rs/google_doubleclicksearch2_cli/conversion_insert",
                   vec![
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("patch",
-                    Some(r##"Updates a batch of conversions in DoubleClick Search. This method supports patch semantics."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_doubleclicksearch2_cli/conversion_patch",
-                  vec![
-                    (Some(r##"advertiser-id"##),
-                     None,
-                     Some(r##"Numeric ID of the advertiser."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"agency-id"##),
-                     None,
-                     Some(r##"Numeric ID of the agency."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"end-date"##),
-                     None,
-                     Some(r##"Last date (inclusive) on which to retrieve conversions. Format is yyyymmdd."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"engine-account-id"##),
-                     None,
-                     Some(r##"Numeric ID of the engine account."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"row-count"##),
-                     None,
-                     Some(r##"The number of conversions to return per call."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"start-date"##),
-                     None,
-                     Some(r##"First date (inclusive) on which to retrieve conversions. Format is yyyymmdd."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"start-row"##),
-                     None,
-                     Some(r##"The 0-based starting index for retrieving conversions results."##),
-                     Some(true),
-                     Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
@@ -1292,7 +1136,7 @@ fn main() {
     
     let mut app = App::new("doubleclicksearch2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190625")
+           .version("1.0.13+20200331")
            .about("Reports and modifies your advertising data in DoubleClick Search (for example, campaigns, ad groups, keywords, and conversions).")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_doubleclicksearch2_cli")
            .arg(Arg::with_name("url")

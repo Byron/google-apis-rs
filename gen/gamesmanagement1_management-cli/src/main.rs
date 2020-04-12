@@ -717,260 +717,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _quests_reset(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.quests().reset(opt.value_of("quest-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _quests_reset_all(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.quests().reset_all();
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _quests_reset_all_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.quests().reset_all_for_all_players();
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _quests_reset_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.quests().reset_for_all_players(opt.value_of("quest-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _quests_reset_multiple_for_all_players(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "quest-ids" => Some(("quest_ids", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["kind", "quest-ids"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::QuestsResetMultipleForAllRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.quests().reset_multiple_for_all_players(request);
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _rooms_reset(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.rooms().reset();
@@ -1493,29 +1239,6 @@ impl<'n> Engine<'n> {
                     }
                 }
             },
-            ("quests", Some(opt)) => {
-                match opt.subcommand() {
-                    ("reset", Some(opt)) => {
-                        call_result = self._quests_reset(opt, dry_run, &mut err);
-                    },
-                    ("reset-all", Some(opt)) => {
-                        call_result = self._quests_reset_all(opt, dry_run, &mut err);
-                    },
-                    ("reset-all-for-all-players", Some(opt)) => {
-                        call_result = self._quests_reset_all_for_all_players(opt, dry_run, &mut err);
-                    },
-                    ("reset-for-all-players", Some(opt)) => {
-                        call_result = self._quests_reset_for_all_players(opt, dry_run, &mut err);
-                    },
-                    ("reset-multiple-for-all-players", Some(opt)) => {
-                        call_result = self._quests_reset_multiple_for_all_players(opt, dry_run, &mut err);
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("quests".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
-                }
-            },
             ("rooms", Some(opt)) => {
                 match opt.subcommand() {
                     ("reset", Some(opt)) => {
@@ -1759,7 +1482,7 @@ fn main() {
         
         ("events", "methods: 'reset', 'reset-all', 'reset-all-for-all-players', 'reset-for-all-players' and 'reset-multiple-for-all-players'", vec![
             ("reset",
-                    Some(r##"Resets all player progress on the event with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application. All quests for this player that use the event will also be reset."##),
+                    Some(r##"Resets all player progress on the event with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/events_reset",
                   vec![
                     (Some(r##"event-id"##),
@@ -1775,7 +1498,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-all",
-                    Some(r##"Resets all player progress on all events for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application. All quests for this player will also be reset."##),
+                    Some(r##"Resets all player progress on all events for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/events_reset-all",
                   vec![
                     (Some(r##"v"##),
@@ -1785,7 +1508,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-all-for-all-players",
-                    Some(r##"Resets all draft events for all players. This method is only available to user accounts for your developer console. All quests that use any of these events will also be reset."##),
+                    Some(r##"Resets all draft events for all players. This method is only available to user accounts for your developer console."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/events_reset-all-for-all-players",
                   vec![
                     (Some(r##"v"##),
@@ -1795,7 +1518,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-for-all-players",
-                    Some(r##"Resets the event with the given ID for all players. This method is only available to user accounts for your developer console. Only draft events can be reset. All quests that use the event will also be reset."##),
+                    Some(r##"Resets the event with the given ID for all players. This method is only available to user accounts for your developer console. Only draft events can be reset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/events_reset-for-all-players",
                   vec![
                     (Some(r##"event-id"##),
@@ -1811,7 +1534,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("reset-multiple-for-all-players",
-                    Some(r##"Resets events with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft events may be reset. All quests that use any of the events will also be reset."##),
+                    Some(r##"Resets events with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft events may be reset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/events_reset-multiple-for-all-players",
                   vec![
                     (Some(r##"kv"##),
@@ -1866,77 +1589,6 @@ fn main() {
                      Some(r##"A player ID. A value of me may be used in place of the authenticated player's ID."##),
                      Some(true),
                      Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                  ]),
-            ]),
-        
-        ("quests", "methods: 'reset', 'reset-all', 'reset-all-for-all-players', 'reset-for-all-players' and 'reset-multiple-for-all-players'", vec![
-            ("reset",
-                    Some(r##"Resets all player progress on the quest with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/quests_reset",
-                  vec![
-                    (Some(r##"quest-id"##),
-                     None,
-                     Some(r##"The ID of the quest."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                  ]),
-            ("reset-all",
-                    Some(r##"Resets all player progress on all quests for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/quests_reset-all",
-                  vec![
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                  ]),
-            ("reset-all-for-all-players",
-                    Some(r##"Resets all draft quests for all players. This method is only available to user accounts for your developer console."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/quests_reset-all-for-all-players",
-                  vec![
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                  ]),
-            ("reset-for-all-players",
-                    Some(r##"Resets all player progress on the quest with the given ID for all players. This method is only available to user accounts for your developer console. Only draft quests can be reset."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/quests_reset-for-all-players",
-                  vec![
-                    (Some(r##"quest-id"##),
-                     None,
-                     Some(r##"The ID of the quest."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                  ]),
-            ("reset-multiple-for-all-players",
-                    Some(r##"Resets quests with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft quests may be reset."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/quests_reset-multiple-for-all-players",
-                  vec![
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -2079,7 +1731,7 @@ fn main() {
     
     let mut app = App::new("gamesmanagement1-management")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190627")
+           .version("1.0.13+20200402")
            .about("The Management API for Google Play Game Services.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli")
            .arg(Arg::with_name("url")

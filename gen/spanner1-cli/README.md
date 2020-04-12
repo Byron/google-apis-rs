@@ -25,14 +25,28 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Spanner* API at revision *20190613*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Spanner* API at revision *20200403*. The CLI is at version *1.0.13*.
 
 ```bash
 spanner1 [options]
         projects
                 instance-configs-get <name> [-p <v>]... [-o <out>]
                 instance-configs-list <parent> [-p <v>]... [-o <out>]
+                instances-backup-operations-list <parent> [-p <v>]... [-o <out>]
+                instances-backups-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-backups-delete <name> [-p <v>]... [-o <out>]
+                instances-backups-get <name> [-p <v>]... [-o <out>]
+                instances-backups-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-backups-list <parent> [-p <v>]... [-o <out>]
+                instances-backups-operations-cancel <name> [-p <v>]... [-o <out>]
+                instances-backups-operations-delete <name> [-p <v>]... [-o <out>]
+                instances-backups-operations-get <name> [-p <v>]... [-o <out>]
+                instances-backups-operations-list <name> [-p <v>]... [-o <out>]
+                instances-backups-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-backups-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-backups-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-database-operations-list <parent> [-p <v>]... [-o <out>]
                 instances-databases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-databases-drop-database <database> [-p <v>]... [-o <out>]
                 instances-databases-get <name> [-p <v>]... [-o <out>]
@@ -43,6 +57,8 @@ spanner1 [options]
                 instances-databases-operations-delete <name> [-p <v>]... [-o <out>]
                 instances-databases-operations-get <name> [-p <v>]... [-o <out>]
                 instances-databases-operations-list <name> [-p <v>]... [-o <out>]
+                instances-databases-restore <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-databases-sessions-batch-create <database> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-databases-sessions-begin-transaction <session> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-databases-sessions-commit <session> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-databases-sessions-create <database> (-r <kv>)... [-p <v>]... [-o <out>]

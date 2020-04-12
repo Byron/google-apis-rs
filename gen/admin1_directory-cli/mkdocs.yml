@@ -1,4 +1,4 @@
-site_name: directory v1.0.12+20190214
+site_name: directory v1.0.13+20200204
 site_url: http://byron.github.io/google-apis-rs/google-admin1_directory-cli
 site_description: A complete library to interact with directory (protocol directory_v1)
 
@@ -62,8 +62,6 @@ pages:
 - ['orgunits_patch.md', 'Orgunits', 'Patch']
 - ['orgunits_update.md', 'Orgunits', 'Update']
 - ['privileges_list.md', 'Privileges', 'List']
-- ['resolved-app-access-settings_get-settings.md', 'Resolved App Access Settings', 'Get Settings']
-- ['resolved-app-access-settings_list-trusted-apps.md', 'Resolved App Access Settings', 'List Trusted Apps']
 - ['resources_buildings-delete.md', 'Resources', 'Buildings Delete']
 - ['resources_buildings-get.md', 'Resources', 'Buildings Get']
 - ['resources_buildings-insert.md', 'Resources', 'Buildings Insert']

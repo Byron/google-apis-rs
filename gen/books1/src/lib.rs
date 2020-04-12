@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *books* crate version *1.0.12+20181212*, where *20181212* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *books* crate version *1.0.13+20200310*, where *20200310* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *books* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/books/docs/v1/getting_started).
@@ -374,7 +374,7 @@ impl<'a, C, A> Books<C, A>
         Books {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://www.googleapis.com/books/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -421,7 +421,7 @@ impl<'a, C, A> Books<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -795,22 +795,21 @@ pub struct Notification {
 impl ResponseResult for Notification {}
 
 
-/// User settings in sub-objects, each for different purposes.
+/// The actual selling price of the book. This is the same as the suggested retail or list price unless there are offers or discounts on this volume. (In LITE projection.)
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UsersettingsNotesExport {
-    /// no description provided
-    #[serde(rename="isEnabled")]
-    pub is_enabled: Option<bool>,
-    /// no description provided
-    #[serde(rename="folderName")]
-    pub folder_name: Option<String>,
+pub struct VolumeSaleInfoRetailPrice {
+    /// Amount in the currency listed below. (In LITE projection.)
+    pub amount: Option<f64>,
+    /// An ISO 4217, three-letter currency code. (In LITE projection.)
+    #[serde(rename="currencyCode")]
+    pub currency_code: Option<String>,
 }
 
-impl NestedType for UsersettingsNotesExport {}
-impl Part for UsersettingsNotesExport {}
+impl NestedType for VolumeSaleInfoRetailPrice {}
+impl Part for VolumeSaleInfoRetailPrice {}
 
 
 /// There is no detailed description.
@@ -1573,6 +1572,30 @@ pub struct Category {
 impl ResponseResult for Category {}
 
 
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SeriesSeriesSeriesSubscriptionReleaseInfo {
+    /// Cancellation date of the series subscription (or when it ends).
+    #[serde(rename="cancellationTimestampUs")]
+    pub cancellation_timestamp_us: Option<String>,
+    /// Release information for the last release.
+    #[serde(rename="currentReleaseInfo")]
+    pub current_release_info: Option<BooksSubscriptionReleaseInfo>,
+    /// series subscription type.
+    #[serde(rename="seriesSubscriptionType")]
+    pub series_subscription_type: Option<String>,
+    /// Release information for the next release.
+    #[serde(rename="nextReleaseInfo")]
+    pub next_release_info: Option<BooksSubscriptionReleaseInfo>,
+}
+
+impl NestedType for SeriesSeriesSeriesSubscriptionReleaseInfo {}
+impl Part for SeriesSeriesSeriesSubscriptionReleaseInfo {}
+
+
 /// A list of onboarding categories.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2003,21 +2026,22 @@ impl NestedType for AnnotationLayerSummary {}
 impl Part for AnnotationLayerSummary {}
 
 
-/// The actual selling price of the book. This is the same as the suggested retail or list price unless there are offers or discounts on this volume. (In LITE projection.)
+/// User settings in sub-objects, each for different purposes.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct VolumeSaleInfoRetailPrice {
-    /// Amount in the currency listed below. (In LITE projection.)
-    pub amount: Option<f64>,
-    /// An ISO 4217, three-letter currency code. (In LITE projection.)
-    #[serde(rename="currencyCode")]
-    pub currency_code: Option<String>,
+pub struct UsersettingsNotesExport {
+    /// no description provided
+    #[serde(rename="isEnabled")]
+    pub is_enabled: Option<bool>,
+    /// no description provided
+    #[serde(rename="folderName")]
+    pub folder_name: Option<String>,
 }
 
-impl NestedType for VolumeSaleInfoRetailPrice {}
-impl Part for VolumeSaleInfoRetailPrice {}
+impl NestedType for UsersettingsNotesExport {}
+impl Part for UsersettingsNotesExport {}
 
 
 /// Offer list (=undiscounted) price in Micros.
@@ -2366,6 +2390,29 @@ impl Part for VolumeUserInfo {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BooksSubscriptionReleaseInfo {
+    /// Currency code of the amount.
+    #[serde(rename="currencyCode")]
+    pub currency_code: Option<String>,
+    /// The release date.
+    #[serde(rename="releaseTimestampUs")]
+    pub release_timestamp_us: Option<String>,
+    /// Amount in micros of the specified currency code.
+    #[serde(rename="amountInMicros")]
+    pub amount_in_micros: Option<String>,
+    /// The release number of this issue/volume/book.
+    #[serde(rename="releaseNumber")]
+    pub release_number: Option<String>,
+}
+
+impl Part for BooksSubscriptionReleaseInfo {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsersettingsNotificationRewardExpirations {
     /// no description provided
     pub opted_state: Option<String>,
@@ -2388,13 +2435,28 @@ pub struct SeriesSeries {
     #[serde(rename="bannerImageUrl")]
     pub banner_image_url: Option<String>,
     /// no description provided
+    pub title: Option<String>,
+    /// no description provided
     #[serde(rename="imageUrl")]
     pub image_url: Option<String>,
+    /// no description provided
+    #[serde(rename="seriesFormatType")]
+    pub series_format_type: Option<String>,
+    /// no description provided
+    #[serde(rename="isComplete")]
+    pub is_complete: Option<bool>,
+    /// no description provided
+    #[serde(rename="subscriptionId")]
+    pub subscription_id: Option<String>,
+    /// no description provided
+    #[serde(rename="eligibleForSubscription")]
+    pub eligible_for_subscription: Option<bool>,
     /// no description provided
     #[serde(rename="seriesType")]
     pub series_type: Option<String>,
     /// no description provided
-    pub title: Option<String>,
+    #[serde(rename="seriesSubscriptionReleaseInfo")]
+    pub series_subscription_release_info: Option<SeriesSeriesSeriesSubscriptionReleaseInfo>,
 }
 
 impl NestedType for SeriesSeries {}

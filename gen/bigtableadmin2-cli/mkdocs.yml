@@ -1,4 +1,4 @@
-site_name: Bigtable Admin v1.0.12+20190506
+site_name: Bigtable Admin v1.0.13+20200211
 site_url: http://byron.github.io/google-apis-rs/google-bigtableadmin2-cli
 site_description: A complete library to interact with Bigtable Admin (protocol v2)
 
@@ -18,6 +18,9 @@ pages:
 - ['projects_instances-app-profiles-get.md', 'Projects', 'Instances App Profiles Get']
 - ['projects_instances-app-profiles-list.md', 'Projects', 'Instances App Profiles List']
 - ['projects_instances-app-profiles-patch.md', 'Projects', 'Instances App Profiles Patch']
+- ['projects_instances-clusters-backups-get-iam-policy.md', 'Projects', 'Instances Clusters Backups Get Iam Policy']
+- ['projects_instances-clusters-backups-set-iam-policy.md', 'Projects', 'Instances Clusters Backups Set Iam Policy']
+- ['projects_instances-clusters-backups-test-iam-permissions.md', 'Projects', 'Instances Clusters Backups Test Iam Permissions']
 - ['projects_instances-clusters-create.md', 'Projects', 'Instances Clusters Create']
 - ['projects_instances-clusters-delete.md', 'Projects', 'Instances Clusters Delete']
 - ['projects_instances-clusters-get.md', 'Projects', 'Instances Clusters Get']

@@ -1586,7 +1586,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output Only. The resource name of the organization. This is the
+                     Some(r##"Output only. The resource name of the organization. This is the
         organization's relative path in the API. Its format is
         "organizations/[organization_id]". For example, "organizations/1234"."##),
                      Some(true),
@@ -1827,7 +1827,11 @@ fn main() {
         + Project does not support `allUsers` and `allAuthenticatedUsers` as
         `members` in a `Binding` of a `Policy`.
         
-        + The owner role can be granted only to `user` and `serviceAccount`.
+        + The owner role can be granted to a `user`, `serviceAccount`, or a group
+        that is part of an organization. For example,
+        group@myownpersonaldomain.com could be added as an owner to a project in
+        the myownpersonaldomain.com organization, but not the examplepetstore.com
+        organization.
         
         + Service accounts can be made owners of a project directly
         without any restrictions. However, to be added as an owner, a user must be
@@ -1989,7 +1993,7 @@ fn main() {
     
     let mut app = App::new("cloudresourcemanager1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190701")
+           .version("1.0.13+20200408")
            .about("Creates, reads, and updates metadata for Google Cloud Platform resource containers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli")
            .arg(Arg::with_name("url")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Container Analysis* crate version *1.0.12+20190625*, where *20190625* is the exact revision of the *containeranalysis:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Container Analysis* crate version *1.0.13+20200327*, where *20200327* is the exact revision of the *containeranalysis:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Container Analysis* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/container-analysis/api/reference/rest/).
@@ -334,7 +334,7 @@ impl<'a, C, A> ContainerAnalysis<C, A>
         ContainerAnalysis {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://containeranalysis.googleapis.com/".to_string(),
             _root_url: "https://containeranalysis.googleapis.com/".to_string(),
         }
@@ -345,7 +345,7 @@ impl<'a, C, A> ContainerAnalysis<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -452,16 +452,19 @@ pub struct Detail {
     pub min_affected_version: Option<Version>,
     /// Required. The name of the package where the vulnerability was found.
     pub package: Option<String>,
-    /// The type of package; whether native or non native(ruby gems, node.js
-    /// packages etc).
-    #[serde(rename="packageType")]
-    pub package_type: Option<String>,
     /// Whether this detail is obsolete. Occurrences are expected not to point to
     /// obsolete details.
     #[serde(rename="isObsolete")]
     pub is_obsolete: Option<bool>,
-    /// Deprecated, do not use. Use fixed_location instead.
-    /// 
+    /// The type of package; whether native or non native(ruby gems, node.js
+    /// packages etc).
+    #[serde(rename="packageType")]
+    pub package_type: Option<String>,
+    /// The time this information was last changed at the source. This is an
+    /// upstream timestamp from the underlying information source - e.g. Ubuntu
+    /// security tracker.
+    #[serde(rename="sourceUpdateTime")]
+    pub source_update_time: Option<String>,
     /// The max version of the package in which the vulnerability exists.
     #[serde(rename="maxAffectedVersion")]
     pub max_affected_version: Option<Version>,
@@ -550,7 +553,7 @@ impl Part for GenericSignedAttestation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchCreateOccurrencesRequest {
-    /// The occurrences to create. Max allowed length is 1000.
+    /// Required. The occurrences to create. Max allowed length is 1000.
     pub occurrences: Option<Vec<Occurrence>>,
 }
 
@@ -676,13 +679,6 @@ pub struct SetIamPolicyRequest {
     /// valid policy but certain Cloud Platform services (such as Projects)
     /// might reject them.
     pub policy: Option<Policy>,
-    /// OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only
-    /// the fields in the mask will be modified. If no mask is provided, the
-    /// following default mask is used:
-    /// paths: "bindings, etag"
-    /// This field is only used by Cloud IAM.
-    #[serde(rename="updateMask")]
-    pub update_mask: Option<String>,
 }
 
 impl RequestValue for SetIamPolicyRequest {}
@@ -779,7 +775,11 @@ impl ResponseResult for ListScanConfigsResponse {}
 /// * [occurrences get iam policy projects](struct.ProjectOccurrenceGetIamPolicyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetIamPolicyRequest { _never_set: Option<bool> }
+pub struct GetIamPolicyRequest {
+    /// OPTIONAL: A `GetPolicyOptions` object for specifying options to
+    /// `GetIamPolicy`. This field is only used by Cloud IAM.
+    pub options: Option<GetPolicyOptions>,
+}
 
 impl RequestValue for GetIamPolicyRequest {}
 
@@ -1043,7 +1043,7 @@ pub struct Binding {
     ///    who is authenticated with a Google account or a service account.
     /// 
     /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` .
+    ///    account. For example, `alice@example.com` .
     /// 
     /// 
     /// * `serviceAccount:{emailid}`: An email address that represents a service
@@ -1051,6 +1051,26 @@ pub struct Binding {
     /// 
     /// * `group:{emailid}`: An email address that represents a Google group.
     ///    For example, `admins@example.com`.
+    /// 
+    /// * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a user that has been recently deleted. For
+    ///    example, `alice@example.com?uid=123456789012345678901`. If the user is
+    ///    recovered, this value reverts to `user:{emailid}` and the recovered user
+    ///    retains the role in the binding.
+    /// 
+    /// * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus
+    ///    unique identifier) representing a service account that has been recently
+    ///    deleted. For example,
+    ///    `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.
+    ///    If the service account is undeleted, this value reverts to
+    ///    `serviceAccount:{emailid}` and the undeleted service account retains the
+    ///    role in the binding.
+    /// 
+    /// * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a Google group that has been recently
+    ///    deleted. For example, `admins@example.com?uid=123456789012345678901`. If
+    ///    the group is recovered, this value reverts to `group:{emailid}` and the
+    ///    recovered group retains the role in the binding.
     /// 
     /// 
     /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
@@ -1199,22 +1219,17 @@ pub struct BuildProvenance {
 impl Part for BuildProvenance {}
 
 
-/// Note holding the version of the provider's builder and the signature of the
-/// provenance message in the build details occurrence.
+/// Details of an attestation occurrence.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Build {
-    /// Required. Immutable. Version of the builder which produced this build.
-    #[serde(rename="builderVersion")]
-    pub builder_version: Option<String>,
-    /// Signature of the build in occurrences pointing to this build note
-    /// containing build details.
-    pub signature: Option<BuildSignature>,
+pub struct Details {
+    /// Required. Attestation for the resource.
+    pub attestation: Option<Attestation>,
 }
 
-impl Part for Build {}
+impl Part for Details {}
 
 
 /// Details of a deployment occurrence.
@@ -1241,7 +1256,7 @@ impl Part for GrafeasV1beta1DeploymentDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchCreateNotesRequest {
-    /// The notes to create. Max allowed length is 1000.
+    /// Required. The notes to create. Max allowed length is 1000.
     pub notes: Option<HashMap<String, Note>>,
 }
 
@@ -1409,50 +1424,68 @@ pub struct Version {
 impl Part for Version {}
 
 
-/// Details of an attestation occurrence.
+/// Note holding the version of the provider's builder and the signature of the
+/// provenance message in the build details occurrence.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Details {
-    /// Required. Attestation for the resource.
-    pub attestation: Option<Attestation>,
+pub struct Build {
+    /// Required. Immutable. Version of the builder which produced this build.
+    #[serde(rename="builderVersion")]
+    pub builder_version: Option<String>,
+    /// Signature of the build in occurrences pointing to this build note
+    /// containing build details.
+    pub signature: Option<BuildSignature>,
 }
 
-impl Part for Details {}
+impl Part for Build {}
 
 
-/// Defines an Identity and Access Management (IAM) policy. It is used to
-/// specify access control policies for Cloud Platform resources.
+/// An Identity and Access Management (IAM) policy, which specifies access
+/// controls for Google Cloud resources.
 /// 
-/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
-/// `members` to a `role`, where the members can be user accounts, Google groups,
-/// Google domains, and service accounts. A `role` is a named list of permissions
-/// defined by IAM.
+/// A `Policy` is a collection of `bindings`. A `binding` binds one or more
+/// `members` to a single `role`. Members can be user accounts, service accounts,
+/// Google groups, and domains (such as G Suite). A `role` is a named list of
+/// permissions; each `role` can be an IAM predefined role or a user-created
+/// custom role.
 /// 
-/// **JSON Example**
+/// Optionally, a `binding` can specify a `condition`, which is a logical
+/// expression that allows access to a resource only if the expression evaluates
+/// to `true`. A condition can add constraints based on attributes of the
+/// request, the resource, or both.
+/// 
+/// **JSON example:**
 /// 
 /// ````text
 /// {
 ///   "bindings": [
 ///     {
-///       "role": "roles/owner",
+///       "role": "roles/resourcemanager.organizationAdmin",
 ///       "members": [
 ///         "user:mike@example.com",
 ///         "group:admins@example.com",
 ///         "domain:google.com",
-///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
+///         "serviceAccount:my-project-id@appspot.gserviceaccount.com"
 ///       ]
 ///     },
 ///     {
-///       "role": "roles/viewer",
-///       "members": ["user:sean@example.com"]
+///       "role": "roles/resourcemanager.organizationViewer",
+///       "members": ["user:eve@example.com"],
+///       "condition": {
+///         "title": "expirable access",
+///         "description": "Does not grant access after Sep 2020",
+///         "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')",
+///       }
 ///     }
-///   ]
+///   ],
+///   "etag": "BwWWja0YfJA=",
+///   "version": 3
 /// }
 /// ````
 /// 
-/// **YAML Example**
+/// **YAML example:**
 /// 
 /// ````text
 /// bindings:
@@ -1460,15 +1493,21 @@ impl Part for Details {}
 ///   - user:mike@example.com
 ///   - group:admins@example.com
 ///   - domain:google.com
-///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///   role: roles/owner
+///   - serviceAccount:my-project-id@appspot.gserviceaccount.com
+///   role: roles/resourcemanager.organizationAdmin
 /// - members:
-///   - user:sean@example.com
-///   role: roles/viewer
+///   - user:eve@example.com
+///   role: roles/resourcemanager.organizationViewer
+///   condition:
+///     title: expirable access
+///     description: Does not grant access after Sep 2020
+///     expression: request.time < timestamp('2020-10-01T00:00:00.000Z')
+/// - etag: BwWWja0YfJA=
+/// - version: 3
 /// ````
 /// 
 /// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam/docs).
+/// [IAM documentation](https://cloud.google.com/iam/docs/).
 /// 
 /// # Activities
 /// 
@@ -1481,9 +1520,10 @@ impl Part for Details {}
 /// * [occurrences get iam policy projects](struct.ProjectOccurrenceGetIamPolicyCall.html) (response)
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
-    /// Specifies cloud audit logging configuration for this policy.
-    #[serde(rename="auditConfigs")]
-    pub audit_configs: Option<Vec<AuditConfig>>,
+    /// Associates a list of `members` to a `role`. Optionally, may specify a
+    /// `condition` that determines how and when the `bindings` are applied. Each
+    /// of the `bindings` must contain at least one member.
+    pub bindings: Option<Vec<Binding>>,
     /// `etag` is used for optimistic concurrency control as a way to help
     /// prevent simultaneous updates of a policy from overwriting each other.
     /// It is strongly suggested that systems make use of the `etag` in the
@@ -1492,13 +1532,32 @@ pub struct Policy {
     /// systems are expected to put that etag in the request to `setIamPolicy` to
     /// ensure that their change will be applied to the same version of the policy.
     /// 
-    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
-    /// policy is overwritten blindly.
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
     pub etag: Option<String>,
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
-    pub bindings: Option<Vec<Binding>>,
-    /// Deprecated.
+    /// Specifies the format of the policy.
+    /// 
+    /// Valid values are `0`, `1`, and `3`. Requests that specify an invalid value
+    /// are rejected.
+    /// 
+    /// Any operation that affects conditional role bindings must specify version
+    /// `3`. This requirement applies to the following operations:
+    /// 
+    /// * Getting a policy that includes a conditional role binding
+    /// * Adding a conditional role binding to a policy
+    /// * Changing a conditional role binding in a policy
+    /// * Removing any role binding, with or without a condition, from a policy
+    ///   that includes conditions
+    /// 
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
+    /// 
+    /// If a policy does not include any conditions, operations on that policy may
+    /// specify any valid version or leave the field unset.
     pub version: Option<i32>,
 }
 
@@ -1746,44 +1805,6 @@ pub struct BuildSignature {
 impl Part for BuildSignature {}
 
 
-/// Provides the configuration for logging a type of permissions.
-/// Example:
-/// 
-/// ````text
-/// {
-///   "audit_log_configs": [
-///     {
-///       "log_type": "DATA_READ",
-///       "exempted_members": [
-///         "user:foo@gmail.com"
-///       ]
-///     },
-///     {
-///       "log_type": "DATA_WRITE",
-///     }
-///   ]
-/// }
-/// ````
-/// 
-/// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
-/// foo@gmail.com from DATA_READ logging.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AuditLogConfig {
-    /// Specifies the identities that do not cause logging for this type of
-    /// permission.
-    /// Follows the same format of Binding.members.
-    #[serde(rename="exemptedMembers")]
-    pub exempted_members: Option<Vec<String>>,
-    /// The log type that this config enables.
-    #[serde(rename="logType")]
-    pub log_type: Option<String>,
-}
-
-impl Part for AuditLogConfig {}
-
-
 /// An entity that can have metadata. For example, a Docker image.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1847,30 +1868,59 @@ pub struct Package {
 impl Part for Package {}
 
 
-/// Represents an expression text. Example:
+/// Represents a textual expression in the Common Expression Language (CEL)
+/// syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+/// are documented at https://github.com/google/cel-spec.
+/// 
+/// Example (Comparison):
 /// 
 /// ````text
-/// title: "User account presence"
-/// description: "Determines whether the request has a user account"
-/// expression: "size(request.user) > 0"
+/// title: "Summary size limit"
+/// description: "Determines if a summary is less than 100 chars"
+/// expression: "document.summary.size() < 100"
 /// ````
+/// 
+/// Example (Equality):
+/// 
+/// ````text
+/// title: "Requestor is owner"
+/// description: "Determines if requestor is the document owner"
+/// expression: "document.owner == request.auth.claims.email"
+/// ````
+/// 
+/// Example (Logic):
+/// 
+/// ````text
+/// title: "Public documents"
+/// description: "Determine whether the document should be publicly visible"
+/// expression: "document.type != 'private' && document.type != 'internal'"
+/// ````
+/// 
+/// Example (Data Manipulation):
+/// 
+/// ````text
+/// title: "Notification string"
+/// description: "Create a notification string with a timestamp."
+/// expression: "'New message received at ' + string(document.create_time)"
+/// ````
+/// 
+/// The exact variables and functions that may be referenced within an expression
+/// are determined by the service that evaluates it. See the service
+/// documentation for additional information.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
-    /// An optional description of the expression. This is a longer text which
+    /// Optional. Description of the expression. This is a longer text which
     /// describes the expression, e.g. when hovered over it in a UI.
     pub description: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
+    /// Textual representation of an expression in Common Expression Language
+    /// syntax.
     pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error
+    /// Optional. String indicating the location of the expression for error
     /// reporting, e.g. a file name and a position in the file.
     pub location: Option<String>,
-    /// An optional title for the expression, i.e. a short string describing
+    /// Optional. Title for the expression, i.e. a short string describing
     /// its purpose. This can be used e.g. in UIs which allow to enter the
     /// expression.
     pub title: Option<String>,
@@ -1897,12 +1947,17 @@ pub struct Vulnerability {
     /// The CVSS score for this vulnerability.
     #[serde(rename="cvssScore")]
     pub cvss_score: Option<f32>,
+    /// Note provider assigned impact of the vulnerability.
+    pub severity: Option<String>,
+    /// The time this information was last changed at the source. This is an
+    /// upstream timestamp from the underlying information source - e.g. Ubuntu
+    /// security tracker.
+    #[serde(rename="sourceUpdateTime")]
+    pub source_update_time: Option<String>,
     /// All information about the package to specifically identify this
     /// vulnerability. One entry per (version range and cpe_uri) the package
     /// vulnerability has manifested in.
     pub details: Option<Vec<Detail>>,
-    /// Note provider assigned impact of the vulnerability.
-    pub severity: Option<String>,
 }
 
 impl Part for Vulnerability {}
@@ -2219,6 +2274,27 @@ impl RequestValue for Occurrence {}
 impl ResponseResult for Occurrence {}
 
 
+/// Encapsulates settings provided to GetIamPolicy.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetPolicyOptions {
+    /// Optional. The policy format version to be returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
+    #[serde(rename="requestedPolicyVersion")]
+    pub requested_policy_version: Option<i32>,
+}
+
+impl Part for GetPolicyOptions {}
+
+
 /// Response for listing notes.
 /// 
 /// # Activities
@@ -2254,75 +2330,6 @@ pub struct Deployable {
 }
 
 impl Part for Deployable {}
-
-
-/// Specifies the audit configuration for a service.
-/// The configuration determines which permission types are logged, and what
-/// identities, if any, are exempted from logging.
-/// An AuditConfig must have one or more AuditLogConfigs.
-/// 
-/// If there are AuditConfigs for both `allServices` and a specific service,
-/// the union of the two AuditConfigs is used for that service: the log_types
-/// specified in each AuditConfig are enabled, and the exempted_members in each
-/// AuditLogConfig are exempted.
-/// 
-/// Example Policy with multiple AuditConfigs:
-/// 
-/// ````text
-/// {
-///   "audit_configs": [
-///     {
-///       "service": "allServices"
-///       "audit_log_configs": [
-///         {
-///           "log_type": "DATA_READ",
-///           "exempted_members": [
-///             "user:foo@gmail.com"
-///           ]
-///         },
-///         {
-///           "log_type": "DATA_WRITE",
-///         },
-///         {
-///           "log_type": "ADMIN_READ",
-///         }
-///       ]
-///     },
-///     {
-///       "service": "fooservice.googleapis.com"
-///       "audit_log_configs": [
-///         {
-///           "log_type": "DATA_READ",
-///         },
-///         {
-///           "log_type": "DATA_WRITE",
-///           "exempted_members": [
-///             "user:bar@gmail.com"
-///           ]
-///         }
-///       ]
-///     }
-///   ]
-/// }
-/// ````
-/// 
-/// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
-/// logging. It also exempts foo@gmail.com from DATA_READ logging, and
-/// bar@gmail.com from DATA_WRITE logging.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AuditConfig {
-    /// The configuration for logging of each type of permission.
-    #[serde(rename="auditLogConfigs")]
-    pub audit_log_configs: Option<Vec<AuditLogConfig>>,
-    /// Specifies a service that will be enabled for audit logging.
-    /// For example, `storage.googleapis.com`, `cloudsql.googleapis.com`.
-    /// `allServices` is a special value that covers all services.
-    pub service: Option<String>,
-}
-
-impl Part for AuditConfig {}
 
 
 /// Per resource and severity counts of fixable and total vulnerabilities.
@@ -2397,7 +2404,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The name of the project to list scan configurations for in the form of
+    /// * `parent` - Required. The name of the project to list scan configurations for in the form of
     ///              `projects/[PROJECT_ID]`.
     pub fn scan_configs_list(&self, parent: &str) -> ProjectScanConfigListCall<'a, C, A> {
         ProjectScanConfigListCall {
@@ -2472,7 +2479,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The name of the project in the form of `projects/[PROJECT_ID]`, under which
+    /// * `parent` - Required. The name of the project in the form of `projects/[PROJECT_ID]`, under which
     ///              the occurrences are to be created.
     pub fn occurrences_batch_create(&self, request: BatchCreateOccurrencesRequest, parent: &str) -> ProjectOccurrenceBatchCreateCall<'a, C, A> {
         ProjectOccurrenceBatchCreateCall {
@@ -2491,7 +2498,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the note in the form of
+    /// * `name` - Required. The name of the note in the form of
     ///            `projects/[PROVIDER_ID]/notes/[NOTE_ID]`.
     pub fn notes_get(&self, name: &str) -> ProjectNoteGetCall<'a, C, A> {
         ProjectNoteGetCall {
@@ -2509,7 +2516,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the occurrence in the form of
+    /// * `name` - Required. The name of the occurrence in the form of
     ///            `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`.
     pub fn occurrences_get(&self, name: &str) -> ProjectOccurrenceGetCall<'a, C, A> {
         ProjectOccurrenceGetCall {
@@ -2528,7 +2535,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the note in the form of
+    /// * `name` - Required. The name of the note in the form of
     ///            `projects/[PROVIDER_ID]/notes/[NOTE_ID]`.
     pub fn notes_patch(&self, request: Note, name: &str) -> ProjectNotePatchCall<'a, C, A> {
         ProjectNotePatchCall {
@@ -2550,7 +2557,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the note to list occurrences for in the form of
+    /// * `name` - Required. The name of the note to list occurrences for in the form of
     ///            `projects/[PROVIDER_ID]/notes/[NOTE_ID]`.
     pub fn notes_occurrences_list(&self, name: &str) -> ProjectNoteOccurrenceListCall<'a, C, A> {
         ProjectNoteOccurrenceListCall {
@@ -2571,7 +2578,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The name of the project to list notes for in the form of
+    /// * `parent` - Required. The name of the project to list notes for in the form of
     ///              `projects/[PROJECT_ID]`.
     pub fn notes_list(&self, parent: &str) -> ProjectNoteListCall<'a, C, A> {
         ProjectNoteListCall {
@@ -2593,7 +2600,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the occurrence in the form of
+    /// * `name` - Required. The name of the occurrence in the form of
     ///            `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`.
     pub fn occurrences_patch(&self, request: Occurrence, name: &str) -> ProjectOccurrencePatchCall<'a, C, A> {
         ProjectOccurrencePatchCall {
@@ -2613,7 +2620,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The name of the project to get a vulnerability summary for in the form of
+    /// * `parent` - Required. The name of the project to get a vulnerability summary for in the form of
     ///              `projects/[PROJECT_ID]`.
     pub fn occurrences_get_vulnerability_summary(&self, parent: &str) -> ProjectOccurrenceGetVulnerabilitySummaryCall<'a, C, A> {
         ProjectOccurrenceGetVulnerabilitySummaryCall {
@@ -2633,7 +2640,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The name of the project in the form of `projects/[PROJECT_ID]`, under which
+    /// * `parent` - Required. The name of the project in the form of `projects/[PROJECT_ID]`, under which
     ///              the occurrence is to be created.
     pub fn occurrences_create(&self, request: Occurrence, parent: &str) -> ProjectOccurrenceCreateCall<'a, C, A> {
         ProjectOccurrenceCreateCall {
@@ -2707,7 +2714,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the occurrence in the form of
+    /// * `name` - Required. The name of the occurrence in the form of
     ///            `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`.
     pub fn occurrences_get_notes(&self, name: &str) -> ProjectOccurrenceGetNoteCall<'a, C, A> {
         ProjectOccurrenceGetNoteCall {
@@ -2726,7 +2733,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the scan configuration in the form of
+    /// * `name` - Required. The name of the scan configuration in the form of
     ///            `projects/[PROJECT_ID]/scanConfigs/[SCAN_CONFIG_ID]`.
     pub fn scan_configs_update(&self, request: ScanConfig, name: &str) -> ProjectScanConfigUpdateCall<'a, C, A> {
         ProjectScanConfigUpdateCall {
@@ -2745,7 +2752,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The name of the project to list occurrences for in the form of
+    /// * `parent` - Required. The name of the project to list occurrences for in the form of
     ///              `projects/[PROJECT_ID]`.
     pub fn occurrences_list(&self, parent: &str) -> ProjectOccurrenceListCall<'a, C, A> {
         ProjectOccurrenceListCall {
@@ -2768,7 +2775,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the occurrence in the form of
+    /// * `name` - Required. The name of the occurrence in the form of
     ///            `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`.
     pub fn occurrences_delete(&self, name: &str) -> ProjectOccurrenceDeleteCall<'a, C, A> {
         ProjectOccurrenceDeleteCall {
@@ -2787,7 +2794,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The name of the project in the form of `projects/[PROJECT_ID]`, under which
+    /// * `parent` - Required. The name of the project in the form of `projects/[PROJECT_ID]`, under which
     ///              the notes are to be created.
     pub fn notes_batch_create(&self, request: BatchCreateNotesRequest, parent: &str) -> ProjectNoteBatchCreateCall<'a, C, A> {
         ProjectNoteBatchCreateCall {
@@ -2806,7 +2813,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the note in the form of
+    /// * `name` - Required. The name of the note in the form of
     ///            `projects/[PROVIDER_ID]/notes/[NOTE_ID]`.
     pub fn notes_delete(&self, name: &str) -> ProjectNoteDeleteCall<'a, C, A> {
         ProjectNoteDeleteCall {
@@ -2824,7 +2831,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the scan configuration in the form of
+    /// * `name` - Required. The name of the scan configuration in the form of
     ///            `projects/[PROJECT_ID]/scanConfigs/[SCAN_CONFIG_ID]`.
     pub fn scan_configs_get(&self, name: &str) -> ProjectScanConfigGetCall<'a, C, A> {
         ProjectScanConfigGetCall {
@@ -2870,7 +2877,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The name of the project in the form of `projects/[PROJECT_ID]`, under which
+    /// * `parent` - Required. The name of the project in the form of `projects/[PROJECT_ID]`, under which
     ///              the note is to be created.
     pub fn notes_create(&self, request: Note, parent: &str) -> ProjectNoteCreateCall<'a, C, A> {
         ProjectNoteCreateCall {
@@ -3109,7 +3116,7 @@ impl<'a, C, A> ProjectScanConfigListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// The name of the project to list scan configurations for in the form of
+    /// Required. The name of the project to list scan configurations for in the form of
     /// `projects/[PROJECT_ID]`.
     ///
     /// Sets the *parent* path property to the given value.
@@ -3134,7 +3141,7 @@ impl<'a, C, A> ProjectScanConfigListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._page_size = Some(new_value);
         self
     }
-    /// The filter expression.
+    /// Required. The filter expression.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectScanConfigListCall<'a, C, A> {
@@ -3983,7 +3990,7 @@ impl<'a, C, A> ProjectOccurrenceBatchCreateCall<'a, C, A> where C: BorrowMut<hyp
         self._request = new_value;
         self
     }
-    /// The name of the project in the form of `projects/[PROJECT_ID]`, under which
+    /// Required. The name of the project in the form of `projects/[PROJECT_ID]`, under which
     /// the occurrences are to be created.
     ///
     /// Sets the *parent* path property to the given value.
@@ -4232,7 +4239,7 @@ impl<'a, C, A> ProjectNoteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// The name of the note in the form of
+    /// Required. The name of the note in the form of
     /// `projects/[PROVIDER_ID]/notes/[NOTE_ID]`.
     ///
     /// Sets the *name* path property to the given value.
@@ -4481,7 +4488,7 @@ impl<'a, C, A> ProjectOccurrenceGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// The name of the occurrence in the form of
+    /// Required. The name of the occurrence in the form of
     /// `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`.
     ///
     /// Sets the *name* path property to the given value.
@@ -4766,7 +4773,7 @@ impl<'a, C, A> ProjectNotePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// The name of the note in the form of
+    /// Required. The name of the note in the form of
     /// `projects/[PROVIDER_ID]/notes/[NOTE_ID]`.
     ///
     /// Sets the *name* path property to the given value.
@@ -5039,7 +5046,7 @@ impl<'a, C, A> ProjectNoteOccurrenceListCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// The name of the note to list occurrences for in the form of
+    /// Required. The name of the note to list occurrences for in the form of
     /// `projects/[PROVIDER_ID]/notes/[NOTE_ID]`.
     ///
     /// Sets the *name* path property to the given value.
@@ -5324,7 +5331,7 @@ impl<'a, C, A> ProjectNoteListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// The name of the project to list notes for in the form of
+    /// Required. The name of the project to list notes for in the form of
     /// `projects/[PROJECT_ID]`.
     ///
     /// Sets the *parent* path property to the given value.
@@ -5631,7 +5638,7 @@ impl<'a, C, A> ProjectOccurrencePatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._request = new_value;
         self
     }
-    /// The name of the occurrence in the form of
+    /// Required. The name of the occurrence in the form of
     /// `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`.
     ///
     /// Sets the *name* path property to the given value.
@@ -5892,7 +5899,7 @@ impl<'a, C, A> ProjectOccurrenceGetVulnerabilitySummaryCall<'a, C, A> where C: B
     }
 
 
-    /// The name of the project to get a vulnerability summary for in the form of
+    /// Required. The name of the project to get a vulnerability summary for in the form of
     /// `projects/[PROJECT_ID]`.
     ///
     /// Sets the *parent* path property to the given value.
@@ -6179,7 +6186,7 @@ impl<'a, C, A> ProjectOccurrenceCreateCall<'a, C, A> where C: BorrowMut<hyper::C
         self._request = new_value;
         self
     }
-    /// The name of the project in the form of `projects/[PROJECT_ID]`, under which
+    /// Required. The name of the project in the form of `projects/[PROJECT_ID]`, under which
     /// the occurrence is to be created.
     ///
     /// Sets the *parent* path property to the given value.
@@ -7003,7 +7010,7 @@ impl<'a, C, A> ProjectOccurrenceGetNoteCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
-    /// The name of the occurrence in the form of
+    /// Required. The name of the occurrence in the form of
     /// `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`.
     ///
     /// Sets the *name* path property to the given value.
@@ -7283,7 +7290,7 @@ impl<'a, C, A> ProjectScanConfigUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
         self._request = new_value;
         self
     }
-    /// The name of the scan configuration in the form of
+    /// Required. The name of the scan configuration in the form of
     /// `projects/[PROJECT_ID]/scanConfigs/[SCAN_CONFIG_ID]`.
     ///
     /// Sets the *name* path property to the given value.
@@ -7547,7 +7554,7 @@ impl<'a, C, A> ProjectOccurrenceListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// The name of the project to list occurrences for in the form of
+    /// Required. The name of the project to list occurrences for in the form of
     /// `projects/[PROJECT_ID]`.
     ///
     /// Sets the *parent* path property to the given value.
@@ -7820,7 +7827,7 @@ impl<'a, C, A> ProjectOccurrenceDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    /// The name of the occurrence in the form of
+    /// Required. The name of the occurrence in the form of
     /// `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`.
     ///
     /// Sets the *name* path property to the given value.
@@ -8100,7 +8107,7 @@ impl<'a, C, A> ProjectNoteBatchCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._request = new_value;
         self
     }
-    /// The name of the project in the form of `projects/[PROJECT_ID]`, under which
+    /// Required. The name of the project in the form of `projects/[PROJECT_ID]`, under which
     /// the notes are to be created.
     ///
     /// Sets the *parent* path property to the given value.
@@ -8349,7 +8356,7 @@ impl<'a, C, A> ProjectNoteDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// The name of the note in the form of
+    /// Required. The name of the note in the form of
     /// `projects/[PROVIDER_ID]/notes/[NOTE_ID]`.
     ///
     /// Sets the *name* path property to the given value.
@@ -8598,7 +8605,7 @@ impl<'a, C, A> ProjectScanConfigGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// The name of the scan configuration in the form of
+    /// Required. The name of the scan configuration in the form of
     /// `projects/[PROJECT_ID]/scanConfigs/[SCAN_CONFIG_ID]`.
     ///
     /// Sets the *name* path property to the given value.
@@ -9170,7 +9177,7 @@ impl<'a, C, A> ProjectNoteCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._request = new_value;
         self
     }
-    /// The name of the project in the form of `projects/[PROJECT_ID]`, under which
+    /// Required. The name of the project in the form of `projects/[PROJECT_ID]`, under which
     /// the note is to be created.
     ///
     /// Sets the *parent* path property to the given value.
@@ -9181,7 +9188,7 @@ impl<'a, C, A> ProjectNoteCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._parent = new_value.to_string();
         self
     }
-    /// The ID to use for this note.
+    /// Required. The ID to use for this note.
     ///
     /// Sets the *note id* query property to the given value.
     pub fn note_id(mut self, new_value: &str) -> ProjectNoteCreateCall<'a, C, A> {

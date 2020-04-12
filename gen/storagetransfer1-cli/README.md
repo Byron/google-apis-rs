@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *storagetransfer* API at revision *20190702*. The CLI is at version *1.0.12*.
+This documentation was generated from the *storagetransfer* API at revision *20200405*. The CLI is at version *1.0.13*.
 
 ```bash
 storagetransfer1 [options]
@@ -38,7 +38,6 @@ storagetransfer1 [options]
                 patch <job-name> (-r <kv>)... [-p <v>]... [-o <out>]
         transfer-operations
                 cancel <name> [-p <v>]... [-o <out>]
-                delete <name> [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
                 list <name> [-p <v>]... [-o <out>]
                 pause <name> (-r <kv>)... [-p <v>]... [-o <out>]

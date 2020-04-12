@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *TPU* crate version *1.0.12+20190619*, where *20190619* is the exact revision of the *tpu:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *TPU* crate version *1.0.13+20200318*, where *20200318* is the exact revision of the *tpu:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *TPU* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/tpu/).
@@ -336,7 +336,7 @@ impl<'a, C, A> TPU<C, A>
         TPU {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://tpu.googleapis.com/".to_string(),
             _root_url: "https://tpu.googleapis.com/".to_string(),
         }
@@ -347,7 +347,7 @@ impl<'a, C, A> TPU<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -457,7 +457,6 @@ pub struct Node {
     /// conflicts with any subnetworks in the user's provided network, or the
     /// provided network is peered with another network that is using that CIDR
     /// block.
-    /// Required.
     #[serde(rename="cidrBlock")]
     pub cidr_block: Option<String>,
     /// Output only. The time when the node was created.
@@ -684,6 +683,8 @@ pub struct ListTensorFlowVersionsResponse {
     /// The next page token or empty if none.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// Locations that could not be reached.
+    pub unreachable: Option<Vec<String>>,
     /// The listed nodes.
     #[serde(rename="tensorflowVersions")]
     pub tensorflow_versions: Option<Vec<TensorFlowVersion>>,
@@ -727,6 +728,8 @@ pub struct ListAcceleratorTypesResponse {
     /// The next page token or empty if none.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// Locations that could not be reached.
+    pub unreachable: Option<Vec<String>>,
     /// The listed nodes.
     #[serde(rename="acceleratorTypes")]
     pub accelerator_types: Option<Vec<AcceleratorType>>,

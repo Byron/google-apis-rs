@@ -253,6 +253,7 @@ impl<'n> Engine<'n> {
                     "capacity.unit" => Some(("capacity.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pattern" => Some(("pattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rich-product-content" => Some(("richProductContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "disclosure-date" => Some(("disclosureDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "theme" => Some(("theme", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suggested-retail-price.currency" => Some(("suggestedRetailPrice.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -277,7 +278,7 @@ impl<'n> Engine<'n> {
                     "video-link" => Some(("videoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "age-group" => Some(("ageGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["age-group", "amount", "brand", "capacity", "color", "count", "currency", "description", "disclosure-date", "excluded-destination", "flavor", "format", "gender", "gtin", "image-link", "image-url", "included-destination", "item-group-id", "material", "mpn", "pattern", "product-line", "product-name", "product-page-url", "product-type", "release-date", "scent", "size", "size-system", "size-type", "status", "suggested-retail-price", "target-client-id", "theme", "title", "type", "unit", "value", "video-link"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["age-group", "amount", "brand", "capacity", "color", "count", "currency", "description", "disclosure-date", "excluded-destination", "flavor", "format", "gender", "gtin", "image-link", "image-url", "included-destination", "item-group-id", "material", "mpn", "pattern", "product-line", "product-name", "product-page-url", "product-type", "release-date", "rich-product-content", "scent", "size", "size-system", "size-type", "status", "suggested-retail-price", "target-client-id", "theme", "title", "type", "unit", "value", "video-link"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -621,7 +622,7 @@ fn main() {
     
     let mut app = App::new("manufacturers1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190627")
+           .version("1.0.13+20200317")
            .about("Public API for managing Manufacturer Center related data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_manufacturers1_cli")
            .arg(Arg::with_name("url")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firestore* crate version *1.0.12+20190419*, where *20190419* is the exact revision of the *firestore:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Firestore* crate version *1.0.13+20200311*, where *20200311* is the exact revision of the *firestore:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Firestore* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/firestore).
@@ -339,7 +339,7 @@ impl<'a, C, A> Firestore<C, A>
         Firestore {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://firestore.googleapis.com/".to_string(),
             _root_url: "https://firestore.googleapis.com/".to_string(),
         }
@@ -350,7 +350,7 @@ impl<'a, C, A> Firestore<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -447,14 +447,12 @@ pub struct GoogleFirestoreAdminV1Index {
     /// time, and that have the same collection id as this index.
     #[serde(rename="queryScope")]
     pub query_scope: Option<String>,
-    /// Output only.
-    /// A server defined name for this index.
+    /// Output only. A server defined name for this index.
     /// The form of this name for composite indexes will be:
     /// `projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/indexes/{composite_index_id}`
     /// For single field indexes, this field will be empty.
     pub name: Option<String>,
-    /// Output only.
-    /// The serving state of the index.
+    /// Output only. The serving state of the index.
     pub state: Option<String>,
 }
 
@@ -698,7 +696,8 @@ pub struct WriteResponse {
     /// This field is always set.
     #[serde(rename="streamToken")]
     pub stream_token: Option<String>,
-    /// The time at which the commit occurred.
+    /// The time at which the commit occurred. Any read with an equal or greater
+    /// `read_time` is guaranteed to see the effects of the write.
     #[serde(rename="commitTime")]
     pub commit_time: Option<String>,
     /// The ID of the stream.
@@ -1087,7 +1086,7 @@ impl Part for DocumentRemove {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RollbackRequest {
-    /// The transaction to roll back.
+    /// Required. The transaction to roll back.
     pub transaction: Option<String>,
 }
 
@@ -1170,14 +1169,18 @@ impl ResponseResult for BeginTransactionResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Write {
-    /// A document name to delete. In the format:
-    /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
-    pub delete: Option<String>,
     /// An optional precondition on the document.
     /// 
     /// The write will fail if this is set and not met by the target document.
     #[serde(rename="currentDocument")]
     pub current_document: Option<Precondition>,
+    /// The transforms to perform after update.
+    /// 
+    /// This field can be set only when the operation is `update`. If present, this
+    /// write is equivalent to performing `update` and `transform` to the same
+    /// document atomically and in order.
+    #[serde(rename="updateTransforms")]
+    pub update_transforms: Option<Vec<FieldTransform>>,
     /// The fields to update in this write.
     /// 
     /// This field can be set only when the operation is `update`.
@@ -1190,13 +1193,13 @@ pub struct Write {
     /// The field paths in this mask must not contain a reserved field name.
     #[serde(rename="updateMask")]
     pub update_mask: Option<DocumentMask>,
-    /// Applies a transformation to a document.
-    /// At most one `transform` per document is allowed in a given request.
-    /// An `update` cannot follow a `transform` on the same document in a given
-    /// request.
-    pub transform: Option<DocumentTransform>,
+    /// A document name to delete. In the format:
+    /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
+    pub delete: Option<String>,
     /// A document to write.
     pub update: Option<Document>,
+    /// Applies a transformation to a document.
+    pub transform: Option<DocumentTransform>,
 }
 
 impl Part for Write {}
@@ -1298,7 +1301,8 @@ pub struct CommitResponse {
     /// request.
     #[serde(rename="writeResults")]
     pub write_results: Option<Vec<WriteResult>>,
-    /// The time at which the commit occurred.
+    /// The time at which the commit occurred. Any read with an equal or greater
+    /// `read_time` is guaranteed to see the effects of the commit.
     #[serde(rename="commitTime")]
     pub commit_time: Option<String>,
 }
@@ -1483,7 +1487,7 @@ pub struct BatchGetDocumentsRequest {
     /// given `database`. Duplicate names will be elided.
     pub documents: Option<Vec<String>>,
     /// Reads documents as they were at the given time.
-    /// This may not be older than 60 seconds.
+    /// This may not be older than 270 seconds.
     #[serde(rename="readTime")]
     pub read_time: Option<String>,
 }
@@ -1493,58 +1497,14 @@ impl RequestValue for BatchGetDocumentsRequest {}
 
 /// The `Status` type defines a logical error model that is suitable for
 /// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
 /// 
-/// * Simple to use and understand for most users
-/// * Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// * Partial errors. If a service needs to return partial errors to the client,
-///   it may embed the `Status` in the normal response to indicate the partial
-///   errors.
-/// 
-/// * Workflow errors. A typical workflow has multiple steps. Each step may
-///   have a `Status` message for error reporting.
-/// 
-/// * Batch operations. If a client uses batch request and batch response, the
-///   `Status` message should be used directly inside batch response, one for
-///   each error sub-response.
-/// 
-/// * Asynchronous operations. If an API call embeds asynchronous operation
-///   results in its response, the status of those operations should be
-///   represented directly using the `Status` message.
-/// 
-/// * Logging. If some API errors are stored in logs, the message `Status` could
-///   be used directly after any stripping needed for security/privacy reasons.
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Status {
     /// A developer-facing error message, which should be in English. Any
@@ -1578,14 +1538,8 @@ pub struct Target {
     /// Using a resume token with a different target is unsupported and may fail.
     #[serde(rename="resumeToken")]
     pub resume_token: Option<String>,
-    /// A client provided target ID.
-    /// 
-    /// If not set, the server will assign an ID for the target.
-    /// 
-    /// Used for resuming a target without changing IDs. The IDs can either be
-    /// client-assigned or be server-assigned in a previous stream. All targets
-    /// with client provided IDs must be added before adding a target that needs
-    /// a server-assigned id.
+    /// The target ID that identifies the target on the stream. Must be a positive
+    /// number and non-zero.
     #[serde(rename="targetId")]
     pub target_id: Option<i32>,
     /// Start listening after a specific `read_time`.
@@ -1765,7 +1719,7 @@ pub struct RunQueryRequest {
     #[serde(rename="structuredQuery")]
     pub structured_query: Option<StructuredQuery>,
     /// Reads documents as they were at the given time.
-    /// This may not be older than 60 seconds.
+    /// This may not be older than 270 seconds.
     #[serde(rename="readTime")]
     pub read_time: Option<String>,
 }
@@ -1809,11 +1763,7 @@ pub struct TargetChange {
     /// 
     /// If empty, the change applies to all targets.
     /// 
-    /// For `target_change_type=ADD`, the order of the target IDs matches the order
-    /// of the requests to add the targets. This allows clients to unambiguously
-    /// associate server-assigned target IDs with added targets.
-    /// 
-    /// For other states, the order of the target IDs is not defined.
+    /// The order of the target IDs is not defined.
     #[serde(rename="targetIds")]
     pub target_ids: Option<Vec<i32>>,
     /// The consistent `read_time` for the given `target_ids` (omitted when the
@@ -1958,7 +1908,7 @@ pub struct GoogleLongrunningOperation {
     pub response: Option<HashMap<String, String>>,
     /// The server-assigned name, which is only unique within the same service that
     /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should have the format of `operations/some/unique/name`.
+    /// `name` should be a resource name ending with `operations/{unique_id}`.
     pub name: Option<String>,
     /// Service-specific metadata associated with the operation.  It typically
     /// contains progress information and common metadata such as create time.
@@ -1995,14 +1945,12 @@ impl Part for LatLng {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirestoreAdminV1IndexConfig {
-    /// Output only.
-    /// When true, the `Field`'s index configuration is set from the
+    /// Output only. When true, the `Field`'s index configuration is set from the
     /// configuration specified by the `ancestor_field`.
     /// When false, the `Field`'s index configuration is defined explicitly.
     #[serde(rename="usesAncestorConfig")]
     pub uses_ancestor_config: Option<bool>,
-    /// Output only.
-    /// Specifies the resource name of the `Field` from which this field's
+    /// Output only. Specifies the resource name of the `Field` from which this field's
     /// index configuration is set (when `uses_ancestor_config` is true),
     /// or from which it *would* be set if this field had no index configuration
     /// (when `uses_ancestor_config` is false).
@@ -2215,7 +2163,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `database` - The database name. In the format:
+    /// * `database` - Required. The database name. In the format:
     ///                `projects/{project_id}/databases/{database_id}`.
     pub fn databases_documents_listen(&self, request: ListenRequest, database: &str) -> ProjectDatabaseDocumentListenCall<'a, C, A> {
         ProjectDatabaseDocumentListenCall {
@@ -2235,7 +2183,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `database` - The database name. In the format:
+    /// * `database` - Required. The database name. In the format:
     ///                `projects/{project_id}/databases/{database_id}`.
     pub fn databases_documents_rollback(&self, request: RollbackRequest, database: &str) -> ProjectDatabaseDocumentRollbackCall<'a, C, A> {
         ProjectDatabaseDocumentRollbackCall {
@@ -2255,7 +2203,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `database` - The database name. In the format:
+    /// * `database` - Required. The database name. In the format:
     ///                `projects/{project_id}/databases/{database_id}`.
     pub fn databases_documents_commit(&self, request: CommitRequest, database: &str) -> ProjectDatabaseDocumentCommitCall<'a, C, A> {
         ProjectDatabaseDocumentCommitCall {
@@ -2291,7 +2239,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - A name of the form
+    /// * `name` - Required. A name of the form
     ///            `projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/indexes/{index_id}`
     pub fn databases_collection_groups_indexes_get(&self, name: &str) -> ProjectDatabaseCollectionGroupIndexeGetCall<'a, C, A> {
         ProjectDatabaseCollectionGroupIndexeGetCall {
@@ -2357,7 +2305,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the Document to get. In the format:
+    /// * `name` - Required. The resource name of the Document to get. In the format:
     ///            `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
     pub fn databases_documents_get(&self, name: &str) -> ProjectDatabaseDocumentGetCall<'a, C, A> {
         ProjectDatabaseDocumentGetCall {
@@ -2379,7 +2327,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The parent resource name. In the format:
+    /// * `parent` - Required. The parent resource name. In the format:
     ///              `projects/{project_id}/databases/{database_id}/documents` or
     ///              `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
     ///              For example:
@@ -2406,7 +2354,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `database` - The database name. In the format:
+    /// * `database` - Required. The database name. In the format:
     ///                `projects/{project_id}/databases/{database_id}`.
     pub fn databases_documents_batch_get(&self, request: BatchGetDocumentsRequest, database: &str) -> ProjectDatabaseDocumentBatchGetCall<'a, C, A> {
         ProjectDatabaseDocumentBatchGetCall {
@@ -2426,7 +2374,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `database` - The database name. In the format:
+    /// * `database` - Required. The database name. In the format:
     ///                `projects/{project_id}/databases/{database_id}`.
     pub fn databases_documents_begin_transaction(&self, request: BeginTransactionRequest, database: &str) -> ProjectDatabaseDocumentBeginTransactionCall<'a, C, A> {
         ProjectDatabaseDocumentBeginTransactionCall {
@@ -2446,7 +2394,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The parent document. In the format:
+    /// * `parent` - Required. The parent document. In the format:
     ///              `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
     ///              For example:
     ///              `projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`
@@ -2520,7 +2468,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - A parent name of the form
+    /// * `parent` - Required. A parent name of the form
     ///              `projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}`
     pub fn databases_collection_groups_indexes_list(&self, parent: &str) -> ProjectDatabaseCollectionGroupIndexeListCall<'a, C, A> {
         ProjectDatabaseCollectionGroupIndexeListCall {
@@ -2541,7 +2489,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the Document to delete. In the format:
+    /// * `name` - Required. The resource name of the Document to delete. In the format:
     ///            `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
     pub fn databases_documents_delete(&self, name: &str) -> ProjectDatabaseDocumentDeleteCall<'a, C, A> {
         ProjectDatabaseDocumentDeleteCall {
@@ -2561,7 +2509,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - A name of the form
+    /// * `name` - Required. A name of the form
     ///            `projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/fields/{field_id}`
     pub fn databases_collection_groups_fields_get(&self, name: &str) -> ProjectDatabaseCollectionGroupFieldGetCall<'a, C, A> {
         ProjectDatabaseCollectionGroupFieldGetCall {
@@ -2604,7 +2552,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Database to import into. Should be of the form:
+    /// * `name` - Required. Database to import into. Should be of the form:
     ///            `projects/{project_id}/databases/{database_id}`.
     pub fn databases_import_documents(&self, request: GoogleFirestoreAdminV1ImportDocumentsRequest, name: &str) -> ProjectDatabaseImportDocumentCall<'a, C, A> {
         ProjectDatabaseImportDocumentCall {
@@ -2623,7 +2571,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - A name of the form
+    /// * `name` - Required. A name of the form
     ///            `projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/indexes/{index_id}`
     pub fn databases_collection_groups_indexes_delete(&self, name: &str) -> ProjectDatabaseCollectionGroupIndexeDeleteCall<'a, C, A> {
         ProjectDatabaseCollectionGroupIndexeDeleteCall {
@@ -2668,7 +2616,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Database to export. Should be of the form:
+    /// * `name` - Required. Database to export. Should be of the form:
     ///            `projects/{project_id}/databases/{database_id}`.
     pub fn databases_export_documents(&self, request: GoogleFirestoreAdminV1ExportDocumentsRequest, name: &str) -> ProjectDatabaseExportDocumentCall<'a, C, A> {
         ProjectDatabaseExportDocumentCall {
@@ -2692,7 +2640,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - A parent name of the form
+    /// * `parent` - Required. A parent name of the form
     ///              `projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}`
     pub fn databases_collection_groups_fields_list(&self, parent: &str) -> ProjectDatabaseCollectionGroupFieldListCall<'a, C, A> {
         ProjectDatabaseCollectionGroupFieldListCall {
@@ -2716,7 +2664,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - A parent name of the form
+    /// * `parent` - Required. A parent name of the form
     ///              `projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}`
     pub fn databases_collection_groups_indexes_create(&self, request: GoogleFirestoreAdminV1Index, parent: &str) -> ProjectDatabaseCollectionGroupIndexeCreateCall<'a, C, A> {
         ProjectDatabaseCollectionGroupIndexeCreateCall {
@@ -2736,10 +2684,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The parent resource. For example:
+    /// * `parent` - Required. The parent resource. For example:
     ///              `projects/{project_id}/databases/{database_id}/documents` or
     ///              `projects/{project_id}/databases/{database_id}/documents/chatrooms/{chatroom_id}`
-    /// * `collectionId` - The collection ID, relative to `parent`, to list. For example: `chatrooms`.
+    /// * `collectionId` - Required. The collection ID, relative to `parent`, to list. For example: `chatrooms`.
     pub fn databases_documents_create_document(&self, request: Document, parent: &str, collection_id: &str) -> ProjectDatabaseDocumentCreateDocumentCall<'a, C, A> {
         ProjectDatabaseDocumentCreateDocumentCall {
             hub: self.hub,
@@ -2760,13 +2708,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The parent resource name. In the format:
+    /// * `parent` - Required. The parent resource name. In the format:
     ///              `projects/{project_id}/databases/{database_id}/documents` or
     ///              `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
     ///              For example:
     ///              `projects/my-project/databases/my-database/documents` or
     ///              `projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`
-    /// * `collectionId` - The collection ID, relative to `parent`, to list. For example: `chatrooms`
+    /// * `collectionId` - Required. The collection ID, relative to `parent`, to list. For example: `chatrooms`
     ///                    or `messages`.
     pub fn databases_documents_list(&self, parent: &str, collection_id: &str) -> ProjectDatabaseDocumentListCall<'a, C, A> {
         ProjectDatabaseDocumentListCall {
@@ -2793,7 +2741,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `database` - The database name. In the format:
+    /// * `database` - Required. The database name. In the format:
     ///                `projects/{project_id}/databases/{database_id}`.
     ///                This is only required in the first message.
     pub fn databases_documents_write(&self, request: WriteRequest, database: &str) -> ProjectDatabaseDocumentWriteCall<'a, C, A> {
@@ -3075,7 +3023,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListenCall<'a, C, A> where C: BorrowMut<hy
         self._request = new_value;
         self
     }
-    /// The database name. In the format:
+    /// Required. The database name. In the format:
     /// `projects/{project_id}/databases/{database_id}`.
     ///
     /// Sets the *database* path property to the given value.
@@ -3355,7 +3303,7 @@ impl<'a, C, A> ProjectDatabaseDocumentRollbackCall<'a, C, A> where C: BorrowMut<
         self._request = new_value;
         self
     }
-    /// The database name. In the format:
+    /// Required. The database name. In the format:
     /// `projects/{project_id}/databases/{database_id}`.
     ///
     /// Sets the *database* path property to the given value.
@@ -3635,7 +3583,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCommitCall<'a, C, A> where C: BorrowMut<hy
         self._request = new_value;
         self
     }
-    /// The database name. In the format:
+    /// Required. The database name. In the format:
     /// `projects/{project_id}/databases/{database_id}`.
     ///
     /// Sets the *database* path property to the given value.
@@ -4132,7 +4080,7 @@ impl<'a, C, A> ProjectDatabaseCollectionGroupIndexeGetCall<'a, C, A> where C: Bo
     }
 
 
-    /// A name of the form
+    /// Required. A name of the form
     /// `projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/indexes/{index_id}`
     ///
     /// Sets the *name* path property to the given value.
@@ -4970,7 +4918,7 @@ impl<'a, C, A> ProjectDatabaseDocumentGetCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// The resource name of the Document to get. In the format:
+    /// Required. The resource name of the Document to get. In the format:
     /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
     ///
     /// Sets the *name* path property to the given value.
@@ -4989,7 +4937,7 @@ impl<'a, C, A> ProjectDatabaseDocumentGetCall<'a, C, A> where C: BorrowMut<hyper
         self
     }
     /// Reads the version of the document at the given time.
-    /// This may not be older than 60 seconds.
+    /// This may not be older than 270 seconds.
     ///
     /// Sets the *read time* query property to the given value.
     pub fn read_time(mut self, new_value: &str) -> ProjectDatabaseDocumentGetCall<'a, C, A> {
@@ -5274,7 +5222,7 @@ impl<'a, C, A> ProjectDatabaseDocumentRunQueryCall<'a, C, A> where C: BorrowMut<
         self._request = new_value;
         self
     }
-    /// The parent resource name. In the format:
+    /// Required. The parent resource name. In the format:
     /// `projects/{project_id}/databases/{database_id}/documents` or
     /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
     /// For example:
@@ -5561,7 +5509,7 @@ impl<'a, C, A> ProjectDatabaseDocumentBatchGetCall<'a, C, A> where C: BorrowMut<
         self._request = new_value;
         self
     }
-    /// The database name. In the format:
+    /// Required. The database name. In the format:
     /// `projects/{project_id}/databases/{database_id}`.
     ///
     /// Sets the *database* path property to the given value.
@@ -5841,7 +5789,7 @@ impl<'a, C, A> ProjectDatabaseDocumentBeginTransactionCall<'a, C, A> where C: Bo
         self._request = new_value;
         self
     }
-    /// The database name. In the format:
+    /// Required. The database name. In the format:
     /// `projects/{project_id}/databases/{database_id}`.
     ///
     /// Sets the *database* path property to the given value.
@@ -6121,7 +6069,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListCollectionIdCall<'a, C, A> where C: Bo
         self._request = new_value;
         self
     }
-    /// The parent document. In the format:
+    /// Required. The parent document. In the format:
     /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
     /// For example:
     /// `projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`
@@ -6716,7 +6664,7 @@ impl<'a, C, A> ProjectDatabaseCollectionGroupIndexeListCall<'a, C, A> where C: B
     }
 
 
-    /// A parent name of the form
+    /// Required. A parent name of the form
     /// `projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}`
     ///
     /// Sets the *parent* path property to the given value.
@@ -6998,7 +6946,7 @@ impl<'a, C, A> ProjectDatabaseDocumentDeleteCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// The resource name of the Document to delete. In the format:
+    /// Required. The resource name of the Document to delete. In the format:
     /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
     ///
     /// Sets the *name* path property to the given value.
@@ -7263,7 +7211,7 @@ impl<'a, C, A> ProjectDatabaseCollectionGroupFieldGetCall<'a, C, A> where C: Bor
     }
 
 
-    /// A name of the form
+    /// Required. A name of the form
     /// `projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/fields/{field_id}`
     ///
     /// Sets the *name* path property to the given value.
@@ -7798,7 +7746,7 @@ impl<'a, C, A> ProjectDatabaseImportDocumentCall<'a, C, A> where C: BorrowMut<hy
         self._request = new_value;
         self
     }
-    /// Database to import into. Should be of the form:
+    /// Required. Database to import into. Should be of the form:
     /// `projects/{project_id}/databases/{database_id}`.
     ///
     /// Sets the *name* path property to the given value.
@@ -8047,7 +7995,7 @@ impl<'a, C, A> ProjectDatabaseCollectionGroupIndexeDeleteCall<'a, C, A> where C:
     }
 
 
-    /// A name of the form
+    /// Required. A name of the form
     /// `projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/indexes/{index_id}`
     ///
     /// Sets the *name* path property to the given value.
@@ -8584,7 +8532,7 @@ impl<'a, C, A> ProjectDatabaseExportDocumentCall<'a, C, A> where C: BorrowMut<hy
         self._request = new_value;
         self
     }
-    /// Database to export. Should be of the form:
+    /// Required. Database to export. Should be of the form:
     /// `projects/{project_id}/databases/{database_id}`.
     ///
     /// Sets the *name* path property to the given value.
@@ -8853,7 +8801,7 @@ impl<'a, C, A> ProjectDatabaseCollectionGroupFieldListCall<'a, C, A> where C: Bo
     }
 
 
-    /// A parent name of the form
+    /// Required. A parent name of the form
     /// `projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}`
     ///
     /// Sets the *parent* path property to the given value.
@@ -9162,7 +9110,7 @@ impl<'a, C, A> ProjectDatabaseCollectionGroupIndexeCreateCall<'a, C, A> where C:
         self._request = new_value;
         self
     }
-    /// A parent name of the form
+    /// Required. A parent name of the form
     /// `projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}`
     ///
     /// Sets the *parent* path property to the given value.
@@ -9456,7 +9404,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCreateDocumentCall<'a, C, A> where C: Borr
         self._request = new_value;
         self
     }
-    /// The parent resource. For example:
+    /// Required. The parent resource. For example:
     /// `projects/{project_id}/databases/{database_id}/documents` or
     /// `projects/{project_id}/databases/{database_id}/documents/chatrooms/{chatroom_id}`
     ///
@@ -9468,7 +9416,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCreateDocumentCall<'a, C, A> where C: Borr
         self._parent = new_value.to_string();
         self
     }
-    /// The collection ID, relative to `parent`, to list. For example: `chatrooms`.
+    /// Required. The collection ID, relative to `parent`, to list. For example: `chatrooms`.
     ///
     /// Sets the *collection id* path property to the given value.
     ///
@@ -9773,7 +9721,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
-    /// The parent resource name. In the format:
+    /// Required. The parent resource name. In the format:
     /// `projects/{project_id}/databases/{database_id}/documents` or
     /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
     /// For example:
@@ -9788,7 +9736,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListCall<'a, C, A> where C: BorrowMut<hype
         self._parent = new_value.to_string();
         self
     }
-    /// The collection ID, relative to `parent`, to list. For example: `chatrooms`
+    /// Required. The collection ID, relative to `parent`, to list. For example: `chatrooms`
     /// or `messages`.
     ///
     /// Sets the *collection id* path property to the given value.
@@ -9820,7 +9768,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListCall<'a, C, A> where C: BorrowMut<hype
         self
     }
     /// Reads documents as they were at the given time.
-    /// This may not be older than 60 seconds.
+    /// This may not be older than 270 seconds.
     ///
     /// Sets the *read time* query property to the given value.
     pub fn read_time(mut self, new_value: &str) -> ProjectDatabaseDocumentListCall<'a, C, A> {
@@ -10126,7 +10074,7 @@ impl<'a, C, A> ProjectDatabaseDocumentWriteCall<'a, C, A> where C: BorrowMut<hyp
         self._request = new_value;
         self
     }
-    /// The database name. In the format:
+    /// Required. The database name. In the format:
     /// `projects/{project_id}/databases/{database_id}`.
     /// This is only required in the first message.
     ///

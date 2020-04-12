@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Build* crate version *1.0.12+20190702*, where *20190702* is the exact revision of the *cloudbuild:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Cloud Build* crate version *1.0.13+20200323*, where *20200323* is the exact revision of the *cloudbuild:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Cloud Build* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/cloud-build/docs/).
@@ -330,7 +330,7 @@ impl<'a, C, A> CloudBuild<C, A>
         CloudBuild {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://cloudbuild.googleapis.com/".to_string(),
             _root_url: "https://cloudbuild.googleapis.com/".to_string(),
         }
@@ -344,7 +344,7 @@ impl<'a, C, A> CloudBuild<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -449,18 +449,33 @@ impl Part for Artifacts {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RepoSource {
-    /// Name of the Cloud Source Repository. If omitted, the name "default" is
-    /// assumed.
-    #[serde(rename="repoName")]
-    pub repo_name: Option<String>,
-    /// Name of the tag to build.
-    #[serde(rename="tagName")]
-    pub tag_name: Option<String>,
     /// ID of the project that owns the Cloud Source Repository. If omitted, the
     /// project ID requesting the build is assumed.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
-    /// Name of the branch to build.
+    /// Only trigger a build if the revision regex does NOT match the revision
+    /// regex.
+    #[serde(rename="invertRegex")]
+    pub invert_regex: Option<bool>,
+    /// Explicit commit SHA to build.
+    #[serde(rename="commitSha")]
+    pub commit_sha: Option<String>,
+    /// Substitutions to use in a triggered build.
+    /// Should only be used with RunBuildTrigger
+    pub substitutions: Option<HashMap<String, String>>,
+    /// Required. Name of the Cloud Source Repository.
+    #[serde(rename="repoName")]
+    pub repo_name: Option<String>,
+    /// Regex matching tags to build.
+    /// 
+    /// The syntax of the regular expressions accepted is the syntax accepted by
+    /// RE2 and described at https://github.com/google/re2/wiki/Syntax
+    #[serde(rename="tagName")]
+    pub tag_name: Option<String>,
+    /// Regex matching branches to build.
+    /// 
+    /// The syntax of the regular expressions accepted is the syntax accepted by
+    /// RE2 and described at https://github.com/google/re2/wiki/Syntax
     #[serde(rename="branchName")]
     pub branch_name: Option<String>,
     /// Directory, relative to the source root, in which to run the build.
@@ -468,9 +483,6 @@ pub struct RepoSource {
     /// This must be a relative path. If a step's `dir` is specified and is an
     /// absolute path, this value is ignored for that step's execution.
     pub dir: Option<String>,
-    /// Explicit commit SHA to build.
-    #[serde(rename="commitSha")]
-    pub commit_sha: Option<String>,
 }
 
 impl RequestValue for RepoSource {}
@@ -621,6 +633,13 @@ pub struct Build {
     /// If any of the images fail to be pushed, the build status is marked
     /// `FAILURE`.
     pub images: Option<Vec<String>>,
+    /// TTL in queue for this build. If provided and the build is enqueued longer
+    /// than this value, the build will expire and the build status will be
+    /// `EXPIRED`.
+    /// 
+    /// The TTL starts ticking from create_time.
+    #[serde(rename="queueTtl")]
+    pub queue_ttl: Option<String>,
     /// Output only. Unique identifier of the build.
     pub id: Option<String>,
     /// Secrets to decrypt using Cloud Key Management Service.
@@ -857,9 +876,10 @@ pub struct BuildOptions {
     /// Requested verifiability options.
     #[serde(rename="requestedVerifyOption")]
     pub requested_verify_option: Option<String>,
-    /// Option to specify a `WorkerPool` for the build. User specifies the pool
-    /// with the format "[WORKERPOOL_PROJECT_ID]/[WORKERPOOL_NAME]".
-    /// This is an experimental field.
+    /// Option to specify a `WorkerPool` for the build.
+    /// Format: projects/{project}/workerPools/{workerPool}
+    /// 
+    /// This field is experimental.
     #[serde(rename="workerPool")]
     pub worker_pool: Option<String>,
 }
@@ -874,7 +894,10 @@ impl Part for BuildOptions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PullRequestFilter {
-    /// Whether to block builds on a "/gcbrun" comment from a repository owner or
+    /// If true, branches that do NOT match the git_ref will trigger a build.
+    #[serde(rename="invertRegex")]
+    pub invert_regex: Option<bool>,
+    /// Whether to block builds on a "/gcbrun" comment from a repository admin or
     /// collaborator.
     #[serde(rename="commentControl")]
     pub comment_control: Option<String>,
@@ -904,6 +927,8 @@ impl Part for PullRequestFilter {}
 pub struct BuildTrigger {
     /// GitHubEventsConfig describes the configuration of a trigger that creates
     /// a build whenever a GitHub event is received.
+    /// 
+    /// Mutually exclusive with `trigger_template`.
     pub github: Option<GitHubEventsConfig>,
     /// Human-readable description of this trigger.
     pub description: Option<String>,
@@ -912,7 +937,7 @@ pub struct BuildTrigger {
     /// Output only. Unique identifier of the trigger.
     pub id: Option<String>,
     /// ignored_files and included_files are file glob matches using
-    /// http://godoc/pkg/path/filepath#Match extended with support for "**".
+    /// https://golang.org/pkg/path/filepath/#Match extended with support for "**".
     /// 
     /// If ignored_files and changed files are both empty, then they are
     /// not used to determine whether or not to trigger a build.
@@ -942,15 +967,26 @@ pub struct BuildTrigger {
     /// then we do not trigger a build.
     #[serde(rename="includedFiles")]
     pub included_files: Option<Vec<String>>,
-    /// Substitutions data for Build resource.
+    /// Substitutions for Build resource. The keys must match the following
+    /// regular expression: `^_[A-Z0-9_]+$`.The keys cannot conflict with the
+    /// keys in bindings.
     pub substitutions: Option<HashMap<String, String>>,
     /// Template describing the types of source changes to trigger a build.
     /// 
     /// Branch and tag names in trigger templates are interpreted as regular
     /// expressions. Any branch or tag change that matches that regular expression
     /// will trigger a build.
+    /// 
+    /// Mutually exclusive with `github`.
     #[serde(rename="triggerTemplate")]
     pub trigger_template: Option<RepoSource>,
+    /// User-assigned name of the trigger. Must be unique within the project.
+    /// Trigger names must meet the following requirements:
+    /// 
+    /// + They must contain only alphanumeric characters and dashes.
+    /// + They can be 1-64 characters long.
+    /// + They must begin and end with an alphanumeric character.
+    pub name: Option<String>,
 }
 
 impl RequestValue for BuildTrigger {}
@@ -1127,12 +1163,16 @@ impl Part for Volume {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PushFilter {
-    /// Regexes of tags to match.
+    /// When true, only trigger a build if the revision regex does NOT match the
+    /// git_ref regex.
+    #[serde(rename="invertRegex")]
+    pub invert_regex: Option<bool>,
+    /// Regexes matching tags to build.
     /// 
     /// The syntax of the regular expressions accepted is the syntax accepted by
     /// RE2 and described at https://github.com/google/re2/wiki/Syntax
     pub tag: Option<String>,
-    /// Regexes of branches to match.
+    /// Regexes matching branches to build.
     /// 
     /// The syntax of the regular expressions accepted is the syntax accepted by
     /// RE2 and described at https://github.com/google/re2/wiki/Syntax
@@ -1479,8 +1519,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - ID of the project that owns the trigger.
-    /// * `triggerId` - ID of the `BuildTrigger` to get.
+    /// * `projectId` - Required. ID of the project that owns the trigger.
+    /// * `triggerId` - Required. Identifier (`id` or `name`) of the `BuildTrigger` to get.
     pub fn triggers_get(&self, project_id: &str, trigger_id: &str) -> ProjectTriggerGetCall<'a, C, A> {
         ProjectTriggerGetCall {
             hub: self.hub,
@@ -1500,7 +1540,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - ID of the project for which to list BuildTriggers.
+    /// * `projectId` - Required. ID of the project for which to list BuildTriggers.
     pub fn triggers_list(&self, project_id: &str) -> ProjectTriggerListCall<'a, C, A> {
         ProjectTriggerListCall {
             hub: self.hub,
@@ -1521,8 +1561,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - ID of the project that owns the trigger.
-    /// * `triggerId` - ID of the `BuildTrigger` to delete.
+    /// * `projectId` - Required. ID of the project that owns the trigger.
+    /// * `triggerId` - Required. ID of the `BuildTrigger` to delete.
     pub fn triggers_delete(&self, project_id: &str, trigger_id: &str) -> ProjectTriggerDeleteCall<'a, C, A> {
         ProjectTriggerDeleteCall {
             hub: self.hub,
@@ -1541,8 +1581,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - ID of the project.
-    /// * `id` - ID of the build.
+    /// * `projectId` - Required. ID of the project.
+    /// * `id` - Required. ID of the build.
     pub fn builds_cancel(&self, request: CancelBuildRequest, project_id: &str, id: &str) -> ProjectBuildCancelCall<'a, C, A> {
         ProjectBuildCancelCall {
             hub: self.hub,
@@ -1566,7 +1606,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - ID of the project.
+    /// * `projectId` - Required. ID of the project.
     pub fn builds_create(&self, request: Build, project_id: &str) -> ProjectBuildCreateCall<'a, C, A> {
         ProjectBuildCreateCall {
             hub: self.hub,
@@ -1587,8 +1627,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - ID of the project.
-    /// * `id` - ID of the build.
+    /// * `projectId` - Required. ID of the project.
+    /// * `id` - Required. ID of the build.
     pub fn builds_get(&self, project_id: &str, id: &str) -> ProjectBuildGetCall<'a, C, A> {
         ProjectBuildGetCall {
             hub: self.hub,
@@ -1609,7 +1649,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - ID of the project.
+    /// * `projectId` - Required. ID of the project.
     pub fn builds_list(&self, project_id: &str) -> ProjectBuildListCall<'a, C, A> {
         ProjectBuildListCall {
             hub: self.hub,
@@ -1630,8 +1670,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - ID of the project.
-    /// * `triggerId` - ID of the trigger.
+    /// * `projectId` - Required. ID of the project.
+    /// * `triggerId` - Required. ID of the trigger.
     pub fn triggers_run(&self, request: RepoSource, project_id: &str, trigger_id: &str) -> ProjectTriggerRunCall<'a, C, A> {
         ProjectTriggerRunCall {
             hub: self.hub,
@@ -1677,8 +1717,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - ID of the project.
-    /// * `id` - Build ID of the original build.
+    /// * `projectId` - Required. ID of the project.
+    /// * `id` - Required. Build ID of the original build.
     pub fn builds_retry(&self, request: RetryBuildRequest, project_id: &str, id: &str) -> ProjectBuildRetryCall<'a, C, A> {
         ProjectBuildRetryCall {
             hub: self.hub,
@@ -1700,7 +1740,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - ID of the project for which to configure automatic builds.
+    /// * `projectId` - Required. ID of the project for which to configure automatic builds.
     pub fn triggers_create(&self, request: BuildTrigger, project_id: &str) -> ProjectTriggerCreateCall<'a, C, A> {
         ProjectTriggerCreateCall {
             hub: self.hub,
@@ -1721,8 +1761,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - ID of the project that owns the trigger.
-    /// * `triggerId` - ID of the `BuildTrigger` to update.
+    /// * `projectId` - Required. ID of the project that owns the trigger.
+    /// * `triggerId` - Required. ID of the `BuildTrigger` to update.
     pub fn triggers_patch(&self, request: BuildTrigger, project_id: &str, trigger_id: &str) -> ProjectTriggerPatchCall<'a, C, A> {
         ProjectTriggerPatchCall {
             hub: self.hub,
@@ -2750,7 +2790,7 @@ impl<'a, C, A> ProjectTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// ID of the project that owns the trigger.
+    /// Required. ID of the project that owns the trigger.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -2760,7 +2800,7 @@ impl<'a, C, A> ProjectTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._project_id = new_value.to_string();
         self
     }
-    /// ID of the `BuildTrigger` to get.
+    /// Required. Identifier (`id` or `name`) of the `BuildTrigger` to get.
     ///
     /// Sets the *trigger id* path property to the given value.
     ///
@@ -3016,7 +3056,7 @@ impl<'a, C, A> ProjectTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// ID of the project for which to list BuildTriggers.
+    /// Required. ID of the project for which to list BuildTriggers.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -3278,7 +3318,7 @@ impl<'a, C, A> ProjectTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// ID of the project that owns the trigger.
+    /// Required. ID of the project that owns the trigger.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -3288,7 +3328,7 @@ impl<'a, C, A> ProjectTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._project_id = new_value.to_string();
         self
     }
-    /// ID of the `BuildTrigger` to delete.
+    /// Required. ID of the `BuildTrigger` to delete.
     ///
     /// Sets the *trigger id* path property to the given value.
     ///
@@ -3565,7 +3605,7 @@ impl<'a, C, A> ProjectBuildCancelCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._request = new_value;
         self
     }
-    /// ID of the project.
+    /// Required. ID of the project.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -3575,7 +3615,7 @@ impl<'a, C, A> ProjectBuildCancelCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._project_id = new_value.to_string();
         self
     }
-    /// ID of the build.
+    /// Required. ID of the build.
     ///
     /// Sets the *id* path property to the given value.
     ///
@@ -3854,7 +3894,7 @@ impl<'a, C, A> ProjectBuildCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._request = new_value;
         self
     }
-    /// ID of the project.
+    /// Required. ID of the project.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -4103,7 +4143,7 @@ impl<'a, C, A> ProjectBuildGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// ID of the project.
+    /// Required. ID of the project.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -4113,7 +4153,7 @@ impl<'a, C, A> ProjectBuildGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._project_id = new_value.to_string();
         self
     }
-    /// ID of the build.
+    /// Required. ID of the build.
     ///
     /// Sets the *id* path property to the given value.
     ///
@@ -4375,7 +4415,7 @@ impl<'a, C, A> ProjectBuildListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// ID of the project.
+    /// Required. ID of the project.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -4673,7 +4713,7 @@ impl<'a, C, A> ProjectTriggerRunCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._request = new_value;
         self
     }
-    /// ID of the project.
+    /// Required. ID of the project.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -4683,7 +4723,7 @@ impl<'a, C, A> ProjectTriggerRunCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._project_id = new_value.to_string();
         self
     }
-    /// ID of the trigger.
+    /// Required. ID of the trigger.
     ///
     /// Sets the *trigger id* path property to the given value.
     ///
@@ -4986,7 +5026,7 @@ impl<'a, C, A> ProjectBuildRetryCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._request = new_value;
         self
     }
-    /// ID of the project.
+    /// Required. ID of the project.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -4996,7 +5036,7 @@ impl<'a, C, A> ProjectBuildRetryCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._project_id = new_value.to_string();
         self
     }
-    /// Build ID of the original build.
+    /// Required. Build ID of the original build.
     ///
     /// Sets the *id* path property to the given value.
     ///
@@ -5273,7 +5313,7 @@ impl<'a, C, A> ProjectTriggerCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._request = new_value;
         self
     }
-    /// ID of the project for which to configure automatic builds.
+    /// Required. ID of the project for which to configure automatic builds.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -5552,7 +5592,7 @@ impl<'a, C, A> ProjectTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._request = new_value;
         self
     }
-    /// ID of the project that owns the trigger.
+    /// Required. ID of the project that owns the trigger.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -5562,7 +5602,7 @@ impl<'a, C, A> ProjectTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._project_id = new_value.to_string();
         self
     }
-    /// ID of the `BuildTrigger` to update.
+    /// Required. ID of the `BuildTrigger` to update.
     ///
     /// Sets the *trigger id* path property to the given value.
     ///

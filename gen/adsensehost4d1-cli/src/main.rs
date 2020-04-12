@@ -1001,6 +1001,9 @@ impl<'n> Engine<'n> {
                 "user-locale" => {
                     call = call.user_locale(value.unwrap_or(""));
                 },
+                "callback-url" => {
+                    call = call.callback_url(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1014,7 +1017,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["website-locale", "user-locale"].iter().map(|v|*v));
+                                                                           v.extend(["website-locale", "user-locale", "callback-url"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2762,7 +2765,7 @@ fn main() {
     
     let mut app = App::new("adsensehost4d1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190703")
+           .version("1.0.13+20200407")
            .about("Generates performance reports, generates ad codes, and provides publisher management capabilities for AdSense Hosts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adsensehost4d1_cli")
            .arg(Arg::with_name("url")

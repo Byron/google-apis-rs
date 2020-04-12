@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Bigtable Admin* crate version *1.0.12+20190506*, where *20190506* is the exact revision of the *bigtableadmin:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Bigtable Admin* crate version *1.0.13+20200211*, where *20200211* is the exact revision of the *bigtableadmin:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Bigtable Admin* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/bigtable/).
@@ -14,7 +14,7 @@
 //! * [operations](struct.Operation.html)
 //!  * [*cancel*](struct.OperationCancelCall.html), [*delete*](struct.OperationDeleteCall.html), [*get*](struct.OperationGetCall.html) and [*projects operations list*](struct.OperationProjectOperationListCall.html)
 //! * projects
-//!  * [*instances app profiles create*](struct.ProjectInstanceAppProfileCreateCall.html), [*instances app profiles delete*](struct.ProjectInstanceAppProfileDeleteCall.html), [*instances app profiles get*](struct.ProjectInstanceAppProfileGetCall.html), [*instances app profiles list*](struct.ProjectInstanceAppProfileListCall.html), [*instances app profiles patch*](struct.ProjectInstanceAppProfilePatchCall.html), [*instances clusters create*](struct.ProjectInstanceClusterCreateCall.html), [*instances clusters delete*](struct.ProjectInstanceClusterDeleteCall.html), [*instances clusters get*](struct.ProjectInstanceClusterGetCall.html), [*instances clusters list*](struct.ProjectInstanceClusterListCall.html), [*instances clusters update*](struct.ProjectInstanceClusterUpdateCall.html), [*instances create*](struct.ProjectInstanceCreateCall.html), [*instances delete*](struct.ProjectInstanceDeleteCall.html), [*instances get*](struct.ProjectInstanceGetCall.html), [*instances get iam policy*](struct.ProjectInstanceGetIamPolicyCall.html), [*instances list*](struct.ProjectInstanceListCall.html), [*instances partial update instance*](struct.ProjectInstancePartialUpdateInstanceCall.html), [*instances set iam policy*](struct.ProjectInstanceSetIamPolicyCall.html), [*instances tables check consistency*](struct.ProjectInstanceTableCheckConsistencyCall.html), [*instances tables create*](struct.ProjectInstanceTableCreateCall.html), [*instances tables delete*](struct.ProjectInstanceTableDeleteCall.html), [*instances tables drop row range*](struct.ProjectInstanceTableDropRowRangeCall.html), [*instances tables generate consistency token*](struct.ProjectInstanceTableGenerateConsistencyTokenCall.html), [*instances tables get*](struct.ProjectInstanceTableGetCall.html), [*instances tables get iam policy*](struct.ProjectInstanceTableGetIamPolicyCall.html), [*instances tables list*](struct.ProjectInstanceTableListCall.html), [*instances tables modify column families*](struct.ProjectInstanceTableModifyColumnFamilyCall.html), [*instances tables set iam policy*](struct.ProjectInstanceTableSetIamPolicyCall.html), [*instances tables test iam permissions*](struct.ProjectInstanceTableTestIamPermissionCall.html), [*instances test iam permissions*](struct.ProjectInstanceTestIamPermissionCall.html), [*instances update*](struct.ProjectInstanceUpdateCall.html), [*locations get*](struct.ProjectLocationGetCall.html) and [*locations list*](struct.ProjectLocationListCall.html)
+//!  * [*instances app profiles create*](struct.ProjectInstanceAppProfileCreateCall.html), [*instances app profiles delete*](struct.ProjectInstanceAppProfileDeleteCall.html), [*instances app profiles get*](struct.ProjectInstanceAppProfileGetCall.html), [*instances app profiles list*](struct.ProjectInstanceAppProfileListCall.html), [*instances app profiles patch*](struct.ProjectInstanceAppProfilePatchCall.html), [*instances clusters backups get iam policy*](struct.ProjectInstanceClusterBackupGetIamPolicyCall.html), [*instances clusters backups set iam policy*](struct.ProjectInstanceClusterBackupSetIamPolicyCall.html), [*instances clusters backups test iam permissions*](struct.ProjectInstanceClusterBackupTestIamPermissionCall.html), [*instances clusters create*](struct.ProjectInstanceClusterCreateCall.html), [*instances clusters delete*](struct.ProjectInstanceClusterDeleteCall.html), [*instances clusters get*](struct.ProjectInstanceClusterGetCall.html), [*instances clusters list*](struct.ProjectInstanceClusterListCall.html), [*instances clusters update*](struct.ProjectInstanceClusterUpdateCall.html), [*instances create*](struct.ProjectInstanceCreateCall.html), [*instances delete*](struct.ProjectInstanceDeleteCall.html), [*instances get*](struct.ProjectInstanceGetCall.html), [*instances get iam policy*](struct.ProjectInstanceGetIamPolicyCall.html), [*instances list*](struct.ProjectInstanceListCall.html), [*instances partial update instance*](struct.ProjectInstancePartialUpdateInstanceCall.html), [*instances set iam policy*](struct.ProjectInstanceSetIamPolicyCall.html), [*instances tables check consistency*](struct.ProjectInstanceTableCheckConsistencyCall.html), [*instances tables create*](struct.ProjectInstanceTableCreateCall.html), [*instances tables delete*](struct.ProjectInstanceTableDeleteCall.html), [*instances tables drop row range*](struct.ProjectInstanceTableDropRowRangeCall.html), [*instances tables generate consistency token*](struct.ProjectInstanceTableGenerateConsistencyTokenCall.html), [*instances tables get*](struct.ProjectInstanceTableGetCall.html), [*instances tables get iam policy*](struct.ProjectInstanceTableGetIamPolicyCall.html), [*instances tables list*](struct.ProjectInstanceTableListCall.html), [*instances tables modify column families*](struct.ProjectInstanceTableModifyColumnFamilyCall.html), [*instances tables set iam policy*](struct.ProjectInstanceTableSetIamPolicyCall.html), [*instances tables test iam permissions*](struct.ProjectInstanceTableTestIamPermissionCall.html), [*instances test iam permissions*](struct.ProjectInstanceTestIamPermissionCall.html), [*instances update*](struct.ProjectInstanceUpdateCall.html), [*locations get*](struct.ProjectLocationGetCall.html) and [*locations list*](struct.ProjectLocationListCall.html)
 //! 
 //! 
 //! 
@@ -365,7 +365,7 @@ impl<'a, C, A> BigtableAdmin<C, A>
         BigtableAdmin {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://bigtableadmin.googleapis.com/".to_string(),
             _root_url: "https://bigtableadmin.googleapis.com/".to_string(),
         }
@@ -379,7 +379,7 @@ impl<'a, C, A> BigtableAdmin<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -419,7 +419,7 @@ impl<'a, C, A> BigtableAdmin<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CheckConsistencyRequest {
-    /// The token created using GenerateConsistencyToken for the Table.
+    /// Required. The token created using GenerateConsistencyToken for the Table.
     #[serde(rename="consistencyToken")]
     pub consistency_token: Option<String>,
 }
@@ -465,6 +465,7 @@ impl ResponseResult for ListInstancesResponse {}
 /// 
 /// * [instances tables set iam policy projects](struct.ProjectInstanceTableSetIamPolicyCall.html) (request)
 /// * [instances set iam policy projects](struct.ProjectInstanceSetIamPolicyCall.html) (request)
+/// * [instances clusters backups set iam policy projects](struct.ProjectInstanceClusterBackupSetIamPolicyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetIamPolicyRequest {
@@ -522,7 +523,7 @@ pub struct Binding {
     ///    who is authenticated with a Google account or a service account.
     /// 
     /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` .
+    ///    account. For example, `alice@example.com` .
     /// 
     /// 
     /// * `serviceAccount:{emailid}`: An email address that represents a service
@@ -530,6 +531,26 @@ pub struct Binding {
     /// 
     /// * `group:{emailid}`: An email address that represents a Google group.
     ///    For example, `admins@example.com`.
+    /// 
+    /// * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a user that has been recently deleted. For
+    ///    example, `alice@example.com?uid=123456789012345678901`. If the user is
+    ///    recovered, this value reverts to `user:{emailid}` and the recovered user
+    ///    retains the role in the binding.
+    /// 
+    /// * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus
+    ///    unique identifier) representing a service account that has been recently
+    ///    deleted. For example,
+    ///    `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.
+    ///    If the service account is undeleted, this value reverts to
+    ///    `serviceAccount:{emailid}` and the undeleted service account retains the
+    ///    role in the binding.
+    /// 
+    /// * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a Google group that has been recently
+    ///    deleted. For example, `admins@example.com?uid=123456789012345678901`. If
+    ///    the group is recovered, this value reverts to `group:{emailid}` and the
+    ///    recovered group retains the role in the binding.
     /// 
     /// 
     /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
@@ -582,7 +603,7 @@ impl RequestValue for DropRowRangeRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Instance {
-    /// The descriptive name for this instance as it appears in UIs.
+    /// Required. The descriptive name for this instance as it appears in UIs.
     /// Can be changed at any time, but should be kept globally unique
     /// to avoid confusion.
     #[serde(rename="displayName")]
@@ -590,7 +611,7 @@ pub struct Instance {
     /// (`OutputOnly`)
     /// The current state of the instance.
     pub state: Option<String>,
-    /// Labels are a flexible and lightweight mechanism for organizing cloud
+    /// Required. Labels are a flexible and lightweight mechanism for organizing cloud
     /// resources into groups that reflect a customer's organizational needs and
     /// deployment strategies. They can be used to filter resources and aggregate
     /// metrics.
@@ -602,12 +623,12 @@ pub struct Instance {
     /// * No more than 64 labels can be associated with a given resource.
     /// * Keys and values must both be under 128 bytes.
     pub labels: Option<HashMap<String, String>>,
-    /// The type of the instance. Defaults to `PRODUCTION`.
+    /// Required. The type of the instance. Defaults to `PRODUCTION`.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// (`OutputOnly`)
+    /// Required. (`OutputOnly`)
     /// The unique name of the instance. Values are of the form
-    /// `projects/<project>/instances/a-z+[a-z0-9]`.
+    /// `projects/{project}/instances/a-z+[a-z0-9]`.
     pub name: Option<String>,
 }
 
@@ -761,10 +782,11 @@ pub struct Empty { _never_set: Option<bool> }
 impl ResponseResult for Empty {}
 
 
-/// Read/write requests may be routed to any cluster in the instance, and will
-/// fail over to another cluster in the event of transient errors or delays.
-/// Choosing this option sacrifices read-your-writes consistency to improve
-/// availability.
+/// Read/write requests are routed to the nearest cluster in the instance, and
+/// will fail over to the nearest cluster that is available in the event of
+/// transient errors or delays. Clusters in a region are considered
+/// equidistant. Choosing this option sacrifices read-your-writes consistency
+/// to improve availability.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -776,58 +798,14 @@ impl Part for MultiClusterRoutingUseAny {}
 
 /// The `Status` type defines a logical error model that is suitable for
 /// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
 /// 
-/// * Simple to use and understand for most users
-/// * Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// * Partial errors. If a service needs to return partial errors to the client,
-///   it may embed the `Status` in the normal response to indicate the partial
-///   errors.
-/// 
-/// * Workflow errors. A typical workflow has multiple steps. Each step may
-///   have a `Status` message for error reporting.
-/// 
-/// * Batch operations. If a client uses batch request and batch response, the
-///   `Status` message should be used directly inside batch response, one for
-///   each error sub-response.
-/// 
-/// * Asynchronous operations. If an API call embeds asynchronous operation
-///   results in its response, the status of those operations should be
-///   represented directly using the `Status` message.
-/// 
-/// * Logging. If some API errors are stored in logs, the message `Status` could
-///   be used directly after any stripping needed for security/privacy reasons.
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Status {
     /// A developer-facing error message, which should be in English. Any
@@ -844,37 +822,50 @@ pub struct Status {
 impl Part for Status {}
 
 
-/// Defines an Identity and Access Management (IAM) policy. It is used to
-/// specify access control policies for Cloud Platform resources.
+/// An Identity and Access Management (IAM) policy, which specifies access
+/// controls for Google Cloud resources.
 /// 
-/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
-/// `members` to a `role`, where the members can be user accounts, Google groups,
-/// Google domains, and service accounts. A `role` is a named list of permissions
-/// defined by IAM.
+/// A `Policy` is a collection of `bindings`. A `binding` binds one or more
+/// `members` to a single `role`. Members can be user accounts, service accounts,
+/// Google groups, and domains (such as G Suite). A `role` is a named list of
+/// permissions; each `role` can be an IAM predefined role or a user-created
+/// custom role.
 /// 
-/// **JSON Example**
+/// Optionally, a `binding` can specify a `condition`, which is a logical
+/// expression that allows access to a resource only if the expression evaluates
+/// to `true`. A condition can add constraints based on attributes of the
+/// request, the resource, or both.
+/// 
+/// **JSON example:**
 /// 
 /// ````text
 /// {
 ///   "bindings": [
 ///     {
-///       "role": "roles/owner",
+///       "role": "roles/resourcemanager.organizationAdmin",
 ///       "members": [
 ///         "user:mike@example.com",
 ///         "group:admins@example.com",
 ///         "domain:google.com",
-///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
+///         "serviceAccount:my-project-id@appspot.gserviceaccount.com"
 ///       ]
 ///     },
 ///     {
-///       "role": "roles/viewer",
-///       "members": ["user:sean@example.com"]
+///       "role": "roles/resourcemanager.organizationViewer",
+///       "members": ["user:eve@example.com"],
+///       "condition": {
+///         "title": "expirable access",
+///         "description": "Does not grant access after Sep 2020",
+///         "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')",
+///       }
 ///     }
-///   ]
+///   ],
+///   "etag": "BwWWja0YfJA=",
+///   "version": 3
 /// }
 /// ````
 /// 
-/// **YAML Example**
+/// **YAML example:**
 /// 
 /// ````text
 /// bindings:
@@ -882,25 +873,33 @@ impl Part for Status {}
 ///   - user:mike@example.com
 ///   - group:admins@example.com
 ///   - domain:google.com
-///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///   role: roles/owner
+///   - serviceAccount:my-project-id@appspot.gserviceaccount.com
+///   role: roles/resourcemanager.organizationAdmin
 /// - members:
-///   - user:sean@example.com
-///   role: roles/viewer
+///   - user:eve@example.com
+///   role: roles/resourcemanager.organizationViewer
+///   condition:
+///     title: expirable access
+///     description: Does not grant access after Sep 2020
+///     expression: request.time < timestamp('2020-10-01T00:00:00.000Z')
+/// - etag: BwWWja0YfJA=
+/// - version: 3
 /// ````
 /// 
 /// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam/docs).
+/// [IAM documentation](https://cloud.google.com/iam/docs/).
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [instances tables set iam policy projects](struct.ProjectInstanceTableSetIamPolicyCall.html) (response)
-/// * [instances get iam policy projects](struct.ProjectInstanceGetIamPolicyCall.html) (response)
+/// * [instances clusters backups get iam policy projects](struct.ProjectInstanceClusterBackupGetIamPolicyCall.html) (response)
 /// * [instances set iam policy projects](struct.ProjectInstanceSetIamPolicyCall.html) (response)
+/// * [instances get iam policy projects](struct.ProjectInstanceGetIamPolicyCall.html) (response)
+/// * [instances tables set iam policy projects](struct.ProjectInstanceTableSetIamPolicyCall.html) (response)
 /// * [instances tables get iam policy projects](struct.ProjectInstanceTableGetIamPolicyCall.html) (response)
+/// * [instances clusters backups set iam policy projects](struct.ProjectInstanceClusterBackupSetIamPolicyCall.html) (response)
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
     /// Specifies cloud audit logging configuration for this policy.
@@ -914,13 +913,36 @@ pub struct Policy {
     /// systems are expected to put that etag in the request to `setIamPolicy` to
     /// ensure that their change will be applied to the same version of the policy.
     /// 
-    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
-    /// policy is overwritten blindly.
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
     pub etag: Option<String>,
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
+    /// Associates a list of `members` to a `role`. Optionally, may specify a
+    /// `condition` that determines how and when the `bindings` are applied. Each
+    /// of the `bindings` must contain at least one member.
     pub bindings: Option<Vec<Binding>>,
-    /// Deprecated.
+    /// Specifies the format of the policy.
+    /// 
+    /// Valid values are `0`, `1`, and `3`. Requests that specify an invalid value
+    /// are rejected.
+    /// 
+    /// Any operation that affects conditional role bindings must specify version
+    /// `3`. This requirement applies to the following operations:
+    /// 
+    /// * Getting a policy that includes a conditional role binding
+    /// * Adding a conditional role binding to a policy
+    /// * Changing a conditional role binding in a policy
+    /// * Removing any role binding, with or without a condition, from a policy
+    ///   that includes conditions
+    /// 
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
+    /// 
+    /// If a policy does not include any conditions, operations on that policy may
+    /// specify any valid version or leave the field unset.
     pub version: Option<i32>,
 }
 
@@ -947,7 +969,7 @@ pub struct Cluster {
     /// parent instance's tables, unless explicitly overridden.
     #[serde(rename="defaultStorageType")]
     pub default_storage_type: Option<String>,
-    /// The number of nodes allocated to this cluster. More nodes enable higher
+    /// Required. The number of nodes allocated to this cluster. More nodes enable higher
     /// throughput and more consistent performance.
     #[serde(rename="serveNodes")]
     pub serve_nodes: Option<i32>,
@@ -955,11 +977,11 @@ pub struct Cluster {
     /// The location where this cluster's nodes and storage reside. For best
     /// performance, clients should be located as close as possible to this
     /// cluster. Currently only zones are supported, so values should be of the
-    /// form `projects/<project>/locations/<zone>`.
+    /// form `projects/{project}/locations/{zone}`.
     pub location: Option<String>,
-    /// (`OutputOnly`)
+    /// Required. (`OutputOnly`)
     /// The unique name of the cluster. Values are of the form
-    /// `projects/<project>/instances/<instance>/clusters/a-z*`.
+    /// `projects/{project}/instances/{instance}/clusters/a-z*`.
     pub name: Option<String>,
     /// (`OutputOnly`)
     /// The current state of the cluster.
@@ -982,7 +1004,7 @@ impl ResponseResult for Cluster {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ModifyColumnFamiliesRequest {
-    /// Modifications to be atomically applied to the specified table's families.
+    /// Required. Modifications to be atomically applied to the specified table's families.
     /// Entries are applied in order, meaning that earlier modifications can be
     /// masked by later ones (in the case of repeated updates to the same family,
     /// for example).
@@ -1026,21 +1048,21 @@ impl Part for GcRule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateInstanceRequest {
-    /// The ID to be used when referring to the new instance within its project,
+    /// Required. The ID to be used when referring to the new instance within its project,
     /// e.g., just `myinstance` rather than
     /// `projects/myproject/instances/myinstance`.
     #[serde(rename="instanceId")]
     pub instance_id: Option<String>,
-    /// The clusters to be created within the instance, mapped by desired
+    /// Required. The clusters to be created within the instance, mapped by desired
     /// cluster ID, e.g., just `mycluster` rather than
     /// `projects/myproject/instances/myinstance/clusters/mycluster`.
     /// Fields marked `OutputOnly` must be left blank.
-    /// Currently, at most two clusters can be specified.
+    /// Currently, at most four clusters can be specified.
     pub clusters: Option<HashMap<String, Cluster>>,
-    /// The unique name of the project in which to create the new instance.
-    /// Values are of the form `projects/<project>`.
+    /// Required. The unique name of the project in which to create the new instance.
+    /// Values are of the form `projects/{project}`.
     pub parent: Option<String>,
-    /// The instance to create.
+    /// Required. The instance to create.
     /// Fields marked `OutputOnly` must be left blank.
     pub instance: Option<Instance>,
 }
@@ -1070,7 +1092,7 @@ impl Part for Intersection {}
 ///     {
 ///       "log_type": "DATA_READ",
 ///       "exempted_members": [
-///         "user:foo@gmail.com"
+///         "user:jose@example.com"
 ///       ]
 ///     },
 ///     {
@@ -1081,7 +1103,7 @@ impl Part for Intersection {}
 /// ````
 /// 
 /// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
-/// foo@gmail.com from DATA_READ logging.
+/// jose@example.com from DATA_READ logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1106,11 +1128,16 @@ impl Part for AuditLogConfig {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [instances clusters backups get iam policy projects](struct.ProjectInstanceClusterBackupGetIamPolicyCall.html) (request)
 /// * [instances get iam policy projects](struct.ProjectInstanceGetIamPolicyCall.html) (request)
 /// * [instances tables get iam policy projects](struct.ProjectInstanceTableGetIamPolicyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetIamPolicyRequest { _never_set: Option<bool> }
+pub struct GetIamPolicyRequest {
+    /// OPTIONAL: A `GetPolicyOptions` object for specifying options to
+    /// `GetIamPolicy`. This field is only used by Cloud IAM.
+    pub options: Option<GetPolicyOptions>,
+}
 
 impl RequestValue for GetIamPolicyRequest {}
 
@@ -1122,6 +1149,7 @@ impl RequestValue for GetIamPolicyRequest {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [instances clusters backups test iam permissions projects](struct.ProjectInstanceClusterBackupTestIamPermissionCall.html) (request)
 /// * [instances test iam permissions projects](struct.ProjectInstanceTestIamPermissionCall.html) (request)
 /// * [instances tables test iam permissions projects](struct.ProjectInstanceTableTestIamPermissionCall.html) (request)
 /// 
@@ -1137,30 +1165,59 @@ pub struct TestIamPermissionsRequest {
 impl RequestValue for TestIamPermissionsRequest {}
 
 
-/// Represents an expression text. Example:
+/// Represents a textual expression in the Common Expression Language (CEL)
+/// syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+/// are documented at https://github.com/google/cel-spec.
+/// 
+/// Example (Comparison):
 /// 
 /// ````text
-/// title: "User account presence"
-/// description: "Determines whether the request has a user account"
-/// expression: "size(request.user) > 0"
+/// title: "Summary size limit"
+/// description: "Determines if a summary is less than 100 chars"
+/// expression: "document.summary.size() < 100"
 /// ````
+/// 
+/// Example (Equality):
+/// 
+/// ````text
+/// title: "Requestor is owner"
+/// description: "Determines if requestor is the document owner"
+/// expression: "document.owner == request.auth.claims.email"
+/// ````
+/// 
+/// Example (Logic):
+/// 
+/// ````text
+/// title: "Public documents"
+/// description: "Determine whether the document should be publicly visible"
+/// expression: "document.type != 'private' && document.type != 'internal'"
+/// ````
+/// 
+/// Example (Data Manipulation):
+/// 
+/// ````text
+/// title: "Notification string"
+/// description: "Create a notification string with a timestamp."
+/// expression: "'New message received at ' + string(document.create_time)"
+/// ````
+/// 
+/// The exact variables and functions that may be referenced within an expression
+/// are determined by the service that evaluates it. See the service
+/// documentation for additional information.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
-    /// An optional description of the expression. This is a longer text which
+    /// Optional. Description of the expression. This is a longer text which
     /// describes the expression, e.g. when hovered over it in a UI.
     pub description: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
+    /// Textual representation of an expression in Common Expression Language
+    /// syntax.
     pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error
+    /// Optional. String indicating the location of the expression for error
     /// reporting, e.g. a file name and a position in the file.
     pub location: Option<String>,
-    /// An optional title for the expression, i.e. a short string describing
+    /// Optional. Title for the expression, i.e. a short string describing
     /// its purpose. This can be used e.g. in UIs which allow to enter the
     /// expression.
     pub title: Option<String>,
@@ -1204,6 +1261,7 @@ impl ResponseResult for ListClustersResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [instances clusters backups test iam permissions projects](struct.ProjectInstanceClusterBackupTestIamPermissionCall.html) (response)
 /// * [instances test iam permissions projects](struct.ProjectInstanceTestIamPermissionCall.html) (response)
 /// * [instances tables test iam permissions projects](struct.ProjectInstanceTableTestIamPermissionCall.html) (response)
 /// 
@@ -1272,7 +1330,7 @@ impl ResponseResult for ListAppProfilesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateTableRequest {
-    /// The Table to create.
+    /// Required. The Table to create.
     pub table: Option<Table>,
     /// The optional list of row keys that will be used to initially split the
     /// table into several tablets (tablets are similar to HBase regions).
@@ -1292,8 +1350,9 @@ pub struct CreateTableRequest {
     ///   * Tablet 5 `[other, )                => {"other", "zz"}.`
     #[serde(rename="initialSplits")]
     pub initial_splits: Option<Vec<Split>>,
-    /// The name by which the new table should be referred to within the parent
-    /// instance, e.g., `foobar` rather than `<parent>/tables/foobar`.
+    /// Required. The name by which the new table should be referred to within the parent
+    /// instance, e.g., `foobar` rather than `{parent}/tables/foobar`.
+    /// Maximum 50 characters.
     #[serde(rename="tableId")]
     pub table_id: Option<String>,
 }
@@ -1336,7 +1395,7 @@ impl ResponseResult for ListOperationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppProfile {
-    /// Use a multi-cluster routing policy that may pick any cluster.
+    /// Use a multi-cluster routing policy.
     #[serde(rename="multiClusterRoutingUseAny")]
     pub multi_cluster_routing_use_any: Option<MultiClusterRoutingUseAny>,
     /// Strongly validated etag for optimistic concurrency control. Preserve the
@@ -1383,8 +1442,29 @@ pub struct CheckConsistencyResponse {
 impl ResponseResult for CheckConsistencyResponse {}
 
 
+/// Encapsulates settings provided to GetIamPolicy.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetPolicyOptions {
+    /// Optional. The policy format version to be returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
+    #[serde(rename="requestedPolicyVersion")]
+    pub requested_policy_version: Option<i32>,
+}
+
+impl Part for GetPolicyOptions {}
+
+
 /// Unconditionally routes all read/write requests to a specific cluster.
-/// This option preserves read-your-writes consistency, but does not improve
+/// This option preserves read-your-writes consistency but does not improve
 /// availability.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1410,8 +1490,7 @@ impl Part for SingleClusterRouting {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ClusterState {
-    /// Output only.
-    /// The state of replication for the table in this cluster.
+    /// Output only. The state of replication for the table in this cluster.
     #[serde(rename="replicationState")]
     pub replication_state: Option<String>,
 }
@@ -1440,7 +1519,7 @@ impl Part for ClusterState {}
 ///         {
 ///           "log_type": "DATA_READ",
 ///           "exempted_members": [
-///             "user:foo@gmail.com"
+///             "user:jose@example.com"
 ///           ]
 ///         },
 ///         {
@@ -1452,7 +1531,7 @@ impl Part for ClusterState {}
 ///       ]
 ///     },
 ///     {
-///       "service": "fooservice.googleapis.com"
+///       "service": "sampleservice.googleapis.com"
 ///       "audit_log_configs": [
 ///         {
 ///           "log_type": "DATA_READ",
@@ -1460,7 +1539,7 @@ impl Part for ClusterState {}
 ///         {
 ///           "log_type": "DATA_WRITE",
 ///           "exempted_members": [
-///             "user:bar@gmail.com"
+///             "user:aliya@example.com"
 ///           ]
 ///         }
 ///       ]
@@ -1469,9 +1548,9 @@ impl Part for ClusterState {}
 /// }
 /// ````
 /// 
-/// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
-/// logging. It also exempts foo@gmail.com from DATA_READ logging, and
-/// bar@gmail.com from DATA_WRITE logging.
+/// For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
+/// logging. It also exempts jose@example.com from DATA_READ logging, and
+/// aliya@example.com from DATA_WRITE logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1518,8 +1597,7 @@ impl RequestValue for GenerateConsistencyTokenRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Table {
-    /// Output only.
-    /// Map from cluster ID to per-cluster table state.
+    /// Output only. Map from cluster ID to per-cluster table state.
     /// If it could not be determined whether or not the table has data in a
     /// particular cluster (for example, if its zone is unavailable), then
     /// there will be an entry for the cluster with UNKNOWN `replication_status`.
@@ -1531,8 +1609,7 @@ pub struct Table {
     /// Views: `SCHEMA_VIEW`, `FULL`
     #[serde(rename="columnFamilies")]
     pub column_families: Option<HashMap<String, ColumnFamily>>,
-    /// Output only.
-    /// The unique name of the table. Values are of the form
+    /// Output only. The unique name of the table. Values are of the form
     /// `projects/<project>/instances/<instance>/tables/_a-zA-Z0-9*`.
     /// Views: `NAME_ONLY`, `SCHEMA_VIEW`, `REPLICATION_VIEW`, `FULL`
     pub name: Option<String>,
@@ -1584,7 +1661,7 @@ pub struct Operation {
     pub response: Option<HashMap<String, String>>,
     /// The server-assigned name, which is only unique within the same service that
     /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should have the format of `operations/some/unique/name`.
+    /// `name` should be a resource name ending with `operations/{unique_id}`.
     pub name: Option<String>,
     /// Service-specific metadata associated with the operation.  It typically
     /// contains progress information and common metadata such as create time.
@@ -1786,7 +1863,7 @@ impl<'a, C, A> OperationMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = BigtableAdmin::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `instances_app_profiles_create(...)`, `instances_app_profiles_delete(...)`, `instances_app_profiles_get(...)`, `instances_app_profiles_list(...)`, `instances_app_profiles_patch(...)`, `instances_clusters_create(...)`, `instances_clusters_delete(...)`, `instances_clusters_get(...)`, `instances_clusters_list(...)`, `instances_clusters_update(...)`, `instances_create(...)`, `instances_delete(...)`, `instances_get(...)`, `instances_get_iam_policy(...)`, `instances_list(...)`, `instances_partial_update_instance(...)`, `instances_set_iam_policy(...)`, `instances_tables_check_consistency(...)`, `instances_tables_create(...)`, `instances_tables_delete(...)`, `instances_tables_drop_row_range(...)`, `instances_tables_generate_consistency_token(...)`, `instances_tables_get(...)`, `instances_tables_get_iam_policy(...)`, `instances_tables_list(...)`, `instances_tables_modify_column_families(...)`, `instances_tables_set_iam_policy(...)`, `instances_tables_test_iam_permissions(...)`, `instances_test_iam_permissions(...)`, `instances_update(...)`, `locations_get(...)` and `locations_list(...)`
+/// // like `instances_app_profiles_create(...)`, `instances_app_profiles_delete(...)`, `instances_app_profiles_get(...)`, `instances_app_profiles_list(...)`, `instances_app_profiles_patch(...)`, `instances_clusters_backups_get_iam_policy(...)`, `instances_clusters_backups_set_iam_policy(...)`, `instances_clusters_backups_test_iam_permissions(...)`, `instances_clusters_create(...)`, `instances_clusters_delete(...)`, `instances_clusters_get(...)`, `instances_clusters_list(...)`, `instances_clusters_update(...)`, `instances_create(...)`, `instances_delete(...)`, `instances_get(...)`, `instances_get_iam_policy(...)`, `instances_list(...)`, `instances_partial_update_instance(...)`, `instances_set_iam_policy(...)`, `instances_tables_check_consistency(...)`, `instances_tables_create(...)`, `instances_tables_delete(...)`, `instances_tables_drop_row_range(...)`, `instances_tables_generate_consistency_token(...)`, `instances_tables_get(...)`, `instances_tables_get_iam_policy(...)`, `instances_tables_list(...)`, `instances_tables_modify_column_families(...)`, `instances_tables_set_iam_policy(...)`, `instances_tables_test_iam_permissions(...)`, `instances_test_iam_permissions(...)`, `instances_update(...)`, `locations_get(...)` and `locations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1811,9 +1888,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The unique name of the Table for which to create a consistency token.
+    /// * `name` - Required. The unique name of the Table for which to create a consistency token.
     ///            Values are of the form
-    ///            `projects/<project>/instances/<instance>/tables/<table>`.
+    ///            `projects/{project}/instances/{instance}/tables/{table}`.
     pub fn instances_tables_generate_consistency_token(&self, request: GenerateConsistencyTokenRequest, name: &str) -> ProjectInstanceTableGenerateConsistencyTokenCall<'a, C, A> {
         ProjectInstanceTableGenerateConsistencyTokenCall {
             hub: self.hub,
@@ -1851,9 +1928,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The unique name of the table on which to drop a range of rows.
+    /// * `name` - Required. The unique name of the table on which to drop a range of rows.
     ///            Values are of the form
-    ///            `projects/<project>/instances/<instance>/tables/<table>`.
+    ///            `projects/{project}/instances/{instance}/tables/{table}`.
     pub fn instances_tables_drop_row_range(&self, request: DropRowRangeRequest, name: &str) -> ProjectInstanceTableDropRowRangeCall<'a, C, A> {
         ProjectInstanceTableDropRowRangeCall {
             hub: self.hub,
@@ -1871,8 +1948,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The unique name of the app profile to be deleted. Values are of the form
-    ///            `projects/<project>/instances/<instance>/appProfiles/<app_profile>`.
+    /// * `name` - Required. The unique name of the app profile to be deleted. Values are of the form
+    ///            `projects/{project}/instances/{instance}/appProfiles/{app_profile}`.
     pub fn instances_app_profiles_delete(&self, name: &str) -> ProjectInstanceAppProfileDeleteCall<'a, C, A> {
         ProjectInstanceAppProfileDeleteCall {
             hub: self.hub,
@@ -1886,13 +1963,34 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Lists information about clusters in an instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The unique name of the instance for which a list of clusters is requested.
+    ///              Values are of the form `projects/{project}/instances/{instance}`.
+    ///              Use `{instance} = '-'` to list Clusters for all Instances in a project,
+    ///              e.g., `projects/myproject/instances/-`.
+    pub fn instances_clusters_list(&self, parent: &str) -> ProjectInstanceClusterListCall<'a, C, A> {
+        ProjectInstanceClusterListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Create an instance within a project.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The unique name of the project in which to create the new instance.
-    ///              Values are of the form `projects/<project>`.
+    /// * `parent` - Required. The unique name of the project in which to create the new instance.
+    ///              Values are of the form `projects/{project}`.
     pub fn instances_create(&self, request: CreateInstanceRequest, parent: &str) -> ProjectInstanceCreateCall<'a, C, A> {
         ProjectInstanceCreateCall {
             hub: self.hub,
@@ -1911,9 +2009,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The unique name of the instance in which to create the new cluster.
+    /// * `parent` - Required. The unique name of the instance in which to create the new cluster.
     ///              Values are of the form
-    ///              `projects/<project>/instances/<instance>`.
+    ///              `projects/{project}/instances/{instance}`.
     pub fn instances_clusters_create(&self, request: Cluster, parent: &str) -> ProjectInstanceClusterCreateCall<'a, C, A> {
         ProjectInstanceClusterCreateCall {
             hub: self.hub,
@@ -1932,9 +2030,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The unique name of the requested table.
+    /// * `name` - Required. The unique name of the requested table.
     ///            Values are of the form
-    ///            `projects/<project>/instances/<instance>/tables/<table>`.
+    ///            `projects/{project}/instances/{instance}/tables/{table}`.
     pub fn instances_tables_get(&self, name: &str) -> ProjectInstanceTableGetCall<'a, C, A> {
         ProjectInstanceTableGetCall {
             hub: self.hub,
@@ -1975,10 +2073,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The unique name of the instance for which a list of app profiles is
+    /// * `parent` - Required. The unique name of the instance for which a list of app profiles is
     ///              requested. Values are of the form
-    ///              `projects/<project>/instances/<instance>`.
-    ///              Use `<instance> = '-'` to list AppProfiles for all Instances in a project,
+    ///              `projects/{project}/instances/{instance}`.
+    ///              Use `{instance} = '-'` to list AppProfiles for all Instances in a project,
     ///              e.g., `projects/myproject/instances/-`.
     pub fn instances_app_profiles_list(&self, parent: &str) -> ProjectInstanceAppProfileListCall<'a, C, A> {
         ProjectInstanceAppProfileListCall {
@@ -1999,14 +2097,34 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - (`OutputOnly`)
+    /// * `name` - Required. (`OutputOnly`)
     ///            The unique name of the cluster. Values are of the form
-    ///            `projects/<project>/instances/<instance>/clusters/a-z*`.
+    ///            `projects/{project}/instances/{instance}/clusters/a-z*`.
     pub fn instances_clusters_update(&self, request: Cluster, name: &str) -> ProjectInstanceClusterUpdateCall<'a, C, A> {
         ProjectInstanceClusterUpdateCall {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns permissions that the caller has on the specified table resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested.
+    ///                See the operation documentation for the appropriate value for this field.
+    pub fn instances_clusters_backups_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectInstanceClusterBackupTestIamPermissionCall<'a, C, A> {
+        ProjectInstanceClusterBackupTestIamPermissionCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2043,9 +2161,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The unique name of the Table for which to check replication consistency.
+    /// * `name` - Required. The unique name of the Table for which to check replication consistency.
     ///            Values are of the form
-    ///            `projects/<project>/instances/<instance>/tables/<table>`.
+    ///            `projects/{project}/instances/{instance}/tables/{table}`.
     pub fn instances_tables_check_consistency(&self, request: CheckConsistencyRequest, name: &str) -> ProjectInstanceTableCheckConsistencyCall<'a, C, A> {
         ProjectInstanceTableCheckConsistencyCall {
             hub: self.hub,
@@ -2100,8 +2218,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the access control policy for an instance resource. Returns an empty
-    /// policy if an table exists but does not have a policy set.
+    /// Gets the access control policy for a Table or Backup resource.
+    /// Returns an empty policy if the resource exists but does not have a policy
+    /// set.
     /// 
     /// # Arguments
     ///
@@ -2125,8 +2244,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The unique name of the requested app profile. Values are of the form
-    ///            `projects/<project>/instances/<instance>/appProfiles/<app_profile>`.
+    /// * `name` - Required. The unique name of the requested app profile. Values are of the form
+    ///            `projects/{project}/instances/{instance}/appProfiles/{app_profile}`.
     pub fn instances_app_profiles_get(&self, name: &str) -> ProjectInstanceAppProfileGetCall<'a, C, A> {
         ProjectInstanceAppProfileGetCall {
             hub: self.hub,
@@ -2143,8 +2262,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The unique name of the instance to be deleted.
-    ///            Values are of the form `projects/<project>/instances/<instance>`.
+    /// * `name` - Required. The unique name of the instance to be deleted.
+    ///            Values are of the form `projects/{project}/instances/{instance}`.
     pub fn instances_delete(&self, name: &str) -> ProjectInstanceDeleteCall<'a, C, A> {
         ProjectInstanceDeleteCall {
             hub: self.hub,
@@ -2157,19 +2276,20 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists information about clusters in an instance.
+    /// Gets the access control policy for a Table or Backup resource.
+    /// Returns an empty policy if the resource exists but does not have a policy
+    /// set.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The unique name of the instance for which a list of clusters is requested.
-    ///              Values are of the form `projects/<project>/instances/<instance>`.
-    ///              Use `<instance> = '-'` to list Clusters for all Instances in a project,
-    ///              e.g., `projects/myproject/instances/-`.
-    pub fn instances_clusters_list(&self, parent: &str) -> ProjectInstanceClusterListCall<'a, C, A> {
-        ProjectInstanceClusterListCall {
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which the policy is being requested.
+    ///                See the operation documentation for the appropriate value for this field.
+    pub fn instances_clusters_backups_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectInstanceClusterBackupGetIamPolicyCall<'a, C, A> {
+        ProjectInstanceClusterBackupGetIamPolicyCall {
             hub: self.hub,
-            _parent: parent.to_string(),
-            _page_token: Default::default(),
+            _request: request,
+            _resource: resource.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2185,8 +2305,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The unique name of the instance in which to create the table.
-    ///              Values are of the form `projects/<project>/instances/<instance>`.
+    /// * `parent` - Required. The unique name of the instance in which to create the table.
+    ///              Values are of the form `projects/{project}/instances/{instance}`.
     pub fn instances_tables_create(&self, request: CreateTableRequest, parent: &str) -> ProjectInstanceTableCreateCall<'a, C, A> {
         ProjectInstanceTableCreateCall {
             hub: self.hub,
@@ -2204,8 +2324,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The unique name of the instance for which tables should be listed.
-    ///              Values are of the form `projects/<project>/instances/<instance>`.
+    /// * `parent` - Required. The unique name of the instance for which tables should be listed.
+    ///              Values are of the form `projects/{project}/instances/{instance}`.
     pub fn instances_tables_list(&self, parent: &str) -> ProjectInstanceTableListCall<'a, C, A> {
         ProjectInstanceTableListCall {
             hub: self.hub,
@@ -2225,8 +2345,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The unique name of the requested cluster. Values are of the form
-    ///            `projects/<project>/instances/<instance>/clusters/<cluster>`.
+    /// * `name` - Required. The unique name of the requested cluster. Values are of the form
+    ///            `projects/{project}/instances/{instance}/clusters/{cluster}`.
     pub fn instances_clusters_get(&self, name: &str) -> ProjectInstanceClusterGetCall<'a, C, A> {
         ProjectInstanceClusterGetCall {
             hub: self.hub,
@@ -2245,9 +2365,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - (`OutputOnly`)
+    /// * `name` - Required. (`OutputOnly`)
     ///            The unique name of the instance. Values are of the form
-    ///            `projects/<project>/instances/a-z+[a-z0-9]`.
+    ///            `projects/{project}/instances/a-z+[a-z0-9]`.
     pub fn instances_partial_update_instance(&self, request: Instance, name: &str) -> ProjectInstancePartialUpdateInstanceCall<'a, C, A> {
         ProjectInstancePartialUpdateInstanceCall {
             hub: self.hub,
@@ -2266,8 +2386,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The unique name of the requested instance. Values are of the form
-    ///            `projects/<project>/instances/<instance>`.
+    /// * `name` - Required. The unique name of the requested instance. Values are of the form
+    ///            `projects/{project}/instances/{instance}`.
     pub fn instances_get(&self, name: &str) -> ProjectInstanceGetCall<'a, C, A> {
         ProjectInstanceGetCall {
             hub: self.hub,
@@ -2287,9 +2407,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - (`OutputOnly`)
+    /// * `name` - Required. (`OutputOnly`)
     ///            The unique name of the instance. Values are of the form
-    ///            `projects/<project>/instances/a-z+[a-z0-9]`.
+    ///            `projects/{project}/instances/a-z+[a-z0-9]`.
     pub fn instances_update(&self, request: Instance, name: &str) -> ProjectInstanceUpdateCall<'a, C, A> {
         ProjectInstanceUpdateCall {
             hub: self.hub,
@@ -2307,8 +2427,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The unique name of the project for which a list of instances is requested.
-    ///              Values are of the form `projects/<project>`.
+    /// * `parent` - Required. The unique name of the project for which a list of instances is requested.
+    ///              Values are of the form `projects/{project}`.
     pub fn instances_list(&self, parent: &str) -> ProjectInstanceListCall<'a, C, A> {
         ProjectInstanceListCall {
             hub: self.hub,
@@ -2327,9 +2447,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The unique name of the instance in which to create the new app profile.
+    /// * `parent` - Required. The unique name of the instance in which to create the new app profile.
     ///              Values are of the form
-    ///              `projects/<project>/instances/<instance>`.
+    ///              `projects/{project}/instances/{instance}`.
     pub fn instances_app_profiles_create(&self, request: AppProfile, parent: &str) -> ProjectInstanceAppProfileCreateCall<'a, C, A> {
         ProjectInstanceAppProfileCreateCall {
             hub: self.hub,
@@ -2353,9 +2473,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The unique name of the table whose families should be modified.
+    /// * `name` - Required. The unique name of the table whose families should be modified.
     ///            Values are of the form
-    ///            `projects/<project>/instances/<instance>/tables/<table>`.
+    ///            `projects/{project}/instances/{instance}/tables/{table}`.
     pub fn instances_tables_modify_column_families(&self, request: ModifyColumnFamiliesRequest, name: &str) -> ProjectInstanceTableModifyColumnFamilyCall<'a, C, A> {
         ProjectInstanceTableModifyColumnFamilyCall {
             hub: self.hub,
@@ -2369,8 +2489,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on a table resource. Replaces any existing
-    /// policy.
+    /// Sets the access control policy on a Table or Backup resource.
+    /// Replaces any existing policy.
     /// 
     /// # Arguments
     ///
@@ -2394,8 +2514,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The unique name of the cluster to be deleted. Values are of the form
-    ///            `projects/<project>/instances/<instance>/clusters/<cluster>`.
+    /// * `name` - Required. The unique name of the cluster to be deleted. Values are of the form
+    ///            `projects/{project}/instances/{instance}/clusters/{cluster}`.
     pub fn instances_clusters_delete(&self, name: &str) -> ProjectInstanceClusterDeleteCall<'a, C, A> {
         ProjectInstanceClusterDeleteCall {
             hub: self.hub,
@@ -2432,13 +2552,34 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The unique name of the table to be deleted.
+    /// * `name` - Required. The unique name of the table to be deleted.
     ///            Values are of the form
-    ///            `projects/<project>/instances/<instance>/tables/<table>`.
+    ///            `projects/{project}/instances/{instance}/tables/{table}`.
     pub fn instances_tables_delete(&self, name: &str) -> ProjectInstanceTableDeleteCall<'a, C, A> {
         ProjectInstanceTableDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Sets the access control policy on a Table or Backup resource.
+    /// Replaces any existing policy.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which the policy is being specified.
+    ///                See the operation documentation for the appropriate value for this field.
+    pub fn instances_clusters_backups_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectInstanceClusterBackupSetIamPolicyCall<'a, C, A> {
+        ProjectInstanceClusterBackupSetIamPolicyCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3734,9 +3875,9 @@ impl<'a, C, A> ProjectInstanceTableGenerateConsistencyTokenCall<'a, C, A> where 
         self._request = new_value;
         self
     }
-    /// The unique name of the Table for which to create a consistency token.
+    /// Required. The unique name of the Table for which to create a consistency token.
     /// Values are of the form
-    /// `projects/<project>/instances/<instance>/tables/<table>`.
+    /// `projects/{project}/instances/{instance}/tables/{table}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4265,9 +4406,9 @@ impl<'a, C, A> ProjectInstanceTableDropRowRangeCall<'a, C, A> where C: BorrowMut
         self._request = new_value;
         self
     }
-    /// The unique name of the table on which to drop a range of rows.
+    /// Required. The unique name of the table on which to drop a range of rows.
     /// Values are of the form
-    /// `projects/<project>/instances/<instance>/tables/<table>`.
+    /// `projects/{project}/instances/{instance}/tables/{table}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4520,8 +4661,8 @@ impl<'a, C, A> ProjectInstanceAppProfileDeleteCall<'a, C, A> where C: BorrowMut<
     }
 
 
-    /// The unique name of the app profile to be deleted. Values are of the form
-    /// `projects/<project>/instances/<instance>/appProfiles/<app_profile>`.
+    /// Required. The unique name of the app profile to be deleted. Values are of the form
+    /// `projects/{project}/instances/{instance}/appProfiles/{app_profile}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4531,7 +4672,7 @@ impl<'a, C, A> ProjectInstanceAppProfileDeleteCall<'a, C, A> where C: BorrowMut<
         self._name = new_value.to_string();
         self
     }
-    /// If true, ignore safety checks when deleting the app profile.
+    /// Required. If true, ignore safety checks when deleting the app profile.
     ///
     /// Sets the *ignore warnings* query property to the given value.
     pub fn ignore_warnings(mut self, new_value: bool) -> ProjectInstanceAppProfileDeleteCall<'a, C, A> {
@@ -4590,6 +4731,269 @@ impl<'a, C, A> ProjectInstanceAppProfileDeleteCall<'a, C, A> where C: BorrowMut<
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceAppProfileDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists information about clusters in an instance.
+///
+/// A builder for the *instances.clusters.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigtableadmin2 as bigtableadmin2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use bigtableadmin2::BigtableAdmin;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = BigtableAdmin::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_clusters_list("parent")
+///              .page_token("diam")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceClusterListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a BigtableAdmin<C, A>,
+    _parent: String,
+    _page_token: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceClusterListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceClusterListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListClustersResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "bigtableadmin.projects.instances.clusters.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/clusters";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::BigtableAdmin.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The unique name of the instance for which a list of clusters is requested.
+    /// Values are of the form `projects/{project}/instances/{instance}`.
+    /// Use `{instance} = '-'` to list Clusters for all Instances in a project,
+    /// e.g., `projects/myproject/instances/-`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectInstanceClusterListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// DEPRECATED: This field is unused and ignored.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectInstanceClusterListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceClusterListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceClusterListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::BigtableAdmin`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceClusterListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4807,8 +5211,8 @@ impl<'a, C, A> ProjectInstanceCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._request = new_value;
         self
     }
-    /// The unique name of the project in which to create the new instance.
-    /// Values are of the form `projects/<project>`.
+    /// Required. The unique name of the project in which to create the new instance.
+    /// Values are of the form `projects/{project}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -4915,7 +5319,7 @@ impl<'a, C, A> ProjectInstanceCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().instances_clusters_create(req, "parent")
-///              .cluster_id("ipsum")
+///              .cluster_id("et")
 ///              .doit();
 /// # }
 /// ```
@@ -5092,9 +5496,9 @@ impl<'a, C, A> ProjectInstanceClusterCreateCall<'a, C, A> where C: BorrowMut<hyp
         self._request = new_value;
         self
     }
-    /// The unique name of the instance in which to create the new cluster.
+    /// Required. The unique name of the instance in which to create the new cluster.
     /// Values are of the form
-    /// `projects/<project>/instances/<instance>`.
+    /// `projects/{project}/instances/{instance}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -5104,7 +5508,7 @@ impl<'a, C, A> ProjectInstanceClusterCreateCall<'a, C, A> where C: BorrowMut<hyp
         self._parent = new_value.to_string();
         self
     }
-    /// The ID to be used when referring to the new cluster within its instance,
+    /// Required. The ID to be used when referring to the new cluster within its instance,
     /// e.g., just `mycluster` rather than
     /// `projects/myproject/instances/myinstance/clusters/mycluster`.
     ///
@@ -5204,7 +5608,7 @@ impl<'a, C, A> ProjectInstanceClusterCreateCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().instances_tables_get("name")
-///              .view("et")
+///              .view("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -5356,9 +5760,9 @@ impl<'a, C, A> ProjectInstanceTableGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    /// The unique name of the requested table.
+    /// Required. The unique name of the requested table.
     /// Values are of the form
-    /// `projects/<project>/instances/<instance>/tables/<table>`.
+    /// `projects/{project}/instances/{instance}/tables/{table}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -5473,8 +5877,8 @@ impl<'a, C, A> ProjectInstanceTableGetCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().instances_app_profiles_patch(req, "name")
-///              .update_mask("aliquyam")
-///              .ignore_warnings(true)
+///              .update_mask("Lorem")
+///              .ignore_warnings(false)
 ///              .doit();
 /// # }
 /// ```
@@ -5667,7 +6071,7 @@ impl<'a, C, A> ProjectInstanceAppProfilePatchCall<'a, C, A> where C: BorrowMut<h
         self._name = new_value.to_string();
         self
     }
-    /// The subset of app profile fields which should be replaced.
+    /// Required. The subset of app profile fields which should be replaced.
     /// If unset, all fields will be replaced.
     ///
     /// Sets the *update mask* query property to the given value.
@@ -5773,8 +6177,8 @@ impl<'a, C, A> ProjectInstanceAppProfilePatchCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().instances_app_profiles_list("parent")
-///              .page_token("eos")
-///              .page_size(-81)
+///              .page_token("sadipscing")
+///              .page_size(-48)
 ///              .doit();
 /// # }
 /// ```
@@ -5930,10 +6334,10 @@ impl<'a, C, A> ProjectInstanceAppProfileListCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// The unique name of the instance for which a list of app profiles is
+    /// Required. The unique name of the instance for which a list of app profiles is
     /// requested. Values are of the form
-    /// `projects/<project>/instances/<instance>`.
-    /// Use `<instance> = '-'` to list AppProfiles for all Instances in a project,
+    /// `projects/{project}/instances/{instance}`.
+    /// Use `{instance} = '-'` to list AppProfiles for all Instances in a project,
     /// e.g., `projects/myproject/instances/-`.
     ///
     /// Sets the *parent* path property to the given value.
@@ -5952,7 +6356,14 @@ impl<'a, C, A> ProjectInstanceAppProfileListCall<'a, C, A> where C: BorrowMut<hy
         self
     }
     /// Maximum number of results per page.
-    /// CURRENTLY UNIMPLEMENTED AND IGNORED.
+    /// 
+    /// A page_size of zero lets the server choose the number of items to return.
+    /// A page_size which is strictly positive will return at most that many items.
+    /// A negative page_size will cause an error.
+    /// 
+    /// Following the first request, subsequent paginated calls are not required
+    /// to pass a page_size. If a page_size is set in subsequent calls, it must
+    /// match the page_size given in the first request.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectInstanceAppProfileListCall<'a, C, A> {
@@ -6228,9 +6639,9 @@ impl<'a, C, A> ProjectInstanceClusterUpdateCall<'a, C, A> where C: BorrowMut<hyp
         self._request = new_value;
         self
     }
-    /// (`OutputOnly`)
+    /// Required. (`OutputOnly`)
     /// The unique name of the cluster. Values are of the form
-    /// `projects/<project>/instances/<instance>/clusters/a-z*`.
+    /// `projects/{project}/instances/{instance}/clusters/a-z*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -6292,6 +6703,286 @@ impl<'a, C, A> ProjectInstanceClusterUpdateCall<'a, C, A> where C: BorrowMut<hyp
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceClusterUpdateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Returns permissions that the caller has on the specified table resource.
+///
+/// A builder for the *instances.clusters.backups.testIamPermissions* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigtableadmin2 as bigtableadmin2;
+/// use bigtableadmin2::TestIamPermissionsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use bigtableadmin2::BigtableAdmin;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = BigtableAdmin::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = TestIamPermissionsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_clusters_backups_test_iam_permissions(req, "resource")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceClusterBackupTestIamPermissionCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a BigtableAdmin<C, A>,
+    _request: TestIamPermissionsRequest,
+    _resource: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceClusterBackupTestIamPermissionCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceClusterBackupTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, TestIamPermissionsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "bigtableadmin.projects.instances.clusters.backups.testIamPermissions",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v2/{+resource}:testIamPermissions";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::BigtableAdmin.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resource"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectInstanceClusterBackupTestIamPermissionCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which the policy detail is being requested.
+    /// See the operation documentation for the appropriate value for this field.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectInstanceClusterBackupTestIamPermissionCall<'a, C, A> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceClusterBackupTestIamPermissionCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceClusterBackupTestIamPermissionCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::BigtableAdmin`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceClusterBackupTestIamPermissionCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6792,9 +7483,9 @@ impl<'a, C, A> ProjectInstanceTableCheckConsistencyCall<'a, C, A> where C: Borro
         self._request = new_value;
         self
     }
-    /// The unique name of the Table for which to check replication consistency.
+    /// Required. The unique name of the Table for which to check replication consistency.
     /// Values are of the form
-    /// `projects/<project>/instances/<instance>/tables/<table>`.
+    /// `projects/{project}/instances/{instance}/tables/{table}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -6895,9 +7586,9 @@ impl<'a, C, A> ProjectInstanceTableCheckConsistencyCall<'a, C, A> where C: Borro
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("amet")
-///              .page_size(-60)
-///              .filter("labore")
+///              .page_token("eirmod")
+///              .page_size(-33)
+///              .filter("invidunt")
 ///              .doit();
 /// # }
 /// ```
@@ -7432,8 +8123,9 @@ impl<'a, C, A> ProjectInstanceGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
-/// Gets the access control policy for an instance resource. Returns an empty
-/// policy if an table exists but does not have a policy set.
+/// Gets the access control policy for a Table or Backup resource.
+/// Returns an empty policy if the resource exists but does not have a policy
+/// set.
 ///
 /// A builder for the *instances.tables.getIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7888,8 +8580,8 @@ impl<'a, C, A> ProjectInstanceAppProfileGetCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
-    /// The unique name of the requested app profile. Values are of the form
-    /// `projects/<project>/instances/<instance>/appProfiles/<app_profile>`.
+    /// Required. The unique name of the requested app profile. Values are of the form
+    /// `projects/{project}/instances/{instance}/appProfiles/{app_profile}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -8137,8 +8829,8 @@ impl<'a, C, A> ProjectInstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// The unique name of the instance to be deleted.
-    /// Values are of the form `projects/<project>/instances/<instance>`.
+    /// Required. The unique name of the instance to be deleted.
+    /// Values are of the form `projects/{project}/instances/{instance}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -8211,9 +8903,11 @@ impl<'a, C, A> ProjectInstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Lists information about clusters in an instance.
+/// Gets the access control policy for a Table or Backup resource.
+/// Returns an empty policy if the resource exists but does not have a policy
+/// set.
 ///
-/// A builder for the *instances.clusters.list* method supported by a *project* resource.
+/// A builder for the *instances.clusters.backups.getIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -8225,6 +8919,7 @@ impl<'a, C, A> ProjectInstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_bigtableadmin2 as bigtableadmin2;
+/// use bigtableadmin2::GetIamPolicyRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8235,32 +8930,36 @@ impl<'a, C, A> ProjectInstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = BigtableAdmin::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GetIamPolicyRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().instances_clusters_list("parent")
-///              .page_token("Lorem")
+/// let result = hub.projects().instances_clusters_backups_get_iam_policy(req, "resource")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectInstanceClusterListCall<'a, C, A>
+pub struct ProjectInstanceClusterBackupGetIamPolicyCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a BigtableAdmin<C, A>,
-    _parent: String,
-    _page_token: Option<String>,
+    _request: GetIamPolicyRequest,
+    _resource: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectInstanceClusterListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectInstanceClusterBackupGetIamPolicyCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectInstanceClusterListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectInstanceClusterBackupGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListClustersResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -8269,14 +8968,11 @@ impl<'a, C, A> ProjectInstanceClusterListCall<'a, C, A> where C: BorrowMut<hyper
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "bigtableadmin.projects.instances.clusters.list",
-                               http_method: hyper::method::Method::Get });
+        dlg.begin(MethodInfo { id: "bigtableadmin.projects.instances.clusters.backups.getIamPolicy",
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        for &field in ["alt", "parent", "pageToken"].iter() {
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8288,12 +8984,12 @@ impl<'a, C, A> ProjectInstanceClusterListCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+parent}/clusters";
+        let mut url = self.hub._base_url.clone() + "v2/{+resource}:getIamPolicy";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::BigtableAdmin.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -8308,7 +9004,7 @@ impl<'a, C, A> ProjectInstanceClusterListCall<'a, C, A> where C: BorrowMut<hyper
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["parent"].iter() {
+            for param_name in ["resource"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -8320,6 +9016,17 @@ impl<'a, C, A> ProjectInstanceClusterListCall<'a, C, A> where C: BorrowMut<hyper
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -8336,11 +9043,15 @@ impl<'a, C, A> ProjectInstanceClusterListCall<'a, C, A> where C: BorrowMut<hyper
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -8391,24 +9102,24 @@ impl<'a, C, A> ProjectInstanceClusterListCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// The unique name of the instance for which a list of clusters is requested.
-    /// Values are of the form `projects/<project>/instances/<instance>`.
-    /// Use `<instance> = '-'` to list Clusters for all Instances in a project,
-    /// e.g., `projects/myproject/instances/-`.
     ///
-    /// Sets the *parent* path property to the given value.
+    /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectInstanceClusterListCall<'a, C, A> {
-        self._parent = new_value.to_string();
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectInstanceClusterBackupGetIamPolicyCall<'a, C, A> {
+        self._request = new_value;
         self
     }
-    /// DEPRECATED: This field is unused and ignored.
+    /// REQUIRED: The resource for which the policy is being requested.
+    /// See the operation documentation for the appropriate value for this field.
     ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectInstanceClusterListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectInstanceClusterBackupGetIamPolicyCall<'a, C, A> {
+        self._resource = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -8417,7 +9128,7 @@ impl<'a, C, A> ProjectInstanceClusterListCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceClusterListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceClusterBackupGetIamPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8442,7 +9153,7 @@ impl<'a, C, A> ProjectInstanceClusterListCall<'a, C, A> where C: BorrowMut<hyper
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceClusterListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceClusterBackupGetIamPolicyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8462,7 +9173,7 @@ impl<'a, C, A> ProjectInstanceClusterListCall<'a, C, A> where C: BorrowMut<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceClusterListCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceClusterBackupGetIamPolicyCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8682,8 +9393,8 @@ impl<'a, C, A> ProjectInstanceTableCreateCall<'a, C, A> where C: BorrowMut<hyper
         self._request = new_value;
         self
     }
-    /// The unique name of the instance in which to create the table.
-    /// Values are of the form `projects/<project>/instances/<instance>`.
+    /// Required. The unique name of the instance in which to create the table.
+    /// Values are of the form `projects/{project}/instances/{instance}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -8784,9 +9495,9 @@ impl<'a, C, A> ProjectInstanceTableCreateCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().instances_tables_list("parent")
-///              .view("duo")
-///              .page_token("et")
-///              .page_size(-40)
+///              .view("eirmod")
+///              .page_token("sanctus")
+///              .page_size(-22)
 ///              .doit();
 /// # }
 /// ```
@@ -8946,8 +9657,8 @@ impl<'a, C, A> ProjectInstanceTableListCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
-    /// The unique name of the instance for which tables should be listed.
-    /// Values are of the form `projects/<project>/instances/<instance>`.
+    /// Required. The unique name of the instance for which tables should be listed.
+    /// Values are of the form `projects/{project}/instances/{instance}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -8958,7 +9669,7 @@ impl<'a, C, A> ProjectInstanceTableListCall<'a, C, A> where C: BorrowMut<hyper::
         self
     }
     /// The view to be applied to the returned tables' fields.
-    /// Defaults to `NAME_ONLY` if unspecified; no others are currently supported.
+    /// Only NAME_ONLY view (default) and REPLICATION_VIEW are supported.
     ///
     /// Sets the *view* query property to the given value.
     pub fn view(mut self, new_value: &str) -> ProjectInstanceTableListCall<'a, C, A> {
@@ -9225,8 +9936,8 @@ impl<'a, C, A> ProjectInstanceClusterGetCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// The unique name of the requested cluster. Values are of the form
-    /// `projects/<project>/instances/<instance>/clusters/<cluster>`.
+    /// Required. The unique name of the requested cluster. Values are of the form
+    /// `projects/{project}/instances/{instance}/clusters/{cluster}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -9334,7 +10045,7 @@ impl<'a, C, A> ProjectInstanceClusterGetCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().instances_partial_update_instance(req, "name")
-///              .update_mask("amet")
+///              .update_mask("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -9511,9 +10222,9 @@ impl<'a, C, A> ProjectInstancePartialUpdateInstanceCall<'a, C, A> where C: Borro
         self._request = new_value;
         self
     }
-    /// (`OutputOnly`)
+    /// Required. (`OutputOnly`)
     /// The unique name of the instance. Values are of the form
-    /// `projects/<project>/instances/a-z+[a-z0-9]`.
+    /// `projects/{project}/instances/a-z+[a-z0-9]`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -9523,7 +10234,7 @@ impl<'a, C, A> ProjectInstancePartialUpdateInstanceCall<'a, C, A> where C: Borro
         self._name = new_value.to_string();
         self
     }
-    /// The subset of Instance fields which should be replaced.
+    /// Required. The subset of Instance fields which should be replaced.
     /// Must be explicitly set.
     ///
     /// Sets the *update mask* query property to the given value.
@@ -9769,8 +10480,8 @@ impl<'a, C, A> ProjectInstanceGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// The unique name of the requested instance. Values are of the form
-    /// `projects/<project>/instances/<instance>`.
+    /// Required. The unique name of the requested instance. Values are of the form
+    /// `projects/{project}/instances/{instance}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -10051,9 +10762,9 @@ impl<'a, C, A> ProjectInstanceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._request = new_value;
         self
     }
-    /// (`OutputOnly`)
+    /// Required. (`OutputOnly`)
     /// The unique name of the instance. Values are of the form
-    /// `projects/<project>/instances/a-z+[a-z0-9]`.
+    /// `projects/{project}/instances/a-z+[a-z0-9]`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -10154,7 +10865,7 @@ impl<'a, C, A> ProjectInstanceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().instances_list("parent")
-///              .page_token("ea")
+///              .page_token("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -10306,8 +11017,8 @@ impl<'a, C, A> ProjectInstanceListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// The unique name of the project for which a list of instances is requested.
-    /// Values are of the form `projects/<project>`.
+    /// Required. The unique name of the project for which a list of instances is requested.
+    /// Values are of the form `projects/{project}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -10422,7 +11133,7 @@ impl<'a, C, A> ProjectInstanceListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().instances_app_profiles_create(req, "parent")
 ///              .ignore_warnings(true)
-///              .app_profile_id("dolor")
+///              .app_profile_id("et")
 ///              .doit();
 /// # }
 /// ```
@@ -10603,9 +11314,9 @@ impl<'a, C, A> ProjectInstanceAppProfileCreateCall<'a, C, A> where C: BorrowMut<
         self._request = new_value;
         self
     }
-    /// The unique name of the instance in which to create the new app profile.
+    /// Required. The unique name of the instance in which to create the new app profile.
     /// Values are of the form
-    /// `projects/<project>/instances/<instance>`.
+    /// `projects/{project}/instances/{instance}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -10622,7 +11333,7 @@ impl<'a, C, A> ProjectInstanceAppProfileCreateCall<'a, C, A> where C: BorrowMut<
         self._ignore_warnings = Some(new_value);
         self
     }
-    /// The ID to be used when referring to the new app profile within its
+    /// Required. The ID to be used when referring to the new app profile within its
     /// instance, e.g., just `myprofile` rather than
     /// `projects/myproject/instances/myinstance/appProfiles/myprofile`.
     ///
@@ -10903,9 +11614,9 @@ impl<'a, C, A> ProjectInstanceTableModifyColumnFamilyCall<'a, C, A> where C: Bor
         self._request = new_value;
         self
     }
-    /// The unique name of the table whose families should be modified.
+    /// Required. The unique name of the table whose families should be modified.
     /// Values are of the form
-    /// `projects/<project>/instances/<instance>/tables/<table>`.
+    /// `projects/{project}/instances/{instance}/tables/{table}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -10978,8 +11689,8 @@ impl<'a, C, A> ProjectInstanceTableModifyColumnFamilyCall<'a, C, A> where C: Bor
 }
 
 
-/// Sets the access control policy on a table resource. Replaces any existing
-/// policy.
+/// Sets the access control policy on a Table or Backup resource.
+/// Replaces any existing policy.
 ///
 /// A builder for the *instances.tables.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -11434,8 +12145,8 @@ impl<'a, C, A> ProjectInstanceClusterDeleteCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
-    /// The unique name of the cluster to be deleted. Values are of the form
-    /// `projects/<project>/instances/<instance>/clusters/<cluster>`.
+    /// Required. The unique name of the cluster to be deleted. Values are of the form
+    /// `projects/{project}/instances/{instance}/clusters/{cluster}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -11963,9 +12674,9 @@ impl<'a, C, A> ProjectInstanceTableDeleteCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// The unique name of the table to be deleted.
+    /// Required. The unique name of the table to be deleted.
     /// Values are of the form
-    /// `projects/<project>/instances/<instance>/tables/<table>`.
+    /// `projects/{project}/instances/{instance}/tables/{table}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -12027,6 +12738,287 @@ impl<'a, C, A> ProjectInstanceTableDeleteCall<'a, C, A> where C: BorrowMut<hyper
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceTableDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Sets the access control policy on a Table or Backup resource.
+/// Replaces any existing policy.
+///
+/// A builder for the *instances.clusters.backups.setIamPolicy* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigtableadmin2 as bigtableadmin2;
+/// use bigtableadmin2::SetIamPolicyRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use bigtableadmin2::BigtableAdmin;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = BigtableAdmin::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SetIamPolicyRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_clusters_backups_set_iam_policy(req, "resource")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceClusterBackupSetIamPolicyCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a BigtableAdmin<C, A>,
+    _request: SetIamPolicyRequest,
+    _resource: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceClusterBackupSetIamPolicyCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceClusterBackupSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "bigtableadmin.projects.instances.clusters.backups.setIamPolicy",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v2/{+resource}:setIamPolicy";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::BigtableAdmin.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resource"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectInstanceClusterBackupSetIamPolicyCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which the policy is being specified.
+    /// See the operation documentation for the appropriate value for this field.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectInstanceClusterBackupSetIamPolicyCall<'a, C, A> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceClusterBackupSetIamPolicyCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceClusterBackupSetIamPolicyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::BigtableAdmin`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceClusterBackupSetIamPolicyCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

@@ -6955,14 +6955,15 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "deletion-request-time" => Some(("deletionRequestTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deletion-request-time" => Some(("deletionRequestTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "firebase-project-id" => Some(("firebaseProjectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id.user-id" => Some(("id.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id.type" => Some(("id.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "property-id" => Some(("propertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["deletion-request-time", "firebase-project-id", "id", "kind", "type", "user-id", "web-property-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["deletion-request-time", "firebase-project-id", "id", "kind", "property-id", "type", "user-id", "web-property-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -10383,7 +10384,7 @@ fn main() {
     
     let mut app = App::new("analytics3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190604")
+           .version("1.0.13+20190807")
            .about("Views and manages your Google Analytics data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analytics3_cli")
            .arg(Arg::with_name("url")

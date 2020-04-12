@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *safebrowsing* crate version *1.0.12+20190702*, where *20190702* is the exact revision of the *safebrowsing:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *safebrowsing* crate version *1.0.13+20200407*, where *20200407* is the exact revision of the *safebrowsing:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *safebrowsing* *v4* API can be found at the
 //! [official documentation site](https://developers.google.com/safe-browsing/).
@@ -312,7 +312,7 @@ impl<'a, C, A> Safebrowsing<C, A>
         Safebrowsing {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://safebrowsing.googleapis.com/".to_string(),
             _root_url: "https://safebrowsing.googleapis.com/".to_string(),
         }
@@ -341,7 +341,7 @@ impl<'a, C, A> Safebrowsing<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -601,8 +601,8 @@ pub struct Constraints {
     /// format.
     pub language: Option<String>,
     /// Sets the maximum number of entries that the client is willing to have
-    /// in the local database. This should be a power of 2 between 2**10 and
-    /// 2**20. If zero, no database size limit is set.
+    /// in the local database for the specified list. This should be a power of
+    /// 2 between 2**10 and 2**20. If zero, no database size limit is set.
     #[serde(rename="maxDatabaseEntries")]
     pub max_database_entries: Option<i32>,
     /// Requests the list for a specific geographic location. If not set the

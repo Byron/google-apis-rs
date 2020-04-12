@@ -192,6 +192,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -205,6 +208,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["options-requested-policy-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1080,7 +1084,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the billing account to retrieve. For example,
+                     Some(r##"Required. The resource name of the billing account to retrieve. For example,
         `billingAccounts/012345-567890-ABCDEF`."##),
                      Some(true),
                      Some(false)),
@@ -1152,7 +1156,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the billing account resource to be updated."##),
+                     Some(r##"Required. The name of the billing account resource to be updated."##),
                      Some(true),
                      Some(false)),
         
@@ -1183,7 +1187,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the billing account associated with the projects that
+                     Some(r##"Required. The resource name of the billing account associated with the projects that
         you want to list. For example, `billingAccounts/012345-567890-ABCDEF`."##),
                      Some(true),
                      Some(false)),
@@ -1276,7 +1280,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the project for which billing information is
+                     Some(r##"Required. The resource name of the project for which billing information is
         retrieved. For example, `projects/tokyo-rain-123`."##),
                      Some(true),
                      Some(false)),
@@ -1329,7 +1333,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the project associated with the billing information
+                     Some(r##"Required. The resource name of the project associated with the billing information
         that you want to update. For example, `projects/tokyo-rain-123`."##),
                      Some(true),
                      Some(false)),
@@ -1377,7 +1381,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the service.
+                     Some(r##"Required. The name of the service.
         Example: "services/DA34-426B-A397""##),
                      Some(true),
                      Some(false)),
@@ -1400,7 +1404,7 @@ fn main() {
     
     let mut app = App::new("cloudbilling1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190617")
+           .version("1.0.13+20200401")
            .about("Allows developers to manage billing for their Google Cloud Platform projects
                programmatically.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudbilling1_cli")

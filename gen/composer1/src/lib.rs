@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Composer* crate version *1.0.12+20190613*, where *20190613* is the exact revision of the *composer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Cloud Composer* crate version *1.0.13+20200406*, where *20200406* is the exact revision of the *composer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Cloud Composer* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/composer/).
@@ -334,7 +334,7 @@ impl<'a, C, A> CloudComposer<C, A>
         CloudComposer {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://composer.googleapis.com/".to_string(),
             _root_url: "https://composer.googleapis.com/".to_string(),
         }
@@ -345,7 +345,7 @@ impl<'a, C, A> CloudComposer<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -379,8 +379,7 @@ impl<'a, C, A> CloudComposer<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnvironmentConfig {
-    /// Output only.
-    /// The Cloud Storage prefix of the DAGs for this environment. Although Cloud
+    /// Output only. The Cloud Storage prefix of the DAGs for this environment. Although Cloud
     /// Storage objects reside in a flat namespace, a hierarchical file tree
     /// can be simulated using "/"-delimited object name prefixes. DAG objects for
     /// this environment reside in a simulated directory with the given prefix.
@@ -392,16 +391,17 @@ pub struct EnvironmentConfig {
     /// The configuration used for the Kubernetes Engine cluster.
     #[serde(rename="nodeConfig")]
     pub node_config: Option<NodeConfig>,
-    /// Output only.
-    /// The URI of the Apache Airflow Web UI hosted within this environment (see
+    /// Output only. The URI of the Apache Airflow Web UI hosted within this environment (see
     /// [Airflow web
     /// interface](/composer/docs/how-to/accessing/airflow-web-interface)).
     #[serde(rename="airflowUri")]
     pub airflow_uri: Option<String>,
-    /// Output only.
-    /// The Kubernetes Engine cluster used to run this environment.
+    /// Output only. The Kubernetes Engine cluster used to run this environment.
     #[serde(rename="gkeCluster")]
     pub gke_cluster: Option<String>,
+    /// The configuration used for the Private IP Cloud Composer environment.
+    #[serde(rename="privateEnvironmentConfig")]
+    pub private_environment_config: Option<PrivateEnvironmentConfig>,
     /// The number of nodes in the Kubernetes Engine cluster that will be
     /// used to run this environment.
     #[serde(rename="nodeCount")]
@@ -435,6 +435,30 @@ pub struct Status {
 }
 
 impl Part for Status {}
+
+
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
+/// 
+/// ````text
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+/// }
+/// ````
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations operations delete projects](struct.ProjectLocationOperationDeleteCall.html) (response)
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Empty { _never_set: Option<bool> }
+
+impl ResponseResult for Empty {}
 
 
 /// Specifies the selection and configuration of software inside the environment.
@@ -571,6 +595,53 @@ pub struct ListImageVersionsResponse {
 impl ResponseResult for ListImageVersionsResponse {}
 
 
+/// An environment for running orchestration tasks.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations environments patch projects](struct.ProjectLocationEnvironmentPatchCall.html) (request)
+/// * [locations environments create projects](struct.ProjectLocationEnvironmentCreateCall.html) (request)
+/// * [locations environments get projects](struct.ProjectLocationEnvironmentGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Environment {
+    /// Output only. The time at which this environment was last modified.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
+    /// The resource name of the environment, in the form:
+    /// "projects/{projectId}/locations/{locationId}/environments/{environmentId}"
+    /// 
+    /// EnvironmentId must start with a lowercase letter followed by up to 63
+    /// lowercase letters, numbers, or hyphens, and cannot end with a hyphen.
+    pub name: Option<String>,
+    /// Output only. The UUID (Universally Unique IDentifier) associated with this environment.
+    /// This value is generated when the environment is created.
+    pub uuid: Option<String>,
+    /// Optional. User-defined labels for this environment.
+    /// The labels map can contain no more than 64 entries. Entries of the labels
+    /// map are UTF8 strings that comply with the following restrictions:
+    /// 
+    /// * Keys must conform to regexp: \p{Ll}\p{Lo}{0,62}
+    /// * Values must conform to regexp:  [\p{Ll}\p{Lo}\p{N}_-]{0,63}
+    /// * Both keys and values are additionally constrained to be <= 128 bytes in
+    /// size.
+    pub labels: Option<HashMap<String, String>>,
+    /// Configuration parameters for this environment.
+    pub config: Option<EnvironmentConfig>,
+    /// The current state of the environment.
+    pub state: Option<String>,
+    /// Output only. The time at which this environment was created.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+}
+
+impl RequestValue for Environment {}
+impl ResponseResult for Environment {}
+
+
 /// The environments in a project and location.
 /// 
 /// # Activities
@@ -615,6 +686,9 @@ pub struct NodeConfig {
     /// specified, the location information from the specified field will be
     /// propagated to the unspecified field.
     /// 
+    /// The `machineTypeId` must not be a [shared-core machine
+    /// type](/compute/docs/machine-types#sharedcore).
+    /// 
     /// If this field is unspecified, the `machineTypeId` defaults
     /// to "n1-standard-1".
     #[serde(rename="machineType")]
@@ -650,6 +724,19 @@ pub struct NodeConfig {
     /// If unspecified, defaults to 100GB. Cannot be updated.
     #[serde(rename="diskSizeGb")]
     pub disk_size_gb: Option<i32>,
+    /// Optional. The configuration for controlling how IPs are allocated in the GKE cluster.
+    #[serde(rename="ipAllocationPolicy")]
+    pub ip_allocation_policy: Option<IPAllocationPolicy>,
+    /// Optional. The Compute Engine subnetwork to be used for machine
+    /// communications, specified as a
+    /// [relative resource
+    /// name](/apis/design/resource_names#relative_resource_name). For example:
+    /// "projects/{projectId}/regions/{regionId}/subnetworks/{subnetworkId}"
+    /// 
+    /// If a subnetwork is provided, `nodeConfig.network` must also be provided,
+    /// and the subnetwork must belong to the enclosing environment's project and
+    /// location.
+    pub subnetwork: Option<String>,
     /// Optional. The Compute Engine [zone](/compute/docs/regions-zones) in which
     /// to deploy the VMs used to run the Apache Airflow software, specified as a
     /// [relative resource
@@ -665,43 +752,71 @@ pub struct NodeConfig {
     /// specified, the location information from the specified field will be
     /// propagated to the unspecified field.
     pub location: Option<String>,
-    /// Optional. The Compute Engine subnetwork to be used for machine
-    /// communications, specified as a
-    /// [relative resource
-    /// name](/apis/design/resource_names#relative_resource_name). For example:
-    /// "projects/{projectId}/regions/{regionId}/subnetworks/{subnetworkId}"
-    /// 
-    /// If a subnetwork is provided, `nodeConfig.network` must also be provided,
-    /// and the subnetwork must belong to the enclosing environment's project and
-    /// location.
-    pub subnetwork: Option<String>,
 }
 
 impl Part for NodeConfig {}
 
 
-/// A generic empty message that you can re-use to avoid defining duplicated
-/// empty messages in your APIs. A typical example is to use it as the request
-/// or the response type of an API method. For instance:
+/// Configuration for controlling how IPs are allocated in the
+/// GKE cluster running the Apache Airflow software.
 /// 
-/// ````text
-/// service Foo {
-///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-/// }
-/// ````
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-/// The JSON representation for `Empty` is empty JSON object `{}`.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations operations delete projects](struct.ProjectLocationOperationDeleteCall.html) (response)
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty { _never_set: Option<bool> }
+pub struct IPAllocationPolicy {
+    /// Optional. The IP address range used to allocate IP addresses to pods in
+    /// the GKE cluster.
+    /// 
+    /// This field is applicable only when `use_ip_aliases` is true.
+    /// 
+    /// Set to blank to have GKE choose a range with the default size.
+    /// 
+    /// Set to /netmask (e.g. `/14`) to have GKE choose a range with a specific
+    /// netmask.
+    /// 
+    /// Set to a
+    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
+    /// notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g.
+    /// `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific range
+    /// to use.
+    #[serde(rename="clusterIpv4CidrBlock")]
+    pub cluster_ipv4_cidr_block: Option<String>,
+    /// Optional. The IP address range of the services IP addresses in this
+    /// GKE cluster.
+    /// 
+    /// This field is applicable only when `use_ip_aliases` is true.
+    /// 
+    /// Set to blank to have GKE choose a range with the default size.
+    /// 
+    /// Set to /netmask (e.g. `/14`) to have GKE choose a range with a specific
+    /// netmask.
+    /// 
+    /// Set to a
+    /// [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
+    /// notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g.
+    /// `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific range
+    /// to use.
+    #[serde(rename="servicesIpv4CidrBlock")]
+    pub services_ipv4_cidr_block: Option<String>,
+    /// Optional. The name of the services' secondary range used to allocate
+    /// IP addresses to the GKE cluster.
+    /// 
+    /// This field is applicable only when `use_ip_aliases` is true.
+    #[serde(rename="servicesSecondaryRangeName")]
+    pub services_secondary_range_name: Option<String>,
+    /// Optional. Whether or not to enable Alias IPs in the GKE cluster.
+    /// If `true`, a VPC-native cluster is created.
+    #[serde(rename="useIpAliases")]
+    pub use_ip_aliases: Option<bool>,
+    /// Optional. The name of the GKE cluster's secondary range used to allocate
+    /// IP addresses to pods.
+    /// 
+    /// This field is applicable only when `use_ip_aliases` is true.
+    #[serde(rename="clusterSecondaryRangeName")]
+    pub cluster_secondary_range_name: Option<String>,
+}
 
-impl ResponseResult for Empty {}
+impl Part for IPAllocationPolicy {}
 
 
 /// ImageVersion information
@@ -770,51 +885,64 @@ pub struct Operation {
 impl ResponseResult for Operation {}
 
 
-/// An environment for running orchestration tasks.
+/// The configuration information for configuring a Private IP Cloud Composer
+/// environment.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations environments patch projects](struct.ProjectLocationEnvironmentPatchCall.html) (request)
-/// * [locations environments create projects](struct.ProjectLocationEnvironmentCreateCall.html) (request)
-/// * [locations environments get projects](struct.ProjectLocationEnvironmentGetCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Environment {
-    /// Output only.
-    /// The time at which this environment was last modified.
-    #[serde(rename="updateTime")]
-    pub update_time: Option<String>,
-    /// The resource name of the environment, in the form:
-    /// "projects/{projectId}/locations/{locationId}/environments/{environmentId}"
-    pub name: Option<String>,
-    /// Output only.
-    /// The UUID (Universally Unique IDentifier) associated with this environment.
-    /// This value is generated when the environment is created.
-    pub uuid: Option<String>,
-    /// Optional. User-defined labels for this environment.
-    /// The labels map can contain no more than 64 entries. Entries of the labels
-    /// map are UTF8 strings that comply with the following restrictions:
-    /// 
-    /// * Keys must conform to regexp: \p{Ll}\p{Lo}{0,62}
-    /// * Values must conform to regexp:  [\p{Ll}\p{Lo}\p{N}_-]{0,63}
-    /// * Both keys and values are additionally constrained to be <= 128 bytes in
-    /// size.
-    pub labels: Option<HashMap<String, String>>,
-    /// Configuration parameters for this environment.
-    pub config: Option<EnvironmentConfig>,
-    /// The current state of the environment.
-    pub state: Option<String>,
-    /// Output only.
-    /// The time at which this environment was created.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
+pub struct PrivateEnvironmentConfig {
+    /// Optional. The CIDR block from which IP range in tenant project will be reserved for
+    /// Cloud SQL. Needs to be disjoint from `web_server_ipv4_cidr_block`.
+    #[serde(rename="cloudSqlIpv4CidrBlock")]
+    pub cloud_sql_ipv4_cidr_block: Option<String>,
+    /// Optional. The CIDR block from which IP range for web server will be reserved. Needs
+    /// to be disjoint from `private_cluster_config.master_ipv4_cidr_block` and
+    /// `cloud_sql_ipv4_cidr_block`.
+    #[serde(rename="webServerIpv4CidrBlock")]
+    pub web_server_ipv4_cidr_block: Option<String>,
+    /// Output only. The IP range reserved for the tenant project's App Engine VMs.
+    #[serde(rename="webServerIpv4ReservedRange")]
+    pub web_server_ipv4_reserved_range: Option<String>,
+    /// Optional. If `true`, a Private IP Cloud Composer environment is created.
+    /// If this field is set to true, `IPAllocationPolicy.use_ip_aliases` must be
+    /// set to true.
+    #[serde(rename="enablePrivateEnvironment")]
+    pub enable_private_environment: Option<bool>,
+    /// Optional. Configuration for the private GKE cluster for a Private IP
+    /// Cloud Composer environment.
+    #[serde(rename="privateClusterConfig")]
+    pub private_cluster_config: Option<PrivateClusterConfig>,
 }
 
-impl RequestValue for Environment {}
-impl ResponseResult for Environment {}
+impl Part for PrivateEnvironmentConfig {}
+
+
+/// Configuration options for the private GKE cluster in a Cloud Composer
+/// environment.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PrivateClusterConfig {
+    /// Optional. If `true`, access to the public endpoint of the GKE cluster is
+    /// denied.
+    #[serde(rename="enablePrivateEndpoint")]
+    pub enable_private_endpoint: Option<bool>,
+    /// Output only. The IP range in CIDR notation to use for the hosted master network. This
+    /// range is used for assigning internal IP addresses to the GKE cluster
+    /// master or set of masters and to the internal load balancer virtual IP.
+    /// This range must not overlap with any other ranges in use
+    /// within the cluster's network.
+    #[serde(rename="masterIpv4ReservedRange")]
+    pub master_ipv4_reserved_range: Option<String>,
+    /// Optional. The CIDR block from which IPv4 range for GKE master will be reserved. If
+    /// left blank, the default value of '172.16.0.0/23' is used.
+    #[serde(rename="masterIpv4CidrBlock")]
+    pub master_ipv4_cidr_block: Option<String>,
+}
+
+impl Part for PrivateClusterConfig {}
 
 
 

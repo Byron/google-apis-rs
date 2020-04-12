@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud RuntimeConfig* API at revision *20190624*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Cloud RuntimeConfig* API at revision *20200406*. The CLI is at version *1.0.13*.
 
 ```bash
 runtimeconfig1-beta1 [options]

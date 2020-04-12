@@ -1,4 +1,4 @@
-site_name: Games Configuration v1.0.12+20190627
+site_name: Games Configuration v1.0.13+20200402
 site_url: http://byron.github.io/google-apis-rs/google-gamesconfiguration1_configuration-cli
 site_description: A complete library to interact with Games Configuration (protocol v1configuration)
 
@@ -13,14 +13,12 @@ pages:
 - ['achievement-configurations_get.md', 'Achievement Configurations', 'Get']
 - ['achievement-configurations_insert.md', 'Achievement Configurations', 'Insert']
 - ['achievement-configurations_list.md', 'Achievement Configurations', 'List']
-- ['achievement-configurations_patch.md', 'Achievement Configurations', 'Patch']
 - ['achievement-configurations_update.md', 'Achievement Configurations', 'Update']
 - ['image-configurations_upload.md', 'Image Configurations', 'Upload']
 - ['leaderboard-configurations_delete.md', 'Leaderboard Configurations', 'Delete']
 - ['leaderboard-configurations_get.md', 'Leaderboard Configurations', 'Get']
 - ['leaderboard-configurations_insert.md', 'Leaderboard Configurations', 'Insert']
 - ['leaderboard-configurations_list.md', 'Leaderboard Configurations', 'List']
-- ['leaderboard-configurations_patch.md', 'Leaderboard Configurations', 'Patch']
 - ['leaderboard-configurations_update.md', 'Leaderboard Configurations', 'Update']
 
 theme: readthedocs

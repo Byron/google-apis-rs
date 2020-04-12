@@ -2,10 +2,10 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *licensing* crate version *1.0.12+20170213*, where *20170213* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *licensing* crate version *1.0.13+20190916*, where *20190916* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *licensing* *v1* API can be found at the
-//! [official documentation site](https://developers.google.com/google-apps/licensing/).
+//! [official documentation site](https://developers.google.com/admin-sdk/licensing/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/licensing1).
 //! # Features
 //! 
@@ -327,7 +327,7 @@ impl<'a, C, A> Licensing<C, A>
         Licensing {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://www.googleapis.com/apps/licensing/v1/product/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -338,7 +338,7 @@ impl<'a, C, A> Licensing<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -366,7 +366,7 @@ impl<'a, C, A> Licensing<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// Template for LiscenseAssignment Resource
+/// Representation of a license assignment.
 /// 
 /// # Activities
 /// 
@@ -383,12 +383,12 @@ impl<'a, C, A> Licensing<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LicenseAssignment {
-    /// Id of the sku of the product.
+    /// A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
     #[serde(rename="skuId")]
     pub sku_id: Option<String>,
     /// Identifies the resource as a LicenseAssignment.
     pub kind: Option<String>,
-    /// Email id of the user.
+    /// The user's current primary email address. If the user's email address changes, use the new email address in your API requests. Since a userId is subject to change, do not use a userId value as a key for persistent data. This key could break if the current user's email address changes. If the userId is suspended, the license status changes.
     #[serde(rename="userId")]
     pub user_id: Option<String>,
     /// Display Name of the product.
@@ -402,7 +402,7 @@ pub struct LicenseAssignment {
     /// Link to this page.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
-    /// Id of the product.
+    /// A product's unique identifier. For more information about products in this version of the API, see Product and SKU IDs.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -412,7 +412,7 @@ impl Resource for LicenseAssignment {}
 impl ResponseResult for LicenseAssignment {}
 
 
-/// Template for LicenseAssignment Insert request
+/// Representation of a license assignment.
 /// 
 /// # Activities
 /// 
@@ -443,7 +443,7 @@ impl RequestValue for LicenseAssignmentInsert {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LicenseAssignmentList {
-    /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
+    /// The token that you must submit in a subsequent request to retrieve additional license results matching your query parameters. The maxResults query string is related to the nextPageToken since maxResults determines how many entries are returned on each next page.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
     /// The LicenseAssignments in this page of results.
@@ -503,13 +503,15 @@ impl<'a, C, A> LicenseAssignmentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Revoke License.
+    /// Revoke a license.
     /// 
     /// # Arguments
     ///
-    /// * `productId` - Name for product
-    /// * `skuId` - Name for sku
-    /// * `userId` - email id or unique Id of the user
+    /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
+    /// * `skuId` - A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
+    /// * `userId` - The user's current primary email address. If the user's email address changes, use the new email address in your API requests.
+    ///              Since a userId is subject to change, do not use a userId value as a key for persistent data. This key could break if the current user's email address changes.
+    ///              If the userId is suspended, the license status changes.
     pub fn delete(&self, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentDeleteCall<'a, C, A> {
         LicenseAssignmentDeleteCall {
             hub: self.hub,
@@ -524,12 +526,13 @@ impl<'a, C, A> LicenseAssignmentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List license assignments for given product of the customer.
+    /// List all users assigned licenses for a specific product SKU.
     /// 
     /// # Arguments
     ///
-    /// * `productId` - Name for product
-    /// * `customerId` - CustomerId represents the customer for whom licenseassignments are queried
+    /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
+    /// * `customerId` - Customer's customerId. A previous version of this API accepted the primary domain name as a value for this field.
+    ///                  If the customer is suspended, the server returns an error.
     pub fn list_for_product(&self, product_id: &str, customer_id: &str) -> LicenseAssignmentListForProductCall<'a, C, A> {
         LicenseAssignmentListForProductCall {
             hub: self.hub,
@@ -545,13 +548,15 @@ impl<'a, C, A> LicenseAssignmentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get license assignment of a particular product and sku for a user
+    /// Get a specific user's license by product SKU.
     /// 
     /// # Arguments
     ///
-    /// * `productId` - Name for product
-    /// * `skuId` - Name for sku
-    /// * `userId` - email id or unique Id of the user
+    /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
+    /// * `skuId` - A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
+    /// * `userId` - The user's current primary email address. If the user's email address changes, use the new email address in your API requests.
+    ///              Since a userId is subject to change, do not use a userId value as a key for persistent data. This key could break if the current user's email address changes.
+    ///              If the userId is suspended, the license status changes.
     pub fn get(&self, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentGetCall<'a, C, A> {
         LicenseAssignmentGetCall {
             hub: self.hub,
@@ -566,13 +571,14 @@ impl<'a, C, A> LicenseAssignmentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List license assignments for given product and sku of the customer.
+    /// List all users assigned licenses for a specific product SKU.
     /// 
     /// # Arguments
     ///
-    /// * `productId` - Name for product
-    /// * `skuId` - Name for sku
-    /// * `customerId` - CustomerId represents the customer for whom licenseassignments are queried
+    /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
+    /// * `skuId` - A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
+    /// * `customerId` - Customer's customerId. A previous version of this API accepted the primary domain name as a value for this field.
+    ///                  If the customer is suspended, the server returns an error.
     pub fn list_for_product_and_sku(&self, product_id: &str, sku_id: &str, customer_id: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, A> {
         LicenseAssignmentListForProductAndSkuCall {
             hub: self.hub,
@@ -589,14 +595,16 @@ impl<'a, C, A> LicenseAssignmentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Assign License.
+    /// Reassign a user's product SKU with a different SKU in the same product.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `productId` - Name for product
-    /// * `skuId` - Name for sku for which license would be revoked
-    /// * `userId` - email id or unique Id of the user
+    /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
+    /// * `skuId` - A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
+    /// * `userId` - The user's current primary email address. If the user's email address changes, use the new email address in your API requests.
+    ///              Since a userId is subject to change, do not use a userId value as a key for persistent data. This key could break if the current user's email address changes.
+    ///              If the userId is suspended, the license status changes.
     pub fn update(&self, request: LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentUpdateCall<'a, C, A> {
         LicenseAssignmentUpdateCall {
             hub: self.hub,
@@ -612,14 +620,16 @@ impl<'a, C, A> LicenseAssignmentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Assign License. This method supports patch semantics.
+    /// Reassign a user's product SKU with a different SKU in the same product. This method supports patch semantics.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `productId` - Name for product
-    /// * `skuId` - Name for sku for which license would be revoked
-    /// * `userId` - email id or unique Id of the user
+    /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
+    /// * `skuId` - A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
+    /// * `userId` - The user's current primary email address. If the user's email address changes, use the new email address in your API requests.
+    ///              Since a userId is subject to change, do not use a userId value as a key for persistent data. This key could break if the current user's email address changes.
+    ///              If the userId is suspended, the license status changes.
     pub fn patch(&self, request: LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentPatchCall<'a, C, A> {
         LicenseAssignmentPatchCall {
             hub: self.hub,
@@ -635,13 +645,13 @@ impl<'a, C, A> LicenseAssignmentMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Assign License.
+    /// Assign a license.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `productId` - Name for product
-    /// * `skuId` - Name for sku
+    /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
+    /// * `skuId` - A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
     pub fn insert(&self, request: LicenseAssignmentInsert, product_id: &str, sku_id: &str) -> LicenseAssignmentInsertCall<'a, C, A> {
         LicenseAssignmentInsertCall {
             hub: self.hub,
@@ -663,7 +673,7 @@ impl<'a, C, A> LicenseAssignmentMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Revoke License.
+/// Revoke a license.
 ///
 /// A builder for the *delete* method supported by a *licenseAssignment* resource.
 /// It is not used directly, but through a `LicenseAssignmentMethods` instance.
@@ -827,7 +837,7 @@ impl<'a, C, A> LicenseAssignmentDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    /// Name for product
+    /// A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     ///
     /// Sets the *product id* path property to the given value.
     ///
@@ -837,7 +847,7 @@ impl<'a, C, A> LicenseAssignmentDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
         self._product_id = new_value.to_string();
         self
     }
-    /// Name for sku
+    /// A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
     ///
     /// Sets the *sku id* path property to the given value.
     ///
@@ -847,7 +857,9 @@ impl<'a, C, A> LicenseAssignmentDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
         self._sku_id = new_value.to_string();
         self
     }
-    /// email id or unique Id of the user
+    /// The user's current primary email address. If the user's email address changes, use the new email address in your API requests.
+    /// Since a userId is subject to change, do not use a userId value as a key for persistent data. This key could break if the current user's email address changes.
+    /// If the userId is suspended, the license status changes.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -916,7 +928,7 @@ impl<'a, C, A> LicenseAssignmentDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// List license assignments for given product of the customer.
+/// List all users assigned licenses for a specific product SKU.
 ///
 /// A builder for the *listForProduct* method supported by a *licenseAssignment* resource.
 /// It is not used directly, but through a `LicenseAssignmentMethods` instance.
@@ -1099,7 +1111,7 @@ impl<'a, C, A> LicenseAssignmentListForProductCall<'a, C, A> where C: BorrowMut<
     }
 
 
-    /// Name for product
+    /// A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     ///
     /// Sets the *product id* path property to the given value.
     ///
@@ -1109,7 +1121,8 @@ impl<'a, C, A> LicenseAssignmentListForProductCall<'a, C, A> where C: BorrowMut<
         self._product_id = new_value.to_string();
         self
     }
-    /// CustomerId represents the customer for whom licenseassignments are queried
+    /// Customer's customerId. A previous version of this API accepted the primary domain name as a value for this field.
+    /// If the customer is suspended, the server returns an error.
     ///
     /// Sets the *customer id* query property to the given value.
     ///
@@ -1119,14 +1132,14 @@ impl<'a, C, A> LicenseAssignmentListForProductCall<'a, C, A> where C: BorrowMut<
         self._customer_id = new_value.to_string();
         self
     }
-    /// Token to fetch the next page.Optional. By default server will return first page
+    /// Token to fetch the next page of data. The maxResults query string is related to the pageToken since maxResults determines how many entries are returned on each page. This is an optional query string. If not specified, the server returns the first page.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of campaigns to return at one time. Must be positive. Optional. Default value is 100.
+    /// The maxResults query string determines how many entries are returned on each page of a large response. This is an optional parameter. The value must be a positive number.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> LicenseAssignmentListForProductCall<'a, C, A> {
@@ -1192,7 +1205,7 @@ impl<'a, C, A> LicenseAssignmentListForProductCall<'a, C, A> where C: BorrowMut<
 }
 
 
-/// Get license assignment of a particular product and sku for a user
+/// Get a specific user's license by product SKU.
 ///
 /// A builder for the *get* method supported by a *licenseAssignment* resource.
 /// It is not used directly, but through a `LicenseAssignmentMethods` instance.
@@ -1367,7 +1380,7 @@ impl<'a, C, A> LicenseAssignmentGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// Name for product
+    /// A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     ///
     /// Sets the *product id* path property to the given value.
     ///
@@ -1377,7 +1390,7 @@ impl<'a, C, A> LicenseAssignmentGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._product_id = new_value.to_string();
         self
     }
-    /// Name for sku
+    /// A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
     ///
     /// Sets the *sku id* path property to the given value.
     ///
@@ -1387,7 +1400,9 @@ impl<'a, C, A> LicenseAssignmentGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._sku_id = new_value.to_string();
         self
     }
-    /// email id or unique Id of the user
+    /// The user's current primary email address. If the user's email address changes, use the new email address in your API requests.
+    /// Since a userId is subject to change, do not use a userId value as a key for persistent data. This key could break if the current user's email address changes.
+    /// If the userId is suspended, the license status changes.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -1456,7 +1471,7 @@ impl<'a, C, A> LicenseAssignmentGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// List license assignments for given product and sku of the customer.
+/// List all users assigned licenses for a specific product SKU.
 ///
 /// A builder for the *listForProductAndSku* method supported by a *licenseAssignment* resource.
 /// It is not used directly, but through a `LicenseAssignmentMethods` instance.
@@ -1641,7 +1656,7 @@ impl<'a, C, A> LicenseAssignmentListForProductAndSkuCall<'a, C, A> where C: Borr
     }
 
 
-    /// Name for product
+    /// A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     ///
     /// Sets the *product id* path property to the given value.
     ///
@@ -1651,7 +1666,7 @@ impl<'a, C, A> LicenseAssignmentListForProductAndSkuCall<'a, C, A> where C: Borr
         self._product_id = new_value.to_string();
         self
     }
-    /// Name for sku
+    /// A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
     ///
     /// Sets the *sku id* path property to the given value.
     ///
@@ -1661,7 +1676,8 @@ impl<'a, C, A> LicenseAssignmentListForProductAndSkuCall<'a, C, A> where C: Borr
         self._sku_id = new_value.to_string();
         self
     }
-    /// CustomerId represents the customer for whom licenseassignments are queried
+    /// Customer's customerId. A previous version of this API accepted the primary domain name as a value for this field.
+    /// If the customer is suspended, the server returns an error.
     ///
     /// Sets the *customer id* query property to the given value.
     ///
@@ -1671,14 +1687,14 @@ impl<'a, C, A> LicenseAssignmentListForProductAndSkuCall<'a, C, A> where C: Borr
         self._customer_id = new_value.to_string();
         self
     }
-    /// Token to fetch the next page.Optional. By default server will return first page
+    /// Token to fetch the next page of data. The maxResults query string is related to the pageToken since maxResults determines how many entries are returned on each page. This is an optional query string. If not specified, the server returns the first page.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of campaigns to return at one time. Must be positive. Optional. Default value is 100.
+    /// The maxResults query string determines how many entries are returned on each page of a large response. This is an optional parameter. The value must be a positive number.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> LicenseAssignmentListForProductAndSkuCall<'a, C, A> {
@@ -1744,7 +1760,7 @@ impl<'a, C, A> LicenseAssignmentListForProductAndSkuCall<'a, C, A> where C: Borr
 }
 
 
-/// Assign License.
+/// Reassign a user's product SKU with a different SKU in the same product.
 ///
 /// A builder for the *update* method supported by a *licenseAssignment* resource.
 /// It is not used directly, but through a `LicenseAssignmentMethods` instance.
@@ -1950,7 +1966,7 @@ impl<'a, C, A> LicenseAssignmentUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
         self._request = new_value;
         self
     }
-    /// Name for product
+    /// A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     ///
     /// Sets the *product id* path property to the given value.
     ///
@@ -1960,7 +1976,7 @@ impl<'a, C, A> LicenseAssignmentUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
         self._product_id = new_value.to_string();
         self
     }
-    /// Name for sku for which license would be revoked
+    /// A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
     ///
     /// Sets the *sku id* path property to the given value.
     ///
@@ -1970,7 +1986,9 @@ impl<'a, C, A> LicenseAssignmentUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
         self._sku_id = new_value.to_string();
         self
     }
-    /// email id or unique Id of the user
+    /// The user's current primary email address. If the user's email address changes, use the new email address in your API requests.
+    /// Since a userId is subject to change, do not use a userId value as a key for persistent data. This key could break if the current user's email address changes.
+    /// If the userId is suspended, the license status changes.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -2039,7 +2057,7 @@ impl<'a, C, A> LicenseAssignmentUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Assign License. This method supports patch semantics.
+/// Reassign a user's product SKU with a different SKU in the same product. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *licenseAssignment* resource.
 /// It is not used directly, but through a `LicenseAssignmentMethods` instance.
@@ -2245,7 +2263,7 @@ impl<'a, C, A> LicenseAssignmentPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._request = new_value;
         self
     }
-    /// Name for product
+    /// A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     ///
     /// Sets the *product id* path property to the given value.
     ///
@@ -2255,7 +2273,7 @@ impl<'a, C, A> LicenseAssignmentPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._product_id = new_value.to_string();
         self
     }
-    /// Name for sku for which license would be revoked
+    /// A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
     ///
     /// Sets the *sku id* path property to the given value.
     ///
@@ -2265,7 +2283,9 @@ impl<'a, C, A> LicenseAssignmentPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._sku_id = new_value.to_string();
         self
     }
-    /// email id or unique Id of the user
+    /// The user's current primary email address. If the user's email address changes, use the new email address in your API requests.
+    /// Since a userId is subject to change, do not use a userId value as a key for persistent data. This key could break if the current user's email address changes.
+    /// If the userId is suspended, the license status changes.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -2334,7 +2354,7 @@ impl<'a, C, A> LicenseAssignmentPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Assign License.
+/// Assign a license.
 ///
 /// A builder for the *insert* method supported by a *licenseAssignment* resource.
 /// It is not used directly, but through a `LicenseAssignmentMethods` instance.
@@ -2538,7 +2558,7 @@ impl<'a, C, A> LicenseAssignmentInsertCall<'a, C, A> where C: BorrowMut<hyper::C
         self._request = new_value;
         self
     }
-    /// Name for product
+    /// A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     ///
     /// Sets the *product id* path property to the given value.
     ///
@@ -2548,7 +2568,7 @@ impl<'a, C, A> LicenseAssignmentInsertCall<'a, C, A> where C: BorrowMut<hyper::C
         self._product_id = new_value.to_string();
         self
     }
-    /// Name for sku
+    /// A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
     ///
     /// Sets the *sku id* path property to the given value.
     ///

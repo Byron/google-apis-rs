@@ -69,14 +69,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "basic.combining-function" => Some(("basic.combiningFunction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom.expr.title" => Some(("custom.expr.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom.expr.expression" => Some(("custom.expr.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom.expr.description" => Some(("custom.expr.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom.expr.location" => Some(("custom.expr.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "basic.combining-function" => Some(("basic.combiningFunction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["basic", "combining-function", "create-time", "description", "name", "title", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["basic", "combining-function", "custom", "description", "expr", "expression", "location", "name", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -329,14 +331,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "basic.combining-function" => Some(("basic.combiningFunction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom.expr.title" => Some(("custom.expr.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom.expr.expression" => Some(("custom.expr.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom.expr.description" => Some(("custom.expr.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom.expr.location" => Some(("custom.expr.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "basic.combining-function" => Some(("basic.combiningFunction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["basic", "combining-function", "create-time", "description", "name", "title", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["basic", "combining-function", "custom", "description", "expr", "expression", "location", "name", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -400,6 +404,91 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _access_policies_access_levels_replace_all(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ReplaceAccessLevelsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.access_policies().access_levels_replace_all(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _access_policies_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -423,13 +512,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "name", "parent", "title", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "name", "parent", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -678,13 +766,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "name", "parent", "title", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "name", "parent", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -748,6 +835,91 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _access_policies_service_perimeters_commit(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CommitServicePerimetersRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.access_policies().service_perimeters_commit(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _access_policies_service_perimeters_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -772,16 +944,22 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "status.restricted-services" => Some(("status.restrictedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "status.vpc-accessible-services.enable-restriction" => Some(("status.vpcAccessibleServices.enableRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status.vpc-accessible-services.allowed-services" => Some(("status.vpcAccessibleServices.allowedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "status.resources" => Some(("status.resources", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "status.access-levels" => Some(("status.accessLevels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "perimeter-type" => Some(("perimeterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "use-explicit-dry-run-spec" => Some(("useExplicitDryRunSpec", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "spec.restricted-services" => Some(("spec.restrictedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "spec.vpc-accessible-services.enable-restriction" => Some(("spec.vpcAccessibleServices.enableRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "spec.vpc-accessible-services.allowed-services" => Some(("spec.vpcAccessibleServices.allowedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "spec.resources" => Some(("spec.resources", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "spec.access-levels" => Some(("spec.accessLevels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-levels", "create-time", "description", "name", "perimeter-type", "resources", "restricted-services", "status", "title", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-levels", "allowed-services", "description", "enable-restriction", "name", "perimeter-type", "resources", "restricted-services", "spec", "status", "title", "use-explicit-dry-run-spec", "vpc-accessible-services"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1028,16 +1206,22 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "status.restricted-services" => Some(("status.restrictedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "status.vpc-accessible-services.enable-restriction" => Some(("status.vpcAccessibleServices.enableRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status.vpc-accessible-services.allowed-services" => Some(("status.vpcAccessibleServices.allowedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "status.resources" => Some(("status.resources", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "status.access-levels" => Some(("status.accessLevels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "perimeter-type" => Some(("perimeterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "use-explicit-dry-run-spec" => Some(("useExplicitDryRunSpec", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "spec.restricted-services" => Some(("spec.restrictedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "spec.vpc-accessible-services.enable-restriction" => Some(("spec.vpcAccessibleServices.enableRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "spec.vpc-accessible-services.allowed-services" => Some(("spec.vpcAccessibleServices.allowedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "spec.resources" => Some(("spec.resources", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "spec.access-levels" => Some(("spec.accessLevels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-levels", "create-time", "description", "name", "perimeter-type", "resources", "restricted-services", "status", "title", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-levels", "allowed-services", "description", "enable-restriction", "name", "perimeter-type", "resources", "restricted-services", "spec", "status", "title", "use-explicit-dry-run-spec", "vpc-accessible-services"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1068,6 +1252,91 @@ impl<'n> Engine<'n> {
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _access_policies_service_perimeters_replace_all(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ReplaceServicePerimetersRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.access_policies().service_perimeters_replace_all(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1373,6 +1642,9 @@ impl<'n> Engine<'n> {
                     ("access-levels-patch", Some(opt)) => {
                         call_result = self._access_policies_access_levels_patch(opt, dry_run, &mut err);
                     },
+                    ("access-levels-replace-all", Some(opt)) => {
+                        call_result = self._access_policies_access_levels_replace_all(opt, dry_run, &mut err);
+                    },
                     ("create", Some(opt)) => {
                         call_result = self._access_policies_create(opt, dry_run, &mut err);
                     },
@@ -1388,6 +1660,9 @@ impl<'n> Engine<'n> {
                     ("patch", Some(opt)) => {
                         call_result = self._access_policies_patch(opt, dry_run, &mut err);
                     },
+                    ("service-perimeters-commit", Some(opt)) => {
+                        call_result = self._access_policies_service_perimeters_commit(opt, dry_run, &mut err);
+                    },
                     ("service-perimeters-create", Some(opt)) => {
                         call_result = self._access_policies_service_perimeters_create(opt, dry_run, &mut err);
                     },
@@ -1402,6 +1677,9 @@ impl<'n> Engine<'n> {
                     },
                     ("service-perimeters-patch", Some(opt)) => {
                         call_result = self._access_policies_service_perimeters_patch(opt, dry_run, &mut err);
+                    },
+                    ("service-perimeters-replace-all", Some(opt)) => {
+                        call_result = self._access_policies_service_perimeters_replace_all(opt, dry_run, &mut err);
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("access-policies".to_string()));
@@ -1514,7 +1792,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("access-policies", "methods: 'access-levels-create', 'access-levels-delete', 'access-levels-get', 'access-levels-list', 'access-levels-patch', 'create', 'delete', 'get', 'list', 'patch', 'service-perimeters-create', 'service-perimeters-delete', 'service-perimeters-get', 'service-perimeters-list' and 'service-perimeters-patch'", vec![
+        ("access-policies", "methods: 'access-levels-create', 'access-levels-delete', 'access-levels-get', 'access-levels-list', 'access-levels-patch', 'access-levels-replace-all', 'create', 'delete', 'get', 'list', 'patch', 'service-perimeters-commit', 'service-perimeters-create', 'service-perimeters-delete', 'service-perimeters-get', 'service-perimeters-list', 'service-perimeters-patch' and 'service-perimeters-replace-all'", vec![
             ("access-levels-create",
                     Some(r##"Create an Access Level. The longrunning
         operation from this RPC will have a successful status once the Access
@@ -1642,7 +1920,50 @@ fn main() {
                      None,
                      Some(r##"Required. Resource name for the Access Level. The `short_name` component
         must begin with a letter and only include alphanumeric and '_'. Format:
-        `accessPolicies/{policy_id}/accessLevels/{short_name}`"##),
+        `accessPolicies/{policy_id}/accessLevels/{short_name}`. The maximum length
+        of the `short_name` component is 50 characters."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("access-levels-replace-all",
+                    Some(r##"Replace all existing Access Levels in an Access
+        Policy with
+        the Access Levels provided. This
+        is done atomically. The longrunning operation from this RPC will have a
+        successful status once all replacements have propagated to long-lasting
+        storage. Replacements containing errors will result in an error response
+        for the first error encountered.  Replacement will be cancelled on error,
+        existing Access Levels will not be
+        affected. Operation.response field will contain
+        ReplaceAccessLevelsResponse. Removing Access Levels contained in existing
+        Service Perimeters will result in
+        error."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_accesscontextmanager1_cli/access-policies_access-levels-replace-all",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name for the access policy which owns these
+        Access Levels.
+        
+        Format: `accessPolicies/{policy_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -1791,8 +2112,51 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("service-perimeters-commit",
+                    Some(r##"Commit the dry-run spec for all the Service Perimeters in an
+        Access Policy.
+        A commit operation on a Service Perimeter involves copying its `spec` field
+        to that Service Perimeter's `status` field. Only Service Perimeters with
+        `use_explicit_dry_run_spec` field set to true are affected by a commit
+        operation. The longrunning operation from this RPC will have a successful
+        status once the dry-run specs for all the Service Perimeters have been
+        committed. If a commit fails, it will cause the longrunning operation to
+        return an error response and the entire commit operation will be cancelled.
+        When successful, Operation.response field will contain
+        CommitServicePerimetersResponse. The `dry_run` and the `spec` fields will
+        be cleared after a successful commit operation."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_accesscontextmanager1_cli/access-policies_service-perimeters-commit",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name for the parent Access Policy which owns all
+        Service Perimeters in scope for
+        the commit operation.
+        
+        Format: `accessPolicies/{policy_id}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("service-perimeters-create",
-                    Some(r##"Create an Service Perimeter. The
+                    Some(r##"Create a Service Perimeter. The
         longrunning operation from this RPC will have a successful status once the
         Service Perimeter has
         propagated to long-lasting storage. Service Perimeters containing
@@ -1827,7 +2191,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("service-perimeters-delete",
-                    Some(r##"Delete an Service Perimeter by resource
+                    Some(r##"Delete a Service Perimeter by resource
         name. The longrunning operation from this RPC will have a successful status
         once the Service Perimeter has been
         removed from long-lasting storage."##),
@@ -1855,7 +2219,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("service-perimeters-get",
-                    Some(r##"Get an Service Perimeter by resource
+                    Some(r##"Get a Service Perimeter by resource
         name."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accesscontextmanager1_cli/access-policies_service-perimeters-get",
                   vec![
@@ -1907,7 +2271,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("service-perimeters-patch",
-                    Some(r##"Update an Service Perimeter. The
+                    Some(r##"Update a Service Perimeter. The
         longrunning operation from this RPC will have a successful status once the
         changes to the Service Perimeter have
         propagated to long-lasting storage. Service Perimeter containing
@@ -1919,6 +2283,46 @@ fn main() {
                      Some(r##"Required. Resource name for the ServicePerimeter.  The `short_name`
         component must begin with a letter and only include alphanumeric and '_'.
         Format: `accessPolicies/{policy_id}/servicePerimeters/{short_name}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("service-perimeters-replace-all",
+                    Some(r##"Replace all existing Service Perimeters in an
+        Access Policy
+        with the Service Perimeters provided.
+        This is done atomically. The longrunning operation from this
+        RPC will have a successful status once all replacements have propagated to
+        long-lasting storage. Replacements containing errors will result in an
+        error response for the first error encountered. Replacement will be
+        cancelled on error, existing Service Perimeters will not be
+        affected. Operation.response field will contain
+        ReplaceServicePerimetersResponse."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_accesscontextmanager1_cli/access-policies_service-perimeters-replace-all",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name for the access policy which owns these
+        Service Perimeters.
+        
+        Format: `accessPolicies/{policy_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2066,7 +2470,7 @@ fn main() {
     
     let mut app = App::new("accesscontextmanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190626")
+           .version("1.0.13+20200405")
            .about("An API for setting attribute based access control to requests to GCP services.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_accesscontextmanager1_cli")
            .arg(Arg::with_name("url")

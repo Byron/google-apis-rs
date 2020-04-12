@@ -2,10 +2,10 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *reports* crate version *1.0.12+20190521*, where *20190521* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *reports* crate version *1.0.13+20191014*, where *20191014* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *reports* *v1_reports* API can be found at the
-//! [official documentation site](https://developers.google.com/admin-sdk/reports/).
+//! [official documentation site](/admin-sdk/reports/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/admin1_reports).
 //! # Features
 //! 
@@ -348,7 +348,7 @@ impl<'a, C, A> Reports<C, A>
         Reports {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://www.googleapis.com/admin/reports/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -371,7 +371,7 @@ impl<'a, C, A> Reports<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -399,13 +399,13 @@ impl<'a, C, A> Reports<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// Nested value of the parameter.
+/// Nested parameter value pairs associated with this parameter. Complex value type for a parameter are returned as a list of parameter values. For example, the address parameter may have a value as [{parameter: [{name: city, value: abc}]}]
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityEventsParametersMessageValue {
-    /// Looping to get parameter values.
+    /// Parameter values
     pub parameter: Option<Vec<NestedParameter>>,
 }
 
@@ -413,7 +413,7 @@ impl NestedType for ActivityEventsParametersMessageValue {}
 impl Part for ActivityEventsParametersMessageValue {}
 
 
-/// Key-Value pairs to give detailed information on the warning.
+/// Key-value pairs to give detailed information on the warning.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -435,13 +435,13 @@ impl Part for UsageReportsWarningsData {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsageReport {
-    /// The date to which the record belongs.
+    /// The date of the report request.
     pub date: Option<String>,
-    /// The kind of object.
+    /// The type of API resource. For a usage report, the value is admin#reports#usageReport.
     pub kind: Option<String>,
     /// ETag of the resource.
     pub etag: Option<String>,
-    /// Parameter value pairs for various applications.
+    /// Parameter value pairs for various applications. For the Customers usage report parameters and values, see the customer usage parameters reference.
     pub parameters: Option<Vec<UsageReportParameters>>,
     /// Information about the type of the item.
     pub entity: Option<UsageReportEntity>,
@@ -456,16 +456,16 @@ impl Part for UsageReport {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityId {
-    /// Application name to which the event belongs.
+    /// Application name to which the event belongs. For possible values see the list of applications above in applicationName.
     #[serde(rename="applicationName")]
     pub application_name: Option<String>,
     /// Unique qualifier if multiple events have the same time.
     #[serde(rename="uniqueQualifier")]
     pub unique_qualifier: Option<String>,
-    /// Obfuscated customer ID of the source customer.
+    /// The unique identifier for a G suite account.
     #[serde(rename="customerId")]
     pub customer_id: Option<String>,
-    /// Time of occurrence of the activity.
+    /// Time of occurrence of the activity. This is in UNIX epoch time in seconds.
     pub time: Option<String>,
 }
 
@@ -473,17 +473,19 @@ impl NestedType for ActivityId {}
 impl Part for ActivityId {}
 
 
-/// Warnings if any.
+/// Warnings, if any.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsageReportsWarnings {
-    /// Human readable message for the warning.
+    /// The human readable messages for a warning are:  
+    /// - Data is not available warning - Sorry, data for date yyyy-mm-dd for application "application name" is not available.  
+    /// - Partial data is available warning - Data for date yyyy-mm-dd for application "application name" is not available right now, please try again after a few hours.
     pub message: Option<String>,
-    /// Machine readable code / warning type.
+    /// Machine readable code or warning type. The warning code value is 200.
     pub code: Option<String>,
-    /// Key-Value pairs to give detailed information on the warning.
+    /// Key-value pairs to give detailed information on the warning.
     pub data: Option<Vec<UsageReportsWarningsData>>,
 }
 
@@ -497,16 +499,16 @@ impl Part for UsageReportsWarnings {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Activity {
-    /// Kind of resource this is.
+    /// The type of API resource. For an activity report, the value is audit#activity.
     pub kind: Option<String>,
     /// ETag of the entry.
     pub etag: Option<String>,
-    /// Activity events.
+    /// Activity events in the report.
     pub events: Option<Vec<ActivityEvents>>,
-    /// IP Address of the user doing the action.
+    /// IP address of the user doing the action. This is the Internet Protocol (IP) address of the user when logging into G Suite which may or may not reflect the user's physical location. For example, the IP address can be the user's proxy server's address or a virtual private network (VPN) address. The API supports IPv4 and IPv6.
     #[serde(rename="ipAddress")]
     pub ip_address: Option<String>,
-    /// Domain of source customer.
+    /// This is the domain that is affected by the report's event. For example domain of Admin console or the Drive application's document owner.
     #[serde(rename="ownerDomain")]
     pub owner_domain: Option<String>,
     /// User doing the action.
@@ -535,10 +537,10 @@ pub struct NestedParameter {
     pub multi_value: Option<Vec<String>>,
     /// The name of the parameter.
     pub name: Option<String>,
-    /// Multiple integral values of the parameter.
+    /// Multiple integer values of the parameter.
     #[serde(rename="multiIntValue")]
     pub multi_int_value: Option<Vec<String>>,
-    /// Integral value of the parameter.
+    /// Integer value of the parameter.
     #[serde(rename="intValue")]
     pub int_value: Option<String>,
     /// String value of the parameter.
@@ -601,12 +603,12 @@ impl ResponseResult for Channel {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Activities {
-    /// Token for retrieving the next page
+    /// Token for retrieving the follow-on next page of the report. The nextPageToken value is used in the request's pageToken query string.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// Each record in read response.
+    /// Each activity record in the response.
     pub items: Option<Vec<Activity>>,
-    /// Kind of list response this is.
+    /// The type of API resource. For an activity report, the value is reports#activities.
     pub kind: Option<String>,
     /// ETag of the resource.
     pub etag: Option<String>,
@@ -615,13 +617,13 @@ pub struct Activities {
 impl ResponseResult for Activities {}
 
 
-/// Nested values of the parameter.
+/// List of messageValue objects.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityEventsParametersMultiMessageValue {
-    /// Parameter value.
+    /// Parameter values
     pub parameter: Option<Vec<NestedParameter>>,
 }
 
@@ -629,7 +631,7 @@ impl NestedType for ActivityEventsParametersMultiMessageValue {}
 impl Part for ActivityEventsParametersMultiMessageValue {}
 
 
-/// Parameter value pairs for various applications.
+/// Parameter value pairs for various applications. For the Customers usage report parameters and values, see the customer usage parameters reference.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -638,10 +640,10 @@ pub struct UsageReportParameters {
     /// Nested message value of the parameter.
     #[serde(rename="msgValue")]
     pub msg_value: Option<Vec<HashMap<String, String>>>,
-    /// RFC 3339 formatted value of the parameter.
+    /// The RFC 3339 formatted value of the parameter, for example 2010-10-28T10:26:35.000Z.
     #[serde(rename="datetimeValue")]
     pub datetime_value: Option<String>,
-    /// The name of the parameter.
+    /// no description provided
     pub name: Option<String>,
     /// String value of the parameter.
     #[serde(rename="stringValue")]
@@ -649,7 +651,7 @@ pub struct UsageReportParameters {
     /// Boolean value of the parameter.
     #[serde(rename="boolValue")]
     pub bool_value: Option<bool>,
-    /// Integral value of the parameter.
+    /// Integer value of the parameter.
     #[serde(rename="intValue")]
     pub int_value: Option<String>,
 }
@@ -664,14 +666,14 @@ impl Part for UsageReportParameters {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityActor {
-    /// Obfuscated user id of the user.
+    /// The unique G Suite profile ID of the actor. May be absent if the actor is not a G Suite user.
     #[serde(rename="profileId")]
     pub profile_id: Option<String>,
-    /// Email address of the user.
+    /// The primary email address of the actor. May be absent if there is no email address associated with the actor.
     pub email: Option<String>,
-    /// For OAuth 2LO API requests, consumer_key of the requestor.
+    /// Only present when callerType is KEY. Can be the consumer_key of the requestor for OAuth 2LO API requests or an identifier for robot accounts.
     pub key: Option<String>,
-    /// User or OAuth 2LO request.
+    /// The type of actor.
     #[serde(rename="callerType")]
     pub caller_type: Option<String>,
 }
@@ -680,7 +682,7 @@ impl NestedType for ActivityActor {}
 impl Part for ActivityActor {}
 
 
-/// JSON template for a collection of usage reports.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -693,24 +695,24 @@ impl Part for ActivityActor {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsageReports {
-    /// Token for retrieving the next page
+    /// Token to specify next page. A report with multiple pages has a nextPageToken property in the response. For your follow-on requests getting all of the report's pages, enter the nextPageToken value in the pageToken query string.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The kind of object.
+    /// The type of API resource. For a usage report, the value is admin#reports#usageReports.
     pub kind: Option<String>,
     /// ETag of the resource.
     pub etag: Option<String>,
     /// Various application parameter records.
     #[serde(rename="usageReports")]
     pub usage_reports: Option<Vec<UsageReport>>,
-    /// Warnings if any.
+    /// Warnings, if any.
     pub warnings: Option<Vec<UsageReportsWarnings>>,
 }
 
 impl ResponseResult for UsageReports {}
 
 
-/// Parameter value pairs for various applications.
+/// Parameter value pairs for various applications. For more information about eventName parameters, see the list of event names for various applications above in applicationName.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -718,7 +720,7 @@ impl ResponseResult for UsageReports {}
 pub struct ActivityEventsParameters {
     /// The name of the parameter.
     pub name: Option<String>,
-    /// Nested value of the parameter.
+    /// Nested parameter value pairs associated with this parameter. Complex value type for a parameter are returned as a list of parameter values. For example, the address parameter may have a value as [{parameter: [{name: city, value: abc}]}]
     #[serde(rename="messageValue")]
     pub message_value: Option<ActivityEventsParametersMessageValue>,
     /// Boolean value of the parameter.
@@ -726,16 +728,16 @@ pub struct ActivityEventsParameters {
     pub bool_value: Option<bool>,
     /// String value of the parameter.
     pub value: Option<String>,
-    /// Integral value of the parameter.
+    /// Integer value of the parameter.
     #[serde(rename="intValue")]
     pub int_value: Option<String>,
-    /// Multi-string value of the parameter.
+    /// String values of the parameter.
     #[serde(rename="multiValue")]
     pub multi_value: Option<Vec<String>>,
-    /// Multi-int value of the parameter.
+    /// Integer values of the parameter.
     #[serde(rename="multiIntValue")]
     pub multi_int_value: Option<Vec<String>>,
-    /// Nested values of the parameter.
+    /// List of messageValue objects.
     #[serde(rename="multiMessageValue")]
     pub multi_message_value: Option<Vec<ActivityEventsParametersMultiMessageValue>>,
 }
@@ -744,18 +746,22 @@ impl NestedType for ActivityEventsParameters {}
 impl Part for ActivityEventsParameters {}
 
 
-/// Activity events.
+/// Activity events in the report.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityEvents {
-    /// Type of event.
+    /// Type of event. The G Suite service or feature that an administrator changes is identified in the type property which identifies an event using the eventName property. For a full list of the API's type categories, see the list of event names for various applications above in applicationName.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Name of event.
+    /// Name of the event. This is the specific name of the activity reported by the API. And each eventName is related to a specific G Suite service or feature which the API organizes into types of events.
+    /// For eventName request parameters in general:  
+    /// - If no eventName is given, the report returns all possible instances of an eventName.  
+    /// - When you request an eventName, the API's response returns all activities which contain that eventName. It is possible that the returned activities will have other eventName properties in addition to the one requested.   
+    /// For more information about eventName properties, see the list of event names for various applications above in applicationName.
     pub name: Option<String>,
-    /// Parameter value pairs for various applications.
+    /// Parameter value pairs for various applications. For more information about eventName parameters, see the list of event names for various applications above in applicationName.
     pub parameters: Option<Vec<ActivityEventsParameters>>,
 }
 
@@ -769,19 +775,19 @@ impl Part for ActivityEvents {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsageReportEntity {
-    /// Obfuscated user id for the record.
+    /// The user's immutable G Suite profile identifier.
     #[serde(rename="profileId")]
     pub profile_id: Option<String>,
-    /// user's email. Only relevant if entity.type = "USER"
+    /// The user's email address. Only relevant if entity.type = "USER"
     #[serde(rename="userEmail")]
     pub user_email: Option<String>,
-    /// The type of item, can be customer, user, or entity (aka. object).
+    /// The type of item. The value is customer.
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Object key. Only relevant if entity.type = "OBJECT" Note: external-facing name of report is "Entities" rather than "Objects".
     #[serde(rename="entityId")]
     pub entity_id: Option<String>,
-    /// Obfuscated customer id for the record.
+    /// The unique identifier of the customer's account.
     #[serde(rename="customerId")]
     pub customer_id: Option<String>,
 }
@@ -895,13 +901,13 @@ impl<'a, C, A> EntityUsageReportMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a report which is a collection of properties / statistics for a set of objects.
+    /// Retrieves a report which is a collection of properties and statistics for entities used by users within the account. For more information, see the Entities Usage Report guide. For more information about the entities report's parameters, see the Entities Usage parameters reference guides.
     /// 
     /// # Arguments
     ///
-    /// * `entityType` - Type of object. Should be one of - gplus_communities.
-    /// * `entityKey` - Represents the key of object for which the data should be filtered.
-    /// * `date` - Represents the date in yyyy-mm-dd format for which the data is to be fetched.
+    /// * `entityType` - Represents the type of entity for the report.
+    /// * `entityKey` - Represents the key of the object to filter the data with.
+    /// * `date` - Represents the date the usage occurred. The timestamp is in the ISO 8601 format, yyyy-mm-dd. We recommend you use your account's time zone for this.
     pub fn get(&self, entity_type: &str, entity_key: &str, date: &str) -> EntityUsageReportGetCall<'a, C, A> {
         EntityUsageReportGetCall {
             hub: self.hub,
@@ -963,11 +969,11 @@ impl<'a, C, A> ActivityMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of activities for a specific customer and application.
+    /// Retrieves a list of activities for a specific customer's account and application such as the Admin console application or the Google Drive application. For more information, see the guides for administrator and Google Drive activity reports. For more information about the activity report's parameters, see the activity parameters reference guides.
     /// 
     /// # Arguments
     ///
-    /// * `userKey` - Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
+    /// * `userKey` - Represents the profile ID or the user email for which the data should be filtered. Can be all for all information, or userKey for a user's unique G Suite profile ID or their primary email address.
     /// * `applicationName` - Application name for which the events are to be retrieved.
     pub fn list(&self, user_key: &str, application_name: &str) -> ActivityListCall<'a, C, A> {
         ActivityListCall {
@@ -991,12 +997,12 @@ impl<'a, C, A> ActivityMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Push changes to activities
+    /// Start receiving notifications for account activities. For more information, see Receiving Push Notifications.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `userKey` - Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
+    /// * `userKey` - Represents the profile ID or the user email for which the data should be filtered. Can be all for all information, or userKey for a user's unique G Suite profile ID or their primary email address.
     /// * `applicationName` - Application name for which the events are to be retrieved.
     pub fn watch(&self, request: Channel, user_key: &str, application_name: &str) -> ActivityWatchCall<'a, C, A> {
         ActivityWatchCall {
@@ -1063,11 +1069,11 @@ impl<'a, C, A> CustomerUsageReportMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a report which is a collection of properties / statistics for a specific customer.
+    /// Retrieves a report which is a collection of properties and statistics for a specific customer's account. For more information, see the Customers Usage Report guide. For more information about the customer report's parameters, see the Customers Usage parameters reference guides.
     /// 
     /// # Arguments
     ///
-    /// * `date` - Represents the date in yyyy-mm-dd format for which the data is to be fetched.
+    /// * `date` - Represents the date the usage occurred. The timestamp is in the ISO 8601 format, yyyy-mm-dd. We recommend you use your account's time zone for this.
     pub fn get(&self, date: &str) -> CustomerUsageReportGetCall<'a, C, A> {
         CustomerUsageReportGetCall {
             hub: self.hub,
@@ -1125,12 +1131,12 @@ impl<'a, C, A> UserUsageReportMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a report which is a collection of properties / statistics for a set of users.
+    /// Retrieves a report which is a collection of properties and statistics for a set of users with the account. For more information, see the User Usage Report guide. For more information about the user report's parameters, see the Users Usage parameters reference guides.
     /// 
     /// # Arguments
     ///
-    /// * `userKey` - Represents the profile id or the user email for which the data should be filtered.
-    /// * `date` - Represents the date in yyyy-mm-dd format for which the data is to be fetched.
+    /// * `userKey` - Represents the profile ID or the user email for which the data should be filtered. Can be all for all information, or userKey for a user's unique G Suite profile ID or their primary email address.
+    /// * `date` - Represents the date the usage occurred. The timestamp is in the ISO 8601 format, yyyy-mm-dd. We recommend you use your account's time zone for this.
     pub fn get(&self, user_key: &str, date: &str) -> UserUsageReportGetCall<'a, C, A> {
         UserUsageReportGetCall {
             hub: self.hub,
@@ -1384,7 +1390,7 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Retrieves a report which is a collection of properties / statistics for a set of objects.
+/// Retrieves a report which is a collection of properties and statistics for entities used by users within the account. For more information, see the Entities Usage Report guide. For more information about the entities report's parameters, see the Entities Usage parameters reference guides.
 ///
 /// A builder for the *get* method supported by a *entityUsageReport* resource.
 /// It is not used directly, but through a `EntityUsageReportMethods` instance.
@@ -1584,7 +1590,7 @@ impl<'a, C, A> EntityUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// Type of object. Should be one of - gplus_communities.
+    /// Represents the type of entity for the report.
     ///
     /// Sets the *entity type* path property to the given value.
     ///
@@ -1594,7 +1600,7 @@ impl<'a, C, A> EntityUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._entity_type = new_value.to_string();
         self
     }
-    /// Represents the key of object for which the data should be filtered.
+    /// Represents the key of the object to filter the data with.
     ///
     /// Sets the *entity key* path property to the given value.
     ///
@@ -1604,7 +1610,7 @@ impl<'a, C, A> EntityUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._entity_key = new_value.to_string();
         self
     }
-    /// Represents the date in yyyy-mm-dd format for which the data is to be fetched.
+    /// Represents the date the usage occurred. The timestamp is in the ISO 8601 format, yyyy-mm-dd. We recommend you use your account's time zone for this.
     ///
     /// Sets the *date* path property to the given value.
     ///
@@ -1614,35 +1620,53 @@ impl<'a, C, A> EntityUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._date = new_value.to_string();
         self
     }
-    /// Represents the application name, parameter name pairs to fetch in csv as app_name1:param_name1, app_name2:param_name2.
+    /// The parameters query string is a comma-separated list of event parameters that refine a report's results. The parameter is associated with a specific application. The application values for the Entities usage report are only gplus.
+    /// A parameter query string is in the CSV form of [app_name1:param_name1], [app_name2:param_name2]....
+    /// Note: The API doesn't accept multiple values of a parameter. If a particular parameter is supplied more than once in the API request, the API only accepts the last value of that request parameter.
+    /// In addition, if an invalid request parameter is supplied in the API request, the API ignores that request parameter and returns the response corresponding to the remaining valid request parameters.
+    /// 
+    /// An example of an invalid request parameter is one that does not belong to the application. If no parameters are requested, all parameters are returned.
     ///
     /// Sets the *parameters* query property to the given value.
     pub fn parameters(mut self, new_value: &str) -> EntityUsageReportGetCall<'a, C, A> {
         self._parameters = Some(new_value.to_string());
         self
     }
-    /// Token to specify next page.
+    /// Token to specify next page. A report with multiple pages has a nextPageToken property in the response. In your follow-on request getting the next page of the report, enter the nextPageToken value in the pageToken query string.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> EntityUsageReportGetCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of results to return. Maximum allowed is 1000
+    /// Determines how many activity records are shown on each response page. For example, if the request sets maxResults=1 and the report has two activities, the report has two pages. The response's nextPageToken property has the token to the second page.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> EntityUsageReportGetCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Represents the set of filters including parameter operator value.
+    /// The filters query string is a comma-separated list of an application's event parameters where the parameter's value is manipulated by a relational operator. The filters query string includes the name of the application whose usage is returned in the report. The application values for the Entities usage report include accounts, docs, and gmail.
+    /// Filters are in the form [application name]:[parameter name][relational operator][parameter value],....
+    /// 
+    /// In this example, the <> 'not equal to' operator is URL-encoded in the request's query string (%3C%3E):
+    /// GET https://www.googleapis.com/admin/reports/v1/usage/gplus_communities/all/dates/2017-12-01 ?parameters=gplus:community_name,gplus:num_total_members &filters=gplus:num_total_members>0
+    /// 
+    /// 
+    /// The relational operators include:  
+    /// - == - 'equal to'. 
+    /// - <> - 'not equal to'. It is URL-encoded (%3C%3E). 
+    /// - < - 'less than'. It is URL-encoded (%3C). 
+    /// - <= - 'less than or equal to'. It is URL-encoded (%3C=). 
+    /// - > - 'greater than'. It is URL-encoded (%3E). 
+    /// - >= - 'greater than or equal to'. It is URL-encoded (%3E=).  Filters can only be applied to numeric parameters.
     ///
     /// Sets the *filters* query property to the given value.
     pub fn filters(mut self, new_value: &str) -> EntityUsageReportGetCall<'a, C, A> {
         self._filters = Some(new_value.to_string());
         self
     }
-    /// Represents the customer for which the data is to be fetched.
+    /// The unique ID of the customer to retrieve data for.
     ///
     /// Sets the *customer id* query property to the given value.
     pub fn customer_id(mut self, new_value: &str) -> EntityUsageReportGetCall<'a, C, A> {
@@ -1708,7 +1732,7 @@ impl<'a, C, A> EntityUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Retrieves a list of activities for a specific customer and application.
+/// Retrieves a list of activities for a specific customer's account and application such as the Admin console application or the Google Drive application. For more information, see the guides for administrator and Google Drive activity reports. For more information about the activity report's parameters, see the activity parameters reference guides.
 ///
 /// A builder for the *list* method supported by a *activity* resource.
 /// It is not used directly, but through a `ActivityMethods` instance.
@@ -1926,7 +1950,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
-    /// Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
+    /// Represents the profile ID or the user email for which the data should be filtered. Can be all for all information, or userKey for a user's unique G Suite profile ID or their primary email address.
     ///
     /// Sets the *user key* path property to the given value.
     ///
@@ -1946,63 +1970,84 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._application_name = new_value.to_string();
         self
     }
-    /// Return events which occurred at or after this time.
+    /// Sets the beginning of the range of time shown in the report. The date is in the RFC 3339 format, for example 2010-10-28T10:26:35.000Z. The report returns all activities from startTime until endTime. The startTime must be before the endTime (if specified) and the current time when the request is made, or the API returns an error.
     ///
     /// Sets the *start time* query property to the given value.
     pub fn start_time(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._start_time = Some(new_value.to_string());
         self
     }
-    /// Token to specify next page.
+    /// The token to specify next page. A report with multiple pages has a nextPageToken property in the response. In your follow-on request getting the next page of the report, enter the nextPageToken value in the pageToken query string.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// the organizational unit's(OU) ID to filter activities from users belonging to a specific OU or one of its sub-OU(s)
+    /// ID of the organizational unit to report on. Activity records will be shown only for users who belong to the specified organizational unit. Data before Dec 17, 2018 doesn't appear in the filtered results.
     ///
     /// Sets the *org unit id* query property to the given value.
     pub fn org_unit_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._org_unit_id = Some(new_value.to_string());
         self
     }
-    /// Number of activity records to be shown in each page.
+    /// Determines how many activity records are shown on each response page. For example, if the request sets maxResults=1 and the report has two activities, the report has two pages. The response's nextPageToken property has the token to the second page. The maxResults query string is optional in the request. The default value is 1000.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ActivityListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Event parameters in the form [parameter1 name][operator][parameter1 value],[parameter2 name][operator][parameter2 value],...
+    /// The filters query string is a comma-separated list. The list is composed of event parameters that are manipulated by relational operators. Event parameters are in the form [parameter1 name][relational operator][parameter1 value],[parameter2 name][relational operator][parameter2 value],... 
+    /// These event parameters are associated with a specific eventName. An empty report is returned if the filtered request's parameter does not belong to the eventName. For more information about eventName parameters, see the list of event names for various applications above in applicationName.
+    /// 
+    /// In the following Admin Activity example, the <> operator is URL-encoded in the request's query string (%3C%3E):
+    /// GET...&eventName=CHANGE_CALENDAR_SETTING &filters=NEW_VALUE%3C%3EREAD_ONLY_ACCESS
+    /// 
+    /// In the following Drive example, the list can be a view or edit event's doc_id parameter with a value that is manipulated by an 'equal to' (==) or 'not equal to' (<>) relational operator. In the first example, the report returns each edited document's doc_id. In the second example, the report returns each viewed document's doc_id that equals the value 12345 and does not return any viewed document's which have a doc_id value of 98765. The <> operator is URL-encoded in the request's query string (%3C%3E):
+    /// 
+    /// GET...&eventName=edit&filters=doc_id GET...&eventName=view&filters=doc_id==12345,doc_id%3C%3E98765
+    /// 
+    /// The relational operators include:  
+    /// - == - 'equal to'. 
+    /// - <> - 'not equal to'. It is URL-encoded (%3C%3E). 
+    /// - < - 'less than'. It is URL-encoded (%3C). 
+    /// - <= - 'less than or equal to'. It is URL-encoded (%3C=). 
+    /// - > - 'greater than'. It is URL-encoded (%3E). 
+    /// - >= - 'greater than or equal to'. It is URL-encoded (%3E=).  
+    /// Note: The API doesn't accept multiple values of a parameter. If a particular parameter is supplied more than once in the API request, the API only accepts the last value of that request parameter.
+    /// In addition, if an invalid request parameter is supplied in the API request, the API ignores that request parameter and returns the response corresponding to the remaining valid request parameters. If no parameters are requested, all parameters are returned.
     ///
     /// Sets the *filters* query property to the given value.
     pub fn filters(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._filters = Some(new_value.to_string());
         self
     }
-    /// Name of the event being queried.
+    /// The name of the event being queried by the API. Each eventName is related to a specific G Suite service or feature which the API organizes into types of events. An example is the Google Calendar events in the Admin console application's reports. The Calendar Settings type structure has all of the Calendar eventName activities reported by the API. When an administrator changes a Calendar setting, the API reports this activity in the Calendar Settings type and eventName parameters. For more information about eventName query strings and parameters, see the list of event names for various applications above in applicationName.
     ///
     /// Sets the *event name* query property to the given value.
     pub fn event_name(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._event_name = Some(new_value.to_string());
         self
     }
-    /// Return events which occurred at or before this time.
+    /// Sets the end of the range of time shown in the report. The date is in the RFC 3339 format, for example 2010-10-28T10:26:35.000Z. The default value is the approximate time of the API request. An API report has three basic time concepts:  
+    /// - Date of the API's request for a report: When the API created and retrieved the report. 
+    /// - Report's start time: The beginning of the timespan shown in the report. The startTime must be before the endTime (if specified) and the current time when the request is made, or the API returns an error. 
+    /// - Report's end time: The end of the timespan shown in the report. For example, the timespan of events summarized in a report can start in April and end in May. The report itself can be requested in August.  If the endTime is not specified, the report returns all activities from the startTime until the current time or the most recent 180 days if the startTime is more than 180 days in the past.
     ///
     /// Sets the *end time* query property to the given value.
     pub fn end_time(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._end_time = Some(new_value.to_string());
         self
     }
-    /// Represents the customer for which the data is to be fetched.
+    /// The unique ID of the customer to retrieve data for.
     ///
     /// Sets the *customer id* query property to the given value.
     pub fn customer_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
         self._customer_id = Some(new_value.to_string());
         self
     }
-    /// IP Address of host where the event was performed. Supports both IPv4 and IPv6 addresses.
+    /// The Internet Protocol (IP) Address of host where the event was performed. This is an additional way to filter a report's summary using the IP address of the user whose activity is being reported. This IP address may or may not reflect the user's physical location. For example, the IP address can be the user's proxy server's address or a virtual private network (VPN) address. This parameter supports both IPv4 and IPv6 address versions.
     ///
     /// Sets the *actor ip address* query property to the given value.
     pub fn actor_ip_address(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
@@ -2068,7 +2113,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Push changes to activities
+/// Start receiving notifications for account activities. For more information, see Receiving Push Notifications.
 ///
 /// A builder for the *watch* method supported by a *activity* resource.
 /// It is not used directly, but through a `ActivityMethods` instance.
@@ -2317,7 +2362,7 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
-    /// Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
+    /// Represents the profile ID or the user email for which the data should be filtered. Can be all for all information, or userKey for a user's unique G Suite profile ID or their primary email address.
     ///
     /// Sets the *user key* path property to the given value.
     ///
@@ -2337,63 +2382,84 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._application_name = new_value.to_string();
         self
     }
-    /// Return events which occurred at or after this time.
+    /// Sets the beginning of the range of time shown in the report. The date is in the RFC 3339 format, for example 2010-10-28T10:26:35.000Z. The report returns all activities from startTime until endTime. The startTime must be before the endTime (if specified) and the current time when the request is made, or the API returns an error.
     ///
     /// Sets the *start time* query property to the given value.
     pub fn start_time(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._start_time = Some(new_value.to_string());
         self
     }
-    /// Token to specify next page.
+    /// The token to specify next page. A report with multiple pages has a nextPageToken property in the response. In your follow-on request getting the next page of the report, enter the nextPageToken value in the pageToken query string.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// the organizational unit's(OU) ID to filter activities from users belonging to a specific OU or one of its sub-OU(s)
+    /// ID of the organizational unit to report on. Activity records will be shown only for users who belong to the specified organizational unit. Data before Dec 17, 2018 doesn't appear in the filtered results.
     ///
     /// Sets the *org unit id* query property to the given value.
     pub fn org_unit_id(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._org_unit_id = Some(new_value.to_string());
         self
     }
-    /// Number of activity records to be shown in each page.
+    /// Determines how many activity records are shown on each response page. For example, if the request sets maxResults=1 and the report has two activities, the report has two pages. The response's nextPageToken property has the token to the second page. The maxResults query string is optional in the request. The default value is 1000.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> ActivityWatchCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Event parameters in the form [parameter1 name][operator][parameter1 value],[parameter2 name][operator][parameter2 value],...
+    /// The filters query string is a comma-separated list. The list is composed of event parameters that are manipulated by relational operators. Event parameters are in the form [parameter1 name][relational operator][parameter1 value],[parameter2 name][relational operator][parameter2 value],... 
+    /// These event parameters are associated with a specific eventName. An empty report is returned if the filtered request's parameter does not belong to the eventName. For more information about eventName parameters, see the list of event names for various applications above in applicationName.
+    /// 
+    /// In the following Admin Activity example, the <> operator is URL-encoded in the request's query string (%3C%3E):
+    /// GET...&eventName=CHANGE_CALENDAR_SETTING &filters=NEW_VALUE%3C%3EREAD_ONLY_ACCESS
+    /// 
+    /// In the following Drive example, the list can be a view or edit event's doc_id parameter with a value that is manipulated by an 'equal to' (==) or 'not equal to' (<>) relational operator. In the first example, the report returns each edited document's doc_id. In the second example, the report returns each viewed document's doc_id that equals the value 12345 and does not return any viewed document's which have a doc_id value of 98765. The <> operator is URL-encoded in the request's query string (%3C%3E):
+    /// 
+    /// GET...&eventName=edit&filters=doc_id GET...&eventName=view&filters=doc_id==12345,doc_id%3C%3E98765
+    /// 
+    /// The relational operators include:  
+    /// - == - 'equal to'. 
+    /// - <> - 'not equal to'. It is URL-encoded (%3C%3E). 
+    /// - < - 'less than'. It is URL-encoded (%3C). 
+    /// - <= - 'less than or equal to'. It is URL-encoded (%3C=). 
+    /// - > - 'greater than'. It is URL-encoded (%3E). 
+    /// - >= - 'greater than or equal to'. It is URL-encoded (%3E=).  
+    /// Note: The API doesn't accept multiple values of a parameter. If a particular parameter is supplied more than once in the API request, the API only accepts the last value of that request parameter.
+    /// In addition, if an invalid request parameter is supplied in the API request, the API ignores that request parameter and returns the response corresponding to the remaining valid request parameters. If no parameters are requested, all parameters are returned.
     ///
     /// Sets the *filters* query property to the given value.
     pub fn filters(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._filters = Some(new_value.to_string());
         self
     }
-    /// Name of the event being queried.
+    /// The name of the event being queried by the API. Each eventName is related to a specific G Suite service or feature which the API organizes into types of events. An example is the Google Calendar events in the Admin console application's reports. The Calendar Settings type structure has all of the Calendar eventName activities reported by the API. When an administrator changes a Calendar setting, the API reports this activity in the Calendar Settings type and eventName parameters. For more information about eventName query strings and parameters, see the list of event names for various applications above in applicationName.
     ///
     /// Sets the *event name* query property to the given value.
     pub fn event_name(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._event_name = Some(new_value.to_string());
         self
     }
-    /// Return events which occurred at or before this time.
+    /// Sets the end of the range of time shown in the report. The date is in the RFC 3339 format, for example 2010-10-28T10:26:35.000Z. The default value is the approximate time of the API request. An API report has three basic time concepts:  
+    /// - Date of the API's request for a report: When the API created and retrieved the report. 
+    /// - Report's start time: The beginning of the timespan shown in the report. The startTime must be before the endTime (if specified) and the current time when the request is made, or the API returns an error. 
+    /// - Report's end time: The end of the timespan shown in the report. For example, the timespan of events summarized in a report can start in April and end in May. The report itself can be requested in August.  If the endTime is not specified, the report returns all activities from the startTime until the current time or the most recent 180 days if the startTime is more than 180 days in the past.
     ///
     /// Sets the *end time* query property to the given value.
     pub fn end_time(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._end_time = Some(new_value.to_string());
         self
     }
-    /// Represents the customer for which the data is to be fetched.
+    /// The unique ID of the customer to retrieve data for.
     ///
     /// Sets the *customer id* query property to the given value.
     pub fn customer_id(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
         self._customer_id = Some(new_value.to_string());
         self
     }
-    /// IP Address of host where the event was performed. Supports both IPv4 and IPv6 addresses.
+    /// The Internet Protocol (IP) Address of host where the event was performed. This is an additional way to filter a report's summary using the IP address of the user whose activity is being reported. This IP address may or may not reflect the user's physical location. For example, the IP address can be the user's proxy server's address or a virtual private network (VPN) address. This parameter supports both IPv4 and IPv6 address versions.
     ///
     /// Sets the *actor ip address* query property to the given value.
     pub fn actor_ip_address(mut self, new_value: &str) -> ActivityWatchCall<'a, C, A> {
@@ -2459,7 +2525,7 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Retrieves a report which is a collection of properties / statistics for a specific customer.
+/// Retrieves a report which is a collection of properties and statistics for a specific customer's account. For more information, see the Customers Usage Report guide. For more information about the customer report's parameters, see the Customers Usage parameters reference guides.
 ///
 /// A builder for the *get* method supported by a *customerUsageReport* resource.
 /// It is not used directly, but through a `CustomerUsageReportMethods` instance.
@@ -2645,7 +2711,7 @@ impl<'a, C, A> CustomerUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
-    /// Represents the date in yyyy-mm-dd format for which the data is to be fetched.
+    /// Represents the date the usage occurred. The timestamp is in the ISO 8601 format, yyyy-mm-dd. We recommend you use your account's time zone for this.
     ///
     /// Sets the *date* path property to the given value.
     ///
@@ -2655,21 +2721,26 @@ impl<'a, C, A> CustomerUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._date = new_value.to_string();
         self
     }
-    /// Represents the application name, parameter name pairs to fetch in csv as app_name1:param_name1, app_name2:param_name2.
+    /// The parameters query string is a comma-separated list of event parameters that refine a report's results. The parameter is associated with a specific application. The application values for the Customers usage report include accounts, app_maker, apps_scripts, calendar, classroom, cros, docs, gmail, gplus, device_management, meet, and sites.
+    /// A parameters query string is in the CSV form of app_name1:param_name1, app_name2:param_name2.
+    /// Note: The API doesn't accept multiple values of a parameter. If a particular parameter is supplied more than once in the API request, the API only accepts the last value of that request parameter.
+    /// In addition, if an invalid request parameter is supplied in the API request, the API ignores that request parameter and returns the response corresponding to the remaining valid request parameters.
+    /// 
+    /// An example of an invalid request parameter is one that does not belong to the application. If no parameters are requested, all parameters are returned.
     ///
     /// Sets the *parameters* query property to the given value.
     pub fn parameters(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, A> {
         self._parameters = Some(new_value.to_string());
         self
     }
-    /// Token to specify next page.
+    /// Token to specify next page. A report with multiple pages has a nextPageToken property in the response. For your follow-on requests getting all of the report's pages, enter the nextPageToken value in the pageToken query string.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Represents the customer for which the data is to be fetched.
+    /// The unique ID of the customer to retrieve data for.
     ///
     /// Sets the *customer id* query property to the given value.
     pub fn customer_id(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, A> {
@@ -2735,7 +2806,7 @@ impl<'a, C, A> CustomerUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Retrieves a report which is a collection of properties / statistics for a set of users.
+/// Retrieves a report which is a collection of properties and statistics for a set of users with the account. For more information, see the User Usage Report guide. For more information about the user report's parameters, see the Users Usage parameters reference guides.
 ///
 /// A builder for the *get* method supported by a *userUsageReport* resource.
 /// It is not used directly, but through a `UserUsageReportMethods` instance.
@@ -2938,7 +3009,7 @@ impl<'a, C, A> UserUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// Represents the profile id or the user email for which the data should be filtered.
+    /// Represents the profile ID or the user email for which the data should be filtered. Can be all for all information, or userKey for a user's unique G Suite profile ID or their primary email address.
     ///
     /// Sets the *user key* path property to the given value.
     ///
@@ -2948,7 +3019,7 @@ impl<'a, C, A> UserUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._user_key = new_value.to_string();
         self
     }
-    /// Represents the date in yyyy-mm-dd format for which the data is to be fetched.
+    /// Represents the date the usage occurred. The timestamp is in the ISO 8601 format, yyyy-mm-dd. We recommend you use your account's time zone for this.
     ///
     /// Sets the *date* path property to the given value.
     ///
@@ -2958,42 +3029,61 @@ impl<'a, C, A> UserUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._date = new_value.to_string();
         self
     }
-    /// Represents the application name, parameter name pairs to fetch in csv as app_name1:param_name1, app_name2:param_name2.
+    /// The parameters query string is a comma-separated list of event parameters that refine a report's results. The parameter is associated with a specific application. The application values for the Customers usage report include accounts, app_maker, apps_scripts, calendar, classroom, cros, docs, gmail, gplus, device_management, meet, and sites.
+    /// A parameters query string is in the CSV form of app_name1:param_name1, app_name2:param_name2.
+    /// Note: The API doesn't accept multiple values of a parameter.
+    /// If a particular parameter is supplied more than once in the API request, the API only accepts the last value of that request parameter. In addition, if an invalid request parameter is supplied in the API request, the API ignores that request parameter and returns the response corresponding to the remaining valid request parameters.
+    /// 
+    /// An example of an invalid request parameter is one that does not belong to the application. If no parameters are requested, all parameters are returned.
     ///
     /// Sets the *parameters* query property to the given value.
     pub fn parameters(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, A> {
         self._parameters = Some(new_value.to_string());
         self
     }
-    /// Token to specify next page.
+    /// Token to specify next page. A report with multiple pages has a nextPageToken property in the response. In your follow-on request getting the next page of the report, enter the nextPageToken value in the pageToken query string.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// the organizational unit's ID to filter usage parameters from users belonging to a specific OU or one of its sub-OU(s).
+    /// ID of the organizational unit to report on. User activity will be shown only for users who belong to the specified organizational unit. Data before Dec 17, 2018 doesn't appear in the filtered results.
     ///
     /// Sets the *org unit id* query property to the given value.
     pub fn org_unit_id(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, A> {
         self._org_unit_id = Some(new_value.to_string());
         self
     }
-    /// Maximum number of results to return. Maximum allowed is 1000
+    /// Determines how many activity records are shown on each response page. For example, if the request sets maxResults=1 and the report has two activities, the report has two pages. The response's nextPageToken property has the token to the second page.
+    /// The maxResults query string is optional.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> UserUsageReportGetCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
-    /// Represents the set of filters including parameter operator value.
+    /// The filters query string is a comma-separated list of an application's event parameters where the parameter's value is manipulated by a relational operator. The filters query string includes the name of the application whose usage is returned in the report. The application values for the Users Usage Report include accounts, docs, and gmail.
+    /// Filters are in the form [application name]:[parameter name][relational operator][parameter value],....
+    /// 
+    /// In this example, the <> 'not equal to' operator is URL-encoded in the request's query string (%3C%3E):
+    /// GET https://www.googleapis.com/admin/reports/v1/usage/users/all/dates/2013-03-03 ?parameters=accounts:last_login_time &filters=accounts:last_login_time>2010-10-28T10:26:35.000Z
+    /// 
+    /// 
+    /// The relational operators include:  
+    /// - == - 'equal to'. 
+    /// - <> - 'not equal to'. It is URL-encoded (%3C%3E). 
+    /// - < - 'less than'. It is URL-encoded (%3C). 
+    /// - <= - 'less than or equal to'. It is URL-encoded (%3C=). 
+    /// - > - 'greater than'. It is URL-encoded (%3E). 
+    /// - >= - 'greater than or equal to'. It is URL-encoded (%3E=).
     ///
     /// Sets the *filters* query property to the given value.
     pub fn filters(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, A> {
         self._filters = Some(new_value.to_string());
         self
     }
-    /// Represents the customer for which the data is to be fetched.
+    /// The unique ID of the customer to retrieve data for.
     ///
     /// Sets the *customer id* query property to the given value.
     pub fn customer_id(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, A> {

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-firebaseremoteconfig1"
-version = "1.0.12+20171129"
+version = "1.0.13+20171129"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Firebase Remote Config (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/firebaseremoteconfig1"
 homepage = "https://firebase.google.com/docs/remote-config/"
-documentation = "https://docs.rs/google-firebaseremoteconfig1/1.0.12+20171129"
+documentation = "https://docs.rs/google-firebaseremoteconfig1/1.0.13+20171129"
 license = "MIT"
 keywords = ["firebaseremoteconfig", "google", "protocol", "web", "api"]
 autobins = false

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AnalyticsReporting* crate version *1.0.12+20190625*, where *20190625* is the exact revision of the *analyticsreporting:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *AnalyticsReporting* crate version *1.0.13+20200405*, where *20200405* is the exact revision of the *analyticsreporting:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *AnalyticsReporting* *v4* API can be found at the
 //! [official documentation site](https://developers.google.com/analytics/devguides/reporting/core/v4/).
@@ -335,7 +335,7 @@ impl<'a, C, A> AnalyticsReporting<C, A>
         AnalyticsReporting {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://analyticsreporting.googleapis.com/".to_string(),
             _root_url: "https://analyticsreporting.googleapis.com/".to_string(),
         }
@@ -349,7 +349,7 @@ impl<'a, C, A> AnalyticsReporting<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -487,13 +487,16 @@ pub struct GetReportsRequest {
     #[serde(rename="reportRequests")]
     pub report_requests: Option<Vec<ReportRequest>>,
     /// Enables
-    /// [resource based quotas](/analytics/devguides/reporting/core/v4/limits-quotas#analytics_reporting_api_v4),
+    /// [resource based
+    /// quotas](/analytics/devguides/reporting/core/v4/limits-quotas#analytics_reporting_api_v4),
     /// (defaults to `False`). If this field is set to `True` the
     /// per view (profile) quotas are governed by the computational
     /// cost of the request. Note that using cost based quotas will
     /// higher enable sampling rates. (10 Million for `SMALL`,
     /// 100M for `LARGE`. See the
-    /// [limits and quotas documentation](/analytics/devguides/reporting/core/v4/limits-quotas#analytics_reporting_api_v4) for details.
+    /// [limits and quotas
+    /// documentation](/analytics/devguides/reporting/core/v4/limits-quotas#analytics_reporting_api_v4)
+    /// for details.
     #[serde(rename="useResourceQuotas")]
     pub use_resource_quotas: Option<bool>,
 }
@@ -595,7 +598,8 @@ pub struct ReportRequest {
     /// following expression selects `ga:browser` dimension which starts with
     /// Firefox; `ga:browser=~^Firefox`. For more information on dimensions
     /// and metric filters, see
-    /// [Filters reference](https://developers.google.com/analytics/devguides/reporting/core/v3/reference#filters).
+    /// [Filters
+    /// reference](https://developers.google.com/analytics/devguides/reporting/core/v3/reference#filters).
     #[serde(rename="filtersExpression")]
     pub filters_expression: Option<String>,
     /// The Analytics
@@ -639,7 +643,7 @@ pub struct ReportRequest {
     #[serde(rename="metricFilterClauses")]
     pub metric_filter_clauses: Option<Vec<MetricFilterClause>>,
     /// The dimensions requested.
-    /// Requests can have a total of 7 dimensions.
+    /// Requests can have a total of 9 dimensions.
     pub dimensions: Option<Vec<Dimension>>,
     /// The pivot definitions. Requests can have a maximum of 2 pivots.
     pub pivots: Option<Vec<Pivot>>,
@@ -1269,7 +1273,8 @@ pub struct CohortGroup {
     /// - The cohort definition date ranges need not be aligned to the calendar
     ///   week and month boundaries.
     /// - The `viewId` must be an
-    ///   [app view ID](https://support.google.com/analytics/answer/2649553#WebVersusAppViews)
+    ///   [app view
+    ///   ID](https://support.google.com/analytics/answer/2649553#WebVersusAppViews)
     #[serde(rename="lifetimeValue")]
     pub lifetime_value: Option<bool>,
 }
@@ -1400,7 +1405,12 @@ pub struct Activity {
     /// (defined by the View's Channel Groupings).
     #[serde(rename="channelGrouping")]
     pub channel_grouping: Option<String>,
-    /// Timestamp of the activity.
+    /// Timestamp of the activity. If activities for a visit cross midnight and
+    /// occur in two separate dates, then two sessions (one per date)
+    /// share the session identifier.
+    /// For example, say session ID 113472 has activity within 2019-08-20, and
+    /// session ID 243742 has activity within 2019-08-25 and 2019-08-26. Session ID
+    /// 113472 is one session, and session ID 243742 is two sessions.
     #[serde(rename="activityTime")]
     pub activity_time: Option<String>,
     /// This field contains all the details pertaining to an event and will be

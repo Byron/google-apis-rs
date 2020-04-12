@@ -238,7 +238,7 @@ fn main() {
     
     let mut app = App::new("pagespeedonline2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190507")
+           .version("1.0.13+20191206")
            .about("Analyzes the performance of a web page and provides tailored suggestions to make that page faster.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pagespeedonline2_cli")
            .arg(Arg::with_name("folder")

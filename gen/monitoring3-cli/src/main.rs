@@ -77,12 +77,14 @@ impl<'n> Engine<'n> {
                     "documentation.content" => Some(("documentation.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "documentation.mime-type" => Some(("documentation.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enabled" => Some(("enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "validity.message" => Some(("validity.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "validity.code" => Some(("validity.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "user-labels" => Some(("userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "notification-channels" => Some(("notificationChannels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "mutation-record.mutated-by" => Some(("mutationRecord.mutatedBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mutation-record.mutate-time" => Some(("mutationRecord.mutateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["combiner", "content", "creation-record", "display-name", "documentation", "enabled", "mime-type", "mutate-time", "mutated-by", "mutation-record", "name", "notification-channels", "user-labels"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "combiner", "content", "creation-record", "display-name", "documentation", "enabled", "message", "mime-type", "mutate-time", "mutated-by", "mutation-record", "name", "notification-channels", "user-labels", "validity"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -342,12 +344,14 @@ impl<'n> Engine<'n> {
                     "documentation.content" => Some(("documentation.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "documentation.mime-type" => Some(("documentation.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enabled" => Some(("enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "validity.message" => Some(("validity.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "validity.code" => Some(("validity.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "user-labels" => Some(("userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "notification-channels" => Some(("notificationChannels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "mutation-record.mutated-by" => Some(("mutationRecord.mutatedBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mutation-record.mutate-time" => Some(("mutationRecord.mutateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["combiner", "content", "creation-record", "display-name", "documentation", "enabled", "mime-type", "mutate-time", "mutated-by", "mutation-record", "name", "notification-channels", "user-labels"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "combiner", "content", "creation-record", "display-name", "documentation", "enabled", "message", "mime-type", "mutate-time", "mutated-by", "mutation-record", "name", "notification-channels", "user-labels", "validity"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -957,13 +961,14 @@ impl<'n> Engine<'n> {
                     "value-type" => Some(("valueType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "launch-stage" => Some(("launchStage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "unit" => Some(("unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "monitored-resource-types" => Some(("monitoredResourceTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "metadata.launch-stage" => Some(("metadata.launchStage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.ingest-delay" => Some(("metadata.ingestDelay", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.sample-period" => Some(("metadata.samplePeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "display-name", "ingest-delay", "launch-stage", "metadata", "metric-kind", "name", "sample-period", "type", "unit", "value-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "display-name", "ingest-delay", "launch-stage", "metadata", "metric-kind", "monitored-resource-types", "name", "sample-period", "type", "unit", "value-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2199,6 +2204,93 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_time_series_query(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "query" => Some(("query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["page-size", "page-token", "query"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::QueryTimeSeriesRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().time_series_query(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_uptime_check_configs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -2226,6 +2318,7 @@ impl<'n> Engine<'n> {
                     "resource-group.group-id" => Some(("resourceGroup.groupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-internal" => Some(("isInternal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "tcp-check.port" => Some(("tcpCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "period" => Some(("period", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "selected-regions" => Some(("selectedRegions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2235,12 +2328,13 @@ impl<'n> Engine<'n> {
                     "http-check.headers" => Some(("httpCheck.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "http-check.auth-info.username" => Some(("httpCheck.authInfo.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.auth-info.password" => Some(("httpCheck.authInfo.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-check.validate-ssl" => Some(("httpCheck.validateSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "http-check.mask-headers" => Some(("httpCheck.maskHeaders", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "http-check.path" => Some(("httpCheck.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.port" => Some(("httpCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-info", "display-name", "group-id", "headers", "http-check", "labels", "mask-headers", "monitored-resource", "name", "password", "path", "period", "port", "resource-group", "resource-type", "selected-regions", "tcp-check", "timeout", "type", "use-ssl", "username"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-info", "display-name", "group-id", "headers", "http-check", "is-internal", "labels", "mask-headers", "monitored-resource", "name", "password", "path", "period", "port", "resource-group", "resource-type", "selected-regions", "tcp-check", "timeout", "type", "use-ssl", "username", "validate-ssl"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2490,6 +2584,7 @@ impl<'n> Engine<'n> {
                     "resource-group.group-id" => Some(("resourceGroup.groupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-internal" => Some(("isInternal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "tcp-check.port" => Some(("tcpCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "period" => Some(("period", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "selected-regions" => Some(("selectedRegions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2499,12 +2594,13 @@ impl<'n> Engine<'n> {
                     "http-check.headers" => Some(("httpCheck.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "http-check.auth-info.username" => Some(("httpCheck.authInfo.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.auth-info.password" => Some(("httpCheck.authInfo.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-check.validate-ssl" => Some(("httpCheck.validateSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "http-check.mask-headers" => Some(("httpCheck.maskHeaders", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "http-check.path" => Some(("httpCheck.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.port" => Some(("httpCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-info", "display-name", "group-id", "headers", "http-check", "labels", "mask-headers", "monitored-resource", "name", "password", "path", "period", "port", "resource-group", "resource-type", "selected-regions", "tcp-check", "timeout", "type", "use-ssl", "username"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-info", "display-name", "group-id", "headers", "http-check", "is-internal", "labels", "mask-headers", "monitored-resource", "name", "password", "path", "period", "port", "resource-group", "resource-type", "selected-regions", "tcp-check", "timeout", "type", "use-ssl", "username", "validate-ssl"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2515,6 +2611,789 @@ impl<'n> Engine<'n> {
         }
         let mut request: api::UptimeCheckConfig = json::value::from_value(object).unwrap();
         let mut call = self.hub.projects().uptime_check_configs_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _services_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-endpoints.service" => Some(("cloudEndpoints.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mesh-istio.mesh-uid" => Some(("meshIstio.meshUid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mesh-istio.service-namespace" => Some(("meshIstio.serviceNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mesh-istio.service-name" => Some(("meshIstio.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "telemetry.resource-name" => Some(("telemetry.resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-istio.cluster-name" => Some(("clusterIstio.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-istio.service-namespace" => Some(("clusterIstio.serviceNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-istio.service-name" => Some(("clusterIstio.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-istio.location" => Some(("clusterIstio.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-engine.module-id" => Some(("appEngine.moduleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine", "cloud-endpoints", "cluster-istio", "cluster-name", "display-name", "location", "mesh-istio", "mesh-uid", "module-id", "name", "resource-name", "service", "service-name", "service-namespace", "telemetry"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Service = json::value::from_value(object).unwrap();
+        let mut call = self.hub.services().create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "service-id" => {
+                    call = call.service_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["service-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _services_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.services().delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _services_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.services().get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _services_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.services().list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _services_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-endpoints.service" => Some(("cloudEndpoints.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mesh-istio.mesh-uid" => Some(("meshIstio.meshUid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mesh-istio.service-namespace" => Some(("meshIstio.serviceNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mesh-istio.service-name" => Some(("meshIstio.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "telemetry.resource-name" => Some(("telemetry.resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-istio.cluster-name" => Some(("clusterIstio.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-istio.service-namespace" => Some(("clusterIstio.serviceNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-istio.service-name" => Some(("clusterIstio.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-istio.location" => Some(("clusterIstio.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-engine.module-id" => Some(("appEngine.moduleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine", "cloud-endpoints", "cluster-istio", "cluster-name", "display-name", "location", "mesh-istio", "mesh-uid", "module-id", "name", "resource-name", "service", "service-name", "service-namespace", "telemetry"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Service = json::value::from_value(object).unwrap();
+        let mut call = self.hub.services().patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _services_service_level_objectives_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "goal" => Some(("goal", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "calendar-period" => Some(("calendarPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.basic-sli.latency.threshold" => Some(("serviceLevelIndicator.basicSli.latency.threshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.basic-sli.version" => Some(("serviceLevelIndicator.basicSli.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.basic-sli.method" => Some(("serviceLevelIndicator.basicSli.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.basic-sli.location" => Some(("serviceLevelIndicator.basicSli.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.windows-based.metric-mean-in-range.range.max" => Some(("serviceLevelIndicator.windowsBased.metricMeanInRange.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.metric-mean-in-range.range.min" => Some(("serviceLevelIndicator.windowsBased.metricMeanInRange.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.metric-mean-in-range.time-series" => Some(("serviceLevelIndicator.windowsBased.metricMeanInRange.timeSeries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-bad-metric-filter" => Some(("serviceLevelIndicator.windowsBased.goodBadMetricFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.threshold" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.threshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.latency.threshold" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.latency.threshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.version" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.method" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.location" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.distribution-cut.range.max" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.distributionCut.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.distribution-cut.range.min" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.distributionCut.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.distribution-cut.distribution-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.distributionCut.distributionFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.good-total-ratio.bad-service-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.goodTotalRatio.badServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.good-total-ratio.total-service-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.goodTotalRatio.totalServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.good-total-ratio.good-service-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.goodTotalRatio.goodServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.metric-sum-in-range.range.max" => Some(("serviceLevelIndicator.windowsBased.metricSumInRange.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.metric-sum-in-range.range.min" => Some(("serviceLevelIndicator.windowsBased.metricSumInRange.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.metric-sum-in-range.time-series" => Some(("serviceLevelIndicator.windowsBased.metricSumInRange.timeSeries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.window-period" => Some(("serviceLevelIndicator.windowsBased.windowPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.distribution-cut.range.max" => Some(("serviceLevelIndicator.requestBased.distributionCut.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.distribution-cut.range.min" => Some(("serviceLevelIndicator.requestBased.distributionCut.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.distribution-cut.distribution-filter" => Some(("serviceLevelIndicator.requestBased.distributionCut.distributionFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.good-total-ratio.bad-service-filter" => Some(("serviceLevelIndicator.requestBased.goodTotalRatio.badServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.good-total-ratio.total-service-filter" => Some(("serviceLevelIndicator.requestBased.goodTotalRatio.totalServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.good-total-ratio.good-service-filter" => Some(("serviceLevelIndicator.requestBased.goodTotalRatio.goodServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rolling-period" => Some(("rollingPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bad-service-filter", "basic-sli", "basic-sli-performance", "calendar-period", "display-name", "distribution-cut", "distribution-filter", "goal", "good-bad-metric-filter", "good-service-filter", "good-total-ratio", "good-total-ratio-threshold", "latency", "location", "max", "method", "metric-mean-in-range", "metric-sum-in-range", "min", "name", "performance", "range", "request-based", "rolling-period", "service-level-indicator", "threshold", "time-series", "total-service-filter", "version", "window-period", "windows-based"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ServiceLevelObjective = json::value::from_value(object).unwrap();
+        let mut call = self.hub.services().service_level_objectives_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "service-level-objective-id" => {
+                    call = call.service_level_objective_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["service-level-objective-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _services_service_level_objectives_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.services().service_level_objectives_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _services_service_level_objectives_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.services().service_level_objectives_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "view" => {
+                    call = call.view(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["view"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _services_service_level_objectives_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.services().service_level_objectives_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "view" => {
+                    call = call.view(value.unwrap_or(""));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "page-size", "view"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _services_service_level_objectives_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "goal" => Some(("goal", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "calendar-period" => Some(("calendarPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.basic-sli.latency.threshold" => Some(("serviceLevelIndicator.basicSli.latency.threshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.basic-sli.version" => Some(("serviceLevelIndicator.basicSli.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.basic-sli.method" => Some(("serviceLevelIndicator.basicSli.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.basic-sli.location" => Some(("serviceLevelIndicator.basicSli.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.windows-based.metric-mean-in-range.range.max" => Some(("serviceLevelIndicator.windowsBased.metricMeanInRange.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.metric-mean-in-range.range.min" => Some(("serviceLevelIndicator.windowsBased.metricMeanInRange.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.metric-mean-in-range.time-series" => Some(("serviceLevelIndicator.windowsBased.metricMeanInRange.timeSeries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-bad-metric-filter" => Some(("serviceLevelIndicator.windowsBased.goodBadMetricFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.threshold" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.threshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.latency.threshold" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.latency.threshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.version" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.method" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.basic-sli-performance.location" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.basicSliPerformance.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.distribution-cut.range.max" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.distributionCut.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.distribution-cut.range.min" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.distributionCut.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.distribution-cut.distribution-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.distributionCut.distributionFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.good-total-ratio.bad-service-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.goodTotalRatio.badServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.good-total-ratio.total-service-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.goodTotalRatio.totalServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.good-total-ratio-threshold.performance.good-total-ratio.good-service-filter" => Some(("serviceLevelIndicator.windowsBased.goodTotalRatioThreshold.performance.goodTotalRatio.goodServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.metric-sum-in-range.range.max" => Some(("serviceLevelIndicator.windowsBased.metricSumInRange.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.metric-sum-in-range.range.min" => Some(("serviceLevelIndicator.windowsBased.metricSumInRange.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.metric-sum-in-range.time-series" => Some(("serviceLevelIndicator.windowsBased.metricSumInRange.timeSeries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.windows-based.window-period" => Some(("serviceLevelIndicator.windowsBased.windowPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.distribution-cut.range.max" => Some(("serviceLevelIndicator.requestBased.distributionCut.range.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.distribution-cut.range.min" => Some(("serviceLevelIndicator.requestBased.distributionCut.range.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.distribution-cut.distribution-filter" => Some(("serviceLevelIndicator.requestBased.distributionCut.distributionFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.good-total-ratio.bad-service-filter" => Some(("serviceLevelIndicator.requestBased.goodTotalRatio.badServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.good-total-ratio.total-service-filter" => Some(("serviceLevelIndicator.requestBased.goodTotalRatio.totalServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-level-indicator.request-based.good-total-ratio.good-service-filter" => Some(("serviceLevelIndicator.requestBased.goodTotalRatio.goodServiceFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rolling-period" => Some(("rollingPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bad-service-filter", "basic-sli", "basic-sli-performance", "calendar-period", "display-name", "distribution-cut", "distribution-filter", "goal", "good-bad-metric-filter", "good-service-filter", "good-total-ratio", "good-total-ratio-threshold", "latency", "location", "max", "method", "metric-mean-in-range", "metric-sum-in-range", "min", "name", "performance", "range", "request-based", "rolling-period", "service-level-indicator", "threshold", "time-series", "total-service-filter", "version", "window-period", "windows-based"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ServiceLevelObjective = json::value::from_value(object).unwrap();
+        let mut call = self.hub.services().service_level_objectives_patch(request, opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2724,6 +3603,9 @@ impl<'n> Engine<'n> {
                     ("time-series-list", Some(opt)) => {
                         call_result = self._projects_time_series_list(opt, dry_run, &mut err);
                     },
+                    ("time-series-query", Some(opt)) => {
+                        call_result = self._projects_time_series_query(opt, dry_run, &mut err);
+                    },
                     ("uptime-check-configs-create", Some(opt)) => {
                         call_result = self._projects_uptime_check_configs_create(opt, dry_run, &mut err);
                     },
@@ -2741,6 +3623,44 @@ impl<'n> Engine<'n> {
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("services", Some(opt)) => {
+                match opt.subcommand() {
+                    ("create", Some(opt)) => {
+                        call_result = self._services_create(opt, dry_run, &mut err);
+                    },
+                    ("delete", Some(opt)) => {
+                        call_result = self._services_delete(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._services_get(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._services_list(opt, dry_run, &mut err);
+                    },
+                    ("patch", Some(opt)) => {
+                        call_result = self._services_patch(opt, dry_run, &mut err);
+                    },
+                    ("service-level-objectives-create", Some(opt)) => {
+                        call_result = self._services_service_level_objectives_create(opt, dry_run, &mut err);
+                    },
+                    ("service-level-objectives-delete", Some(opt)) => {
+                        call_result = self._services_service_level_objectives_delete(opt, dry_run, &mut err);
+                    },
+                    ("service-level-objectives-get", Some(opt)) => {
+                        call_result = self._services_service_level_objectives_get(opt, dry_run, &mut err);
+                    },
+                    ("service-level-objectives-list", Some(opt)) => {
+                        call_result = self._services_service_level_objectives_list(opt, dry_run, &mut err);
+                    },
+                    ("service-level-objectives-patch", Some(opt)) => {
+                        call_result = self._services_service_level_objectives_patch(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("services".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -2841,14 +3761,16 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'alert-policies-create', 'alert-policies-delete', 'alert-policies-get', 'alert-policies-list', 'alert-policies-patch', 'collectd-time-series-create', 'groups-create', 'groups-delete', 'groups-get', 'groups-list', 'groups-members-list', 'groups-update', 'metric-descriptors-create', 'metric-descriptors-delete', 'metric-descriptors-get', 'metric-descriptors-list', 'monitored-resource-descriptors-get', 'monitored-resource-descriptors-list', 'notification-channel-descriptors-get', 'notification-channel-descriptors-list', 'notification-channels-create', 'notification-channels-delete', 'notification-channels-get', 'notification-channels-get-verification-code', 'notification-channels-list', 'notification-channels-patch', 'notification-channels-send-verification-code', 'notification-channels-verify', 'time-series-create', 'time-series-list', 'uptime-check-configs-create', 'uptime-check-configs-delete', 'uptime-check-configs-get', 'uptime-check-configs-list' and 'uptime-check-configs-patch'", vec![
+        ("projects", "methods: 'alert-policies-create', 'alert-policies-delete', 'alert-policies-get', 'alert-policies-list', 'alert-policies-patch', 'collectd-time-series-create', 'groups-create', 'groups-delete', 'groups-get', 'groups-list', 'groups-members-list', 'groups-update', 'metric-descriptors-create', 'metric-descriptors-delete', 'metric-descriptors-get', 'metric-descriptors-list', 'monitored-resource-descriptors-get', 'monitored-resource-descriptors-list', 'notification-channel-descriptors-get', 'notification-channel-descriptors-list', 'notification-channels-create', 'notification-channels-delete', 'notification-channels-get', 'notification-channels-get-verification-code', 'notification-channels-list', 'notification-channels-patch', 'notification-channels-send-verification-code', 'notification-channels-verify', 'time-series-create', 'time-series-list', 'time-series-query', 'uptime-check-configs-create', 'uptime-check-configs-delete', 'uptime-check-configs-get', 'uptime-check-configs-list' and 'uptime-check-configs-patch'", vec![
             ("alert-policies-create",
                     Some(r##"Creates a new alerting policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_alert-policies-create",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project in which to create the alerting policy. The format is projects/[PROJECT_ID].Note that this field names the parent container in which the alerting policy will be written, not the name of the created policy. The alerting policy that is returned will have a name that contains a normalized representation of this name as a prefix but adds a suffix of the form /alertPolicies/[POLICY_ID], identifying the policy in the container."##),
+                     Some(r##"Required. The project in which to create the alerting policy. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]
+        Note that this field names the parent container in which the alerting policy will be written, not the name of the created policy. The alerting policy that is returned will have a name that contains a normalized representation of this name as a prefix but adds a suffix of the form /alertPolicies/[ALERT_POLICY_ID], identifying the policy in the container."##),
                      Some(true),
                      Some(false)),
         
@@ -2876,8 +3798,8 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The alerting policy to delete. The format is:
-        projects/[PROJECT_ID]/alertPolicies/[ALERT_POLICY_ID]
+                     Some(r##"Required. The alerting policy to delete. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[ALERT_POLICY_ID]
         For more information, see AlertPolicy."##),
                      Some(true),
                      Some(false)),
@@ -2900,8 +3822,8 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The alerting policy to retrieve. The format is
-        projects/[PROJECT_ID]/alertPolicies/[ALERT_POLICY_ID]
+                     Some(r##"Required. The alerting policy to retrieve. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[ALERT_POLICY_ID]
         "##),
                      Some(true),
                      Some(false)),
@@ -2924,8 +3846,8 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project whose alert policies are to be listed. The format is
-        projects/[PROJECT_ID]
+                     Some(r##"Required. The project whose alert policies are to be listed. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]
         Note that this field names the parent container in which the alerting policies to be listed are stored. To retrieve a single alerting policy by name, use the GetAlertPolicy operation, instead."##),
                      Some(true),
                      Some(false)),
@@ -2948,8 +3870,8 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required if the policy exists. The resource name for this policy. The syntax is:
-        projects/[PROJECT_ID]/alertPolicies/[ALERT_POLICY_ID]
+                     Some(r##"Required if the policy exists. The resource name for this policy. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[ALERT_POLICY_ID]
         [ALERT_POLICY_ID] is assigned by Stackdriver Monitoring when the policy is created. When calling the alertPolicies.create method, do not include the name field in the alerting policy passed as part of the request."##),
                      Some(true),
                      Some(false)),
@@ -2978,7 +3900,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project in which to create the time series. The format is "projects/PROJECT_ID_OR_NUMBER"."##),
+                     Some(r##"The project in which to create the time series. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3006,7 +3930,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project in which to create the group. The format is "projects/{project_id_or_number}"."##),
+                     Some(r##"Required. The project in which to create the group. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3034,7 +3960,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The group to delete. The format is "projects/{project_id_or_number}/groups/{group_id}"."##),
+                     Some(r##"Required. The group to delete. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/groups/[GROUP_ID]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3056,7 +3984,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The group to retrieve. The format is "projects/{project_id_or_number}/groups/{group_id}"."##),
+                     Some(r##"Required. The group to retrieve. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/groups/[GROUP_ID]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3078,7 +4008,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project whose groups are to be listed. The format is "projects/{project_id_or_number}"."##),
+                     Some(r##"Required. The project whose groups are to be listed. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3100,7 +4032,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The group whose members are listed. The format is "projects/{project_id_or_number}/groups/{group_id}"."##),
+                     Some(r##"Required. The group whose members are listed. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/groups/[GROUP_ID]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3122,7 +4056,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. The name of this group. The format is "projects/{project_id_or_number}/groups/{group_id}". When creating a group, this field is ignored and a new name is created consisting of the project specified in the call to CreateGroup and a unique {group_id} that is generated automatically."##),
+                     Some(r##"Output only. The name of this group. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/groups/[GROUP_ID]
+        When creating a group, this field is ignored and a new name is created consisting of the project specified in the call to CreateGroup and a unique [GROUP_ID] that is generated automatically."##),
                      Some(true),
                      Some(false)),
         
@@ -3145,12 +4081,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("metric-descriptors-create",
-                    Some(r##"Creates a new metric descriptor. User-created metric descriptors define custom metrics."##),
+                    Some(r##"Creates a new metric descriptor. User-created metric descriptors define custom metrics (https://cloud.google.com/monitoring/custom-metrics)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_metric-descriptors-create",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project on which to execute the request. The format is "projects/{project_id_or_number}"."##),
+                     Some(r##"Required. The project on which to execute the request. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3173,12 +4111,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("metric-descriptors-delete",
-                    Some(r##"Deletes a metric descriptor. Only user-created custom metrics can be deleted."##),
+                    Some(r##"Deletes a metric descriptor. Only user-created custom metrics (https://cloud.google.com/monitoring/custom-metrics) can be deleted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_metric-descriptors-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The metric descriptor on which to execute the request. The format is "projects/{project_id_or_number}/metricDescriptors/{metric_id}". An example of {metric_id} is: "custom.googleapis.com/my_test_metric"."##),
+                     Some(r##"Required. The metric descriptor on which to execute the request. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/metricDescriptors/[METRIC_ID]
+        An example of [METRIC_ID] is: "custom.googleapis.com/my_test_metric"."##),
                      Some(true),
                      Some(false)),
         
@@ -3195,12 +4135,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("metric-descriptors-get",
-                    Some(r##"Gets a single metric descriptor. This method does not require a Stackdriver account."##),
+                    Some(r##"Gets a single metric descriptor. This method does not require a Workspace."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_metric-descriptors-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The metric descriptor on which to execute the request. The format is "projects/{project_id_or_number}/metricDescriptors/{metric_id}". An example value of {metric_id} is "compute.googleapis.com/instance/disk/read_bytes_count"."##),
+                     Some(r##"Required. The metric descriptor on which to execute the request. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/metricDescriptors/[METRIC_ID]
+        An example value of [METRIC_ID] is "compute.googleapis.com/instance/disk/read_bytes_count"."##),
                      Some(true),
                      Some(false)),
         
@@ -3217,12 +4159,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("metric-descriptors-list",
-                    Some(r##"Lists metric descriptors that match a filter. This method does not require a Stackdriver account."##),
+                    Some(r##"Lists metric descriptors that match a filter. This method does not require a Workspace."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_metric-descriptors-list",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project on which to execute the request. The format is "projects/{project_id_or_number}"."##),
+                     Some(r##"Required. The project on which to execute the request. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3239,12 +4183,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("monitored-resource-descriptors-get",
-                    Some(r##"Gets a single monitored resource descriptor. This method does not require a Stackdriver account."##),
+                    Some(r##"Gets a single monitored resource descriptor. This method does not require a Workspace."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_monitored-resource-descriptors-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The monitored resource descriptor to get. The format is "projects/{project_id_or_number}/monitoredResourceDescriptors/{resource_type}". The {resource_type} is a predefined type, such as cloudsql_database."##),
+                     Some(r##"Required. The monitored resource descriptor to get. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/monitoredResourceDescriptors/[RESOURCE_TYPE]
+        The [RESOURCE_TYPE] is a predefined type, such as cloudsql_database."##),
                      Some(true),
                      Some(false)),
         
@@ -3261,12 +4207,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("monitored-resource-descriptors-list",
-                    Some(r##"Lists monitored resource descriptors that match a filter. This method does not require a Stackdriver account."##),
+                    Some(r##"Lists monitored resource descriptors that match a filter. This method does not require a Workspace."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_monitored-resource-descriptors-list",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project on which to execute the request. The format is "projects/{project_id_or_number}"."##),
+                     Some(r##"Required. The project on which to execute the request. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3288,7 +4236,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The channel type for which to execute the request. The format is projects/[PROJECT_ID]/notificationChannelDescriptors/{channel_type}."##),
+                     Some(r##"Required. The channel type for which to execute the request. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/notificationChannelDescriptors/[CHANNEL_TYPE]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3310,8 +4260,8 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The REST resource name of the parent from which to retrieve the notification channel descriptors. The expected syntax is:
-        projects/[PROJECT_ID]
+                     Some(r##"Required. The REST resource name of the parent from which to retrieve the notification channel descriptors. The expected syntax is:
+        projects/[PROJECT_ID_OR_NUMBER]
         Note that this names the parent container in which to look for the descriptors; to retrieve a single descriptor by name, use the GetNotificationChannelDescriptor operation, instead."##),
                      Some(true),
                      Some(false)),
@@ -3334,9 +4284,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project on which to execute the request. The format is:
-        projects/[PROJECT_ID]
-        Note that this names the container into which the channel will be written. This does not name the newly created channel. The resulting channel's name will have a normalized version of this field as a prefix, but will add /notificationChannels/[CHANNEL_ID] to identify the channel."##),
+                     Some(r##"Required. The project on which to execute the request. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]
+        This names the container into which the channel will be written, this does not name the newly created channel. The resulting channel's name will have a normalized version of this field as a prefix, but will add /notificationChannels/[CHANNEL_ID] to identify the channel."##),
                      Some(true),
                      Some(false)),
         
@@ -3364,7 +4314,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The channel for which to execute the request. The format is projects/[PROJECT_ID]/notificationChannels/[CHANNEL_ID]."##),
+                     Some(r##"Required. The channel for which to execute the request. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/notificationChannels/[CHANNEL_ID]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3386,7 +4338,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The channel for which to execute the request. The format is projects/[PROJECT_ID]/notificationChannels/[CHANNEL_ID]."##),
+                     Some(r##"Required. The channel for which to execute the request. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/notificationChannels/[CHANNEL_ID]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3408,7 +4362,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The notification channel for which a verification code is to be generated and retrieved. This must name a channel that is already verified; if the specified channel is not verified, the request will fail."##),
+                     Some(r##"Required. The notification channel for which a verification code is to be generated and retrieved. This must name a channel that is already verified; if the specified channel is not verified, the request will fail."##),
                      Some(true),
                      Some(false)),
         
@@ -3436,7 +4390,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project on which to execute the request. The format is projects/[PROJECT_ID]. That is, this names the container in which to look for the notification channels; it does not name a specific channel. To query a specific channel by REST resource name, use the GetNotificationChannel operation."##),
+                     Some(r##"Required. The project on which to execute the request. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]
+        This names the container in which to look for the notification channels; it does not name a specific channel. To query a specific channel by REST resource name, use the GetNotificationChannel operation."##),
                      Some(true),
                      Some(false)),
         
@@ -3458,8 +4414,8 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The full REST resource name for this channel. The syntax is:
-        projects/[PROJECT_ID]/notificationChannels/[CHANNEL_ID]
+                     Some(r##"The full REST resource name for this channel. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/notificationChannels/[CHANNEL_ID]
         The [CHANNEL_ID] is automatically assigned by the server on creation."##),
                      Some(true),
                      Some(false)),
@@ -3488,7 +4444,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The notification channel to which to send a verification code."##),
+                     Some(r##"Required. The notification channel to which to send a verification code."##),
                      Some(true),
                      Some(false)),
         
@@ -3516,7 +4472,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The notification channel to verify."##),
+                     Some(r##"Required. The notification channel to verify."##),
                      Some(true),
                      Some(false)),
         
@@ -3544,7 +4500,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project on which to execute the request. The format is "projects/{project_id_or_number}"."##),
+                     Some(r##"Required. The project on which to execute the request. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3567,12 +4525,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("time-series-list",
-                    Some(r##"Lists time series that match a filter. This method does not require a Stackdriver account."##),
+                    Some(r##"Lists time series that match a filter. This method does not require a Workspace."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_time-series-list",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The project on which to execute the request. The format is "projects/{project_id_or_number}"."##),
+                     Some(r##"Required. The project on which to execute the request. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3588,13 +4548,45 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("time-series-query",
+                    Some(r##"Queries time series using the time series query language. This method does not require a Workspace."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_time-series-query",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The project on which to execute the request. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]
+        "##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("uptime-check-configs-create",
-                    Some(r##"Creates a new uptime check configuration."##),
+                    Some(r##"Creates a new Uptime check configuration."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_uptime-check-configs-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The project in which to create the uptime check. The format  is projects/[PROJECT_ID]."##),
+                     Some(r##"Required. The project in which to create the Uptime check. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3617,12 +4609,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("uptime-check-configs-delete",
-                    Some(r##"Deletes an uptime check configuration. Note that this method will fail if the uptime check configuration is referenced by an alert policy or other dependent configs that would be rendered invalid by the deletion."##),
+                    Some(r##"Deletes an Uptime check configuration. Note that this method will fail if the Uptime check configuration is referenced by an alert policy or other dependent configs that would be rendered invalid by the deletion."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_uptime-check-configs-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The uptime check configuration to delete. The format  is projects/[PROJECT_ID]/uptimeCheckConfigs/[UPTIME_CHECK_ID]."##),
+                     Some(r##"Required. The Uptime check configuration to delete. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/uptimeCheckConfigs/[UPTIME_CHECK_ID]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3639,12 +4633,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("uptime-check-configs-get",
-                    Some(r##"Gets a single uptime check configuration."##),
+                    Some(r##"Gets a single Uptime check configuration."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_uptime-check-configs-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The uptime check configuration to retrieve. The format  is projects/[PROJECT_ID]/uptimeCheckConfigs/[UPTIME_CHECK_ID]."##),
+                     Some(r##"Required. The Uptime check configuration to retrieve. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/uptimeCheckConfigs/[UPTIME_CHECK_ID]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3661,12 +4657,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("uptime-check-configs-list",
-                    Some(r##"Lists the existing valid uptime check configurations for the project, leaving out any invalid configurations."##),
+                    Some(r##"Lists the existing valid Uptime check configurations for the project (leaving out any invalid configurations)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_uptime-check-configs-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The project whose uptime check configurations are listed. The format  is projects/[PROJECT_ID]."##),
+                     Some(r##"Required. The project whose Uptime check configurations are listed. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3683,12 +4681,283 @@ fn main() {
                      Some(false)),
                   ]),
             ("uptime-check-configs-patch",
-                    Some(r##"Updates an uptime check configuration. You can either replace the entire configuration with a new one or replace only certain fields in the current configuration by specifying the fields to be updated via "updateMask". Returns the updated configuration."##),
+                    Some(r##"Updates an Uptime check configuration. You can either replace the entire configuration with a new one or replace only certain fields in the current configuration by specifying the fields to be updated via updateMask. Returns the updated configuration."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_uptime-check-configs-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"A unique resource name for this UptimeCheckConfig. The format is:projects/[PROJECT_ID]/uptimeCheckConfigs/[UPTIME_CHECK_ID].This field should be omitted when creating the uptime check configuration; on create, the resource name is assigned by the server and included in the response."##),
+                     Some(r##"A unique resource name for this Uptime check configuration. The format is:
+         projects/[PROJECT_ID_OR_NUMBER]/uptimeCheckConfigs/[UPTIME_CHECK_ID]
+        This field should be omitted when creating the Uptime check configuration; on create, the resource name is assigned by the server and included in the response."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("services", "methods: 'create', 'delete', 'get', 'list', 'patch', 'service-level-objectives-create', 'service-level-objectives-delete', 'service-level-objectives-get', 'service-level-objectives-list' and 'service-level-objectives-patch'", vec![
+            ("create",
+                    Some(r##"Create a Service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/services_create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the parent workspace. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]
+        "##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("delete",
+                    Some(r##"Soft delete this Service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/services_delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the Service to delete. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]
+        "##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get",
+                    Some(r##"Get the named Service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/services_get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the Service. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]
+        "##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",
+                    Some(r##"List Services for this workspace."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/services_list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the parent containing the listed services, either a project or a Monitoring Workspace. The formats are:
+        projects/[PROJECT_ID_OR_NUMBER]
+        workspaces/[HOST_PROJECT_ID_OR_NUMBER]
+        "##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("patch",
+                    Some(r##"Update this Service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/services_patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Resource name for this Service. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]
+        "##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("service-level-objectives-create",
+                    Some(r##"Create a ServiceLevelObjective for the given Service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/services_service-level-objectives-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the parent Service. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]
+        "##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("service-level-objectives-delete",
+                    Some(r##"Delete the given ServiceLevelObjective."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/services_service-level-objectives-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the ServiceLevelObjective to delete. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]/serviceLevelObjectives/[SLO_NAME]
+        "##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("service-level-objectives-get",
+                    Some(r##"Get a ServiceLevelObjective by name."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/services_service-level-objectives-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the ServiceLevelObjective to get. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]/serviceLevelObjectives/[SLO_NAME]
+        "##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("service-level-objectives-list",
+                    Some(r##"List the ServiceLevelObjectives for the given Service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/services_service-level-objectives-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the parent containing the listed SLOs, either a project or a Monitoring Workspace. The formats are:
+        projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]
+        workspaces/[HOST_PROJECT_ID_OR_NUMBER]/services/-
+        "##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("service-level-objectives-patch",
+                    Some(r##"Update the given ServiceLevelObjective."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/services_service-level-objectives-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Resource name for this ServiceLevelObjective. The format is:
+        projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]/serviceLevelObjectives/[SLO_NAME]
+        "##),
                      Some(true),
                      Some(false)),
         
@@ -3714,7 +4983,7 @@ fn main() {
         
         ("uptime-check-ips", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Returns the list of IPs that checkers run from"##),
+                    Some(r##"Returns the list of IP addresses that checkers run from"##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/uptime-check-ips_list",
                   vec![
                     (Some(r##"v"##),
@@ -3735,8 +5004,8 @@ fn main() {
     
     let mut app = App::new("monitoring3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190629")
-           .about("Manages your Stackdriver Monitoring data and configurations. Most projects must be associated with a Stackdriver account, with a few exceptions as noted on the individual method pages. The table entries below are presented in alphabetical order, not in order of common use. For explanations of the concepts found in the table entries, read the Stackdriver Monitoring documentation.")
+           .version("1.0.13+20200329")
+           .about("Manages your Cloud Monitoring data and configurations. Most projects must be associated with a Workspace, with a few exceptions as noted on the individual method pages. The table entries below are presented in alphabetical order, not in order of common use. For explanations of the concepts found in the table entries, read the Cloud Monitoring documentation.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_monitoring3_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

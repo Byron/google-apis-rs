@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dfareporting* crate version *1.0.12+20190531*, where *20190531* is the exact revision of the *dfareporting:v3.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *dfareporting* crate version *1.0.13+20200326*, where *20200326* is the exact revision of the *dfareporting:v3.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *dfareporting* *v3d3* API can be found at the
 //! [official documentation site](https://developers.google.com/doubleclick-advertisers/).
@@ -471,7 +471,7 @@ impl<'a, C, A> Dfareporting<C, A>
         Dfareporting {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://www.googleapis.com/dfareporting/v3.3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -659,7 +659,7 @@ impl<'a, C, A> Dfareporting<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -747,7 +747,7 @@ pub struct Conversion {
     /// Whether this particular request may come from a user under the age of 13, under COPPA compliance.
     #[serde(rename="childDirectedTreatment")]
     pub child_directed_treatment: Option<bool>,
-    /// A list of the alphanumeric encrypted user IDs. Any user ID with exposure prior to the conversion timestamp will be used in the inserted conversion. If no such user ID is found then the conversion will be rejected with NO_COOKIE_MATCH_FOUND error. When set, encryptionInfo should also be specified. This field may only be used when calling batchinsert; it is not supported by batchupdate. This field is mutually exclusive with encryptedUserId, matchId, mobileDeviceId and gclid. This or encryptedUserId or matchId or mobileDeviceId or gclid is a required field.
+    /// A list of the alphanumeric encrypted user IDs. Any user ID with exposure prior to the conversion timestamp will be used in the inserted conversion. If no such user ID is found then the conversion will be rejected with INVALID_ARGUMENT error. When set, encryptionInfo should also be specified. This field may only be used when calling batchinsert; it is not supported by batchupdate. This field is mutually exclusive with encryptedUserId, matchId, mobileDeviceId and gclid. This or encryptedUserId or matchId or mobileDeviceId or gclid is a required field.
     #[serde(rename="encryptedUserIdCandidates")]
     pub encrypted_user_id_candidates: Option<Vec<String>>,
     /// Custom floodlight variables.
@@ -974,7 +974,7 @@ pub struct UserRolePermissionGroupsListResponse {
 impl ResponseResult for UserRolePermissionGroupsListResponse {}
 
 
-/// Represents the list of File resources.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
@@ -989,11 +989,11 @@ pub struct FileList {
     /// Continuation token used to page through files. To retrieve the next page of results, set the next request's "pageToken" to the value of this field. The page token is only valid for a limited amount of time and should not be persisted.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The files returned in this response.
+    /// no description provided
     pub items: Option<Vec<File>>,
-    /// The kind of list this is, in this case dfareporting#fileList.
+    /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#fileList".
     pub kind: Option<String>,
-    /// The eTag of this response for caching purposes.
+    /// Etag of this resource.
     pub etag: Option<String>,
 }
 
@@ -1638,7 +1638,8 @@ pub struct Account {
     /// - "47" for BGN 
     /// - "48" for HRK 
     /// - "49" for MXN 
-    /// - "50" for NGN
+    /// - "50" for NGN 
+    /// - "51" for EGP
     #[serde(rename="currencyId")]
     pub currency_id: Option<String>,
     /// Reporting configuration of this account.
@@ -2130,17 +2131,17 @@ impl Part for TagSetting {}
 pub struct File {
     /// The status of the report file.
     pub status: Option<String>,
-    /// The kind of resource this is, in this case dfareporting#file.
+    /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#file".
     pub kind: Option<String>,
     /// The output format of the report. Only available once the file is available.
     pub format: Option<String>,
-    /// The date range for which the file has report data. The date range will always be the absolute date range for which the report is run.
+    /// no description provided
     #[serde(rename="dateRange")]
     pub date_range: Option<DateRange>,
     /// The filename of the file.
     #[serde(rename="fileName")]
     pub file_name: Option<String>,
-    /// The eTag of this response for caching purposes.
+    /// Etag of this resource.
     pub etag: Option<String>,
     /// The ID of the report this file was generated from.
     #[serde(rename="reportId")]
@@ -2969,9 +2970,9 @@ impl Part for DefaultClickThroughEventTagProperties {}
 pub struct UserProfileList {
     /// The user profiles returned in this response.
     pub items: Option<Vec<UserProfile>>,
-    /// The kind of list this is, in this case dfareporting#userProfileList.
+    /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#userProfileList".
     pub kind: Option<String>,
-    /// The eTag of this response for caching purposes.
+    /// Etag of this resource.
     pub etag: Option<String>,
 }
 
@@ -4279,7 +4280,26 @@ pub struct ReportsConfiguration {
     /// - "10" for "Asia/Dubai" 
     /// - "11" for "America/Los_Angeles" 
     /// - "12" for "Pacific/Auckland" 
-    /// - "13" for "America/Sao_Paulo"
+    /// - "13" for "America/Sao_Paulo" 
+    /// - "16" for "America/Asuncion" 
+    /// - "17" for "America/Chicago" 
+    /// - "18" for "America/Denver" 
+    /// - "19" for "America/St_Johns" 
+    /// - "20" for "Asia/Dhaka" 
+    /// - "21" for "Asia/Jakarta" 
+    /// - "22" for "Asia/Kabul" 
+    /// - "23" for "Asia/Karachi" 
+    /// - "24" for "Asia/Calcutta" 
+    /// - "25" for "Asia/Pyongyang" 
+    /// - "26" for "Asia/Rangoon" 
+    /// - "27" for "Atlantic/Cape_Verde" 
+    /// - "28" for "Atlantic/South_Georgia" 
+    /// - "29" for "Australia/Adelaide" 
+    /// - "30" for "Australia/Lord_Howe" 
+    /// - "31" for "Europe/Moscow" 
+    /// - "32" for "Pacific/Kiritimati" 
+    /// - "35" for "Pacific/Norfolk" 
+    /// - "36" for "Pacific/Tongatapu"
     #[serde(rename="reportGenerationTimeZoneId")]
     pub report_generation_time_zone_id: Option<String>,
     /// Default lookback windows for new advertisers in this account.
@@ -4334,7 +4354,7 @@ pub struct UserRolePermissionsListResponse {
 impl ResponseResult for UserRolePermissionsListResponse {}
 
 
-/// Represents a UserProfile resource.
+/// A UserProfile resource lets you list all DFA user profiles that are associated with a Google user account. The profile_id needs to be specified in other API requests. 
 /// 
 /// # Activities
 /// 
@@ -4349,7 +4369,7 @@ pub struct UserProfile {
     /// The user name.
     #[serde(rename="userName")]
     pub user_name: Option<String>,
-    /// The kind of resource this is, in this case dfareporting#userProfile.
+    /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#userProfile".
     pub kind: Option<String>,
     /// The sub account ID this profile belongs to if applicable.
     #[serde(rename="subAccountId")]
@@ -4357,7 +4377,7 @@ pub struct UserProfile {
     /// The account name this profile belongs to.
     #[serde(rename="accountName")]
     pub account_name: Option<String>,
-    /// The eTag of this response for caching purposes.
+    /// Etag of this resource.
     pub etag: Option<String>,
     /// The sub account name this profile belongs to if applicable.
     #[serde(rename="subAccountName")]
@@ -4948,7 +4968,7 @@ pub struct CreativeAssetMetadata {
     /// List of feature dependencies for the creative asset that are detected by Campaign Manager. Feature dependencies are features that a browser must be able to support in order to render your HTML5 creative correctly. This is a read-only, auto-generated field.
     #[serde(rename="detectedFeatures")]
     pub detected_features: Option<Vec<String>>,
-    /// List of detected click tags for assets. This is a read-only auto-generated field.
+    /// List of detected click tags for assets. This is a read-only, auto-generated field. This field is empty for a rich media asset.
     #[serde(rename="clickTags")]
     pub click_tags: Option<Vec<ClickTag>>,
     /// Rules validated during code generation that generated a warning. This is a read-only, auto-generated field.
@@ -9064,8 +9084,8 @@ impl<'a, C, A> ReportMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `profileId` - The DFA profile ID.
-    /// * `reportId` - The ID of the parent report.
+    /// * `profileId` - The DFA user profile ID.
+    /// * `reportId` - The ID of the report.
     pub fn files_list(&self, profile_id: &str, report_id: &str) -> ReportFileListCall<'a, C, A> {
         ReportFileListCall {
             hub: self.hub,
@@ -9161,11 +9181,11 @@ impl<'a, C, A> ReportMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a report file. This method supports media download.
+    /// Retrieves a report file by its report ID and file ID. This method supports media download.
     /// 
     /// # Arguments
     ///
-    /// * `profileId` - The DFA profile ID.
+    /// * `profileId` - The DFA user profile ID.
     /// * `reportId` - The ID of the report.
     /// * `fileId` - The ID of the report file.
     pub fn files_get(&self, profile_id: &str, report_id: &str, file_id: &str) -> ReportFileGetCall<'a, C, A> {
@@ -23128,7 +23148,7 @@ impl<'a, C, A> ChangeLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._object_ids.push(new_value.to_string());
         self
     }
-    /// Select only change logs whose change time is before the specified minChangeTime.The time should be formatted as an RFC3339 date/time string. For example, for 10:54 PM on July 18th, 2015, in the America/New York time zone, the format is "2015-07-18T22:54:00-04:00". In other words, the year, month, day, the letter T, the hour (24-hour clock system), minute, second, and then the time zone offset.
+    /// Select only change logs whose change time is after the specified minChangeTime.The time should be formatted as an RFC3339 date/time string. For example, for 10:54 PM on July 18th, 2015, in the America/New York time zone, the format is "2015-07-18T22:54:00-04:00". In other words, the year, month, day, the letter T, the hour (24-hour clock system), minute, second, and then the time zone offset.
     ///
     /// Sets the *min change time* query property to the given value.
     pub fn min_change_time(mut self, new_value: &str) -> ChangeLogListCall<'a, C, A> {
@@ -25021,7 +25041,7 @@ impl<'a, C, A> ReportFileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// The DFA profile ID.
+    /// The DFA user profile ID.
     ///
     /// Sets the *profile id* path property to the given value.
     ///
@@ -25031,7 +25051,7 @@ impl<'a, C, A> ReportFileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._profile_id = new_value.to_string();
         self
     }
-    /// The ID of the parent report.
+    /// The ID of the report.
     ///
     /// Sets the *report id* path property to the given value.
     ///
@@ -26205,7 +26225,7 @@ impl<'a, C, A> ReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Retrieves a report file. This method supports media download.
+/// Retrieves a report file by its report ID and file ID. This method supports media download.
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
 /// `.param("alt", "media")`.
@@ -26401,7 +26421,7 @@ impl<'a, C, A> ReportFileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// The DFA profile ID.
+    /// The DFA user profile ID.
     ///
     /// Sets the *profile id* path property to the given value.
     ///

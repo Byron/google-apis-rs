@@ -661,6 +661,9 @@ impl<'n> Engine<'n> {
                 "provisional-user-project" => {
                     call = call.provisional_user_project(value.unwrap_or(""));
                 },
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -674,7 +677,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["user-project", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["user-project", "provisional-user-project", "options-requested-policy-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -731,7 +734,6 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "owner.entity-id" => Some(("owner.entityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.entity" => Some(("owner.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -739,8 +741,10 @@ impl<'n> Engine<'n> {
                     "default-event-based-hold" => Some(("defaultEventBasedHold", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "billing.requester-pays" => Some(("billing.requesterPays", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "encryption.default-kms-key-name" => Some(("encryption.defaultKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone-affinity" => Some(("zoneAffinity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "website.not-found-page" => Some(("website.notFoundPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "website.main-page-suffix" => Some(("website.mainPageSuffix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -755,14 +759,15 @@ impl<'n> Engine<'n> {
                     "retention-policy.effective-time" => Some(("retentionPolicy.effectiveTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retention-policy.is-locked" => Some(("retentionPolicy.isLocked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "retention-policy.retention-period" => Some(("retentionPolicy.retentionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "versioning.enabled" => Some(("versioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "iam-configuration.uniform-bucket-level-access.enabled" => Some(("iamConfiguration.uniformBucketLevelAccess.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "iam-configuration.uniform-bucket-level-access.locked-time" => Some(("iamConfiguration.uniformBucketLevelAccess.lockedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iam-configuration.bucket-policy-only.enabled" => Some(("iamConfiguration.bucketPolicyOnly.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "iam-configuration.bucket-policy-only.locked-time" => Some(("iamConfiguration.bucketPolicyOnly.lockedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "versioning.enabled" => Some(("versioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "zone-separation" => Some(("zoneSeparation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing", "bucket-policy-only", "default-event-based-hold", "default-kms-key-name", "effective-time", "enabled", "encryption", "entity", "entity-id", "etag", "iam-configuration", "id", "is-locked", "kind", "labels", "location", "location-type", "locked-time", "log-bucket", "log-object-prefix", "logging", "main-page-suffix", "metageneration", "name", "not-found-page", "owner", "project-number", "requester-pays", "retention-period", "retention-policy", "self-link", "storage-class", "time-created", "uniform-bucket-level-access", "updated", "versioning", "website"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing", "bucket-policy-only", "default-event-based-hold", "default-kms-key-name", "effective-time", "enabled", "encryption", "entity", "entity-id", "etag", "iam-configuration", "id", "is-locked", "kind", "labels", "location", "location-type", "locked-time", "log-bucket", "log-object-prefix", "logging", "main-page-suffix", "metageneration", "name", "not-found-page", "owner", "project-number", "requester-pays", "retention-period", "retention-policy", "self-link", "storage-class", "time-created", "uniform-bucket-level-access", "updated", "versioning", "website", "zone-affinity", "zone-separation"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -991,7 +996,6 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "owner.entity-id" => Some(("owner.entityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.entity" => Some(("owner.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -999,8 +1003,10 @@ impl<'n> Engine<'n> {
                     "default-event-based-hold" => Some(("defaultEventBasedHold", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "billing.requester-pays" => Some(("billing.requesterPays", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "encryption.default-kms-key-name" => Some(("encryption.defaultKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone-affinity" => Some(("zoneAffinity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "website.not-found-page" => Some(("website.notFoundPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "website.main-page-suffix" => Some(("website.mainPageSuffix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1015,14 +1021,15 @@ impl<'n> Engine<'n> {
                     "retention-policy.effective-time" => Some(("retentionPolicy.effectiveTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retention-policy.is-locked" => Some(("retentionPolicy.isLocked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "retention-policy.retention-period" => Some(("retentionPolicy.retentionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "versioning.enabled" => Some(("versioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "iam-configuration.uniform-bucket-level-access.enabled" => Some(("iamConfiguration.uniformBucketLevelAccess.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "iam-configuration.uniform-bucket-level-access.locked-time" => Some(("iamConfiguration.uniformBucketLevelAccess.lockedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iam-configuration.bucket-policy-only.enabled" => Some(("iamConfiguration.bucketPolicyOnly.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "iam-configuration.bucket-policy-only.locked-time" => Some(("iamConfiguration.bucketPolicyOnly.lockedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "versioning.enabled" => Some(("versioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "zone-separation" => Some(("zoneSeparation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing", "bucket-policy-only", "default-event-based-hold", "default-kms-key-name", "effective-time", "enabled", "encryption", "entity", "entity-id", "etag", "iam-configuration", "id", "is-locked", "kind", "labels", "location", "location-type", "locked-time", "log-bucket", "log-object-prefix", "logging", "main-page-suffix", "metageneration", "name", "not-found-page", "owner", "project-number", "requester-pays", "retention-period", "retention-policy", "self-link", "storage-class", "time-created", "uniform-bucket-level-access", "updated", "versioning", "website"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing", "bucket-policy-only", "default-event-based-hold", "default-kms-key-name", "effective-time", "enabled", "encryption", "entity", "entity-id", "etag", "iam-configuration", "id", "is-locked", "kind", "labels", "location", "location-type", "locked-time", "log-bucket", "log-object-prefix", "logging", "main-page-suffix", "metageneration", "name", "not-found-page", "owner", "project-number", "requester-pays", "retention-period", "retention-policy", "self-link", "storage-class", "time-created", "uniform-bucket-level-access", "updated", "versioning", "website", "zone-affinity", "zone-separation"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1130,8 +1137,9 @@ impl<'n> Engine<'n> {
                     "resource-id" => Some(("resourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "kind", "resource-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "kind", "resource-id", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1280,7 +1288,6 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "owner.entity-id" => Some(("owner.entityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "owner.entity" => Some(("owner.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1288,8 +1295,10 @@ impl<'n> Engine<'n> {
                     "default-event-based-hold" => Some(("defaultEventBasedHold", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "billing.requester-pays" => Some(("billing.requesterPays", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "encryption.default-kms-key-name" => Some(("encryption.defaultKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone-affinity" => Some(("zoneAffinity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "website.not-found-page" => Some(("website.notFoundPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "website.main-page-suffix" => Some(("website.mainPageSuffix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1304,14 +1313,15 @@ impl<'n> Engine<'n> {
                     "retention-policy.effective-time" => Some(("retentionPolicy.effectiveTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retention-policy.is-locked" => Some(("retentionPolicy.isLocked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "retention-policy.retention-period" => Some(("retentionPolicy.retentionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "versioning.enabled" => Some(("versioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "iam-configuration.uniform-bucket-level-access.enabled" => Some(("iamConfiguration.uniformBucketLevelAccess.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "iam-configuration.uniform-bucket-level-access.locked-time" => Some(("iamConfiguration.uniformBucketLevelAccess.lockedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iam-configuration.bucket-policy-only.enabled" => Some(("iamConfiguration.bucketPolicyOnly.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "iam-configuration.bucket-policy-only.locked-time" => Some(("iamConfiguration.bucketPolicyOnly.lockedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "versioning.enabled" => Some(("versioning.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "zone-separation" => Some(("zoneSeparation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing", "bucket-policy-only", "default-event-based-hold", "default-kms-key-name", "effective-time", "enabled", "encryption", "entity", "entity-id", "etag", "iam-configuration", "id", "is-locked", "kind", "labels", "location", "location-type", "locked-time", "log-bucket", "log-object-prefix", "logging", "main-page-suffix", "metageneration", "name", "not-found-page", "owner", "project-number", "requester-pays", "retention-period", "retention-policy", "self-link", "storage-class", "time-created", "uniform-bucket-level-access", "updated", "versioning", "website"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing", "bucket-policy-only", "default-event-based-hold", "default-kms-key-name", "effective-time", "enabled", "encryption", "entity", "entity-id", "etag", "iam-configuration", "id", "is-locked", "kind", "labels", "location", "location-type", "locked-time", "log-bucket", "log-object-prefix", "logging", "main-page-suffix", "metageneration", "name", "not-found-page", "owner", "project-number", "requester-pays", "retention-period", "retention-policy", "self-link", "storage-class", "time-created", "uniform-bucket-level-access", "updated", "versioning", "website", "zone-affinity", "zone-separation"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2985,6 +2995,9 @@ impl<'n> Engine<'n> {
                 "destination-predefined-acl" => {
                     call = call.destination_predefined_acl(value.unwrap_or(""));
                 },
+                "destination-kms-key-name" => {
+                    call = call.destination_kms_key_name(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2998,7 +3011,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-source-generation-match", "projection", "if-source-metageneration-not-match", "if-metageneration-not-match", "user-project", "source-generation", "destination-predefined-acl", "if-source-generation-not-match", "if-source-metageneration-match", "if-generation-match", "provisional-user-project", "if-metageneration-match", "if-generation-not-match"].iter().map(|v|*v));
+                                                                           v.extend(["if-source-generation-match", "projection", "if-source-metageneration-not-match", "destination-kms-key-name", "if-metageneration-not-match", "user-project", "source-generation", "destination-predefined-acl", "if-source-generation-not-match", "if-source-metageneration-match", "if-generation-match", "provisional-user-project", "if-metageneration-match", "if-generation-not-match"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3412,6 +3425,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "start-offset" => {
+                    call = call.start_offset(value.unwrap_or(""));
+                },
                 "provisional-user-project" => {
                     call = call.provisional_user_project(value.unwrap_or(""));
                 },
@@ -3430,6 +3446,9 @@ impl<'n> Engine<'n> {
                 "include-trailing-delimiter" => {
                     call = call.include_trailing_delimiter(arg_from_str(value.unwrap_or("false"), err, "include-trailing-delimiter", "boolean"));
                 },
+                "end-offset" => {
+                    call = call.end_offset(value.unwrap_or(""));
+                },
                 "delimiter" => {
                     call = call.delimiter(value.unwrap_or(""));
                 },
@@ -3446,7 +3465,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["projection", "versions", "user-project", "delimiter", "max-results", "page-token", "prefix", "include-trailing-delimiter", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["projection", "versions", "user-project", "delimiter", "max-results", "end-offset", "page-token", "prefix", "include-trailing-delimiter", "start-offset", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3815,8 +3834,9 @@ impl<'n> Engine<'n> {
                     "resource-id" => Some(("resourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "kind", "resource-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "kind", "resource-id", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4146,6 +4166,9 @@ impl<'n> Engine<'n> {
                 "user-project" => {
                     call = call.user_project(value.unwrap_or(""));
                 },
+                "start-offset" => {
+                    call = call.start_offset(value.unwrap_or(""));
+                },
                 "provisional-user-project" => {
                     call = call.provisional_user_project(value.unwrap_or(""));
                 },
@@ -4164,6 +4187,9 @@ impl<'n> Engine<'n> {
                 "include-trailing-delimiter" => {
                     call = call.include_trailing_delimiter(arg_from_str(value.unwrap_or("false"), err, "include-trailing-delimiter", "boolean"));
                 },
+                "end-offset" => {
+                    call = call.end_offset(value.unwrap_or(""));
+                },
                 "delimiter" => {
                     call = call.delimiter(value.unwrap_or(""));
                 },
@@ -4180,7 +4206,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["projection", "versions", "user-project", "delimiter", "max-results", "page-token", "prefix", "include-trailing-delimiter", "provisional-user-project"].iter().map(|v|*v));
+                                                                           v.extend(["projection", "versions", "user-project", "delimiter", "max-results", "end-offset", "page-token", "prefix", "include-trailing-delimiter", "start-offset", "provisional-user-project"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -6421,7 +6447,7 @@ fn main() {
     
     let mut app = App::new("storage1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190624")
+           .version("1.0.13+20200326")
            .about("Stores and retrieves potentially large, immutable data objects.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_storage1_cli")
            .arg(Arg::with_name("url")

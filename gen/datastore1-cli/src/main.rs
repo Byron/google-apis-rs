@@ -477,6 +477,147 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_indexes_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ancestor" => Some(("ancestor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "index-id" => Some(("indexId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ancestor", "index-id", "kind", "project-id", "state"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleDatastoreAdminV1Index = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().indexes_create(request, opt.value_of("project-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_indexes_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().indexes_delete(opt.value_of("project-id").unwrap_or(""), opt.value_of("index-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_indexes_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().indexes_get(opt.value_of("project-id").unwrap_or(""), opt.value_of("index-id").unwrap_or(""));
@@ -1199,6 +1340,12 @@ impl<'n> Engine<'n> {
                     ("import", Some(opt)) => {
                         call_result = self._projects_import(opt, dry_run, &mut err);
                     },
+                    ("indexes-create", Some(opt)) => {
+                        call_result = self._projects_indexes_create(opt, dry_run, &mut err);
+                    },
+                    ("indexes-delete", Some(opt)) => {
+                        call_result = self._projects_indexes_delete(opt, dry_run, &mut err);
+                    },
                     ("indexes-get", Some(opt)) => {
                         call_result = self._projects_indexes_get(opt, dry_run, &mut err);
                     },
@@ -1320,7 +1467,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'allocate-ids', 'begin-transaction', 'commit', 'export', 'import', 'indexes-get', 'indexes-list', 'lookup', 'operations-cancel', 'operations-delete', 'operations-get', 'operations-list', 'reserve-ids', 'rollback' and 'run-query'", vec![
+        ("projects", "methods: 'allocate-ids', 'begin-transaction', 'commit', 'export', 'import', 'indexes-create', 'indexes-delete', 'indexes-get', 'indexes-list', 'lookup', 'operations-cancel', 'operations-delete', 'operations-get', 'operations-list', 'reserve-ids', 'rollback' and 'run-query'", vec![
             ("allocate-ids",
                     Some(r##"Allocates IDs for the given keys, which is useful for referencing an entity
         before it is inserted."##),
@@ -1328,7 +1475,7 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The ID of the project against which to make the request."##),
+                     Some(r##"Required. The ID of the project against which to make the request."##),
                      Some(true),
                      Some(false)),
         
@@ -1356,7 +1503,7 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The ID of the project against which to make the request."##),
+                     Some(r##"Required. The ID of the project against which to make the request."##),
                      Some(true),
                      Some(false)),
         
@@ -1385,7 +1532,7 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The ID of the project against which to make the request."##),
+                     Some(r##"Required. The ID of the project against which to make the request."##),
                      Some(true),
                      Some(false)),
         
@@ -1420,7 +1567,7 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"Project ID against which to make the request."##),
+                     Some(r##"Required. Project ID against which to make the request."##),
                      Some(true),
                      Some(false)),
         
@@ -1452,6 +1599,46 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
+                     Some(r##"Required. Project ID against which to make the request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("indexes-create",
+                    Some(r##"Creates the specified index.
+        A newly created index's initial state is `CREATING`. On completion of the
+        returned google.longrunning.Operation, the state will be `READY`.
+        If the index already exists, the call will return an `ALREADY_EXISTS`
+        status.
+        
+        During index creation, the process could result in an error, in which
+        case the index will move to the `ERROR` state. The process can be recovered
+        by fixing the data that caused the error, removing the index with
+        delete, then
+        re-creating the index with create.
+        
+        Indexes with a single property cannot be created."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datastore1_cli/projects_indexes-create",
+                  vec![
+                    (Some(r##"project-id"##),
+                     None,
                      Some(r##"Project ID against which to make the request."##),
                      Some(true),
                      Some(false)),
@@ -1461,6 +1648,43 @@ fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("indexes-delete",
+                    Some(r##"Deletes an existing index.
+        An index can only be deleted if it is in a `READY` or `ERROR` state. On
+        successful execution of the request, the index will be in a `DELETING`
+        state. And on completion of the
+        returned google.longrunning.Operation, the index will be removed.
+        
+        During index deletion, the process could result in an error, in which
+        case the index will move to the `ERROR` state. The process can be recovered
+        by fixing the data that caused the error, followed by calling
+        delete again."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datastore1_cli/projects_indexes-delete",
+                  vec![
+                    (Some(r##"project-id"##),
+                     None,
+                     Some(r##"Project ID against which to make the request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"index-id"##),
+                     None,
+                     Some(r##"The resource ID of the index to delete."##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -1532,7 +1756,7 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The ID of the project against which to make the request."##),
+                     Some(r##"Required. The ID of the project against which to make the request."##),
                      Some(true),
                      Some(false)),
         
@@ -1672,7 +1896,7 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The ID of the project against which to make the request."##),
+                     Some(r##"Required. The ID of the project against which to make the request."##),
                      Some(true),
                      Some(false)),
         
@@ -1700,7 +1924,7 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The ID of the project against which to make the request."##),
+                     Some(r##"Required. The ID of the project against which to make the request."##),
                      Some(true),
                      Some(false)),
         
@@ -1728,7 +1952,7 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The ID of the project against which to make the request."##),
+                     Some(r##"Required. The ID of the project against which to make the request."##),
                      Some(true),
                      Some(false)),
         
@@ -1756,7 +1980,7 @@ fn main() {
     
     let mut app = App::new("datastore1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190421")
+           .version("1.0.13+20200311")
            .about("Accesses the schemaless NoSQL database to provide fully managed, robust, scalable storage for your application.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datastore1_cli")

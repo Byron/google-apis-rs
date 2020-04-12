@@ -618,10 +618,11 @@ fn main() {
                   vec![
                     (Some(r##"project-name"##),
                      None,
-                     Some(r##"[Required] The resource name of the Google Cloud Platform project. Written
-        as `projects/` plus the
+                     Some(r##"Required. The resource name of the Google Cloud Platform project. Written
+        as `projects/{projectID}`, where `{projectID}` is the
         [Google Cloud Platform project
         ID](https://support.google.com/cloud/answer/6158840).
+        
         Example: `projects/my-project-123`."##),
                      Some(true),
                      Some(false)),
@@ -644,10 +645,11 @@ fn main() {
                   vec![
                     (Some(r##"project-name"##),
                      None,
-                     Some(r##"[Required] The resource name of the Google Cloud Platform project. Written
-        as `projects/` plus the
+                     Some(r##"Required. The resource name of the Google Cloud Platform project. Written
+        as `projects/{projectID}`, where `{projectID}` is the
         [Google Cloud Platform project
         ID](https://support.google.com/cloud/answer/6158840).
+        
         Example: `projects/my-project-123`."##),
                      Some(true),
                      Some(false)),
@@ -673,16 +675,17 @@ fn main() {
         a `key` parameter. For example:
         
         `POST
-        https://clouderrorreporting.googleapis.com/v1beta1/projects/example-project/events:report?key=123ABC456`"##),
+        https://clouderrorreporting.googleapis.com/v1beta1/{projectName}/events:report?key=123ABC456`"##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouderrorreporting1_beta1_cli/projects_events-report",
                   vec![
                     (Some(r##"project-name"##),
                      None,
-                     Some(r##"[Required] The resource name of the Google Cloud Platform project. Written
-        as `projects/` plus the
+                     Some(r##"Required. The resource name of the Google Cloud Platform project. Written
+        as `projects/{projectId}`, where `{projectId}` is the
         [Google Cloud Platform project
-        ID](https://support.google.com/cloud/answer/6158840). Example:
-        `projects/my-project-123`."##),
+        ID](https://support.google.com/cloud/answer/6158840).
+        
+        Example: // `projects/my-project-123`."##),
                      Some(true),
                      Some(false)),
         
@@ -710,12 +713,12 @@ fn main() {
                   vec![
                     (Some(r##"project-name"##),
                      None,
-                     Some(r##"[Required] The resource name of the Google Cloud Platform project. Written
-        as <code>projects/</code> plus the
-        <a href="https://support.google.com/cloud/answer/6158840">Google Cloud
-        Platform project ID</a>.
+                     Some(r##"Required. The resource name of the Google Cloud Platform project. Written
+        as `projects/{projectID}`, where `{projectID}` is the
+        [Google Cloud Platform project
+        ID](https://support.google.com/cloud/answer/6158840).
         
-        Example: <code>projects/my-project-123</code>."##),
+        Example: `projects/my-project-123`."##),
                      Some(true),
                      Some(false)),
         
@@ -737,7 +740,7 @@ fn main() {
                   vec![
                     (Some(r##"group-name"##),
                      None,
-                     Some(r##"[Required] The group resource name. Written as
+                     Some(r##"Required. The group resource name. Written as
         <code>projects/<var>projectID</var>/groups/<var>group_name</var></code>.
         Call
         <a href="/error-reporting/reference/rest/v1beta1/projects.groupStats/list">
@@ -768,7 +771,7 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The group resource name.
-        Example: <code>projects/my-project-123/groups/my-groupid</code>"##),
+        Example: <code>projects/my-project-123/groups/CNSgkpnppqKCUw</code>"##),
                      Some(true),
                      Some(false)),
         
@@ -796,7 +799,7 @@ fn main() {
     
     let mut app = App::new("clouderrorreporting1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190626")
+           .version("1.0.13+20200331")
            .about("Groups and counts similar errors from cloud services and applications, reports new errors, and provides access to error groups and their associated errors.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouderrorreporting1_beta1_cli")

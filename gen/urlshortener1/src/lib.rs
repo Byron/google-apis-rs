@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *urlshortener* crate version *1.0.12+20150519*, where *20150519* is the exact revision of the *urlshortener:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *urlshortener* crate version *1.0.13+20150519*, where *20150519* is the exact revision of the *urlshortener:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *urlshortener* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/url-shortener/v1/getting_started).
@@ -320,7 +320,7 @@ impl<'a, C, A> Urlshortener<C, A>
         Urlshortener {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://www.googleapis.com/urlshortener/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -331,7 +331,7 @@ impl<'a, C, A> Urlshortener<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

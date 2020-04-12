@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Iot* crate version *1.0.12+20190618*, where *20190618* is the exact revision of the *cloudiot:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Cloud Iot* crate version *1.0.13+20200331*, where *20200331* is the exact revision of the *cloudiot:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Cloud Iot* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iot).
@@ -336,7 +336,7 @@ impl<'a, C, A> CloudIot<C, A>
         CloudIot {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://cloudiot.googleapis.com/".to_string(),
             _root_url: "https://cloudiot.googleapis.com/".to_string(),
         }
@@ -347,7 +347,7 @@ impl<'a, C, A> CloudIot<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -492,37 +492,50 @@ pub struct DeviceConfig {
 impl ResponseResult for DeviceConfig {}
 
 
-/// Defines an Identity and Access Management (IAM) policy. It is used to
-/// specify access control policies for Cloud Platform resources.
+/// An Identity and Access Management (IAM) policy, which specifies access
+/// controls for Google Cloud resources.
 /// 
-/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
-/// `members` to a `role`, where the members can be user accounts, Google groups,
-/// Google domains, and service accounts. A `role` is a named list of permissions
-/// defined by IAM.
+/// A `Policy` is a collection of `bindings`. A `binding` binds one or more
+/// `members` to a single `role`. Members can be user accounts, service accounts,
+/// Google groups, and domains (such as G Suite). A `role` is a named list of
+/// permissions; each `role` can be an IAM predefined role or a user-created
+/// custom role.
 /// 
-/// **JSON Example**
+/// Optionally, a `binding` can specify a `condition`, which is a logical
+/// expression that allows access to a resource only if the expression evaluates
+/// to `true`. A condition can add constraints based on attributes of the
+/// request, the resource, or both.
+/// 
+/// **JSON example:**
 /// 
 /// ````text
 /// {
 ///   "bindings": [
 ///     {
-///       "role": "roles/owner",
+///       "role": "roles/resourcemanager.organizationAdmin",
 ///       "members": [
 ///         "user:mike@example.com",
 ///         "group:admins@example.com",
 ///         "domain:google.com",
-///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
+///         "serviceAccount:my-project-id@appspot.gserviceaccount.com"
 ///       ]
 ///     },
 ///     {
-///       "role": "roles/viewer",
-///       "members": ["user:sean@example.com"]
+///       "role": "roles/resourcemanager.organizationViewer",
+///       "members": ["user:eve@example.com"],
+///       "condition": {
+///         "title": "expirable access",
+///         "description": "Does not grant access after Sep 2020",
+///         "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')",
+///       }
 ///     }
-///   ]
+///   ],
+///   "etag": "BwWWja0YfJA=",
+///   "version": 3
 /// }
 /// ````
 /// 
-/// **YAML Example**
+/// **YAML example:**
 /// 
 /// ````text
 /// bindings:
@@ -530,15 +543,21 @@ impl ResponseResult for DeviceConfig {}
 ///   - user:mike@example.com
 ///   - group:admins@example.com
 ///   - domain:google.com
-///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///   role: roles/owner
+///   - serviceAccount:my-project-id@appspot.gserviceaccount.com
+///   role: roles/resourcemanager.organizationAdmin
 /// - members:
-///   - user:sean@example.com
-///   role: roles/viewer
+///   - user:eve@example.com
+///   role: roles/resourcemanager.organizationViewer
+///   condition:
+///     title: expirable access
+///     description: Does not grant access after Sep 2020
+///     expression: request.time < timestamp('2020-10-01T00:00:00.000Z')
+/// - etag: BwWWja0YfJA=
+/// - version: 3
 /// ````
 /// 
 /// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam/docs).
+/// [IAM documentation](https://cloud.google.com/iam/docs/).
 /// 
 /// # Activities
 /// 
@@ -551,8 +570,9 @@ impl ResponseResult for DeviceConfig {}
 /// * [locations registries groups get iam policy projects](struct.ProjectLocationRegistryGroupGetIamPolicyCall.html) (response)
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
+    /// Associates a list of `members` to a `role`. Optionally, may specify a
+    /// `condition` that determines how and when the `bindings` are applied. Each
+    /// of the `bindings` must contain at least one member.
     pub bindings: Option<Vec<Binding>>,
     /// `etag` is used for optimistic concurrency control as a way to help
     /// prevent simultaneous updates of a policy from overwriting each other.
@@ -562,10 +582,32 @@ pub struct Policy {
     /// systems are expected to put that etag in the request to `setIamPolicy` to
     /// ensure that their change will be applied to the same version of the policy.
     /// 
-    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
-    /// policy is overwritten blindly.
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
     pub etag: Option<String>,
-    /// Deprecated.
+    /// Specifies the format of the policy.
+    /// 
+    /// Valid values are `0`, `1`, and `3`. Requests that specify an invalid value
+    /// are rejected.
+    /// 
+    /// Any operation that affects conditional role bindings must specify version
+    /// `3`. This requirement applies to the following operations:
+    /// 
+    /// * Getting a policy that includes a conditional role binding
+    /// * Adding a conditional role binding to a policy
+    /// * Changing a conditional role binding in a policy
+    /// * Removing any role binding, with or without a condition, from a policy
+    ///   that includes conditions
+    /// 
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
+    /// 
+    /// If a policy does not include any conditions, operations on that policy may
+    /// specify any valid version or leave the field unset.
     pub version: Option<i32>,
 }
 
@@ -583,11 +625,11 @@ impl ResponseResult for Policy {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UnbindDeviceFromGatewayRequest {
-    /// The value of `gateway_id` can be either the device numeric ID or the
+    /// Required. The value of `gateway_id` can be either the device numeric ID or the
     /// user-defined device identifier.
     #[serde(rename="gatewayId")]
     pub gateway_id: Option<String>,
-    /// The device to disassociate from the specified gateway. The value of
+    /// Required. The device to disassociate from the specified gateway. The value of
     /// `device_id` can be either the device numeric ID or the user-defined device
     /// identifier.
     #[serde(rename="deviceId")]
@@ -905,7 +947,7 @@ pub struct ModifyCloudToDeviceConfigRequest {
     /// simultaneous updates without losing data.
     #[serde(rename="versionToUpdate")]
     pub version_to_update: Option<String>,
-    /// The configuration data for the device.
+    /// Required. The configuration data for the device.
     #[serde(rename="binaryData")]
     pub binary_data: Option<String>,
 }
@@ -954,7 +996,11 @@ impl ResponseResult for SendCommandToDeviceResponse {}
 /// * [locations registries groups get iam policy projects](struct.ProjectLocationRegistryGroupGetIamPolicyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetIamPolicyRequest { _never_set: Option<bool> }
+pub struct GetIamPolicyRequest {
+    /// OPTIONAL: A `GetPolicyOptions` object for specifying options to
+    /// `GetIamPolicy`. This field is only used by Cloud IAM.
+    pub options: Option<GetPolicyOptions>,
+}
 
 impl RequestValue for GetIamPolicyRequest {}
 
@@ -1010,30 +1056,59 @@ pub struct RegistryCredential {
 impl Part for RegistryCredential {}
 
 
-/// Represents an expression text. Example:
+/// Represents a textual expression in the Common Expression Language (CEL)
+/// syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+/// are documented at https://github.com/google/cel-spec.
+/// 
+/// Example (Comparison):
 /// 
 /// ````text
-/// title: "User account presence"
-/// description: "Determines whether the request has a user account"
-/// expression: "size(request.user) > 0"
+/// title: "Summary size limit"
+/// description: "Determines if a summary is less than 100 chars"
+/// expression: "document.summary.size() < 100"
 /// ````
+/// 
+/// Example (Equality):
+/// 
+/// ````text
+/// title: "Requestor is owner"
+/// description: "Determines if requestor is the document owner"
+/// expression: "document.owner == request.auth.claims.email"
+/// ````
+/// 
+/// Example (Logic):
+/// 
+/// ````text
+/// title: "Public documents"
+/// description: "Determine whether the document should be publicly visible"
+/// expression: "document.type != 'private' && document.type != 'internal'"
+/// ````
+/// 
+/// Example (Data Manipulation):
+/// 
+/// ````text
+/// title: "Notification string"
+/// description: "Create a notification string with a timestamp."
+/// expression: "'New message received at ' + string(document.create_time)"
+/// ````
+/// 
+/// The exact variables and functions that may be referenced within an expression
+/// are determined by the service that evaluates it. See the service
+/// documentation for additional information.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
-    /// An optional description of the expression. This is a longer text which
+    /// Optional. Description of the expression. This is a longer text which
     /// describes the expression, e.g. when hovered over it in a UI.
     pub description: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
+    /// Textual representation of an expression in Common Expression Language
+    /// syntax.
     pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error
+    /// Optional. String indicating the location of the expression for error
     /// reporting, e.g. a file name and a position in the file.
     pub location: Option<String>,
-    /// An optional title for the expression, i.e. a short string describing
+    /// Optional. Title for the expression, i.e. a short string describing
     /// its purpose. This can be used e.g. in UIs which allow to enter the
     /// expression.
     pub title: Option<String>,
@@ -1216,6 +1291,27 @@ pub struct ListDeviceRegistriesResponse {
 impl ResponseResult for ListDeviceRegistriesResponse {}
 
 
+/// Encapsulates settings provided to GetIamPolicy.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetPolicyOptions {
+    /// Optional. The policy format version to be returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
+    #[serde(rename="requestedPolicyVersion")]
+    pub requested_policy_version: Option<i32>,
+}
+
+impl Part for GetPolicyOptions {}
+
+
 /// Associates `members` with a `role`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1240,7 +1336,7 @@ pub struct Binding {
     ///    who is authenticated with a Google account or a service account.
     /// 
     /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` .
+    ///    account. For example, `alice@example.com` .
     /// 
     /// 
     /// * `serviceAccount:{emailid}`: An email address that represents a service
@@ -1248,6 +1344,26 @@ pub struct Binding {
     /// 
     /// * `group:{emailid}`: An email address that represents a Google group.
     ///    For example, `admins@example.com`.
+    /// 
+    /// * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a user that has been recently deleted. For
+    ///    example, `alice@example.com?uid=123456789012345678901`. If the user is
+    ///    recovered, this value reverts to `user:{emailid}` and the recovered user
+    ///    retains the role in the binding.
+    /// 
+    /// * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus
+    ///    unique identifier) representing a service account that has been recently
+    ///    deleted. For example,
+    ///    `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.
+    ///    If the service account is undeleted, this value reverts to
+    ///    `serviceAccount:{emailid}` and the undeleted service account retains the
+    ///    role in the binding.
+    /// 
+    /// * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a Google group that has been recently
+    ///    deleted. For example, `admins@example.com?uid=123456789012345678901`. If
+    ///    the group is recovered, this value reverts to `group:{emailid}` and the
+    ///    recovered group retains the role in the binding.
     /// 
     /// 
     /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
@@ -1286,7 +1402,7 @@ impl Part for HttpConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SendCommandToDeviceRequest {
-    /// The command data to send to the device.
+    /// Required. The command data to send to the device.
     #[serde(rename="binaryData")]
     pub binary_data: Option<String>,
     /// Optional subfolder for the command. If empty, the command will be delivered
@@ -1311,11 +1427,11 @@ impl RequestValue for SendCommandToDeviceRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BindDeviceToGatewayRequest {
-    /// The value of `gateway_id` can be either the device numeric ID or the
+    /// Required. The value of `gateway_id` can be either the device numeric ID or the
     /// user-defined device identifier.
     #[serde(rename="gatewayId")]
     pub gateway_id: Option<String>,
-    /// The device to associate with the specified gateway. The value of
+    /// Required. The device to associate with the specified gateway. The value of
     /// `device_id` can be either the device numeric ID or the user-defined device
     /// identifier.
     #[serde(rename="deviceId")]
@@ -1375,7 +1491,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The device registry path. Required. For example,
+    /// * `parent` - Required. The device registry path. Required. For example,
     ///              `projects/my-project/locations/us-central1/registries/my-registry`.
     pub fn locations_registries_devices_list(&self, parent: &str) -> ProjectLocationRegistryDeviceListCall<'a, C, A> {
         ProjectLocationRegistryDeviceListCall {
@@ -1402,7 +1518,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The name of the registry. For example,
+    /// * `parent` - Required. The name of the registry. For example,
     ///              `projects/example-project/locations/us-central1/registries/my-registry`.
     pub fn locations_registries_unbind_device_from_gateway(&self, request: UnbindDeviceFromGatewayRequest, parent: &str) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, C, A> {
         ProjectLocationRegistryUnbindDeviceFromGatewayCall {
@@ -1464,7 +1580,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The name of the registry. For example,
+    /// * `parent` - Required. The name of the registry. For example,
     ///              `projects/example-project/locations/us-central1/registries/my-registry`.
     pub fn locations_registries_bind_device_to_gateway(&self, request: BindDeviceToGatewayRequest, parent: &str) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a, C, A> {
         ProjectLocationRegistryBindDeviceToGatewayCall {
@@ -1484,7 +1600,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The project and cloud region where this device registry must be created.
+    /// * `parent` - Required. The project and cloud region where this device registry must be created.
     ///              For example, `projects/example-project/locations/us-central1`.
     pub fn locations_registries_create(&self, request: DeviceRegistry, parent: &str) -> ProjectLocationRegistryCreateCall<'a, C, A> {
         ProjectLocationRegistryCreateCall {
@@ -1503,7 +1619,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The project and cloud region path. For example,
+    /// * `parent` - Required. The project and cloud region path. For example,
     ///              `projects/example-project/locations/us-central1`.
     pub fn locations_registries_list(&self, parent: &str) -> ProjectLocationRegistryListCall<'a, C, A> {
         ProjectLocationRegistryListCall {
@@ -1546,7 +1662,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the device. For example,
+    /// * `name` - Required. The name of the device. For example,
     ///            `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
     ///            `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`.
     pub fn locations_registries_devices_states_list(&self, name: &str) -> ProjectLocationRegistryDeviceStateListCall<'a, C, A> {
@@ -1566,7 +1682,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the device registry. For example,
+    /// * `name` - Required. The name of the device registry. For example,
     ///            `projects/example-project/locations/us-central1/registries/my-registry`.
     pub fn locations_registries_get(&self, name: &str) -> ProjectLocationRegistryGetCall<'a, C, A> {
         ProjectLocationRegistryGetCall {
@@ -1584,7 +1700,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the device registry. For example,
+    /// * `name` - Required. The name of the device registry. For example,
     ///            `projects/example-project/locations/us-central1/registries/my-registry`.
     pub fn locations_registries_delete(&self, name: &str) -> ProjectLocationRegistryDeleteCall<'a, C, A> {
         ProjectLocationRegistryDeleteCall {
@@ -1602,7 +1718,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The device registry path. Required. For example,
+    /// * `parent` - Required. The device registry path. Required. For example,
     ///              `projects/my-project/locations/us-central1/registries/my-registry`.
     pub fn locations_registries_groups_devices_list(&self, parent: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a, C, A> {
         ProjectLocationRegistryGroupDeviceListCall {
@@ -1629,7 +1745,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The name of the device registry where this device should be created.
+    /// * `parent` - Required. The name of the device registry where this device should be created.
     ///              For example,
     ///              `projects/example-project/locations/us-central1/registries/my-registry`.
     pub fn locations_registries_devices_create(&self, request: Device, parent: &str) -> ProjectLocationRegistryDeviceCreateCall<'a, C, A> {
@@ -1649,7 +1765,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the device. For example,
+    /// * `name` - Required. The name of the device. For example,
     ///            `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
     ///            `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`.
     pub fn locations_registries_devices_get(&self, name: &str) -> ProjectLocationRegistryDeviceGetCall<'a, C, A> {
@@ -1682,7 +1798,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the device. For example,
+    /// * `name` - Required. The name of the device. For example,
     ///            `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
     ///            `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`.
     pub fn locations_registries_devices_send_command_to_device(&self, request: SendCommandToDeviceRequest, name: &str) -> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a, C, A> {
@@ -1749,7 +1865,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the device. For example,
+    /// * `name` - Required. The name of the device. For example,
     ///            `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
     ///            `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`.
     pub fn locations_registries_devices_config_versions_list(&self, name: &str) -> ProjectLocationRegistryDeviceConfigVersionListCall<'a, C, A> {
@@ -1794,7 +1910,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the device. For example,
+    /// * `name` - Required. The name of the device. For example,
     ///            `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
     ///            `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`.
     pub fn locations_registries_devices_modify_cloud_to_device_config(&self, request: ModifyCloudToDeviceConfigRequest, name: &str) -> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a, C, A> {
@@ -1836,7 +1952,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the device. For example,
+    /// * `name` - Required. The name of the device. For example,
     ///            `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
     ///            `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`.
     pub fn locations_registries_devices_delete(&self, name: &str) -> ProjectLocationRegistryDeviceDeleteCall<'a, C, A> {
@@ -2098,7 +2214,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceListCall<'a, C, A> where C: BorrowMu
     }
 
 
-    /// The device registry path. Required. For example,
+    /// Required. The device registry path. Required. For example,
     /// `projects/my-project/locations/us-central1/registries/my-registry`.
     ///
     /// Sets the *parent* path property to the given value.
@@ -2453,7 +2569,7 @@ impl<'a, C, A> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, C, A> wher
         self._request = new_value;
         self
     }
-    /// The name of the registry. For example,
+    /// Required. The name of the registry. For example,
     /// `projects/example-project/locations/us-central1/registries/my-registry`.
     ///
     /// Sets the *parent* path property to the given value.
@@ -2749,7 +2865,7 @@ impl<'a, C, A> ProjectLocationRegistryPatchCall<'a, C, A> where C: BorrowMut<hyp
         self._name = new_value.to_string();
         self
     }
-    /// Only updates the `device_registry` fields indicated by this mask.
+    /// Required. Only updates the `device_registry` fields indicated by this mask.
     /// The field mask must not be empty, and it must not contain fields that
     /// are immutable or only set by the server.
     /// Mutable top-level fields: `event_notification_config`, `http_config`,
@@ -3310,7 +3426,7 @@ impl<'a, C, A> ProjectLocationRegistryBindDeviceToGatewayCall<'a, C, A> where C:
         self._request = new_value;
         self
     }
-    /// The name of the registry. For example,
+    /// Required. The name of the registry. For example,
     /// `projects/example-project/locations/us-central1/registries/my-registry`.
     ///
     /// Sets the *parent* path property to the given value.
@@ -3590,7 +3706,7 @@ impl<'a, C, A> ProjectLocationRegistryCreateCall<'a, C, A> where C: BorrowMut<hy
         self._request = new_value;
         self
     }
-    /// The project and cloud region where this device registry must be created.
+    /// Required. The project and cloud region where this device registry must be created.
     /// For example, `projects/example-project/locations/us-central1`.
     ///
     /// Sets the *parent* path property to the given value.
@@ -3849,7 +3965,7 @@ impl<'a, C, A> ProjectLocationRegistryListCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
-    /// The project and cloud region path. For example,
+    /// Required. The project and cloud region path. For example,
     /// `projects/example-project/locations/us-central1`.
     ///
     /// Sets the *parent* path property to the given value.
@@ -4405,7 +4521,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceStateListCall<'a, C, A> where C: Bor
     }
 
 
-    /// The name of the device. For example,
+    /// Required. The name of the device. For example,
     /// `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
     /// `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`.
     ///
@@ -4664,7 +4780,7 @@ impl<'a, C, A> ProjectLocationRegistryGetCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// The name of the device registry. For example,
+    /// Required. The name of the device registry. For example,
     /// `projects/example-project/locations/us-central1/registries/my-registry`.
     ///
     /// Sets the *name* path property to the given value.
@@ -4913,7 +5029,7 @@ impl<'a, C, A> ProjectLocationRegistryDeleteCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// The name of the device registry. For example,
+    /// Required. The name of the device registry. For example,
     /// `projects/example-project/locations/us-central1/registries/my-registry`.
     ///
     /// Sets the *name* path property to the given value.
@@ -5206,7 +5322,7 @@ impl<'a, C, A> ProjectLocationRegistryGroupDeviceListCall<'a, C, A> where C: Bor
     }
 
 
-    /// The device registry path. Required. For example,
+    /// Required. The device registry path. Required. For example,
     /// `projects/my-project/locations/us-central1/registries/my-registry`.
     ///
     /// Sets the *parent* path property to the given value.
@@ -5561,7 +5677,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceCreateCall<'a, C, A> where C: Borrow
         self._request = new_value;
         self
     }
-    /// The name of the device registry where this device should be created.
+    /// Required. The name of the device registry where this device should be created.
     /// For example,
     /// `projects/example-project/locations/us-central1/registries/my-registry`.
     ///
@@ -5816,7 +5932,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceGetCall<'a, C, A> where C: BorrowMut
     }
 
 
-    /// The name of the device. For example,
+    /// Required. The name of the device. For example,
     /// `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
     /// `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`.
     ///
@@ -6117,7 +6233,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a, C, A> wh
         self._request = new_value;
         self
     }
-    /// The name of the device. For example,
+    /// Required. The name of the device. For example,
     /// `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
     /// `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`.
     ///
@@ -6699,7 +6815,7 @@ impl<'a, C, A> ProjectLocationRegistryDevicePatchCall<'a, C, A> where C: BorrowM
         self._name = new_value.to_string();
         self
     }
-    /// Only updates the `device` fields indicated by this mask.
+    /// Required. Only updates the `device` fields indicated by this mask.
     /// The field mask must not be empty, and it must not contain fields that
     /// are immutable or only set by the server.
     /// Mutable top-level fields: `credentials`, `blocked`, and `metadata`
@@ -6953,7 +7069,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceConfigVersionListCall<'a, C, A> wher
     }
 
 
-    /// The name of the device. For example,
+    /// Required. The name of the device. For example,
     /// `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
     /// `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`.
     ///
@@ -7527,7 +7643,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a, C,
         self._request = new_value;
         self
     }
-    /// The name of the device. For example,
+    /// Required. The name of the device. For example,
     /// `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
     /// `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`.
     ///
@@ -8059,7 +8175,7 @@ impl<'a, C, A> ProjectLocationRegistryDeviceDeleteCall<'a, C, A> where C: Borrow
     }
 
 
-    /// The name of the device. For example,
+    /// Required. The name of the device. For example,
     /// `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
     /// `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`.
     ///

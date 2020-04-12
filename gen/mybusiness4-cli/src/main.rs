@@ -71,8 +71,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pending-invitation" => Some(("pendingInvitation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "admin-name" => Some(("adminName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-name", "name", "pending-invitation", "role"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -254,8 +254,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pending-invitation" => Some(("pendingInvitation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "admin-name" => Some(("adminName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-name", "name", "pending-invitation", "role"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -345,7 +345,7 @@ impl<'n> Engine<'n> {
                     "state.vetted-status" => Some(("state.vettedStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-photo-url" => Some(("profilePhotoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.phone-number" => Some(("organizationInfo.phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.registered-domain" => Some(("organizationInfo.registeredDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "organization-info.postal-address.language-code" => Some(("organizationInfo.postalAddress.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "organization-info.postal-address.recipients" => Some(("organizationInfo.postalAddress.recipients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "organization-info.postal-address.locality" => Some(("organizationInfo.postalAddress.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -357,7 +357,7 @@ impl<'n> Engine<'n> {
                     "organization-info.postal-address.organization" => Some(("organizationInfo.postalAddress.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "organization-info.postal-address.sublocality" => Some(("organizationInfo.postalAddress.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "organization-info.postal-address.revision" => Some(("organizationInfo.postalAddress.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "organization-info.registered-domain" => Some(("organizationInfo.registeredDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.phone-number" => Some(("organizationInfo.phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-name", "account-number", "address-lines", "administrative-area", "language-code", "locality", "name", "organization", "organization-info", "permission-level", "phone-number", "postal-address", "postal-code", "profile-photo-url", "recipients", "region-code", "registered-domain", "revision", "role", "sorting-code", "state", "status", "sublocality", "type", "vetted-status"]);
@@ -1007,8 +1007,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pending-invitation" => Some(("pendingInvitation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "admin-name" => Some(("adminName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-name", "name", "pending-invitation", "role"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1190,8 +1190,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pending-invitation" => Some(("pendingInvitation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "admin-name" => Some(("adminName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-name", "name", "pending-invitation", "role"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1606,11 +1606,11 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "profile.description" => Some(("profile.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "open-info.status" => Some(("openInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "open-info.can-reopen" => Some(("openInfo.canReopen", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "open-info.opening-date.month" => Some(("openInfo.openingDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "open-info.opening-date.day" => Some(("openInfo.openingDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "open-info.status" => Some(("openInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "open-info.opening-date.year" => Some(("openInfo.openingDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "open-info.opening-date.day" => Some(("openInfo.openingDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "open-info.opening-date.month" => Some(("openInfo.openingDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "location-state.can-update" => Some(("locationState.canUpdate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "location-state.can-delete" => Some(("locationState.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "location-state.is-disabled" => Some(("locationState.isDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1655,8 +1655,8 @@ impl<'n> Engine<'n> {
                     "additional-phones" => Some(("additionalPhones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "relationship-data.parent-chain" => Some(("relationshipData.parentChain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.new-review-url" => Some(("metadata.newReviewUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metadata.duplicate.location-name" => Some(("metadata.duplicate.locationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.duplicate.access" => Some(("metadata.duplicate.access", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata.duplicate.location-name" => Some(("metadata.duplicate.locationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.duplicate.place-id" => Some(("metadata.duplicate.placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.maps-url" => Some(("metadata.mapsUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary-category.display-name" => Some(("primaryCategory.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2188,41 +2188,41 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "event.schedule.start-date.month" => Some(("event.schedule.startDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.start-date.day" => Some(("event.schedule.startDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.start-date.year" => Some(("event.schedule.startDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-time.hours" => Some(("event.schedule.endTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-time.seconds" => Some(("event.schedule.endTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-time.minutes" => Some(("event.schedule.endTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-time.nanos" => Some(("event.schedule.endTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-date.month" => Some(("event.schedule.endDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-date.day" => Some(("event.schedule.endDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-date.year" => Some(("event.schedule.endDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.start-time.hours" => Some(("event.schedule.startTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.start-time.seconds" => Some(("event.schedule.startTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.start-time.minutes" => Some(("event.schedule.startTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.start-time.nanos" => Some(("event.schedule.startTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.title" => Some(("event.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product.upper-price.nanos" => Some(("product.upperPrice.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "product.upper-price.units" => Some(("product.upperPrice.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product.upper-price.currency-code" => Some(("product.upperPrice.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product.lower-price.nanos" => Some(("product.lowerPrice.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "product.lower-price.units" => Some(("product.lowerPrice.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product.lower-price.currency-code" => Some(("product.lowerPrice.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product.product-name" => Some(("product.productName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "topic-type" => Some(("topicType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "offer.terms-conditions" => Some(("offer.termsConditions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "offer.redeem-online-url" => Some(("offer.redeemOnlineUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "offer.coupon-code" => Some(("offer.couponCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.upper-price.units" => Some(("product.upperPrice.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.upper-price.nanos" => Some(("product.upperPrice.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "product.upper-price.currency-code" => Some(("product.upperPrice.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.lower-price.units" => Some(("product.lowerPrice.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.lower-price.nanos" => Some(("product.lowerPrice.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "product.lower-price.currency-code" => Some(("product.lowerPrice.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.product-name" => Some(("product.productName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "search-url" => Some(("searchUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "call-to-action.url" => Some(("callToAction.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "call-to-action.action-type" => Some(("callToAction.actionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event.title" => Some(("event.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event.schedule.start-date.year" => Some(("event.schedule.startDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-date.day" => Some(("event.schedule.startDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-date.month" => Some(("event.schedule.startDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-time.hours" => Some(("event.schedule.endTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-time.nanos" => Some(("event.schedule.endTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-time.minutes" => Some(("event.schedule.endTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-time.seconds" => Some(("event.schedule.endTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-date.year" => Some(("event.schedule.endDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-date.day" => Some(("event.schedule.endDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-date.month" => Some(("event.schedule.endDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-time.hours" => Some(("event.schedule.startTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-time.nanos" => Some(("event.schedule.startTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-time.minutes" => Some(("event.schedule.startTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-time.seconds" => Some(("event.schedule.startTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["action-type", "call-to-action", "coupon-code", "create-time", "currency-code", "day", "end-date", "end-time", "event", "hours", "language-code", "lower-price", "minutes", "month", "name", "nanos", "offer", "product", "product-name", "redeem-online-url", "schedule", "search-url", "seconds", "start-date", "start-time", "state", "summary", "terms-conditions", "title", "topic-type", "units", "update-time", "upper-price", "url", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2458,41 +2458,41 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "event.schedule.start-date.month" => Some(("event.schedule.startDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.start-date.day" => Some(("event.schedule.startDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.start-date.year" => Some(("event.schedule.startDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-time.hours" => Some(("event.schedule.endTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-time.seconds" => Some(("event.schedule.endTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-time.minutes" => Some(("event.schedule.endTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-time.nanos" => Some(("event.schedule.endTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-date.month" => Some(("event.schedule.endDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-date.day" => Some(("event.schedule.endDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.end-date.year" => Some(("event.schedule.endDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.start-time.hours" => Some(("event.schedule.startTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.start-time.seconds" => Some(("event.schedule.startTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.start-time.minutes" => Some(("event.schedule.startTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.schedule.start-time.nanos" => Some(("event.schedule.startTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "event.title" => Some(("event.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product.upper-price.nanos" => Some(("product.upperPrice.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "product.upper-price.units" => Some(("product.upperPrice.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product.upper-price.currency-code" => Some(("product.upperPrice.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product.lower-price.nanos" => Some(("product.lowerPrice.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "product.lower-price.units" => Some(("product.lowerPrice.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product.lower-price.currency-code" => Some(("product.lowerPrice.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product.product-name" => Some(("product.productName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "topic-type" => Some(("topicType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "offer.terms-conditions" => Some(("offer.termsConditions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "offer.redeem-online-url" => Some(("offer.redeemOnlineUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "offer.coupon-code" => Some(("offer.couponCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.upper-price.units" => Some(("product.upperPrice.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.upper-price.nanos" => Some(("product.upperPrice.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "product.upper-price.currency-code" => Some(("product.upperPrice.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.lower-price.units" => Some(("product.lowerPrice.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.lower-price.nanos" => Some(("product.lowerPrice.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "product.lower-price.currency-code" => Some(("product.lowerPrice.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product.product-name" => Some(("product.productName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "search-url" => Some(("searchUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "call-to-action.url" => Some(("callToAction.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "call-to-action.action-type" => Some(("callToAction.actionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event.title" => Some(("event.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event.schedule.start-date.year" => Some(("event.schedule.startDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-date.day" => Some(("event.schedule.startDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-date.month" => Some(("event.schedule.startDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-time.hours" => Some(("event.schedule.endTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-time.nanos" => Some(("event.schedule.endTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-time.minutes" => Some(("event.schedule.endTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-time.seconds" => Some(("event.schedule.endTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-date.year" => Some(("event.schedule.endDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-date.day" => Some(("event.schedule.endDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.end-date.month" => Some(("event.schedule.endDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-time.hours" => Some(("event.schedule.startTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-time.nanos" => Some(("event.schedule.startTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-time.minutes" => Some(("event.schedule.startTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "event.schedule.start-time.seconds" => Some(("event.schedule.startTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["action-type", "call-to-action", "coupon-code", "create-time", "currency-code", "day", "end-date", "end-time", "event", "hours", "language-code", "lower-price", "minutes", "month", "name", "nanos", "offer", "product", "product-name", "redeem-online-url", "schedule", "search-url", "seconds", "start-date", "start-time", "state", "summary", "terms-conditions", "title", "topic-type", "units", "update-time", "upper-price", "url", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2668,17 +2668,17 @@ impl<'n> Engine<'n> {
                     "attribution.profile-name" => Some(("attribution.profileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attribution.takedown-url" => Some(("attribution.takedownUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attribution.profile-photo-url" => Some(("attribution.profilePhotoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "google-url" => Some(("googleUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "insights.view-count" => Some(("insights.viewCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "media-format" => Some(("mediaFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dimensions.width-pixels" => Some(("dimensions.widthPixels", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "dimensions.height-pixels" => Some(("dimensions.heightPixels", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "thumbnail-url" => Some(("thumbnailUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "google-url" => Some(("googleUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-format" => Some(("mediaFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "insights.view-count" => Some(("insights.viewCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "location-association.category" => Some(("locationAssociation.category", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location-association.price-list-item-id" => Some(("locationAssociation.priceListItemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "dimensions.width-pixels" => Some(("dimensions.widthPixels", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "dimensions.height-pixels" => Some(("dimensions.heightPixels", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution", "category", "create-time", "data-ref", "description", "dimensions", "google-url", "height-pixels", "insights", "location-association", "media-format", "name", "price-list-item-id", "profile-name", "profile-photo-url", "profile-url", "resource-name", "source-url", "takedown-url", "thumbnail-url", "view-count", "width-pixels"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3025,17 +3025,17 @@ impl<'n> Engine<'n> {
                     "attribution.profile-name" => Some(("attribution.profileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attribution.takedown-url" => Some(("attribution.takedownUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attribution.profile-photo-url" => Some(("attribution.profilePhotoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "google-url" => Some(("googleUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "insights.view-count" => Some(("insights.viewCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "media-format" => Some(("mediaFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dimensions.width-pixels" => Some(("dimensions.widthPixels", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "dimensions.height-pixels" => Some(("dimensions.heightPixels", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "thumbnail-url" => Some(("thumbnailUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "google-url" => Some(("googleUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-format" => Some(("mediaFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "insights.view-count" => Some(("insights.viewCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "location-association.category" => Some(("locationAssociation.category", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location-association.price-list-item-id" => Some(("locationAssociation.priceListItemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "dimensions.width-pixels" => Some(("dimensions.widthPixels", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "dimensions.height-pixels" => Some(("dimensions.heightPixels", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution", "category", "create-time", "data-ref", "description", "dimensions", "google-url", "height-pixels", "insights", "location-association", "media-format", "name", "price-list-item-id", "profile-name", "profile-photo-url", "profile-url", "resource-name", "source-url", "takedown-url", "thumbnail-url", "view-count", "width-pixels"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3204,11 +3204,11 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "profile.description" => Some(("profile.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "open-info.status" => Some(("openInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "open-info.can-reopen" => Some(("openInfo.canReopen", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "open-info.opening-date.month" => Some(("openInfo.openingDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "open-info.opening-date.day" => Some(("openInfo.openingDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "open-info.status" => Some(("openInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "open-info.opening-date.year" => Some(("openInfo.openingDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "open-info.opening-date.day" => Some(("openInfo.openingDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "open-info.opening-date.month" => Some(("openInfo.openingDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "location-state.can-update" => Some(("locationState.canUpdate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "location-state.can-delete" => Some(("locationState.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "location-state.is-disabled" => Some(("locationState.isDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3253,8 +3253,8 @@ impl<'n> Engine<'n> {
                     "additional-phones" => Some(("additionalPhones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "relationship-data.parent-chain" => Some(("relationshipData.parentChain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.new-review-url" => Some(("metadata.newReviewUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metadata.duplicate.location-name" => Some(("metadata.duplicate.locationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.duplicate.access" => Some(("metadata.duplicate.access", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata.duplicate.location-name" => Some(("metadata.duplicate.locationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.duplicate.place-id" => Some(("metadata.duplicate.placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.maps-url" => Some(("metadata.mapsUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary-category.display-name" => Some(("primaryCategory.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4494,7 +4494,7 @@ impl<'n> Engine<'n> {
                     "state.vetted-status" => Some(("state.vettedStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-photo-url" => Some(("profilePhotoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "organization-info.phone-number" => Some(("organizationInfo.phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.registered-domain" => Some(("organizationInfo.registeredDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "organization-info.postal-address.language-code" => Some(("organizationInfo.postalAddress.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "organization-info.postal-address.recipients" => Some(("organizationInfo.postalAddress.recipients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "organization-info.postal-address.locality" => Some(("organizationInfo.postalAddress.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4506,7 +4506,7 @@ impl<'n> Engine<'n> {
                     "organization-info.postal-address.organization" => Some(("organizationInfo.postalAddress.organization", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "organization-info.postal-address.sublocality" => Some(("organizationInfo.postalAddress.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "organization-info.postal-address.revision" => Some(("organizationInfo.postalAddress.revision", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "organization-info.registered-domain" => Some(("organizationInfo.registeredDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "organization-info.phone-number" => Some(("organizationInfo.phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["account-name", "account-number", "address-lines", "administrative-area", "language-code", "locality", "name", "organization", "organization-info", "permission-level", "phone-number", "postal-address", "postal-code", "profile-photo-url", "recipients", "region-code", "registered-domain", "revision", "role", "sorting-code", "state", "status", "sublocality", "type", "vetted-status"]);
@@ -4594,8 +4594,8 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "notification-types" => Some(("notificationTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "topic-name" => Some(("topicName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification-types" => Some(("notificationTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "notification-types", "topic-name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -5005,11 +5005,11 @@ impl<'n> Engine<'n> {
                     "result-count" => Some(("resultCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "location.profile.description" => Some(("location.profile.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.language-code" => Some(("location.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.open-info.status" => Some(("location.openInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.open-info.can-reopen" => Some(("location.openInfo.canReopen", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.open-info.opening-date.month" => Some(("location.openInfo.openingDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "location.open-info.opening-date.day" => Some(("location.openInfo.openingDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.open-info.status" => Some(("location.openInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.open-info.opening-date.year" => Some(("location.openInfo.openingDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.open-info.opening-date.day" => Some(("location.openInfo.openingDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.open-info.opening-date.month" => Some(("location.openInfo.openingDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "location.location-state.can-update" => Some(("location.locationState.canUpdate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "location.location-state.can-delete" => Some(("location.locationState.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "location.location-state.is-disabled" => Some(("location.locationState.isDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -5054,8 +5054,8 @@ impl<'n> Engine<'n> {
                     "location.additional-phones" => Some(("location.additionalPhones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "location.relationship-data.parent-chain" => Some(("location.relationshipData.parentChain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.metadata.new-review-url" => Some(("location.metadata.newReviewUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.metadata.duplicate.location-name" => Some(("location.metadata.duplicate.locationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.metadata.duplicate.access" => Some(("location.metadata.duplicate.access", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.metadata.duplicate.location-name" => Some(("location.metadata.duplicate.locationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.metadata.duplicate.place-id" => Some(("location.metadata.duplicate.placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.metadata.maps-url" => Some(("location.metadata.mapsUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.primary-category.display-name" => Some(("location.primaryCategory.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5144,11 +5144,11 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "location.profile.description" => Some(("location.profile.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.language-code" => Some(("location.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.open-info.status" => Some(("location.openInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.open-info.can-reopen" => Some(("location.openInfo.canReopen", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "location.open-info.opening-date.month" => Some(("location.openInfo.openingDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "location.open-info.opening-date.day" => Some(("location.openInfo.openingDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.open-info.status" => Some(("location.openInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.open-info.opening-date.year" => Some(("location.openInfo.openingDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.open-info.opening-date.day" => Some(("location.openInfo.openingDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.open-info.opening-date.month" => Some(("location.openInfo.openingDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "location.location-state.can-update" => Some(("location.locationState.canUpdate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "location.location-state.can-delete" => Some(("location.locationState.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "location.location-state.is-disabled" => Some(("location.locationState.isDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -5193,8 +5193,8 @@ impl<'n> Engine<'n> {
                     "location.additional-phones" => Some(("location.additionalPhones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "location.relationship-data.parent-chain" => Some(("location.relationshipData.parentChain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.metadata.new-review-url" => Some(("location.metadata.newReviewUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "location.metadata.duplicate.location-name" => Some(("location.metadata.duplicate.locationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.metadata.duplicate.access" => Some(("location.metadata.duplicate.access", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.metadata.duplicate.location-name" => Some(("location.metadata.duplicate.locationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.metadata.duplicate.place-id" => Some(("location.metadata.duplicate.placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.metadata.maps-url" => Some(("location.metadata.mapsUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.primary-category.display-name" => Some(("location.primaryCategory.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7452,7 +7452,7 @@ fn main() {
     
     let mut app = App::new("mybusiness4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+0")
+           .version("1.0.13+0")
            .about("The Google My Business API provides an interface for managing business location information on Google.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_mybusiness4_cli")
            .arg(Arg::with_name("folder")

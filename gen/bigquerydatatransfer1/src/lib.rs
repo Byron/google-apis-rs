@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *BigQuery Data Transfer* crate version *1.0.12+20190629*, where *20190629* is the exact revision of the *bigquerydatatransfer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *BigQuery Data Transfer* crate version *1.0.13+20200326*, where *20200326* is the exact revision of the *bigquerydatatransfer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *BigQuery Data Transfer* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/bigquery/).
@@ -114,9 +114,10 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.projects().transfer_configs_patch(req, "name")
-//!              .version_info("dolores")
-//!              .update_mask("kasd")
-//!              .authorization_code("accusam")
+//!              .version_info("kasd")
+//!              .update_mask("accusam")
+//!              .service_account_name("takimata")
+//!              .authorization_code("justo")
 //!              .doit();
 //! 
 //! match result {
@@ -237,6 +238,9 @@ pub use cmn::*;
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
+    /// View your data in Google BigQuery
+    BigqueryReadonly,
+
     /// View and manage your data across Google Cloud Platform services
     CloudPlatform,
 
@@ -250,6 +254,7 @@ pub enum Scope {
 impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
+            Scope::BigqueryReadonly => "https://www.googleapis.com/auth/bigquery.readonly",
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
             Scope::Bigquery => "https://www.googleapis.com/auth/bigquery",
             Scope::CloudPlatformReadOnly => "https://www.googleapis.com/auth/cloud-platform.read-only",
@@ -259,7 +264,7 @@ impl AsRef<str> for Scope {
 
 impl Default for Scope {
     fn default() -> Scope {
-        Scope::Bigquery
+        Scope::BigqueryReadonly
     }
 }
 
@@ -308,9 +313,10 @@ impl Default for Scope {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().transfer_configs_patch(req, "name")
-///              .version_info("justo")
-///              .update_mask("amet.")
-///              .authorization_code("erat")
+///              .version_info("erat")
+///              .update_mask("labore")
+///              .service_account_name("sea")
+///              .authorization_code("nonumy")
 ///              .doit();
 /// 
 /// match result {
@@ -348,7 +354,7 @@ impl<'a, C, A> BigQueryDataTransfer<C, A>
         BigQueryDataTransfer {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://bigquerydatatransfer.googleapis.com/".to_string(),
             _root_url: "https://bigquerydatatransfer.googleapis.com/".to_string(),
         }
@@ -359,7 +365,7 @@ impl<'a, C, A> BigQueryDataTransfer<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -580,6 +586,21 @@ pub struct Location {
 impl ResponseResult for Location {}
 
 
+/// Represents preferences for sending email notifications for transfer run
+/// events.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EmailPreferences {
+    /// If true, email notifications will be sent on transfer run failures.
+    #[serde(rename="enableFailureEmail")]
+    pub enable_failure_email: Option<bool>,
+}
+
+impl Part for EmailPreferences {}
+
+
 /// A request to determine whether the user has valid credentials. This method
 /// is used to limit the number of OAuth popups in the user interface. The
 /// user id is inferred from the API call context.
@@ -738,17 +759,14 @@ pub struct TransferConfig {
     /// The BigQuery target dataset id.
     #[serde(rename="destinationDatasetId")]
     pub destination_dataset_id: Option<String>,
-    /// User specified display name for the data transfer.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The resource name of the transfer config.
-    /// Transfer config names have the form of
-    /// `projects/{project_id}/locations/{region}/transferConfigs/{config_id}`.
-    /// The name is automatically generated based on the config_id specified in
-    /// CreateTransferConfigRequest along with project_id and region. If config_id
-    /// is not provided, usually a uuid, even though it is not guaranteed or
-    /// required, will be generated for config_id.
-    pub name: Option<String>,
+    /// Email notifications will be sent according to these preferences
+    /// to the email address of the user who owns this transfer config.
+    #[serde(rename="emailPreferences")]
+    pub email_preferences: Option<EmailPreferences>,
+    /// Pub/Sub topic where notifications will be sent after transfer runs
+    /// associated with this transfer config finish.
+    #[serde(rename="notificationPubsubTopic")]
+    pub notification_pubsub_topic: Option<String>,
     /// Data transfer schedule.
     /// If the data source does not support a custom schedule, this should be
     /// empty. If it is empty, the default value for the data source will be
@@ -762,28 +780,39 @@ pub struct TransferConfig {
     /// https://cloud.google.com/appengine/docs/flexible/python/scheduling-jobs-with-cron-yaml#the_schedule_format
     /// NOTE: the granularity should be at least 8 hours, or less frequent.
     pub schedule: Option<String>,
-    /// Output only. Region in which BigQuery dataset is located.
-    #[serde(rename="datasetRegion")]
-    pub dataset_region: Option<String>,
     /// Deprecated. Unique ID of the user on whose behalf transfer is done.
     #[serde(rename="userId")]
     pub user_id: Option<String>,
+    /// Is this config disabled. When set to true, no runs are scheduled
+    /// for a given transfer.
+    pub disabled: Option<bool>,
+    /// Data source id. Cannot be changed once data transfer is created.
+    #[serde(rename="dataSourceId")]
+    pub data_source_id: Option<String>,
+    /// User specified display name for the data transfer.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The resource name of the transfer config.
+    /// Transfer config names have the form of
+    /// `projects/{project_id}/locations/{region}/transferConfigs/{config_id}`.
+    /// The name is automatically generated based on the config_id specified in
+    /// CreateTransferConfigRequest along with project_id and region. If config_id
+    /// is not provided, usually a uuid, even though it is not guaranteed or
+    /// required, will be generated for config_id.
+    pub name: Option<String>,
+    /// Output only. Region in which BigQuery dataset is located.
+    #[serde(rename="datasetRegion")]
+    pub dataset_region: Option<String>,
     /// Options customizing the data transfer schedule.
     #[serde(rename="scheduleOptions")]
     pub schedule_options: Option<ScheduleOptions>,
     /// Output only. State of the most recently updated transfer run.
     pub state: Option<String>,
-    /// Data source id. Cannot be changed once data transfer is created.
-    #[serde(rename="dataSourceId")]
-    pub data_source_id: Option<String>,
-    /// Is this config disabled. When set to true, no runs are scheduled
-    /// for a given transfer.
-    pub disabled: Option<bool>,
+    /// Data transfer specific parameters.
+    pub params: Option<HashMap<String, String>>,
     /// Output only. Next time when data transfer will run.
     #[serde(rename="nextRunTime")]
     pub next_run_time: Option<String>,
-    /// Data transfer specific parameters.
-    pub params: Option<HashMap<String, String>>,
 }
 
 impl RequestValue for TransferConfig {}
@@ -969,6 +998,11 @@ impl ResponseResult for DataSource {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TransferRun {
+    /// Output only. Email notifications will be sent according to these
+    /// preferences to the email address of the user who owns the transfer config
+    /// this run was derived from.
+    #[serde(rename="emailPreferences")]
+    pub email_preferences: Option<EmailPreferences>,
     /// Output only. Last time the data transfer run state was updated.
     #[serde(rename="updateTime")]
     pub update_time: Option<String>,
@@ -980,6 +1014,10 @@ pub struct TransferRun {
     /// `projects/{project_id}/locations/{location}/transferConfigs/{config_id}/runs/{run_id}`.
     /// The name is ignored when creating a transfer run.
     pub name: Option<String>,
+    /// Output only. Pub/Sub topic where a notification will be sent after this
+    /// transfer run finishes
+    #[serde(rename="notificationPubsubTopic")]
+    pub notification_pubsub_topic: Option<String>,
     /// Output only. Describes the schedule of this transfer run if it was
     /// created as part of a regular schedule. For batch transfer runs that are
     /// scheduled manually, this is empty.
@@ -997,15 +1035,15 @@ pub struct TransferRun {
     /// Status of the transfer run.
     #[serde(rename="errorStatus")]
     pub error_status: Option<Status>,
-    /// Output only. Data transfer specific parameters.
-    pub params: Option<HashMap<String, String>>,
+    /// Output only. Data source id.
+    #[serde(rename="dataSourceId")]
+    pub data_source_id: Option<String>,
     /// Output only. Time when transfer run was started.
     /// Parameter ignored by server for input requests.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
-    /// Output only. Data source id.
-    #[serde(rename="dataSourceId")]
-    pub data_source_id: Option<String>,
+    /// Output only. Data transfer specific parameters.
+    pub params: Option<HashMap<String, String>>,
     /// For batch transfer runs, specifies the date and time of the data should be
     /// ingested.
     #[serde(rename="runTime")]
@@ -1057,11 +1095,11 @@ impl ResponseResult for ListTransferRunsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ScheduleTransferRunsRequest {
-    /// End time of the range of transfer runs. For example,
+    /// Required. End time of the range of transfer runs. For example,
     /// `"2017-05-30T00:00:00+00:00"`.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
-    /// Start time of the range of transfer runs. For example,
+    /// Required. Start time of the range of transfer runs. For example,
     /// `"2017-05-25T00:00:00+00:00"`.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
@@ -1140,8 +1178,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The field will contain name of the resource requested, for example:
-    ///            `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`
+    /// * `name` - Required. The field will contain name of the resource requested, for example:
+    ///            `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
+    ///            `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`
     pub fn transfer_configs_runs_get(&self, name: &str) -> ProjectTransferConfigRunGetCall<'a, C, A> {
         ProjectTransferConfigRunGetCall {
             hub: self.hub,
@@ -1176,8 +1215,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The field will contain name of the resource requested, for example:
-    ///            `projects/{project_id}/transferConfigs/{config_id}`
+    /// * `name` - Required. The field will contain name of the resource requested, for example:
+    ///            `projects/{project_id}/transferConfigs/{config_id}` or
+    ///            `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`
     pub fn locations_transfer_configs_delete(&self, name: &str) -> ProjectLocationTransferConfigDeleteCall<'a, C, A> {
         ProjectLocationTransferConfigDeleteCall {
             hub: self.hub,
@@ -1195,8 +1235,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The field will contain name of the resource requested, for example:
-    ///            `projects/{project_id}/dataSources/{data_source_id}`
+    /// * `name` - Required. The field will contain name of the resource requested, for example:
+    ///            `projects/{project_id}/dataSources/{data_source_id}` or
+    ///            `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`
     pub fn data_sources_get(&self, name: &str) -> ProjectDataSourceGetCall<'a, C, A> {
         ProjectDataSourceGetCall {
             hub: self.hub,
@@ -1214,16 +1255,17 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The BigQuery project id where the transfer configuration should be created.
-    ///              Must be in the format projects/{project_id}/locations/{location_id}
-    ///              If specified location and location of the destination bigquery dataset
-    ///              do not match - the request will fail.
+    /// * `parent` - Required. The BigQuery project id where the transfer configuration should be created.
+    ///              Must be in the format projects/{project_id}/locations/{location_id} or
+    ///              projects/{project_id}. If specified location and location of the
+    ///              destination bigquery dataset do not match - the request will fail.
     pub fn locations_transfer_configs_create(&self, request: TransferConfig, parent: &str) -> ProjectLocationTransferConfigCreateCall<'a, C, A> {
         ProjectLocationTransferConfigCreateCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
             _version_info: Default::default(),
+            _service_account_name: Default::default(),
             _authorization_code: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1237,8 +1279,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Transfer run name in the form:
-    ///              `projects/{project_id}/transferConfigs/{config_Id}/runs/{run_id}`.
+    /// * `parent` - Required. Transfer run name in the form:
+    ///              `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
+    ///              `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`
     pub fn transfer_configs_runs_transfer_logs_list(&self, parent: &str) -> ProjectTransferConfigRunTransferLogListCall<'a, C, A> {
         ProjectTransferConfigRunTransferLogListCall {
             hub: self.hub,
@@ -1258,9 +1301,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Name of transfer configuration for which transfer runs should be retrieved.
+    /// * `parent` - Required. Name of transfer configuration for which transfer runs should be retrieved.
     ///              Format of transfer configuration resource name is:
-    ///              `projects/{project_id}/transferConfigs/{config_id}`.
+    ///              `projects/{project_id}/transferConfigs/{config_id}` or
+    ///              `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
     pub fn locations_transfer_configs_runs_list(&self, parent: &str) -> ProjectLocationTransferConfigRunListCall<'a, C, A> {
         ProjectLocationTransferConfigRunListCall {
             hub: self.hub,
@@ -1286,7 +1330,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Transfer configuration name in the form:
-    ///              `projects/{project_id}/transferConfigs/{config_id}`.
+    ///              `projects/{project_id}/transferConfigs/{config_id}` or
+    ///              `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
     pub fn transfer_configs_start_manual_runs(&self, request: StartManualTransferRunsRequest, parent: &str) -> ProjectTransferConfigStartManualRunCall<'a, C, A> {
         ProjectTransferConfigStartManualRunCall {
             hub: self.hub,
@@ -1305,8 +1350,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The field will contain name of the resource requested, for example:
-    ///            `projects/{project_id}/dataSources/{data_source_id}`
+    /// * `name` - Required. The field will contain name of the resource requested, for example:
+    ///            `projects/{project_id}/dataSources/{data_source_id}` or
+    ///            `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`
     pub fn locations_data_sources_get(&self, name: &str) -> ProjectLocationDataSourceGetCall<'a, C, A> {
         ProjectLocationDataSourceGetCall {
             hub: self.hub,
@@ -1323,8 +1369,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The field will contain name of the resource requested, for example:
-    ///            `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`
+    /// * `name` - Required. The field will contain name of the resource requested, for example:
+    ///            `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
+    ///            `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`
     pub fn locations_transfer_configs_runs_get(&self, name: &str) -> ProjectLocationTransferConfigRunGetCall<'a, C, A> {
         ProjectLocationTransferConfigRunGetCall {
             hub: self.hub,
@@ -1341,8 +1388,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The field will contain name of the resource requested, for example:
-    ///            `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`
+    /// * `name` - Required. The field will contain name of the resource requested, for example:
+    ///            `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
+    ///            `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`
     pub fn locations_transfer_configs_runs_delete(&self, name: &str) -> ProjectLocationTransferConfigRunDeleteCall<'a, C, A> {
         ProjectLocationTransferConfigRunDeleteCall {
             hub: self.hub,
@@ -1364,8 +1412,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Transfer configuration name in the form:
-    ///              `projects/{project_id}/transferConfigs/{config_id}`.
+    /// * `parent` - Required. Transfer configuration name in the form:
+    ///              `projects/{project_id}/transferConfigs/{config_id}` or
+    ///              `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
     pub fn locations_transfer_configs_schedule_runs(&self, request: ScheduleTransferRunsRequest, parent: &str) -> ProjectLocationTransferConfigScheduleRunCall<'a, C, A> {
         ProjectLocationTransferConfigScheduleRunCall {
             hub: self.hub,
@@ -1383,8 +1432,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The field will contain name of the resource requested, for example:
-    ///            `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`
+    /// * `name` - Required. The field will contain name of the resource requested, for example:
+    ///            `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
+    ///            `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`
     pub fn transfer_configs_runs_delete(&self, name: &str) -> ProjectTransferConfigRunDeleteCall<'a, C, A> {
         ProjectTransferConfigRunDeleteCall {
             hub: self.hub,
@@ -1402,8 +1452,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The BigQuery project id for which data sources should be returned.
-    ///              Must be in the form: `projects/{project_id}`
+    /// * `parent` - Required. The BigQuery project id for which data sources should be returned.
+    ///              Must be in the form: `projects/{project_id}` or
+    ///              `projects/{project_id}/locations/{location_id}
     pub fn data_sources_list(&self, parent: &str) -> ProjectDataSourceListCall<'a, C, A> {
         ProjectDataSourceListCall {
             hub: self.hub,
@@ -1438,6 +1489,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _name: name.to_string(),
             _version_info: Default::default(),
             _update_mask: Default::default(),
+            _service_account_name: Default::default(),
             _authorization_code: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1452,16 +1504,17 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The BigQuery project id where the transfer configuration should be created.
-    ///              Must be in the format projects/{project_id}/locations/{location_id}
-    ///              If specified location and location of the destination bigquery dataset
-    ///              do not match - the request will fail.
+    /// * `parent` - Required. The BigQuery project id where the transfer configuration should be created.
+    ///              Must be in the format projects/{project_id}/locations/{location_id} or
+    ///              projects/{project_id}. If specified location and location of the
+    ///              destination bigquery dataset do not match - the request will fail.
     pub fn transfer_configs_create(&self, request: TransferConfig, parent: &str) -> ProjectTransferConfigCreateCall<'a, C, A> {
         ProjectTransferConfigCreateCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
             _version_info: Default::default(),
+            _service_account_name: Default::default(),
             _authorization_code: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1481,8 +1534,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The data source in the form:
-    ///            `projects/{project_id}/dataSources/{data_source_id}`
+    /// * `name` - Required. The data source in the form:
+    ///            `projects/{project_id}/dataSources/{data_source_id}` or
+    ///            `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`.
     pub fn locations_data_sources_check_valid_creds(&self, request: CheckValidCredsRequest, name: &str) -> ProjectLocationDataSourceCheckValidCredCall<'a, C, A> {
         ProjectLocationDataSourceCheckValidCredCall {
             hub: self.hub,
@@ -1500,8 +1554,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The field will contain name of the resource requested, for example:
-    ///            `projects/{project_id}/transferConfigs/{config_id}`
+    /// * `name` - Required. The field will contain name of the resource requested, for example:
+    ///            `projects/{project_id}/transferConfigs/{config_id}` or
+    ///            `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`
     pub fn transfer_configs_get(&self, name: &str) -> ProjectTransferConfigGetCall<'a, C, A> {
         ProjectTransferConfigGetCall {
             hub: self.hub,
@@ -1519,8 +1574,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The BigQuery project id for which data sources should be returned.
-    ///              Must be in the form: `projects/{project_id}`
+    /// * `parent` - Required. The BigQuery project id for which data sources should be returned.
+    ///              Must be in the form: `projects/{project_id}` or
+    ///              `projects/{project_id}/locations/{location_id}
     pub fn locations_data_sources_list(&self, parent: &str) -> ProjectLocationDataSourceListCall<'a, C, A> {
         ProjectLocationDataSourceListCall {
             hub: self.hub,
@@ -1539,8 +1595,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The field will contain name of the resource requested, for example:
-    ///            `projects/{project_id}/transferConfigs/{config_id}`
+    /// * `name` - Required. The field will contain name of the resource requested, for example:
+    ///            `projects/{project_id}/transferConfigs/{config_id}` or
+    ///            `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`
     pub fn locations_transfer_configs_get(&self, name: &str) -> ProjectLocationTransferConfigGetCall<'a, C, A> {
         ProjectLocationTransferConfigGetCall {
             hub: self.hub,
@@ -1562,7 +1619,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Transfer configuration name in the form:
-    ///              `projects/{project_id}/transferConfigs/{config_id}`.
+    ///              `projects/{project_id}/transferConfigs/{config_id}` or
+    ///              `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
     pub fn locations_transfer_configs_start_manual_runs(&self, request: StartManualTransferRunsRequest, parent: &str) -> ProjectLocationTransferConfigStartManualRunCall<'a, C, A> {
         ProjectLocationTransferConfigStartManualRunCall {
             hub: self.hub,
@@ -1580,8 +1638,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The BigQuery project id for which data sources
-    ///              should be returned: `projects/{project_id}`.
+    /// * `parent` - Required. The BigQuery project id for which data sources
+    ///              should be returned: `projects/{project_id}` or
+    ///              `projects/{project_id}/locations/{location_id}`
     pub fn transfer_configs_list(&self, parent: &str) -> ProjectTransferConfigListCall<'a, C, A> {
         ProjectTransferConfigListCall {
             hub: self.hub,
@@ -1617,6 +1676,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _name: name.to_string(),
             _version_info: Default::default(),
             _update_mask: Default::default(),
+            _service_account_name: Default::default(),
             _authorization_code: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1636,8 +1696,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The data source in the form:
-    ///            `projects/{project_id}/dataSources/{data_source_id}`
+    /// * `name` - Required. The data source in the form:
+    ///            `projects/{project_id}/dataSources/{data_source_id}` or
+    ///            `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`.
     pub fn data_sources_check_valid_creds(&self, request: CheckValidCredsRequest, name: &str) -> ProjectDataSourceCheckValidCredCall<'a, C, A> {
         ProjectDataSourceCheckValidCredCall {
             hub: self.hub,
@@ -1660,8 +1721,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Transfer configuration name in the form:
-    ///              `projects/{project_id}/transferConfigs/{config_id}`.
+    /// * `parent` - Required. Transfer configuration name in the form:
+    ///              `projects/{project_id}/transferConfigs/{config_id}` or
+    ///              `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
     pub fn transfer_configs_schedule_runs(&self, request: ScheduleTransferRunsRequest, parent: &str) -> ProjectTransferConfigScheduleRunCall<'a, C, A> {
         ProjectTransferConfigScheduleRunCall {
             hub: self.hub,
@@ -1699,9 +1761,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Name of transfer configuration for which transfer runs should be retrieved.
+    /// * `parent` - Required. Name of transfer configuration for which transfer runs should be retrieved.
     ///              Format of transfer configuration resource name is:
-    ///              `projects/{project_id}/transferConfigs/{config_id}`.
+    ///              `projects/{project_id}/transferConfigs/{config_id}` or
+    ///              `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
     pub fn transfer_configs_runs_list(&self, parent: &str) -> ProjectTransferConfigRunListCall<'a, C, A> {
         ProjectTransferConfigRunListCall {
             hub: self.hub,
@@ -1722,8 +1785,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The BigQuery project id for which data sources
-    ///              should be returned: `projects/{project_id}`.
+    /// * `parent` - Required. The BigQuery project id for which data sources
+    ///              should be returned: `projects/{project_id}` or
+    ///              `projects/{project_id}/locations/{location_id}`
     pub fn locations_transfer_configs_list(&self, parent: &str) -> ProjectLocationTransferConfigListCall<'a, C, A> {
         ProjectLocationTransferConfigListCall {
             hub: self.hub,
@@ -1743,8 +1807,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Transfer run name in the form:
-    ///              `projects/{project_id}/transferConfigs/{config_Id}/runs/{run_id}`.
+    /// * `parent` - Required. Transfer run name in the form:
+    ///              `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
+    ///              `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`
     pub fn locations_transfer_configs_runs_transfer_logs_list(&self, parent: &str) -> ProjectLocationTransferConfigRunTransferLogListCall<'a, C, A> {
         ProjectLocationTransferConfigRunTransferLogListCall {
             hub: self.hub,
@@ -1765,8 +1830,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The field will contain name of the resource requested, for example:
-    ///            `projects/{project_id}/transferConfigs/{config_id}`
+    /// * `name` - Required. The field will contain name of the resource requested, for example:
+    ///            `projects/{project_id}/transferConfigs/{config_id}` or
+    ///            `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`
     pub fn transfer_configs_delete(&self, name: &str) -> ProjectTransferConfigDeleteCall<'a, C, A> {
         ProjectTransferConfigDeleteCall {
             hub: self.hub,
@@ -1860,7 +1926,7 @@ impl<'a, C, A> ProjectTransferConfigRunGetCall<'a, C, A> where C: BorrowMut<hype
 
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::BigqueryReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -1961,8 +2027,9 @@ impl<'a, C, A> ProjectTransferConfigRunGetCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
-    /// The field will contain name of the resource requested, for example:
-    /// `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`
+    /// Required. The field will contain name of the resource requested, for example:
+    /// `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
+    /// `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2012,7 +2079,7 @@ impl<'a, C, A> ProjectTransferConfigRunGetCall<'a, C, A> where C: BorrowMut<hype
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::BigqueryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2109,7 +2176,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::BigqueryReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -2260,7 +2327,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::BigqueryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2459,8 +2526,9 @@ impl<'a, C, A> ProjectLocationTransferConfigDeleteCall<'a, C, A> where C: Borrow
     }
 
 
-    /// The field will contain name of the resource requested, for example:
-    /// `projects/{project_id}/transferConfigs/{config_id}`
+    /// Required. The field will contain name of the resource requested, for example:
+    /// `projects/{project_id}/transferConfigs/{config_id}` or
+    /// `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2608,7 +2676,7 @@ impl<'a, C, A> ProjectDataSourceGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::BigqueryReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -2709,8 +2777,9 @@ impl<'a, C, A> ProjectDataSourceGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// The field will contain name of the resource requested, for example:
-    /// `projects/{project_id}/dataSources/{data_source_id}`
+    /// Required. The field will contain name of the resource requested, for example:
+    /// `projects/{project_id}/dataSources/{data_source_id}` or
+    /// `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2760,7 +2829,7 @@ impl<'a, C, A> ProjectDataSourceGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::BigqueryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2817,8 +2886,9 @@ impl<'a, C, A> ProjectDataSourceGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_transfer_configs_create(req, "parent")
-///              .version_info("sadipscing")
-///              .authorization_code("aliquyam")
+///              .version_info("no")
+///              .service_account_name("justo")
+///              .authorization_code("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -2829,6 +2899,7 @@ pub struct ProjectLocationTransferConfigCreateCall<'a, C, A>
     _request: TransferConfig,
     _parent: String,
     _version_info: Option<String>,
+    _service_account_name: Option<String>,
     _authorization_code: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
@@ -2852,15 +2923,18 @@ impl<'a, C, A> ProjectLocationTransferConfigCreateCall<'a, C, A> where C: Borrow
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.locations.transferConfigs.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._version_info {
             params.push(("versionInfo", value.to_string()));
         }
+        if let Some(value) = self._service_account_name {
+            params.push(("serviceAccountName", value.to_string()));
+        }
         if let Some(value) = self._authorization_code {
             params.push(("authorizationCode", value.to_string()));
         }
-        for &field in ["alt", "parent", "versionInfo", "authorizationCode"].iter() {
+        for &field in ["alt", "parent", "versionInfo", "serviceAccountName", "authorizationCode"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2999,10 +3073,10 @@ impl<'a, C, A> ProjectLocationTransferConfigCreateCall<'a, C, A> where C: Borrow
         self._request = new_value;
         self
     }
-    /// The BigQuery project id where the transfer configuration should be created.
-    /// Must be in the format projects/{project_id}/locations/{location_id}
-    /// If specified location and location of the destination bigquery dataset
-    /// do not match - the request will fail.
+    /// Required. The BigQuery project id where the transfer configuration should be created.
+    /// Must be in the format projects/{project_id}/locations/{location_id} or
+    /// projects/{project_id}. If specified location and location of the
+    /// destination bigquery dataset do not match - the request will fail.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -3022,6 +3096,16 @@ impl<'a, C, A> ProjectLocationTransferConfigCreateCall<'a, C, A> where C: Borrow
     /// Sets the *version info* query property to the given value.
     pub fn version_info(mut self, new_value: &str) -> ProjectLocationTransferConfigCreateCall<'a, C, A> {
         self._version_info = Some(new_value.to_string());
+        self
+    }
+    /// Optional service account name. If this field is set, transfer config will
+    /// be created with this service account credentials. It requires that
+    /// requesting user calling this API has permissions to act as this service
+    /// account.
+    ///
+    /// Sets the *service account name* query property to the given value.
+    pub fn service_account_name(mut self, new_value: &str) -> ProjectLocationTransferConfigCreateCall<'a, C, A> {
+        self._service_account_name = Some(new_value.to_string());
         self
     }
     /// Optional OAuth2 authorization code to use with this transfer configuration.
@@ -3137,9 +3221,9 @@ impl<'a, C, A> ProjectLocationTransferConfigCreateCall<'a, C, A> where C: Borrow
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().transfer_configs_runs_transfer_logs_list("parent")
-///              .page_token("no")
-///              .page_size(-21)
-///              .add_message_types("justo")
+///              .page_token("et")
+///              .page_size(-41)
+///              .add_message_types("ipsum")
 ///              .doit();
 /// # }
 /// ```
@@ -3200,7 +3284,7 @@ impl<'a, C, A> ProjectTransferConfigRunTransferLogListCall<'a, C, A> where C: Bo
 
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/transferLogs";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::BigqueryReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
@@ -3301,8 +3385,9 @@ impl<'a, C, A> ProjectTransferConfigRunTransferLogListCall<'a, C, A> where C: Bo
     }
 
 
-    /// Transfer run name in the form:
-    /// `projects/{project_id}/transferConfigs/{config_Id}/runs/{run_id}`.
+    /// Required. Transfer run name in the form:
+    /// `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
+    /// `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -3379,7 +3464,7 @@ impl<'a, C, A> ProjectTransferConfigRunTransferLogListCall<'a, C, A> where C: Bo
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::BigqueryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3431,9 +3516,9 @@ impl<'a, C, A> ProjectTransferConfigRunTransferLogListCall<'a, C, A> where C: Bo
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_transfer_configs_runs_list("parent")
 ///              .add_states("et")
-///              .run_attempt("diam")
-///              .page_token("ipsum")
-///              .page_size(-5)
+///              .run_attempt("duo")
+///              .page_token("aliquyam")
+///              .page_size(-9)
 ///              .doit();
 /// # }
 /// ```
@@ -3498,7 +3583,7 @@ impl<'a, C, A> ProjectLocationTransferConfigRunListCall<'a, C, A> where C: Borro
 
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/runs";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::BigqueryReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
@@ -3599,9 +3684,10 @@ impl<'a, C, A> ProjectLocationTransferConfigRunListCall<'a, C, A> where C: Borro
     }
 
 
-    /// Name of transfer configuration for which transfer runs should be retrieved.
+    /// Required. Name of transfer configuration for which transfer runs should be retrieved.
     /// Format of transfer configuration resource name is:
-    /// `projects/{project_id}/transferConfigs/{config_id}`.
+    /// `projects/{project_id}/transferConfigs/{config_id}` or
+    /// `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -3684,7 +3770,7 @@ impl<'a, C, A> ProjectLocationTransferConfigRunListCall<'a, C, A> where C: Borro
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::BigqueryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3917,7 +4003,8 @@ impl<'a, C, A> ProjectTransferConfigStartManualRunCall<'a, C, A> where C: Borrow
         self
     }
     /// Transfer configuration name in the form:
-    /// `projects/{project_id}/transferConfigs/{config_id}`.
+    /// `projects/{project_id}/transferConfigs/{config_id}` or
+    /// `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -4065,7 +4152,7 @@ impl<'a, C, A> ProjectLocationDataSourceGetCall<'a, C, A> where C: BorrowMut<hyp
 
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::BigqueryReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -4166,8 +4253,9 @@ impl<'a, C, A> ProjectLocationDataSourceGetCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
-    /// The field will contain name of the resource requested, for example:
-    /// `projects/{project_id}/dataSources/{data_source_id}`
+    /// Required. The field will contain name of the resource requested, for example:
+    /// `projects/{project_id}/dataSources/{data_source_id}` or
+    /// `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4217,7 +4305,7 @@ impl<'a, C, A> ProjectLocationDataSourceGetCall<'a, C, A> where C: BorrowMut<hyp
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::BigqueryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4314,7 +4402,7 @@ impl<'a, C, A> ProjectLocationTransferConfigRunGetCall<'a, C, A> where C: Borrow
 
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::BigqueryReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -4415,8 +4503,9 @@ impl<'a, C, A> ProjectLocationTransferConfigRunGetCall<'a, C, A> where C: Borrow
     }
 
 
-    /// The field will contain name of the resource requested, for example:
-    /// `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`
+    /// Required. The field will contain name of the resource requested, for example:
+    /// `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
+    /// `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4466,7 +4555,7 @@ impl<'a, C, A> ProjectLocationTransferConfigRunGetCall<'a, C, A> where C: Borrow
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::BigqueryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4664,8 +4753,9 @@ impl<'a, C, A> ProjectLocationTransferConfigRunDeleteCall<'a, C, A> where C: Bor
     }
 
 
-    /// The field will contain name of the resource requested, for example:
-    /// `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`
+    /// Required. The field will contain name of the resource requested, for example:
+    /// `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
+    /// `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4948,8 +5038,9 @@ impl<'a, C, A> ProjectLocationTransferConfigScheduleRunCall<'a, C, A> where C: B
         self._request = new_value;
         self
     }
-    /// Transfer configuration name in the form:
-    /// `projects/{project_id}/transferConfigs/{config_id}`.
+    /// Required. Transfer configuration name in the form:
+    /// `projects/{project_id}/transferConfigs/{config_id}` or
+    /// `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -5197,8 +5288,9 @@ impl<'a, C, A> ProjectTransferConfigRunDeleteCall<'a, C, A> where C: BorrowMut<h
     }
 
 
-    /// The field will contain name of the resource requested, for example:
-    /// `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}`
+    /// Required. The field will contain name of the resource requested, for example:
+    /// `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
+    /// `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -5300,8 +5392,8 @@ impl<'a, C, A> ProjectTransferConfigRunDeleteCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().data_sources_list("parent")
-///              .page_token("sadipscing")
-///              .page_size(-48)
+///              .page_token("amet")
+///              .page_size(-60)
 ///              .doit();
 /// # }
 /// ```
@@ -5356,7 +5448,7 @@ impl<'a, C, A> ProjectDataSourceListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/dataSources";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::BigqueryReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
@@ -5457,8 +5549,9 @@ impl<'a, C, A> ProjectDataSourceListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// The BigQuery project id for which data sources should be returned.
-    /// Must be in the form: `projects/{project_id}`
+    /// Required. The BigQuery project id for which data sources should be returned.
+    /// Must be in the form: `projects/{project_id}` or
+    /// `projects/{project_id}/locations/{location_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -5526,7 +5619,7 @@ impl<'a, C, A> ProjectDataSourceListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::BigqueryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5584,9 +5677,10 @@ impl<'a, C, A> ProjectDataSourceListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_transfer_configs_patch(req, "name")
-///              .version_info("elitr")
-///              .update_mask("amet")
-///              .authorization_code("no")
+///              .version_info("eirmod")
+///              .update_mask("dolore")
+///              .service_account_name("invidunt")
+///              .authorization_code("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -5598,6 +5692,7 @@ pub struct ProjectLocationTransferConfigPatchCall<'a, C, A>
     _name: String,
     _version_info: Option<String>,
     _update_mask: Option<String>,
+    _service_account_name: Option<String>,
     _authorization_code: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
@@ -5621,7 +5716,7 @@ impl<'a, C, A> ProjectLocationTransferConfigPatchCall<'a, C, A> where C: BorrowM
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.locations.transferConfigs.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._version_info {
             params.push(("versionInfo", value.to_string()));
@@ -5629,10 +5724,13 @@ impl<'a, C, A> ProjectLocationTransferConfigPatchCall<'a, C, A> where C: BorrowM
         if let Some(value) = self._update_mask {
             params.push(("updateMask", value.to_string()));
         }
+        if let Some(value) = self._service_account_name {
+            params.push(("serviceAccountName", value.to_string()));
+        }
         if let Some(value) = self._authorization_code {
             params.push(("authorizationCode", value.to_string()));
         }
-        for &field in ["alt", "name", "versionInfo", "updateMask", "authorizationCode"].iter() {
+        for &field in ["alt", "name", "versionInfo", "updateMask", "serviceAccountName", "authorizationCode"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5799,11 +5897,22 @@ impl<'a, C, A> ProjectLocationTransferConfigPatchCall<'a, C, A> where C: BorrowM
         self._version_info = Some(new_value.to_string());
         self
     }
-    /// Required list of fields to be updated in this request.
+    /// Required. Required list of fields to be updated in this request.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: &str) -> ProjectLocationTransferConfigPatchCall<'a, C, A> {
         self._update_mask = Some(new_value.to_string());
+        self
+    }
+    /// Optional service account name. If this field is set and
+    /// "service_account_name" is set in update_mask, transfer config will be
+    /// updated to use this service account credentials. It requires that
+    /// requesting user calling this API has permissions to act as this service
+    /// account.
+    ///
+    /// Sets the *service account name* query property to the given value.
+    pub fn service_account_name(mut self, new_value: &str) -> ProjectLocationTransferConfigPatchCall<'a, C, A> {
+        self._service_account_name = Some(new_value.to_string());
         self
     }
     /// Optional OAuth2 authorization code to use with this transfer configuration.
@@ -5925,8 +6034,9 @@ impl<'a, C, A> ProjectLocationTransferConfigPatchCall<'a, C, A> where C: BorrowM
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().transfer_configs_create(req, "parent")
-///              .version_info("eirmod")
-///              .authorization_code("dolore")
+///              .version_info("Lorem")
+///              .service_account_name("sea")
+///              .authorization_code("et")
 ///              .doit();
 /// # }
 /// ```
@@ -5937,6 +6047,7 @@ pub struct ProjectTransferConfigCreateCall<'a, C, A>
     _request: TransferConfig,
     _parent: String,
     _version_info: Option<String>,
+    _service_account_name: Option<String>,
     _authorization_code: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
@@ -5960,15 +6071,18 @@ impl<'a, C, A> ProjectTransferConfigCreateCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.transferConfigs.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._version_info {
             params.push(("versionInfo", value.to_string()));
         }
+        if let Some(value) = self._service_account_name {
+            params.push(("serviceAccountName", value.to_string()));
+        }
         if let Some(value) = self._authorization_code {
             params.push(("authorizationCode", value.to_string()));
         }
-        for &field in ["alt", "parent", "versionInfo", "authorizationCode"].iter() {
+        for &field in ["alt", "parent", "versionInfo", "serviceAccountName", "authorizationCode"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6107,10 +6221,10 @@ impl<'a, C, A> ProjectTransferConfigCreateCall<'a, C, A> where C: BorrowMut<hype
         self._request = new_value;
         self
     }
-    /// The BigQuery project id where the transfer configuration should be created.
-    /// Must be in the format projects/{project_id}/locations/{location_id}
-    /// If specified location and location of the destination bigquery dataset
-    /// do not match - the request will fail.
+    /// Required. The BigQuery project id where the transfer configuration should be created.
+    /// Must be in the format projects/{project_id}/locations/{location_id} or
+    /// projects/{project_id}. If specified location and location of the
+    /// destination bigquery dataset do not match - the request will fail.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -6130,6 +6244,16 @@ impl<'a, C, A> ProjectTransferConfigCreateCall<'a, C, A> where C: BorrowMut<hype
     /// Sets the *version info* query property to the given value.
     pub fn version_info(mut self, new_value: &str) -> ProjectTransferConfigCreateCall<'a, C, A> {
         self._version_info = Some(new_value.to_string());
+        self
+    }
+    /// Optional service account name. If this field is set, transfer config will
+    /// be created with this service account credentials. It requires that
+    /// requesting user calling this API has permissions to act as this service
+    /// account.
+    ///
+    /// Sets the *service account name* query property to the given value.
+    pub fn service_account_name(mut self, new_value: &str) -> ProjectTransferConfigCreateCall<'a, C, A> {
+        self._service_account_name = Some(new_value.to_string());
         self
     }
     /// Optional OAuth2 authorization code to use with this transfer configuration.
@@ -6428,8 +6552,9 @@ impl<'a, C, A> ProjectLocationDataSourceCheckValidCredCall<'a, C, A> where C: Bo
         self._request = new_value;
         self
     }
-    /// The data source in the form:
-    /// `projects/{project_id}/dataSources/{data_source_id}`
+    /// Required. The data source in the form:
+    /// `projects/{project_id}/dataSources/{data_source_id}` or
+    /// `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -6576,7 +6701,7 @@ impl<'a, C, A> ProjectTransferConfigGetCall<'a, C, A> where C: BorrowMut<hyper::
 
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::BigqueryReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -6677,8 +6802,9 @@ impl<'a, C, A> ProjectTransferConfigGetCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
-    /// The field will contain name of the resource requested, for example:
-    /// `projects/{project_id}/transferConfigs/{config_id}`
+    /// Required. The field will contain name of the resource requested, for example:
+    /// `projects/{project_id}/transferConfigs/{config_id}` or
+    /// `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -6728,7 +6854,7 @@ impl<'a, C, A> ProjectTransferConfigGetCall<'a, C, A> where C: BorrowMut<hyper::
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::BigqueryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6780,8 +6906,8 @@ impl<'a, C, A> ProjectTransferConfigGetCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_data_sources_list("parent")
-///              .page_token("Lorem")
-///              .page_size(-9)
+///              .page_token("sanctus")
+///              .page_size(-22)
 ///              .doit();
 /// # }
 /// ```
@@ -6836,7 +6962,7 @@ impl<'a, C, A> ProjectLocationDataSourceListCall<'a, C, A> where C: BorrowMut<hy
 
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/dataSources";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::BigqueryReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
@@ -6937,8 +7063,9 @@ impl<'a, C, A> ProjectLocationDataSourceListCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// The BigQuery project id for which data sources should be returned.
-    /// Must be in the form: `projects/{project_id}`
+    /// Required. The BigQuery project id for which data sources should be returned.
+    /// Must be in the form: `projects/{project_id}` or
+    /// `projects/{project_id}/locations/{location_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -7006,7 +7133,7 @@ impl<'a, C, A> ProjectLocationDataSourceListCall<'a, C, A> where C: BorrowMut<hy
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::BigqueryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7103,7 +7230,7 @@ impl<'a, C, A> ProjectLocationTransferConfigGetCall<'a, C, A> where C: BorrowMut
 
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::BigqueryReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -7204,8 +7331,9 @@ impl<'a, C, A> ProjectLocationTransferConfigGetCall<'a, C, A> where C: BorrowMut
     }
 
 
-    /// The field will contain name of the resource requested, for example:
-    /// `projects/{project_id}/transferConfigs/{config_id}`
+    /// Required. The field will contain name of the resource requested, for example:
+    /// `projects/{project_id}/transferConfigs/{config_id}` or
+    /// `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -7255,7 +7383,7 @@ impl<'a, C, A> ProjectLocationTransferConfigGetCall<'a, C, A> where C: BorrowMut
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::BigqueryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7488,7 +7616,8 @@ impl<'a, C, A> ProjectLocationTransferConfigStartManualRunCall<'a, C, A> where C
         self
     }
     /// Transfer configuration name in the form:
-    /// `projects/{project_id}/transferConfigs/{config_id}`.
+    /// `projects/{project_id}/transferConfigs/{config_id}` or
+    /// `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -7589,9 +7718,9 @@ impl<'a, C, A> ProjectLocationTransferConfigStartManualRunCall<'a, C, A> where C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().transfer_configs_list("parent")
-///              .page_token("eirmod")
-///              .page_size(-58)
-///              .add_data_source_ids("et")
+///              .page_token("ut")
+///              .page_size(-16)
+///              .add_data_source_ids("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -7652,7 +7781,7 @@ impl<'a, C, A> ProjectTransferConfigListCall<'a, C, A> where C: BorrowMut<hyper:
 
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/transferConfigs";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::BigqueryReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
@@ -7753,8 +7882,9 @@ impl<'a, C, A> ProjectTransferConfigListCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// The BigQuery project id for which data sources
-    /// should be returned: `projects/{project_id}`.
+    /// Required. The BigQuery project id for which data sources
+    /// should be returned: `projects/{project_id}` or
+    /// `projects/{project_id}/locations/{location_id}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -7830,7 +7960,7 @@ impl<'a, C, A> ProjectTransferConfigListCall<'a, C, A> where C: BorrowMut<hyper:
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::BigqueryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7888,9 +8018,10 @@ impl<'a, C, A> ProjectTransferConfigListCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().transfer_configs_patch(req, "name")
-///              .version_info("et")
-///              .update_mask("consetetur")
-///              .authorization_code("ut")
+///              .version_info("dolor")
+///              .update_mask("dolor")
+///              .service_account_name("et")
+///              .authorization_code("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -7902,6 +8033,7 @@ pub struct ProjectTransferConfigPatchCall<'a, C, A>
     _name: String,
     _version_info: Option<String>,
     _update_mask: Option<String>,
+    _service_account_name: Option<String>,
     _authorization_code: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
@@ -7925,7 +8057,7 @@ impl<'a, C, A> ProjectTransferConfigPatchCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.transferConfigs.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._version_info {
             params.push(("versionInfo", value.to_string()));
@@ -7933,10 +8065,13 @@ impl<'a, C, A> ProjectTransferConfigPatchCall<'a, C, A> where C: BorrowMut<hyper
         if let Some(value) = self._update_mask {
             params.push(("updateMask", value.to_string()));
         }
+        if let Some(value) = self._service_account_name {
+            params.push(("serviceAccountName", value.to_string()));
+        }
         if let Some(value) = self._authorization_code {
             params.push(("authorizationCode", value.to_string()));
         }
-        for &field in ["alt", "name", "versionInfo", "updateMask", "authorizationCode"].iter() {
+        for &field in ["alt", "name", "versionInfo", "updateMask", "serviceAccountName", "authorizationCode"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8103,11 +8238,22 @@ impl<'a, C, A> ProjectTransferConfigPatchCall<'a, C, A> where C: BorrowMut<hyper
         self._version_info = Some(new_value.to_string());
         self
     }
-    /// Required list of fields to be updated in this request.
+    /// Required. Required list of fields to be updated in this request.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: &str) -> ProjectTransferConfigPatchCall<'a, C, A> {
         self._update_mask = Some(new_value.to_string());
+        self
+    }
+    /// Optional service account name. If this field is set and
+    /// "service_account_name" is set in update_mask, transfer config will be
+    /// updated to use this service account credentials. It requires that
+    /// requesting user calling this API has permissions to act as this service
+    /// account.
+    ///
+    /// Sets the *service account name* query property to the given value.
+    pub fn service_account_name(mut self, new_value: &str) -> ProjectTransferConfigPatchCall<'a, C, A> {
+        self._service_account_name = Some(new_value.to_string());
         self
     }
     /// Optional OAuth2 authorization code to use with this transfer configuration.
@@ -8406,8 +8552,9 @@ impl<'a, C, A> ProjectDataSourceCheckValidCredCall<'a, C, A> where C: BorrowMut<
         self._request = new_value;
         self
     }
-    /// The data source in the form:
-    /// `projects/{project_id}/dataSources/{data_source_id}`
+    /// Required. The data source in the form:
+    /// `projects/{project_id}/dataSources/{data_source_id}` or
+    /// `projects/{project_id}/locations/{location_id}/dataSources/{data_source_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -8690,8 +8837,9 @@ impl<'a, C, A> ProjectTransferConfigScheduleRunCall<'a, C, A> where C: BorrowMut
         self._request = new_value;
         self
     }
-    /// Transfer configuration name in the form:
-    /// `projects/{project_id}/transferConfigs/{config_id}`.
+    /// Required. Transfer configuration name in the form:
+    /// `projects/{project_id}/transferConfigs/{config_id}` or
+    /// `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -8792,9 +8940,9 @@ impl<'a, C, A> ProjectTransferConfigScheduleRunCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("dolor")
-///              .page_size(-48)
-///              .filter("et")
+///              .page_token("gubergren")
+///              .page_size(-20)
+///              .filter("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -8853,7 +9001,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let mut url = self.hub._base_url.clone() + "v1/{+name}/locations";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::BigqueryReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -9025,7 +9173,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::BigqueryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9076,10 +9224,10 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().transfer_configs_runs_list("parent")
-///              .add_states("amet.")
-///              .run_attempt("voluptua.")
-///              .page_token("Lorem")
-///              .page_size(-11)
+///              .add_states("diam")
+///              .run_attempt("rebum.")
+///              .page_token("consetetur")
+///              .page_size(-44)
 ///              .doit();
 /// # }
 /// ```
@@ -9144,7 +9292,7 @@ impl<'a, C, A> ProjectTransferConfigRunListCall<'a, C, A> where C: BorrowMut<hyp
 
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/runs";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::BigqueryReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
@@ -9245,9 +9393,10 @@ impl<'a, C, A> ProjectTransferConfigRunListCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
-    /// Name of transfer configuration for which transfer runs should be retrieved.
+    /// Required. Name of transfer configuration for which transfer runs should be retrieved.
     /// Format of transfer configuration resource name is:
-    /// `projects/{project_id}/transferConfigs/{config_id}`.
+    /// `projects/{project_id}/transferConfigs/{config_id}` or
+    /// `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -9330,7 +9479,7 @@ impl<'a, C, A> ProjectTransferConfigRunListCall<'a, C, A> where C: BorrowMut<hyp
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::BigqueryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9381,9 +9530,9 @@ impl<'a, C, A> ProjectTransferConfigRunListCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_transfer_configs_list("parent")
-///              .page_token("sit")
-///              .page_size(-26)
-///              .add_data_source_ids("diam")
+///              .page_token("sadipscing")
+///              .page_size(-88)
+///              .add_data_source_ids("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -9444,7 +9593,7 @@ impl<'a, C, A> ProjectLocationTransferConfigListCall<'a, C, A> where C: BorrowMu
 
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/transferConfigs";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::BigqueryReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
@@ -9545,8 +9694,9 @@ impl<'a, C, A> ProjectLocationTransferConfigListCall<'a, C, A> where C: BorrowMu
     }
 
 
-    /// The BigQuery project id for which data sources
-    /// should be returned: `projects/{project_id}`.
+    /// Required. The BigQuery project id for which data sources
+    /// should be returned: `projects/{project_id}` or
+    /// `projects/{project_id}/locations/{location_id}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -9622,7 +9772,7 @@ impl<'a, C, A> ProjectLocationTransferConfigListCall<'a, C, A> where C: BorrowMu
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::BigqueryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9673,9 +9823,9 @@ impl<'a, C, A> ProjectLocationTransferConfigListCall<'a, C, A> where C: BorrowMu
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_transfer_configs_runs_transfer_logs_list("parent")
-///              .page_token("consetetur")
-///              .page_size(-44)
-///              .add_message_types("vero")
+///              .page_token("duo")
+///              .page_size(-82)
+///              .add_message_types("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -9736,7 +9886,7 @@ impl<'a, C, A> ProjectLocationTransferConfigRunTransferLogListCall<'a, C, A> whe
 
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/transferLogs";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::BigqueryReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
@@ -9837,8 +9987,9 @@ impl<'a, C, A> ProjectLocationTransferConfigRunTransferLogListCall<'a, C, A> whe
     }
 
 
-    /// Transfer run name in the form:
-    /// `projects/{project_id}/transferConfigs/{config_Id}/runs/{run_id}`.
+    /// Required. Transfer run name in the form:
+    /// `projects/{project_id}/transferConfigs/{config_id}/runs/{run_id}` or
+    /// `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}/runs/{run_id}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -9915,7 +10066,7 @@ impl<'a, C, A> ProjectLocationTransferConfigRunTransferLogListCall<'a, C, A> whe
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::BigqueryReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10114,8 +10265,9 @@ impl<'a, C, A> ProjectTransferConfigDeleteCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
-    /// The field will contain name of the resource requested, for example:
-    /// `projects/{project_id}/transferConfigs/{config_id}`
+    /// Required. The field will contain name of the resource requested, for example:
+    /// `projects/{project_id}/transferConfigs/{config_id}` or
+    /// `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///

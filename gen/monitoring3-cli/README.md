@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Monitoring* API at revision *20190629*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Monitoring* API at revision *20200329*. The CLI is at version *1.0.13*.
 
 ```bash
 monitoring3 [options]
@@ -60,11 +60,23 @@ monitoring3 [options]
                 notification-channels-verify <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 time-series-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 time-series-list <name> [-p <v>]... [-o <out>]
+                time-series-query <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 uptime-check-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 uptime-check-configs-delete <name> [-p <v>]... [-o <out>]
                 uptime-check-configs-get <name> [-p <v>]... [-o <out>]
                 uptime-check-configs-list <parent> [-p <v>]... [-o <out>]
                 uptime-check-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+        services
+                create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <name> [-p <v>]... [-o <out>]
+                get <name> [-p <v>]... [-o <out>]
+                list <parent> [-p <v>]... [-o <out>]
+                patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                service-level-objectives-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                service-level-objectives-delete <name> [-p <v>]... [-o <out>]
+                service-level-objectives-get <name> [-p <v>]... [-o <out>]
+                service-level-objectives-list <parent> [-p <v>]... [-o <out>]
+                service-level-objectives-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
         uptime-check-ips
                 list [-p <v>]... [-o <out>]
   monitoring3 --help

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Build* API at revision *20190702*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Cloud Build* API at revision *20200323*. The CLI is at version *1.0.13*.
 
 ```bash
 cloudbuild1 [options]

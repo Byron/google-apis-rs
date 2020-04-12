@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Shopping Content* API at revision *20190702*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Shopping Content* API at revision *20200310*. The CLI is at version *1.0.13*.
 
 ```bash
 content2 [options]
@@ -38,7 +38,6 @@ content2 [options]
                 insert <merchant-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 link <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <merchant-id> [-p <v>]... [-o <out>]
-                patch <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
         accountstatuses
                 custombatch (-r <kv>)... [-p <v>]... [-o <out>]
@@ -48,7 +47,6 @@ content2 [options]
                 custombatch (-r <kv>)... [-p <v>]... [-o <out>]
                 get <merchant-id> <account-id> [-p <v>]... [-o <out>]
                 list <merchant-id> [-p <v>]... [-o <out>]
-                patch <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
         datafeeds
                 custombatch (-r <kv>)... [-p <v>]... [-o <out>]
@@ -57,7 +55,6 @@ content2 [options]
                 get <merchant-id> <datafeed-id> [-p <v>]... [-o <out>]
                 insert <merchant-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <merchant-id> [-p <v>]... [-o <out>]
-                patch <merchant-id> <datafeed-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <merchant-id> <datafeed-id> (-r <kv>)... [-p <v>]... [-o <out>]
         datafeedstatuses
                 custombatch (-r <kv>)... [-p <v>]... [-o <out>]
@@ -72,7 +69,6 @@ content2 [options]
                 getaccessiblegmbaccounts <merchant-id> <account-id> [-p <v>]... [-o <out>]
                 list <merchant-id> [-p <v>]... [-o <out>]
                 listposdataproviders [-p <v>]... [-o <out>]
-                patch <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 requestgmbaccess <merchant-id> <account-id> <gmb-email> [-p <v>]... [-o <out>]
                 requestinventoryverification <merchant-id> <account-id> <country> [-p <v>]... [-o <out>]
                 setinventoryverificationcontact <merchant-id> <account-id> <contact-email> <contact-name> <country> <language> [-p <v>]... [-o <out>]
@@ -81,11 +77,6 @@ content2 [options]
         orderinvoices
                 createchargeinvoice <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 createrefundinvoice <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
-        orderpayments
-                notifyauthapproved <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                notifyauthdeclined <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                notifycharge <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                notifyrefund <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
         orderreports
                 listdisbursements <merchant-id> <disbursement-start-date> [-p <v>]... [-o <out>]
                 listtransactions <merchant-id> <disbursement-id> <transaction-start-date> [-p <v>]... [-o <out>]
@@ -138,8 +129,8 @@ content2 [options]
                 get <merchant-id> <account-id> [-p <v>]... [-o <out>]
                 getsupportedcarriers <merchant-id> [-p <v>]... [-o <out>]
                 getsupportedholidays <merchant-id> [-p <v>]... [-o <out>]
+                getsupportedpickupservices <merchant-id> [-p <v>]... [-o <out>]
                 list <merchant-id> [-p <v>]... [-o <out>]
-                patch <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
   content2 --help
 

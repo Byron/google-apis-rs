@@ -1,4 +1,4 @@
-site_name: Dialogflow v1.0.12+20190629
+site_name: Dialogflow v1.0.13+20200408
 site_url: http://byron.github.io/google-apis-rs/google-dialogflow2-cli
 site_description: A complete library to interact with Dialogflow (protocol v2)
 
@@ -9,7 +9,6 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
-- ['projects_agent.md', 'Projects', 'Agent']
 - ['projects_agent-entity-types-batch-delete.md', 'Projects', 'Agent Entity Types Batch Delete']
 - ['projects_agent-entity-types-batch-update.md', 'Projects', 'Agent Entity Types Batch Update']
 - ['projects_agent-entity-types-create.md', 'Projects', 'Agent Entity Types Create']
@@ -20,7 +19,21 @@ pages:
 - ['projects_agent-entity-types-get.md', 'Projects', 'Agent Entity Types Get']
 - ['projects_agent-entity-types-list.md', 'Projects', 'Agent Entity Types List']
 - ['projects_agent-entity-types-patch.md', 'Projects', 'Agent Entity Types Patch']
+- ['projects_agent-environments-users-sessions-contexts-create.md', 'Projects', 'Agent Environments Users Sessions Contexts Create']
+- ['projects_agent-environments-users-sessions-contexts-delete.md', 'Projects', 'Agent Environments Users Sessions Contexts Delete']
+- ['projects_agent-environments-users-sessions-contexts-get.md', 'Projects', 'Agent Environments Users Sessions Contexts Get']
+- ['projects_agent-environments-users-sessions-contexts-list.md', 'Projects', 'Agent Environments Users Sessions Contexts List']
+- ['projects_agent-environments-users-sessions-contexts-patch.md', 'Projects', 'Agent Environments Users Sessions Contexts Patch']
+- ['projects_agent-environments-users-sessions-delete-contexts.md', 'Projects', 'Agent Environments Users Sessions Delete Contexts']
+- ['projects_agent-environments-users-sessions-detect-intent.md', 'Projects', 'Agent Environments Users Sessions Detect Intent']
+- ['projects_agent-environments-users-sessions-entity-types-create.md', 'Projects', 'Agent Environments Users Sessions Entity Types Create']
+- ['projects_agent-environments-users-sessions-entity-types-delete.md', 'Projects', 'Agent Environments Users Sessions Entity Types Delete']
+- ['projects_agent-environments-users-sessions-entity-types-get.md', 'Projects', 'Agent Environments Users Sessions Entity Types Get']
+- ['projects_agent-environments-users-sessions-entity-types-list.md', 'Projects', 'Agent Environments Users Sessions Entity Types List']
+- ['projects_agent-environments-users-sessions-entity-types-patch.md', 'Projects', 'Agent Environments Users Sessions Entity Types Patch']
 - ['projects_agent-export.md', 'Projects', 'Agent Export']
+- ['projects_agent-get-fulfillment.md', 'Projects', 'Agent Get Fulfillment']
+- ['projects_agent-get-validation-result.md', 'Projects', 'Agent Get Validation Result']
 - ['projects_agent-import.md', 'Projects', 'Agent Import']
 - ['projects_agent-intents-batch-delete.md', 'Projects', 'Agent Intents Batch Delete']
 - ['projects_agent-intents-batch-update.md', 'Projects', 'Agent Intents Batch Update']
@@ -44,9 +57,16 @@ pages:
 - ['projects_agent-sessions-entity-types-list.md', 'Projects', 'Agent Sessions Entity Types List']
 - ['projects_agent-sessions-entity-types-patch.md', 'Projects', 'Agent Sessions Entity Types Patch']
 - ['projects_agent-train.md', 'Projects', 'Agent Train']
+- ['projects_agent-update-fulfillment.md', 'Projects', 'Agent Update Fulfillment']
 - ['projects_delete-agent.md', 'Projects', 'Delete Agent']
 - ['projects_get-agent.md', 'Projects', 'Get Agent']
+- ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+- ['projects_operations-cancel.md', 'Projects', 'Operations Cancel']
 - ['projects_operations-get.md', 'Projects', 'Operations Get']
+- ['projects_operations-list.md', 'Projects', 'Operations List']
+- ['projects_set-agent.md', 'Projects', 'Set Agent']
 
 theme: readthedocs
 

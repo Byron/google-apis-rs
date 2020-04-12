@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Debugger* crate version *1.0.12+20190614*, where *20190614* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Cloud Debugger* crate version *1.0.13+20200405*, where *20200405* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Cloud Debugger* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/debugger).
@@ -337,7 +337,7 @@ impl<'a, C, A> CloudDebugger<C, A>
         CloudDebugger {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://clouddebugger.googleapis.com/".to_string(),
             _root_url: "https://clouddebugger.googleapis.com/".to_string(),
         }
@@ -351,7 +351,7 @@ impl<'a, C, A> CloudDebugger<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -491,7 +491,7 @@ impl ResponseResult for ListDebuggeesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RegisterDebuggeeRequest {
-    /// Debuggee information to register.
+    /// Required. Debuggee information to register.
     /// The fields `project`, `uniquifier`, `description` and `agent_version`
     /// of the debuggee must be set.
     pub debuggee: Option<Debuggee>,
@@ -724,7 +724,7 @@ impl Part for SourceContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UpdateActiveBreakpointRequest {
-    /// Updated breakpoint information.
+    /// Required. Updated breakpoint information.
     /// The field `id` must be set.
     /// The agent must echo all Breakpoint specification fields in the update.
     pub breakpoint: Option<Breakpoint>,
@@ -870,6 +870,9 @@ pub struct CloudWorkspaceId {
 impl Part for CloudWorkspaceId {}
 
 
+/// ------------------------------------------------------------------------------
+/// ## Breakpoint (the resource)
+/// 
 /// Represents the breakpoint specification, status and results.
 /// 
 /// # Activities
@@ -1144,7 +1147,7 @@ impl Part for Variable {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetBreakpointResponse {
     /// Breakpoint resource.
-    /// The field `id` is guaranteed to be set (in addition to the echoed fileds).
+    /// The field `id` is guaranteed to be set (in addition to the echoed fields).
     pub breakpoint: Option<Breakpoint>,
 }
 
@@ -1251,7 +1254,7 @@ impl<'a, C, A> ControllerMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `debuggeeId` - Identifies the debuggee being debugged.
+    /// * `debuggeeId` - Required. Identifies the debuggee being debugged.
     /// * `id` - Breakpoint identifier, unique in the scope of the debuggee.
     pub fn debuggees_breakpoints_update(&self, request: UpdateActiveBreakpointRequest, debuggee_id: &str, id: &str) -> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> {
         ControllerDebuggeeBreakpointUpdateCall {
@@ -1309,7 +1312,7 @@ impl<'a, C, A> ControllerMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `debuggeeId` - Identifies the debuggee.
+    /// * `debuggeeId` - Required. Identifies the debuggee.
     pub fn debuggees_breakpoints_list(&self, debuggee_id: &str) -> ControllerDebuggeeBreakpointListCall<'a, C, A> {
         ControllerDebuggeeBreakpointListCall {
             hub: self.hub,
@@ -1370,8 +1373,8 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `debuggeeId` - ID of the debuggee whose breakpoint to get.
-    /// * `breakpointId` - ID of the breakpoint to get.
+    /// * `debuggeeId` - Required. ID of the debuggee whose breakpoint to get.
+    /// * `breakpointId` - Required. ID of the breakpoint to get.
     pub fn debuggees_breakpoints_get(&self, debuggee_id: &str, breakpoint_id: &str) -> DebuggerDebuggeeBreakpointGetCall<'a, C, A> {
         DebuggerDebuggeeBreakpointGetCall {
             hub: self.hub,
@@ -1390,8 +1393,8 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `debuggeeId` - ID of the debuggee whose breakpoint to delete.
-    /// * `breakpointId` - ID of the breakpoint to delete.
+    /// * `debuggeeId` - Required. ID of the debuggee whose breakpoint to delete.
+    /// * `breakpointId` - Required. ID of the breakpoint to delete.
     pub fn debuggees_breakpoints_delete(&self, debuggee_id: &str, breakpoint_id: &str) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> {
         DebuggerDebuggeeBreakpointDeleteCall {
             hub: self.hub,
@@ -1426,7 +1429,7 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `debuggeeId` - ID of the debuggee where the breakpoint is to be set.
+    /// * `debuggeeId` - Required. ID of the debuggee where the breakpoint is to be set.
     pub fn debuggees_breakpoints_set(&self, request: Breakpoint, debuggee_id: &str) -> DebuggerDebuggeeBreakpointSetCall<'a, C, A> {
         DebuggerDebuggeeBreakpointSetCall {
             hub: self.hub,
@@ -1445,7 +1448,7 @@ impl<'a, C, A> DebuggerMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `debuggeeId` - ID of the debuggee whose breakpoints to list.
+    /// * `debuggeeId` - Required. ID of the debuggee whose breakpoints to list.
     pub fn debuggees_breakpoints_list(&self, debuggee_id: &str) -> DebuggerDebuggeeBreakpointListCall<'a, C, A> {
         DebuggerDebuggeeBreakpointListCall {
             hub: self.hub,
@@ -1682,7 +1685,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
         self._request = new_value;
         self
     }
-    /// Identifies the debuggee being debugged.
+    /// Required. Identifies the debuggee being debugged.
     ///
     /// Sets the *debuggee id* path property to the given value.
     ///
@@ -2209,7 +2212,7 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
     }
 
 
-    /// Identifies the debuggee.
+    /// Required. Identifies the debuggee.
     ///
     /// Sets the *debuggee id* path property to the given value.
     ///
@@ -2482,7 +2485,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// ID of the debuggee whose breakpoint to get.
+    /// Required. ID of the debuggee whose breakpoint to get.
     ///
     /// Sets the *debuggee id* path property to the given value.
     ///
@@ -2492,7 +2495,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
         self._debuggee_id = new_value.to_string();
         self
     }
-    /// ID of the breakpoint to get.
+    /// Required. ID of the breakpoint to get.
     ///
     /// Sets the *breakpoint id* path property to the given value.
     ///
@@ -2502,7 +2505,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
         self._breakpoint_id = new_value.to_string();
         self
     }
-    /// The client version making the call.
+    /// Required. The client version making the call.
     /// Schema: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
@@ -2751,7 +2754,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
     }
 
 
-    /// ID of the debuggee whose breakpoint to delete.
+    /// Required. ID of the debuggee whose breakpoint to delete.
     ///
     /// Sets the *debuggee id* path property to the given value.
     ///
@@ -2761,7 +2764,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
         self._debuggee_id = new_value.to_string();
         self
     }
-    /// ID of the breakpoint to delete.
+    /// Required. ID of the breakpoint to delete.
     ///
     /// Sets the *breakpoint id* path property to the given value.
     ///
@@ -2771,7 +2774,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
         self._breakpoint_id = new_value.to_string();
         self
     }
-    /// The client version making the call.
+    /// Required. The client version making the call.
     /// Schema: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
@@ -3005,7 +3008,7 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// Project number of a Google Cloud project whose debuggees to list.
+    /// Required. Project number of a Google Cloud project whose debuggees to list.
     ///
     /// Sets the *project* query property to the given value.
     pub fn project(mut self, new_value: &str) -> DebuggerDebuggeeListCall<'a, C, A> {
@@ -3020,7 +3023,7 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._include_inactive = Some(new_value);
         self
     }
-    /// The client version making the call.
+    /// Required. The client version making the call.
     /// Schema: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
@@ -3298,7 +3301,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
         self._request = new_value;
         self
     }
-    /// ID of the debuggee where the breakpoint is to be set.
+    /// Required. ID of the debuggee where the breakpoint is to be set.
     ///
     /// Sets the *debuggee id* path property to the given value.
     ///
@@ -3308,7 +3311,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
         self._debuggee_id = new_value.to_string();
         self
     }
-    /// The client version making the call.
+    /// Required. The client version making the call.
     /// Schema: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
@@ -3580,7 +3583,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
     }
 
 
-    /// ID of the debuggee whose breakpoints to list.
+    /// Required. ID of the debuggee whose breakpoints to list.
     ///
     /// Sets the *debuggee id* path property to the given value.
     ///
@@ -3625,7 +3628,7 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
         self._include_all_users = Some(new_value);
         self
     }
-    /// The client version making the call.
+    /// Required. The client version making the call.
     /// Schema: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.

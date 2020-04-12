@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Access Context Manager* API at revision *20190626*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Access Context Manager* API at revision *20200405*. The CLI is at version *1.0.13*.
 
 ```bash
 accesscontextmanager1 [options]
@@ -35,16 +35,19 @@ accesscontextmanager1 [options]
                 access-levels-get <name> [-p <v>]... [-o <out>]
                 access-levels-list <parent> [-p <v>]... [-o <out>]
                 access-levels-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                access-levels-replace-all <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <name> [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                service-perimeters-commit <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-perimeters-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-perimeters-delete <name> [-p <v>]... [-o <out>]
                 service-perimeters-get <name> [-p <v>]... [-o <out>]
                 service-perimeters-list <parent> [-p <v>]... [-o <out>]
                 service-perimeters-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                service-perimeters-replace-all <parent> (-r <kv>)... [-p <v>]... [-o <out>]
         operations
                 cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <name> [-p <v>]... [-o <out>]

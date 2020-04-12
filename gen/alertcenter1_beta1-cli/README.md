@@ -25,15 +25,18 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *AlertCenter* API at revision *20190628*. The CLI is at version *1.0.12*.
+This documentation was generated from the *AlertCenter* API at revision *20200406*. The CLI is at version *1.0.13*.
 
 ```bash
 alertcenter1-beta1 [options]
         alerts
+                batch-delete (-r <kv>)... [-p <v>]... [-o <out>]
+                batch-undelete (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <alert-id> [-p <v>]... [-o <out>]
                 feedback-create <alert-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 feedback-list <alert-id> [-p <v>]... [-o <out>]
                 get <alert-id> [-p <v>]... [-o <out>]
+                get-metadata <alert-id> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 undelete <alert-id> (-r <kv>)... [-p <v>]... [-o <out>]
         methods

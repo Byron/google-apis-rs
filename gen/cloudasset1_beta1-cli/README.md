@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Cloud Asset* API can be found at the
-[official documentation site](https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/quickstart-cloud-asset-inventory).
+[official documentation site](https://cloud.google.com/asset-inventory/docs/quickstart).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Asset* API at revision *20190625*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Cloud Asset* API at revision *20200403*. The CLI is at version *1.0.13*.
 
 ```bash
 cloudasset1-beta1 [options]

@@ -25,11 +25,19 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firebase Hosting* API at revision *20190626*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Firebase Hosting* API at revision *20200325*. The CLI is at version *1.0.13*.
 
 ```bash
 firebasehosting1-beta1 [options]
+        projects
+                operations-get <name> [-p <v>]... [-o <out>]
+                sites-channels-releases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                sites-channels-releases-list <parent> [-p <v>]... [-o <out>]
+                sites-releases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                sites-releases-list <parent> [-p <v>]... [-o <out>]
         sites
+                channels-releases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                channels-releases-list <parent> [-p <v>]... [-o <out>]
                 domains-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 domains-delete <name> [-p <v>]... [-o <out>]
                 domains-get <name> [-p <v>]... [-o <out>]
@@ -39,9 +47,11 @@ firebasehosting1-beta1 [options]
                 releases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 releases-list <parent> [-p <v>]... [-o <out>]
                 update-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                versions-clone <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 versions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 versions-delete <name> [-p <v>]... [-o <out>]
                 versions-files-list <parent> [-p <v>]... [-o <out>]
+                versions-list <parent> [-p <v>]... [-o <out>]
                 versions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 versions-populate-files <parent> (-r <kv>)... [-p <v>]... [-o <out>]
   firebasehosting1-beta1 --help

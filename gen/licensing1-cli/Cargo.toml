@@ -4,11 +4,11 @@
 [package]
 
 name = "google-licensing1-cli"
-version = "1.0.12+20170213"
+version = "1.0.13+20190916"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with licensing (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/licensing1-cli"
-homepage = "https://developers.google.com/google-apps/licensing/"
+homepage = "https://developers.google.com/admin-sdk/licensing/"
 documentation = "http://byron.github.io/google-apis-rs/google_licensing1_cli"
 license = "MIT"
 keywords = ["licensing", "google", "cli"]
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-licensing1]
 path = "../licensing1"
-version = "1.0.12+20170213"
+version = "1.0.13+20190916"

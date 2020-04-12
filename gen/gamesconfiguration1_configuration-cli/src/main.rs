@@ -303,108 +303,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _achievement_configurations_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "achievement-type" => Some(("achievementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "steps-to-unlock" => Some(("stepsToUnlock", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "initial-state" => Some(("initialState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "token" => Some(("token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.kind" => Some(("draft.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.description.kind" => Some(("draft.description.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.icon-url" => Some(("draft.iconUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.point-value" => Some(("draft.pointValue", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "draft.sort-rank" => Some(("draft.sortRank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "draft.name.kind" => Some(("draft.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.kind" => Some(("published.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.description.kind" => Some(("published.description.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.icon-url" => Some(("published.iconUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.point-value" => Some(("published.pointValue", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "published.sort-rank" => Some(("published.sortRank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "published.name.kind" => Some(("published.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["achievement-type", "description", "draft", "icon-url", "id", "initial-state", "kind", "name", "point-value", "published", "sort-rank", "steps-to-unlock", "token"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::AchievementConfiguration = json::value::from_value(object).unwrap();
-        let mut call = self.hub.achievement_configurations().patch(request, opt.value_of("achievement-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _achievement_configurations_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -532,7 +430,7 @@ impl<'n> Engine<'n> {
             }
         }
         let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -548,7 +446,6 @@ impl<'n> Engine<'n> {
             };
             match match protocol {
                 CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
                 CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
@@ -834,122 +731,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _leaderboard_configurations_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "score-order" => Some(("scoreOrder", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "score-min" => Some(("scoreMin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "token" => Some(("token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "score-max" => Some(("scoreMax", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.currency-code" => Some(("published.scoreFormat.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.suffix.many.kind" => Some(("published.scoreFormat.suffix.many.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.suffix.two.kind" => Some(("published.scoreFormat.suffix.two.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.suffix.one.kind" => Some(("published.scoreFormat.suffix.one.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.suffix.few.kind" => Some(("published.scoreFormat.suffix.few.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.suffix.zero.kind" => Some(("published.scoreFormat.suffix.zero.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.suffix.other.kind" => Some(("published.scoreFormat.suffix.other.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.number-format-type" => Some(("published.scoreFormat.numberFormatType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.score-format.num-decimal-places" => Some(("published.scoreFormat.numDecimalPlaces", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "published.icon-url" => Some(("published.iconUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.kind" => Some(("published.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.name.kind" => Some(("published.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "published.sort-rank" => Some(("published.sortRank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "draft.score-format.currency-code" => Some(("draft.scoreFormat.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.suffix.many.kind" => Some(("draft.scoreFormat.suffix.many.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.suffix.two.kind" => Some(("draft.scoreFormat.suffix.two.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.suffix.one.kind" => Some(("draft.scoreFormat.suffix.one.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.suffix.few.kind" => Some(("draft.scoreFormat.suffix.few.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.suffix.zero.kind" => Some(("draft.scoreFormat.suffix.zero.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.suffix.other.kind" => Some(("draft.scoreFormat.suffix.other.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.number-format-type" => Some(("draft.scoreFormat.numberFormatType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.score-format.num-decimal-places" => Some(("draft.scoreFormat.numDecimalPlaces", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "draft.icon-url" => Some(("draft.iconUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.kind" => Some(("draft.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.name.kind" => Some(("draft.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "draft.sort-rank" => Some(("draft.sortRank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency-code", "draft", "few", "icon-url", "id", "kind", "many", "name", "num-decimal-places", "number-format-type", "one", "other", "published", "score-format", "score-max", "score-min", "score-order", "sort-rank", "suffix", "token", "two", "zero"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::LeaderboardConfiguration = json::value::from_value(object).unwrap();
-        let mut call = self.hub.leaderboard_configurations().patch(request, opt.value_of("leaderboard-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _leaderboard_configurations_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1085,9 +866,6 @@ impl<'n> Engine<'n> {
                     ("list", Some(opt)) => {
                         call_result = self._achievement_configurations_list(opt, dry_run, &mut err);
                     },
-                    ("patch", Some(opt)) => {
-                        call_result = self._achievement_configurations_patch(opt, dry_run, &mut err);
-                    },
                     ("update", Some(opt)) => {
                         call_result = self._achievement_configurations_update(opt, dry_run, &mut err);
                     },
@@ -1121,9 +899,6 @@ impl<'n> Engine<'n> {
                     },
                     ("list", Some(opt)) => {
                         call_result = self._leaderboard_configurations_list(opt, dry_run, &mut err);
-                    },
-                    ("patch", Some(opt)) => {
-                        call_result = self._leaderboard_configurations_patch(opt, dry_run, &mut err);
                     },
                     ("update", Some(opt)) => {
                         call_result = self._leaderboard_configurations_update(opt, dry_run, &mut err);
@@ -1189,12 +964,15 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::GamesConfiguration::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
+                    ("upload-type", "uploadType"),
+                    ("upload-protocol", "upload_protocol"),
                 ]
         };
 
@@ -1217,7 +995,7 @@ fn main() {
     let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
-        ("achievement-configurations", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
+        ("achievement-configurations", "methods: 'delete', 'get', 'insert', 'list' and 'update'", vec![
             ("delete",
                     Some(r##"Delete the achievement configuration with the given ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesconfiguration1_configuration_cli/achievement-configurations_delete",
@@ -1306,34 +1084,6 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("patch",
-                    Some(r##"Update the metadata of the achievement configuration with the given ID. This method supports patch semantics."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_gamesconfiguration1_configuration_cli/achievement-configurations_patch",
-                  vec![
-                    (Some(r##"achievement-id"##),
-                     None,
-                     Some(r##"The ID of the achievement used by this method."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
             ("update",
                     Some(r##"Update the metadata of the achievement configuration with the given ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesconfiguration1_configuration_cli/achievement-configurations_update",
@@ -1383,7 +1133,7 @@ fn main() {
         
                     (Some(r##"mode"##),
                      Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
@@ -1401,7 +1151,7 @@ fn main() {
                   ]),
             ]),
         
-        ("leaderboard-configurations", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
+        ("leaderboard-configurations", "methods: 'delete', 'get', 'insert', 'list' and 'update'", vec![
             ("delete",
                     Some(r##"Delete the leaderboard configuration with the given ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesconfiguration1_configuration_cli/leaderboard-configurations_delete",
@@ -1490,34 +1240,6 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("patch",
-                    Some(r##"Update the metadata of the leaderboard configuration with the given ID. This method supports patch semantics."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_gamesconfiguration1_configuration_cli/leaderboard-configurations_patch",
-                  vec![
-                    (Some(r##"leaderboard-id"##),
-                     None,
-                     Some(r##"The ID of the leaderboard."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
             ("update",
                     Some(r##"Update the metadata of the leaderboard configuration with the given ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gamesconfiguration1_configuration_cli/leaderboard-configurations_update",
@@ -1552,8 +1274,8 @@ fn main() {
     
     let mut app = App::new("gamesconfiguration1-configuration")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190627")
-           .about("The Publishing API for Google Play Game Services.")
+           .version("1.0.13+20200402")
+           .about("The Google Play Game Services Publishing API allows developers to configure their games in Game Services.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gamesconfiguration1_configuration_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

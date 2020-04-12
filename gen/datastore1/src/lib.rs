@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *datastore* crate version *1.0.12+20190421*, where *20190421* is the exact revision of the *datastore:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *datastore* crate version *1.0.13+20200311*, where *20200311* is the exact revision of the *datastore:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *datastore* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/datastore/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Datastore.html) ... 
 //! 
 //! * projects
-//!  * [*allocate ids*](struct.ProjectAllocateIdCall.html), [*begin transaction*](struct.ProjectBeginTransactionCall.html), [*commit*](struct.ProjectCommitCall.html), [*export*](struct.ProjectExportCall.html), [*import*](struct.ProjectImportCall.html), [*indexes get*](struct.ProjectIndexeGetCall.html), [*indexes list*](struct.ProjectIndexeListCall.html), [*lookup*](struct.ProjectLookupCall.html), [*operations cancel*](struct.ProjectOperationCancelCall.html), [*operations delete*](struct.ProjectOperationDeleteCall.html), [*operations get*](struct.ProjectOperationGetCall.html), [*operations list*](struct.ProjectOperationListCall.html), [*reserve ids*](struct.ProjectReserveIdCall.html), [*rollback*](struct.ProjectRollbackCall.html) and [*run query*](struct.ProjectRunQueryCall.html)
+//!  * [*allocate ids*](struct.ProjectAllocateIdCall.html), [*begin transaction*](struct.ProjectBeginTransactionCall.html), [*commit*](struct.ProjectCommitCall.html), [*export*](struct.ProjectExportCall.html), [*import*](struct.ProjectImportCall.html), [*indexes create*](struct.ProjectIndexeCreateCall.html), [*indexes delete*](struct.ProjectIndexeDeleteCall.html), [*indexes get*](struct.ProjectIndexeGetCall.html), [*indexes list*](struct.ProjectIndexeListCall.html), [*lookup*](struct.ProjectLookupCall.html), [*operations cancel*](struct.ProjectOperationCancelCall.html), [*operations delete*](struct.ProjectOperationDeleteCall.html), [*operations get*](struct.ProjectOperationGetCall.html), [*operations list*](struct.ProjectOperationListCall.html), [*reserve ids*](struct.ProjectReserveIdCall.html), [*rollback*](struct.ProjectRollbackCall.html) and [*run query*](struct.ProjectRunQueryCall.html)
 //! 
 //! 
 //! 
@@ -47,8 +47,10 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().export(...).doit()
+//! let r = hub.projects().indexes_create(...).doit()
+//! let r = hub.projects().indexes_delete(...).doit()
 //! let r = hub.projects().operations_get(...).doit()
+//! let r = hub.projects().export(...).doit()
 //! let r = hub.projects().import(...).doit()
 //! ```
 //! 
@@ -83,7 +85,7 @@
 //! extern crate hyper_rustls;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_datastore1 as datastore1;
-//! use datastore1::GoogleDatastoreAdminV1ExportEntitiesRequest;
+//! use datastore1::GoogleDatastoreAdminV1Index;
 //! use datastore1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -105,12 +107,12 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = GoogleDatastoreAdminV1ExportEntitiesRequest::default();
+//! let mut req = GoogleDatastoreAdminV1Index::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().export(req, "projectId")
+//! let result = hub.projects().indexes_create(req, "projectId")
 //!              .doit();
 //! 
 //! match result {
@@ -270,7 +272,7 @@ impl Default for Scope {
 /// extern crate hyper_rustls;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_datastore1 as datastore1;
-/// use datastore1::GoogleDatastoreAdminV1ExportEntitiesRequest;
+/// use datastore1::GoogleDatastoreAdminV1Index;
 /// use datastore1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -292,12 +294,12 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = GoogleDatastoreAdminV1ExportEntitiesRequest::default();
+/// let mut req = GoogleDatastoreAdminV1Index::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().export(req, "projectId")
+/// let result = hub.projects().indexes_create(req, "projectId")
 ///              .doit();
 /// 
 /// match result {
@@ -335,7 +337,7 @@ impl<'a, C, A> Datastore<C, A>
         Datastore {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://datastore.googleapis.com/".to_string(),
             _root_url: "https://datastore.googleapis.com/".to_string(),
         }
@@ -346,7 +348,7 @@ impl<'a, C, A> Datastore<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -388,7 +390,7 @@ impl<'a, C, A> Datastore<C, A>
 pub struct GoogleDatastoreAdminV1ImportEntitiesRequest {
     /// Client-assigned labels.
     pub labels: Option<HashMap<String, String>>,
-    /// The full resource URL of the external storage location. Currently, only
+    /// Required. The full resource URL of the external storage location. Currently, only
     /// Google Cloud Storage is supported. So input_url should be of the form:
     /// `gs://BUCKET_NAME[/NAMESPACE_PATH]/OVERALL_EXPORT_METADATA_FILE`, where
     /// `BUCKET_NAME` is the name of the Cloud Storage bucket, `NAMESPACE_PATH` is
@@ -455,11 +457,9 @@ impl Part for PartitionId {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleDatastoreAdminV1IndexedProperty {
-    /// The indexed property's direction.  Must not be DIRECTION_UNSPECIFIED.
-    /// Required.
+    /// Required. The indexed property's direction.  Must not be DIRECTION_UNSPECIFIED.
     pub direction: Option<String>,
-    /// The property name to index.
-    /// Required.
+    /// Required. The property name to index.
     pub name: Option<String>,
 }
 
@@ -477,7 +477,7 @@ impl Part for GoogleDatastoreAdminV1IndexedProperty {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LookupRequest {
-    /// Keys of entities to look up.
+    /// Required. Keys of entities to look up.
     pub keys: Option<Vec<Key>>,
     /// The options for this lookup request.
     #[serde(rename="readOptions")]
@@ -516,7 +516,7 @@ impl ResponseResult for BeginTransactionResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AllocateIdsRequest {
-    /// A list of keys with incomplete key paths for which to allocate IDs.
+    /// Required. A list of keys with incomplete key paths for which to allocate IDs.
     /// No key may be reserved/read-only.
     pub keys: Option<Vec<Key>>,
 }
@@ -591,32 +591,28 @@ impl ResponseResult for RunQueryResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [indexes create projects](struct.ProjectIndexeCreateCall.html) (request)
 /// * [indexes get projects](struct.ProjectIndexeGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleDatastoreAdminV1Index {
-    /// The entity kind to which this index applies.
-    /// Required.
+    /// Required. The entity kind to which this index applies.
     pub kind: Option<String>,
-    /// Project ID.
-    /// Output only.
+    /// Output only. Project ID.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
-    /// The index's ancestor mode.  Must not be ANCESTOR_MODE_UNSPECIFIED.
-    /// Required.
+    /// Required. The index's ancestor mode.  Must not be ANCESTOR_MODE_UNSPECIFIED.
     pub ancestor: Option<String>,
-    /// The resource ID of the index.
-    /// Output only.
+    /// Output only. The resource ID of the index.
     #[serde(rename="indexId")]
     pub index_id: Option<String>,
-    /// The state of the index.
-    /// Output only.
+    /// Output only. The state of the index.
     pub state: Option<String>,
-    /// An ordered sequence of property names and their index attributes.
-    /// Required.
+    /// Required. An ordered sequence of property names and their index attributes.
     pub properties: Option<Vec<GoogleDatastoreAdminV1IndexedProperty>>,
 }
 
+impl RequestValue for GoogleDatastoreAdminV1Index {}
 impl ResponseResult for GoogleDatastoreAdminV1Index {}
 
 
@@ -662,58 +658,14 @@ impl ResponseResult for Empty {}
 
 /// The `Status` type defines a logical error model that is suitable for
 /// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
 /// 
-/// * Simple to use and understand for most users
-/// * Flexible enough to meet unexpected needs
-/// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error
-/// message, and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// * Partial errors. If a service needs to return partial errors to the client,
-///   it may embed the `Status` in the normal response to indicate the partial
-///   errors.
-/// 
-/// * Workflow errors. A typical workflow has multiple steps. Each step may
-///   have a `Status` message for error reporting.
-/// 
-/// * Batch operations. If a client uses batch request and batch response, the
-///   `Status` message should be used directly inside batch response, one for
-///   each error sub-response.
-/// 
-/// * Asynchronous operations. If an API call embeds asynchronous operation
-///   results in its response, the status of those operations should be
-///   represented directly using the `Status` message.
-/// 
-/// * Logging. If some API errors are stored in logs, the message `Status` could
-///   be used directly after any stripping needed for security/privacy reasons.
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Status {
     /// A developer-facing error message, which should be in English. Any
@@ -964,7 +916,7 @@ impl Part for MutationResult {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleDatastoreAdminV1ExportEntitiesRequest {
-    /// Location for the export metadata and data files.
+    /// Required. Location for the export metadata and data files.
     /// 
     /// The full resource URL of the external storage location. Currently, only
     /// Google Cloud Storage is supported. So output_url_prefix should be of the
@@ -1026,7 +978,7 @@ impl Part for TransactionOptions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReserveIdsRequest {
-    /// A list of keys with complete key paths whose numeric IDs should not be
+    /// Required. A list of keys with complete key paths whose numeric IDs should not be
     /// auto-allocated.
     pub keys: Option<Vec<Key>>,
     /// If not empty, the ID of the database against which to make the request.
@@ -1371,8 +1323,10 @@ impl Part for ReadWrite {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [export projects](struct.ProjectExportCall.html) (response)
+/// * [indexes create projects](struct.ProjectIndexeCreateCall.html) (response)
+/// * [indexes delete projects](struct.ProjectIndexeDeleteCall.html) (response)
 /// * [operations get projects](struct.ProjectOperationGetCall.html) (response)
+/// * [export projects](struct.ProjectExportCall.html) (response)
 /// * [import projects](struct.ProjectImportCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1394,7 +1348,7 @@ pub struct GoogleLongrunningOperation {
     pub response: Option<HashMap<String, String>>,
     /// The server-assigned name, which is only unique within the same service that
     /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should have the format of `operations/some/unique/name`.
+    /// `name` should be a resource name ending with `operations/{unique_id}`.
     pub name: Option<String>,
     /// Service-specific metadata associated with the operation.  It typically
     /// contains progress information and common metadata such as create time.
@@ -1484,7 +1438,7 @@ impl Part for Entity {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RollbackRequest {
-    /// The transaction identifier, returned by a call to
+    /// Required. The transaction identifier, returned by a call to
     /// Datastore.BeginTransaction.
     pub transaction: Option<String>,
 }
@@ -1676,7 +1630,7 @@ impl Part for Mutation {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Datastore::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `allocate_ids(...)`, `begin_transaction(...)`, `commit(...)`, `export(...)`, `import(...)`, `indexes_get(...)`, `indexes_list(...)`, `lookup(...)`, `operations_cancel(...)`, `operations_delete(...)`, `operations_get(...)`, `operations_list(...)`, `reserve_ids(...)`, `rollback(...)` and `run_query(...)`
+/// // like `allocate_ids(...)`, `begin_transaction(...)`, `commit(...)`, `export(...)`, `import(...)`, `indexes_create(...)`, `indexes_delete(...)`, `indexes_get(...)`, `indexes_list(...)`, `lookup(...)`, `operations_cancel(...)`, `operations_delete(...)`, `operations_get(...)`, `operations_list(...)`, `reserve_ids(...)`, `rollback(...)` and `run_query(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1722,21 +1676,26 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Exports a copy of all or a subset of entities from Google Cloud Datastore
-    /// to another storage system, such as Google Cloud Storage. Recent updates to
-    /// entities may not be reflected in the export. The export occurs in the
-    /// background and its progress can be monitored and managed via the
-    /// Operation resource that is created. The output of an export may only be
-    /// used once the associated operation is done. If an export operation is
-    /// cancelled before completion it may leave partial data behind in Google
-    /// Cloud Storage.
+    /// Creates the specified index.
+    /// A newly created index's initial state is `CREATING`. On completion of the
+    /// returned google.longrunning.Operation, the state will be `READY`.
+    /// If the index already exists, the call will return an `ALREADY_EXISTS`
+    /// status.
+    /// 
+    /// During index creation, the process could result in an error, in which
+    /// case the index will move to the `ERROR` state. The process can be recovered
+    /// by fixing the data that caused the error, removing the index with
+    /// delete, then
+    /// re-creating the index with create.
+    /// 
+    /// Indexes with a single property cannot be created.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Project ID against which to make the request.
-    pub fn export(&self, request: GoogleDatastoreAdminV1ExportEntitiesRequest, project_id: &str) -> ProjectExportCall<'a, C, A> {
-        ProjectExportCall {
+    pub fn indexes_create(&self, request: GoogleDatastoreAdminV1Index, project_id: &str) -> ProjectIndexeCreateCall<'a, C, A> {
+        ProjectIndexeCreateCall {
             hub: self.hub,
             _request: request,
             _project_id: project_id.to_string(),
@@ -1753,7 +1712,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - The ID of the project against which to make the request.
+    /// * `projectId` - Required. The ID of the project against which to make the request.
     pub fn run_query(&self, request: RunQueryRequest, project_id: &str) -> ProjectRunQueryCall<'a, C, A> {
         ProjectRunQueryCall {
             hub: self.hub,
@@ -1773,9 +1732,35 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - The ID of the project against which to make the request.
+    /// * `projectId` - Required. The ID of the project against which to make the request.
     pub fn reserve_ids(&self, request: ReserveIdsRequest, project_id: &str) -> ProjectReserveIdCall<'a, C, A> {
         ProjectReserveIdCall {
+            hub: self.hub,
+            _request: request,
+            _project_id: project_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Exports a copy of all or a subset of entities from Google Cloud Datastore
+    /// to another storage system, such as Google Cloud Storage. Recent updates to
+    /// entities may not be reflected in the export. The export occurs in the
+    /// background and its progress can be monitored and managed via the
+    /// Operation resource that is created. The output of an export may only be
+    /// used once the associated operation is done. If an export operation is
+    /// cancelled before completion it may leave partial data behind in Google
+    /// Cloud Storage.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - Required. Project ID against which to make the request.
+    pub fn export(&self, request: GoogleDatastoreAdminV1ExportEntitiesRequest, project_id: &str) -> ProjectExportCall<'a, C, A> {
+        ProjectExportCall {
             hub: self.hub,
             _request: request,
             _project_id: project_id.to_string(),
@@ -1792,7 +1777,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - The ID of the project against which to make the request.
+    /// * `projectId` - Required. The ID of the project against which to make the request.
     pub fn lookup(&self, request: LookupRequest, project_id: &str) -> ProjectLookupCall<'a, C, A> {
         ProjectLookupCall {
             hub: self.hub,
@@ -1812,7 +1797,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - The ID of the project against which to make the request.
+    /// * `projectId` - Required. The ID of the project against which to make the request.
     pub fn commit(&self, request: CommitRequest, project_id: &str) -> ProjectCommitCall<'a, C, A> {
         ProjectCommitCall {
             hub: self.hub,
@@ -1832,7 +1817,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - The ID of the project against which to make the request.
+    /// * `projectId` - Required. The ID of the project against which to make the request.
     pub fn allocate_ids(&self, request: AllocateIdsRequest, project_id: &str) -> ProjectAllocateIdCall<'a, C, A> {
         ProjectAllocateIdCall {
             hub: self.hub,
@@ -1911,6 +1896,25 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Begins a new transaction.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - Required. The ID of the project against which to make the request.
+    pub fn begin_transaction(&self, request: BeginTransactionRequest, project_id: &str) -> ProjectBeginTransactionCall<'a, C, A> {
+        ProjectBeginTransactionCall {
+            hub: self.hub,
+            _request: request,
+            _project_id: project_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets an index.
     /// 
     /// # Arguments
@@ -1952,17 +1956,26 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Begins a new transaction.
+    /// Deletes an existing index.
+    /// An index can only be deleted if it is in a `READY` or `ERROR` state. On
+    /// successful execution of the request, the index will be in a `DELETING`
+    /// state. And on completion of the
+    /// returned google.longrunning.Operation, the index will be removed.
+    /// 
+    /// During index deletion, the process could result in an error, in which
+    /// case the index will move to the `ERROR` state. The process can be recovered
+    /// by fixing the data that caused the error, followed by calling
+    /// delete again.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `projectId` - The ID of the project against which to make the request.
-    pub fn begin_transaction(&self, request: BeginTransactionRequest, project_id: &str) -> ProjectBeginTransactionCall<'a, C, A> {
-        ProjectBeginTransactionCall {
+    /// * `projectId` - Project ID against which to make the request.
+    /// * `indexId` - The resource ID of the index to delete.
+    pub fn indexes_delete(&self, project_id: &str, index_id: &str) -> ProjectIndexeDeleteCall<'a, C, A> {
+        ProjectIndexeDeleteCall {
             hub: self.hub,
-            _request: request,
             _project_id: project_id.to_string(),
+            _index_id: index_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1976,7 +1989,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - The ID of the project against which to make the request.
+    /// * `projectId` - Required. The ID of the project against which to make the request.
     pub fn rollback(&self, request: RollbackRequest, project_id: &str) -> ProjectRollbackCall<'a, C, A> {
         ProjectRollbackCall {
             hub: self.hub,
@@ -1999,7 +2012,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - Project ID against which to make the request.
+    /// * `projectId` - Required. Project ID against which to make the request.
     pub fn import(&self, request: GoogleDatastoreAdminV1ImportEntitiesRequest, project_id: &str) -> ProjectImportCall<'a, C, A> {
         ProjectImportCall {
             hub: self.hub,
@@ -2313,16 +2326,21 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Exports a copy of all or a subset of entities from Google Cloud Datastore
-/// to another storage system, such as Google Cloud Storage. Recent updates to
-/// entities may not be reflected in the export. The export occurs in the
-/// background and its progress can be monitored and managed via the
-/// Operation resource that is created. The output of an export may only be
-/// used once the associated operation is done. If an export operation is
-/// cancelled before completion it may leave partial data behind in Google
-/// Cloud Storage.
+/// Creates the specified index.
+/// A newly created index's initial state is `CREATING`. On completion of the
+/// returned google.longrunning.Operation, the state will be `READY`.
+/// If the index already exists, the call will return an `ALREADY_EXISTS`
+/// status.
+/// 
+/// During index creation, the process could result in an error, in which
+/// case the index will move to the `ERROR` state. The process can be recovered
+/// by fixing the data that caused the error, removing the index with
+/// delete, then
+/// re-creating the index with create.
+/// 
+/// Indexes with a single property cannot be created.
 ///
-/// A builder for the *export* method supported by a *project* resource.
+/// A builder for the *indexes.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -2334,7 +2352,7 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_datastore1 as datastore1;
-/// use datastore1::GoogleDatastoreAdminV1ExportEntitiesRequest;
+/// use datastore1::GoogleDatastoreAdminV1Index;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2348,29 +2366,29 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = GoogleDatastoreAdminV1ExportEntitiesRequest::default();
+/// let mut req = GoogleDatastoreAdminV1Index::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().export(req, "projectId")
+/// let result = hub.projects().indexes_create(req, "projectId")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectExportCall<'a, C, A>
+pub struct ProjectIndexeCreateCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Datastore<C, A>,
-    _request: GoogleDatastoreAdminV1ExportEntitiesRequest,
+    _request: GoogleDatastoreAdminV1Index,
     _project_id: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectExportCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectIndexeCreateCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectIndexeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2382,7 +2400,7 @@ impl<'a, C, A> ProjectExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "datastore.projects.export",
+        dlg.begin(MethodInfo { id: "datastore.projects.indexes.create",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
@@ -2398,7 +2416,7 @@ impl<'a, C, A> ProjectExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}:export";
+        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}/indexes";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -2518,7 +2536,7 @@ impl<'a, C, A> ProjectExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleDatastoreAdminV1ExportEntitiesRequest) -> ProjectExportCall<'a, C, A> {
+    pub fn request(mut self, new_value: GoogleDatastoreAdminV1Index) -> ProjectIndexeCreateCall<'a, C, A> {
         self._request = new_value;
         self
     }
@@ -2528,7 +2546,7 @@ impl<'a, C, A> ProjectExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectExportCall<'a, C, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeCreateCall<'a, C, A> {
         self._project_id = new_value.to_string();
         self
     }
@@ -2538,7 +2556,7 @@ impl<'a, C, A> ProjectExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectExportCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectIndexeCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2563,7 +2581,7 @@ impl<'a, C, A> ProjectExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectExportCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2583,7 +2601,7 @@ impl<'a, C, A> ProjectExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectExportCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectIndexeCreateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2797,7 +2815,7 @@ impl<'a, C, A> ProjectRunQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._request = new_value;
         self
     }
-    /// The ID of the project against which to make the request.
+    /// Required. The ID of the project against which to make the request.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -3073,7 +3091,7 @@ impl<'a, C, A> ProjectReserveIdCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// The ID of the project against which to make the request.
+    /// Required. The ID of the project against which to make the request.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -3135,6 +3153,288 @@ impl<'a, C, A> ProjectReserveIdCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectReserveIdCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Exports a copy of all or a subset of entities from Google Cloud Datastore
+/// to another storage system, such as Google Cloud Storage. Recent updates to
+/// entities may not be reflected in the export. The export occurs in the
+/// background and its progress can be monitored and managed via the
+/// Operation resource that is created. The output of an export may only be
+/// used once the associated operation is done. If an export operation is
+/// cancelled before completion it may leave partial data behind in Google
+/// Cloud Storage.
+///
+/// A builder for the *export* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_datastore1 as datastore1;
+/// use datastore1::GoogleDatastoreAdminV1ExportEntitiesRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use datastore1::Datastore;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Datastore::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleDatastoreAdminV1ExportEntitiesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().export(req, "projectId")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectExportCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Datastore<C, A>,
+    _request: GoogleDatastoreAdminV1ExportEntitiesRequest,
+    _project_id: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectExportCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectExportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleLongrunningOperation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "datastore.projects.export",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("projectId", self._project_id.to_string()));
+        for &field in ["alt", "projectId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}:export";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["projectId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleDatastoreAdminV1ExportEntitiesRequest) -> ProjectExportCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Project ID against which to make the request.
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> ProjectExportCall<'a, C, A> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectExportCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectExportCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectExportCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3348,7 +3648,7 @@ impl<'a, C, A> ProjectLookupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
-    /// The ID of the project against which to make the request.
+    /// Required. The ID of the project against which to make the request.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -3624,7 +3924,7 @@ impl<'a, C, A> ProjectCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
-    /// The ID of the project against which to make the request.
+    /// Required. The ID of the project against which to make the request.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -3900,7 +4200,7 @@ impl<'a, C, A> ProjectAllocateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._request = new_value;
         self
     }
-    /// The ID of the project against which to make the request.
+    /// Required. The ID of the project against which to make the request.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -4731,6 +5031,281 @@ impl<'a, C, A> ProjectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
+/// Begins a new transaction.
+///
+/// A builder for the *beginTransaction* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_datastore1 as datastore1;
+/// use datastore1::BeginTransactionRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use datastore1::Datastore;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Datastore::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BeginTransactionRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().begin_transaction(req, "projectId")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectBeginTransactionCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Datastore<C, A>,
+    _request: BeginTransactionRequest,
+    _project_id: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectBeginTransactionCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, BeginTransactionResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "datastore.projects.beginTransaction",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("projectId", self._project_id.to_string()));
+        for &field in ["alt", "projectId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}:beginTransaction";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["projectId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BeginTransactionRequest) -> ProjectBeginTransactionCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The ID of the project against which to make the request.
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> ProjectBeginTransactionCall<'a, C, A> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectBeginTransactionCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectBeginTransactionCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBeginTransactionCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Gets an index.
 ///
 /// A builder for the *indexes.get* method supported by a *project* resource.
@@ -5017,9 +5592,9 @@ impl<'a, C, A> ProjectIndexeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().indexes_list("projectId")
-///              .page_token("ea")
-///              .page_size(-61)
-///              .filter("justo")
+///              .page_token("justo")
+///              .page_size(-21)
+///              .filter("et")
 ///              .doit();
 /// # }
 /// ```
@@ -5269,9 +5844,18 @@ impl<'a, C, A> ProjectIndexeListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Begins a new transaction.
+/// Deletes an existing index.
+/// An index can only be deleted if it is in a `READY` or `ERROR` state. On
+/// successful execution of the request, the index will be in a `DELETING`
+/// state. And on completion of the
+/// returned google.longrunning.Operation, the index will be removed.
+/// 
+/// During index deletion, the process could result in an error, in which
+/// case the index will move to the `ERROR` state. The process can be recovered
+/// by fixing the data that caused the error, followed by calling
+/// delete again.
 ///
-/// A builder for the *beginTransaction* method supported by a *project* resource.
+/// A builder for the *indexes.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -5283,7 +5867,6 @@ impl<'a, C, A> ProjectIndexeListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_datastore1 as datastore1;
-/// use datastore1::BeginTransactionRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5294,36 +5877,31 @@ impl<'a, C, A> ProjectIndexeListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = Datastore::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = BeginTransactionRequest::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().begin_transaction(req, "projectId")
+/// let result = hub.projects().indexes_delete("projectId", "indexId")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectBeginTransactionCall<'a, C, A>
+pub struct ProjectIndexeDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Datastore<C, A>,
-    _request: BeginTransactionRequest,
     _project_id: String,
+    _index_id: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectBeginTransactionCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectIndexeDeleteCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectIndexeDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, BeginTransactionResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleLongrunningOperation)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -5331,11 +5909,12 @@ impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::C
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "datastore.projects.beginTransaction",
-                               http_method: hyper::method::Method::Post });
+        dlg.begin(MethodInfo { id: "datastore.projects.indexes.delete",
+                               http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
-        for &field in ["alt", "projectId"].iter() {
+        params.push(("indexId", self._index_id.to_string()));
+        for &field in ["alt", "projectId", "indexId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5347,12 +5926,12 @@ impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}:beginTransaction";
+        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}/indexes/{indexId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
+        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{indexId}", "indexId")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -5363,8 +5942,8 @@ impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::C
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["projectId"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["indexId", "projectId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -5376,17 +5955,6 @@ impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::C
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -5403,15 +5971,11 @@ impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -5462,23 +6026,24 @@ impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BeginTransactionRequest) -> ProjectBeginTransactionCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the project against which to make the request.
+    /// Project ID against which to make the request.
     ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectBeginTransactionCall<'a, C, A> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeDeleteCall<'a, C, A> {
         self._project_id = new_value.to_string();
+        self
+    }
+    /// The resource ID of the index to delete.
+    ///
+    /// Sets the *index id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn index_id(mut self, new_value: &str) -> ProjectIndexeDeleteCall<'a, C, A> {
+        self._index_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5487,7 +6052,7 @@ impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectBeginTransactionCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectIndexeDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5512,7 +6077,7 @@ impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectBeginTransactionCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5532,7 +6097,7 @@ impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBeginTransactionCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectIndexeDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5746,7 +6311,7 @@ impl<'a, C, A> ProjectRollbackCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._request = new_value;
         self
     }
-    /// The ID of the project against which to make the request.
+    /// Required. The ID of the project against which to make the request.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -6025,7 +6590,7 @@ impl<'a, C, A> ProjectImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
-    /// Project ID against which to make the request.
+    /// Required. Project ID against which to make the request.
     ///
     /// Sets the *project id* path property to the given value.
     ///

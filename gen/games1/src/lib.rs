@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games* crate version *1.0.12+20190627*, where *20190627* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Games* crate version *1.0.13+20200402*, where *20200402* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Games* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/games/services/).
@@ -27,10 +27,6 @@
 //!  * [*get*](struct.PlayerGetCall.html) and [*list*](struct.PlayerListCall.html)
 //! * pushtokens
 //!  * [*remove*](struct.PushtokenRemoveCall.html) and [*update*](struct.PushtokenUpdateCall.html)
-//! * [quest milestones](struct.QuestMilestone.html)
-//!  * [*claim*](struct.QuestMilestoneClaimCall.html)
-//! * [quests](struct.Quest.html)
-//!  * [*accept*](struct.QuestAcceptCall.html) and [*list*](struct.QuestListCall.html)
 //! * revisions
 //!  * [*check*](struct.RevisionCheckCall.html)
 //! * [rooms](struct.Room.html)
@@ -360,7 +356,7 @@ impl<'a, C, A> Games<C, A>
         Games {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://www.googleapis.com/games/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -390,12 +386,6 @@ impl<'a, C, A> Games<C, A>
     pub fn pushtokens(&'a self) -> PushtokenMethods<'a, C, A> {
         PushtokenMethods { hub: &self }
     }
-    pub fn quest_milestones(&'a self) -> QuestMilestoneMethods<'a, C, A> {
-        QuestMilestoneMethods { hub: &self }
-    }
-    pub fn quests(&'a self) -> QuestMethods<'a, C, A> {
-        QuestMethods { hub: &self }
-    }
     pub fn revisions(&'a self) -> RevisionMethods<'a, C, A> {
         RevisionMethods { hub: &self }
     }
@@ -413,7 +403,7 @@ impl<'a, C, A> Games<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1010,74 +1000,6 @@ pub struct TurnBasedMatchCreateRequest {
 impl RequestValue for TurnBasedMatchCreateRequest {}
 
 
-/// This is a JSON template for a Quest resource.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [accept quests](struct.QuestAcceptCall.html) (response)
-/// * [list quests](struct.QuestListCall.html) (none)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Quest {
-    /// The description of the quest.
-    pub description: Option<String>,
-    /// The banner image URL for the quest.
-    #[serde(rename="bannerUrl")]
-    pub banner_url: Option<String>,
-    /// The timestamp at which the quest was last updated by the user in milliseconds since the epoch in UTC. Only present if the player has accepted the quest.
-    #[serde(rename="lastUpdatedTimestampMillis")]
-    pub last_updated_timestamp_millis: Option<String>,
-    /// The timestamp at which the user accepted the quest in milliseconds since the epoch in UTC. Only present if the player has accepted the quest.
-    #[serde(rename="acceptedTimestampMillis")]
-    pub accepted_timestamp_millis: Option<String>,
-    /// The icon image URL for the quest.
-    #[serde(rename="iconUrl")]
-    pub icon_url: Option<String>,
-    /// The timestamp at which the user should be notified that the quest will end soon in milliseconds since the epoch in UTC.
-    #[serde(rename="notifyTimestampMillis")]
-    pub notify_timestamp_millis: Option<String>,
-    /// The ID of the application this quest is part of.
-    #[serde(rename="applicationId")]
-    pub application_id: Option<String>,
-    /// The ID of the quest.
-    pub id: Option<String>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#quest.
-    pub kind: Option<String>,
-    /// The quest milestones.
-    pub milestones: Option<Vec<QuestMilestone>>,
-    /// The name of the quest.
-    pub name: Option<String>,
-    /// The timestamp at which the quest becomes active in milliseconds since the epoch in UTC.
-    #[serde(rename="startTimestampMillis")]
-    pub start_timestamp_millis: Option<String>,
-    /// The timestamp at which the quest ceases to be active in milliseconds since the epoch in UTC.
-    #[serde(rename="endTimestampMillis")]
-    pub end_timestamp_millis: Option<String>,
-    /// The state of the quest.
-    /// Possible values are:  
-    /// - "UPCOMING": The quest is upcoming. The user can see the quest, but cannot accept it until it is open. 
-    /// - "OPEN": The quest is currently open and may be accepted at this time. 
-    /// - "ACCEPTED": The user is currently participating in this quest. 
-    /// - "COMPLETED": The user has completed the quest. 
-    /// - "FAILED": The quest was attempted but was not completed before the deadline expired. 
-    /// - "EXPIRED": The quest has expired and was not accepted. 
-    /// - "DELETED": The quest should be deleted from the local database.
-    pub state: Option<String>,
-    /// Indicates whether the banner image being returned is a default image, or is game-provided.
-    #[serde(rename="isDefaultBannerUrl")]
-    pub is_default_banner_url: Option<bool>,
-    /// Indicates whether the icon image being returned is a default image, or is game-provided.
-    #[serde(rename="isDefaultIconUrl")]
-    pub is_default_icon_url: Option<bool>,
-}
-
-impl Resource for Quest {}
-impl ResponseResult for Quest {}
-
-
 /// This is a JSON template for aggregate stats.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1592,36 +1514,31 @@ pub struct RoomLeaveDiagnostics {
 impl Part for RoomLeaveDiagnostics {}
 
 
-/// This is a JSON template for a Quest Milestone resource.
+/// This is a JSON template for a push token resource.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [claim quest milestones](struct.QuestMilestoneClaimCall.html) (none)
+/// * [update pushtokens](struct.PushtokenUpdateCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct QuestMilestone {
-    /// The current state of the milestone.
-    /// Possible values are:  
-    /// - "COMPLETED_NOT_CLAIMED" - The milestone is complete, but has not yet been claimed. 
-    /// - "CLAIMED" - The milestone is complete and has been claimed. 
-    /// - "NOT_COMPLETED" - The milestone has not yet been completed. 
-    /// - "NOT_STARTED" - The milestone is for a quest that has not yet been accepted.
-    pub state: Option<String>,
-    /// The completion reward data of the milestone, represented as a Base64-encoded string. This is a developer-specified binary blob with size between 0 and 2 KB before encoding.
-    #[serde(rename="completionRewardData")]
-    pub completion_reward_data: Option<String>,
-    /// The milestone ID.
-    pub id: Option<String>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#questMilestone.
+pub struct PushToken {
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#pushToken.
     pub kind: Option<String>,
-    /// The criteria of the milestone.
-    pub criteria: Option<Vec<QuestCriterion>>,
+    /// The revision of the client SDK used by your application, in the same format that's used by revisions.check. Used to send backward compatible messages. Format: [PLATFORM_TYPE]:[VERSION_NUMBER]. Possible values of PLATFORM_TYPE are:  
+    /// - IOS - Push token is for iOS
+    #[serde(rename="clientRevision")]
+    pub client_revision: Option<String>,
+    /// Unique identifier for this push token.
+    pub id: Option<PushTokenId>,
+    /// The preferred language for notifications that are sent using this token.
+    pub language: Option<String>,
 }
 
-impl Resource for QuestMilestone {}
+impl RequestValue for PushToken {}
+impl Resource for PushToken {}
 
 
 /// This is a JSON template for a rematch response.
@@ -1739,51 +1656,6 @@ pub struct Played {
 }
 
 impl Part for Played {}
-
-
-/// This is a JSON template for a Quest Criterion Contribution resource.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct QuestContribution {
-    /// The formatted value of the contribution as a string. Format depends on the configuration for the associated event definition in the Play Games Developer Console.
-    #[serde(rename="formattedValue")]
-    pub formatted_value: Option<String>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#questContribution.
-    pub kind: Option<String>,
-    /// The value of the contribution.
-    pub value: Option<String>,
-}
-
-impl Part for QuestContribution {}
-
-
-/// This is a JSON template for a Quest Criterion resource.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct QuestCriterion {
-    /// The ID of the event the criterion corresponds to.
-    #[serde(rename="eventId")]
-    pub event_id: Option<String>,
-    /// The total number of times the associated event must be incremented for the player to complete this quest.
-    #[serde(rename="completionContribution")]
-    pub completion_contribution: Option<QuestContribution>,
-    /// The value of the event associated with this quest at the time that the quest was accepted. This value may change if event increments that took place before the start of quest are uploaded after the quest starts.
-    /// There will be no initialPlayerProgress until the player has accepted the quest.
-    #[serde(rename="initialPlayerProgress")]
-    pub initial_player_progress: Option<QuestContribution>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#questCriterion.
-    pub kind: Option<String>,
-    /// The number of increments the player has made toward the completion count event increments required to complete the quest. This value will not exceed the completion contribution.
-    /// There will be no currentContribution until the player has accepted the quest.
-    #[serde(rename="currentContribution")]
-    pub current_contribution: Option<QuestContribution>,
-}
-
-impl Part for QuestCriterion {}
 
 
 /// This is a JSON template for a list of rooms.
@@ -2146,9 +2018,12 @@ impl Part for PeerSessionDiagnostics {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProfileSettings {
+    /// Whether the player's friends list is visible to the game.
+    #[serde(rename="friendsListVisibility")]
+    pub friends_list_visibility: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string games#profileSettings.
     pub kind: Option<String>,
-    /// The player's current profile visibility. This field is visible to both 1P and 3P APIs.
+    /// no description provided
     #[serde(rename="profileVisible")]
     pub profile_visible: Option<bool>,
 }
@@ -2156,27 +2031,22 @@ pub struct ProfileSettings {
 impl Part for ProfileSettings {}
 
 
-/// This is a JSON template for a list of quest objects.
+/// This is a JSON template for an event period update resource.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list quests](struct.QuestListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct QuestListResponse {
-    /// Token corresponding to the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The quests.
-    pub items: Option<Vec<Quest>>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#questListResponse.
+pub struct EventPeriodUpdate {
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventPeriodUpdate.
     pub kind: Option<String>,
+    /// The time period being covered by this update.
+    #[serde(rename="timePeriod")]
+    pub time_period: Option<EventPeriodRange>,
+    /// The updates being made for this time period.
+    pub updates: Option<Vec<EventUpdateRequest>>,
 }
 
-impl ResponseResult for QuestListResponse {}
+impl Part for EventPeriodUpdate {}
 
 
 /// This is a JSON template for a ListByPlayer response.
@@ -2260,33 +2130,6 @@ pub struct PlayerAchievementListResponse {
 }
 
 impl ResponseResult for PlayerAchievementListResponse {}
-
-
-/// This is a JSON template for a push token resource.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [update pushtokens](struct.PushtokenUpdateCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PushToken {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#pushToken.
-    pub kind: Option<String>,
-    /// The revision of the client SDK used by your application, in the same format that's used by revisions.check. Used to send backward compatible messages. Format: [PLATFORM_TYPE]:[VERSION_NUMBER]. Possible values of PLATFORM_TYPE are:  
-    /// - IOS - Push token is for iOS
-    #[serde(rename="clientRevision")]
-    pub client_revision: Option<String>,
-    /// Unique identifier for this push token.
-    pub id: Option<PushTokenId>,
-    /// The preferred language for notifications that are sent using this token.
-    pub language: Option<String>,
-}
-
-impl RequestValue for PushToken {}
-impl Resource for PushToken {}
 
 
 /// This is a JSON template for a player leaderboard score object.
@@ -2681,24 +2524,6 @@ pub struct RoomP2PStatus {
 impl Part for RoomP2PStatus {}
 
 
-/// This is a JSON template for an event period update resource.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EventPeriodUpdate {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventPeriodUpdate.
-    pub kind: Option<String>,
-    /// The time period being covered by this update.
-    #[serde(rename="timePeriod")]
-    pub time_period: Option<EventPeriodRange>,
-    /// The updates being made for this time period.
-    pub updates: Option<Vec<EventUpdateRequest>>,
-}
-
-impl Part for EventPeriodUpdate {}
-
-
 /// This is a JSON template for a list of achievement update requests.
 /// 
 /// # Activities
@@ -3042,12 +2867,18 @@ pub struct Player {
     /// The url to the portrait mode player banner image.
     #[serde(rename="bannerUrlPortrait")]
     pub banner_url_portrait: Option<String>,
+    /// no description provided
+    #[serde(rename="playerStattus")]
+    pub player_stattus: Option<String>,
     /// The player's profile settings. Controls whether or not the player's profile is visible to other players.
     #[serde(rename="profileSettings")]
     pub profile_settings: Option<ProfileSettings>,
     /// An object to represent Play Game experience information for the player.
     #[serde(rename="experienceInfo")]
     pub experience_info: Option<PlayerExperienceInfo>,
+    /// The friend status of the given player, relative to the requester. This is unset if the player is not sharing their friends list with the game.
+    #[serde(rename="friendStatus")]
+    pub friend_status: Option<String>,
     /// The url to the landscape mode player banner image.
     #[serde(rename="bannerUrlLandscape")]
     pub banner_url_landscape: Option<String>,
@@ -3272,6 +3103,24 @@ impl<'a, C, A> AchievementMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Updates multiple achievements for the currently authenticated player.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn update_multiple(&self, request: AchievementUpdateMultipleRequest) -> AchievementUpdateMultipleCall<'a, C, A> {
+        AchievementUpdateMultipleCall {
+            hub: self.hub,
+            _request: request,
+            _builtin_game_id: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Sets the steps for the currently authenticated player towards unlocking an achievement. If the steps parameter is less than the current number of steps that the player already gained for the achievement, the achievement is not modified.
     /// 
     /// # Arguments
@@ -3283,24 +3132,6 @@ impl<'a, C, A> AchievementMethods<'a, C, A> {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
             _steps: steps,
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Updates multiple achievements for the currently authenticated player.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn update_multiple(&self, request: AchievementUpdateMultipleRequest) -> AchievementUpdateMultipleCall<'a, C, A> {
-        AchievementUpdateMultipleCall {
-            hub: self.hub,
-            _request: request,
-            _builtin_game_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3576,7 +3407,7 @@ impl<'a, C, A> PlayerMethods<'a, C, A> {
 
 
 
-/// A builder providing access to all methods supported on *quest* resources.
+/// A builder providing access to all methods supported on *score* resources.
 /// It is not used directly, but through the `Games` hub.
 ///
 /// # Example
@@ -3600,32 +3431,38 @@ impl<'a, C, A> PlayerMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Games::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `accept(...)` and `list(...)`
+/// // like `get(...)`, `list(...)`, `list_window(...)`, `submit(...)` and `submit_multiple(...)`
 /// // to build up your call.
-/// let rb = hub.quests();
+/// let rb = hub.scores();
 /// # }
 /// ```
-pub struct QuestMethods<'a, C, A>
+pub struct ScoreMethods<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Games<C, A>,
 }
 
-impl<'a, C, A> MethodsBuilder for QuestMethods<'a, C, A> {}
+impl<'a, C, A> MethodsBuilder for ScoreMethods<'a, C, A> {}
 
-impl<'a, C, A> QuestMethods<'a, C, A> {
+impl<'a, C, A> ScoreMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Indicates that the currently authorized user will participate in the quest.
+    /// Lists the scores in a leaderboard, starting from the top.
     /// 
     /// # Arguments
     ///
-    /// * `questId` - The ID of the quest.
-    pub fn accept(&self, quest_id: &str) -> QuestAcceptCall<'a, C, A> {
-        QuestAcceptCall {
+    /// * `leaderboardId` - The ID of the leaderboard.
+    /// * `collection` - The collection of scores you're requesting.
+    /// * `timeSpan` - The time span for the scores and ranks you're requesting.
+    pub fn list(&self, leaderboard_id: &str, collection: &str, time_span: &str) -> ScoreListCall<'a, C, A> {
+        ScoreListCall {
             hub: self.hub,
-            _quest_id: quest_id.to_string(),
+            _leaderboard_id: leaderboard_id.to_string(),
+            _collection: collection.to_string(),
+            _time_span: time_span.to_string(),
+            _page_token: Default::default(),
+            _max_results: Default::default(),
             _language: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3635,15 +3472,86 @@ impl<'a, C, A> QuestMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get a list of quests for your application and the currently authenticated player.
+    /// Get high scores, and optionally ranks, in leaderboards for the currently authenticated player. For a specific time span, leaderboardId can be set to ALL to retrieve data for all leaderboards in a given time span.
+    /// NOTE: You cannot ask for 'ALL' leaderboards and 'ALL' timeSpans in the same request; only one parameter may be set to 'ALL'.
     /// 
     /// # Arguments
     ///
     /// * `playerId` - A player ID. A value of me may be used in place of the authenticated player's ID.
-    pub fn list(&self, player_id: &str) -> QuestListCall<'a, C, A> {
-        QuestListCall {
+    /// * `leaderboardId` - The ID of the leaderboard. Can be set to 'ALL' to retrieve data for all leaderboards for this application.
+    /// * `timeSpan` - The time span for the scores and ranks you're requesting.
+    pub fn get(&self, player_id: &str, leaderboard_id: &str, time_span: &str) -> ScoreGetCall<'a, C, A> {
+        ScoreGetCall {
             hub: self.hub,
             _player_id: player_id.to_string(),
+            _leaderboard_id: leaderboard_id.to_string(),
+            _time_span: time_span.to_string(),
+            _page_token: Default::default(),
+            _max_results: Default::default(),
+            _language: Default::default(),
+            _include_rank_type: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Submits a score to the specified leaderboard.
+    /// 
+    /// # Arguments
+    ///
+    /// * `leaderboardId` - The ID of the leaderboard.
+    /// * `score` - The score you're submitting. The submitted score is ignored if it is worse than a previously submitted score, where worse depends on the leaderboard sort order. The meaning of the score value depends on the leaderboard format type. For fixed-point, the score represents the raw value. For time, the score represents elapsed time in milliseconds. For currency, the score represents a value in micro units.
+    pub fn submit(&self, leaderboard_id: &str, score: &str) -> ScoreSubmitCall<'a, C, A> {
+        ScoreSubmitCall {
+            hub: self.hub,
+            _leaderboard_id: leaderboard_id.to_string(),
+            _score: score.to_string(),
+            _score_tag: Default::default(),
+            _language: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Submits multiple scores to leaderboards.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn submit_multiple(&self, request: PlayerScoreSubmissionList) -> ScoreSubmitMultipleCall<'a, C, A> {
+        ScoreSubmitMultipleCall {
+            hub: self.hub,
+            _request: request,
+            _language: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists the scores in a leaderboard around (and including) a player's score.
+    /// 
+    /// # Arguments
+    ///
+    /// * `leaderboardId` - The ID of the leaderboard.
+    /// * `collection` - The collection of scores you're requesting.
+    /// * `timeSpan` - The time span for the scores and ranks you're requesting.
+    pub fn list_window(&self, leaderboard_id: &str, collection: &str, time_span: &str) -> ScoreListWindowCall<'a, C, A> {
+        ScoreListWindowCall {
+            hub: self.hub,
+            _leaderboard_id: leaderboard_id.to_string(),
+            _collection: collection.to_string(),
+            _time_span: time_span.to_string(),
+            _return_top_if_absent: Default::default(),
+            _results_above: Default::default(),
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
@@ -3848,6 +3756,26 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Finish a turn-based match. Each player should make this call once, after all results are in. Only the player whose turn it is may make the first call to Finish, and can pass in the final match state.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `matchId` - The ID of the match.
+    pub fn finish(&self, request: TurnBasedMatchResults, match_id: &str) -> TurnBasedMatcheFinishCall<'a, C, A> {
+        TurnBasedMatcheFinishCall {
+            hub: self.hub,
+            _request: request,
+            _match_id: match_id.to_string(),
+            _language: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Create a turn-based match.
     /// 
     /// # Arguments
@@ -3914,26 +3842,6 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
         TurnBasedMatcheCancelCall {
             hub: self.hub,
             _match_id: match_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Finish a turn-based match. Each player should make this call once, after all results are in. Only the player whose turn it is may make the first call to Finish, and can pass in the final match state.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `matchId` - The ID of the match.
-    pub fn finish(&self, request: TurnBasedMatchResults, match_id: &str) -> TurnBasedMatcheFinishCall<'a, C, A> {
-        TurnBasedMatcheFinishCall {
-            hub: self.hub,
-            _request: request,
-            _match_id: match_id.to_string(),
-            _language: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4296,7 +4204,7 @@ impl<'a, C, A> RoomMethods<'a, C, A> {
 
 
 
-/// A builder providing access to all methods supported on *score* resources.
+/// A builder providing access to all methods supported on *achievementDefinition* resources.
 /// It is not used directly, but through the `Games` hub.
 ///
 /// # Example
@@ -4320,127 +4228,27 @@ impl<'a, C, A> RoomMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Games::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get(...)`, `list(...)`, `list_window(...)`, `submit(...)` and `submit_multiple(...)`
+/// // like `list(...)`
 /// // to build up your call.
-/// let rb = hub.scores();
+/// let rb = hub.achievement_definitions();
 /// # }
 /// ```
-pub struct ScoreMethods<'a, C, A>
+pub struct AchievementDefinitionMethods<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Games<C, A>,
 }
 
-impl<'a, C, A> MethodsBuilder for ScoreMethods<'a, C, A> {}
+impl<'a, C, A> MethodsBuilder for AchievementDefinitionMethods<'a, C, A> {}
 
-impl<'a, C, A> ScoreMethods<'a, C, A> {
+impl<'a, C, A> AchievementDefinitionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Submits a score to the specified leaderboard.
-    /// 
-    /// # Arguments
-    ///
-    /// * `leaderboardId` - The ID of the leaderboard.
-    /// * `score` - The score you're submitting. The submitted score is ignored if it is worse than a previously submitted score, where worse depends on the leaderboard sort order. The meaning of the score value depends on the leaderboard format type. For fixed-point, the score represents the raw value. For time, the score represents elapsed time in milliseconds. For currency, the score represents a value in micro units.
-    pub fn submit(&self, leaderboard_id: &str, score: &str) -> ScoreSubmitCall<'a, C, A> {
-        ScoreSubmitCall {
+    /// Lists all the achievement definitions for your application.
+    pub fn list(&self) -> AchievementDefinitionListCall<'a, C, A> {
+        AchievementDefinitionListCall {
             hub: self.hub,
-            _leaderboard_id: leaderboard_id.to_string(),
-            _score: score.to_string(),
-            _score_tag: Default::default(),
-            _language: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Lists the scores in a leaderboard, starting from the top.
-    /// 
-    /// # Arguments
-    ///
-    /// * `leaderboardId` - The ID of the leaderboard.
-    /// * `collection` - The collection of scores you're requesting.
-    /// * `timeSpan` - The time span for the scores and ranks you're requesting.
-    pub fn list(&self, leaderboard_id: &str, collection: &str, time_span: &str) -> ScoreListCall<'a, C, A> {
-        ScoreListCall {
-            hub: self.hub,
-            _leaderboard_id: leaderboard_id.to_string(),
-            _collection: collection.to_string(),
-            _time_span: time_span.to_string(),
-            _page_token: Default::default(),
-            _max_results: Default::default(),
-            _language: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Get high scores, and optionally ranks, in leaderboards for the currently authenticated player. For a specific time span, leaderboardId can be set to ALL to retrieve data for all leaderboards in a given time span.
-    /// NOTE: You cannot ask for 'ALL' leaderboards and 'ALL' timeSpans in the same request; only one parameter may be set to 'ALL'.
-    /// 
-    /// # Arguments
-    ///
-    /// * `playerId` - A player ID. A value of me may be used in place of the authenticated player's ID.
-    /// * `leaderboardId` - The ID of the leaderboard. Can be set to 'ALL' to retrieve data for all leaderboards for this application.
-    /// * `timeSpan` - The time span for the scores and ranks you're requesting.
-    pub fn get(&self, player_id: &str, leaderboard_id: &str, time_span: &str) -> ScoreGetCall<'a, C, A> {
-        ScoreGetCall {
-            hub: self.hub,
-            _player_id: player_id.to_string(),
-            _leaderboard_id: leaderboard_id.to_string(),
-            _time_span: time_span.to_string(),
-            _page_token: Default::default(),
-            _max_results: Default::default(),
-            _language: Default::default(),
-            _include_rank_type: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Submits multiple scores to leaderboards.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn submit_multiple(&self, request: PlayerScoreSubmissionList) -> ScoreSubmitMultipleCall<'a, C, A> {
-        ScoreSubmitMultipleCall {
-            hub: self.hub,
-            _request: request,
-            _language: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Lists the scores in a leaderboard around (and including) a player's score.
-    /// 
-    /// # Arguments
-    ///
-    /// * `leaderboardId` - The ID of the leaderboard.
-    /// * `collection` - The collection of scores you're requesting.
-    /// * `timeSpan` - The time span for the scores and ranks you're requesting.
-    pub fn list_window(&self, leaderboard_id: &str, collection: &str, time_span: &str) -> ScoreListWindowCall<'a, C, A> {
-        ScoreListWindowCall {
-            hub: self.hub,
-            _leaderboard_id: leaderboard_id.to_string(),
-            _collection: collection.to_string(),
-            _time_span: time_span.to_string(),
-            _return_top_if_absent: Default::default(),
-            _results_above: Default::default(),
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
@@ -4520,70 +4328,6 @@ impl<'a, C, A> PushtokenMethods<'a, C, A> {
         PushtokenUpdateCall {
             hub: self.hub,
             _request: request,
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-}
-
-
-
-/// A builder providing access to all methods supported on *revision* resources.
-/// It is not used directly, but through the `Games` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_games1 as games1;
-/// 
-/// # #[test] fn egal() {
-/// use std::default::Default;
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use games1::Games;
-/// 
-/// let secret: ApplicationSecret = Default::default();
-/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Games::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `check(...)`
-/// // to build up your call.
-/// let rb = hub.revisions();
-/// # }
-/// ```
-pub struct RevisionMethods<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Games<C, A>,
-}
-
-impl<'a, C, A> MethodsBuilder for RevisionMethods<'a, C, A> {}
-
-impl<'a, C, A> RevisionMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Checks whether the games client is out of date.
-    /// 
-    /// # Arguments
-    ///
-    /// * `clientRevision` - The revision of the client SDK used by your application. Format:
-    ///                      [PLATFORM_TYPE]:[VERSION_NUMBER]. Possible values of PLATFORM_TYPE are:
-    ///                       
-    ///                      - "ANDROID" - Client is running the Android SDK. 
-    ///                      - "IOS" - Client is running the iOS SDK. 
-    ///                      - "WEB_APP" - Client is running as a Web App.
-    pub fn check(&self, client_revision: &str) -> RevisionCheckCall<'a, C, A> {
-        RevisionCheckCall {
-            hub: self.hub,
-            _client_revision: client_revision.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4683,7 +4427,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
 
 
 
-/// A builder providing access to all methods supported on *questMilestone* resources.
+/// A builder providing access to all methods supported on *revision* resources.
 /// It is not used directly, but through the `Games` hub.
 ///
 /// # Example
@@ -4707,93 +4451,37 @@ impl<'a, C, A> EventMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Games::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `claim(...)`
+/// // like `check(...)`
 /// // to build up your call.
-/// let rb = hub.quest_milestones();
+/// let rb = hub.revisions();
 /// # }
 /// ```
-pub struct QuestMilestoneMethods<'a, C, A>
+pub struct RevisionMethods<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Games<C, A>,
 }
 
-impl<'a, C, A> MethodsBuilder for QuestMilestoneMethods<'a, C, A> {}
+impl<'a, C, A> MethodsBuilder for RevisionMethods<'a, C, A> {}
 
-impl<'a, C, A> QuestMilestoneMethods<'a, C, A> {
+impl<'a, C, A> RevisionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Report that a reward for the milestone corresponding to milestoneId for the quest corresponding to questId has been claimed by the currently authorized user.
+    /// Checks whether the games client is out of date.
     /// 
     /// # Arguments
     ///
-    /// * `questId` - The ID of the quest.
-    /// * `milestoneId` - The ID of the milestone.
-    /// * `requestId` - A numeric ID to ensure that the request is handled correctly across retries. Your client application must generate this ID randomly.
-    pub fn claim(&self, quest_id: &str, milestone_id: &str, request_id: &str) -> QuestMilestoneClaimCall<'a, C, A> {
-        QuestMilestoneClaimCall {
+    /// * `clientRevision` - The revision of the client SDK used by your application. Format:
+    ///                      [PLATFORM_TYPE]:[VERSION_NUMBER]. Possible values of PLATFORM_TYPE are:
+    ///                       
+    ///                      - "ANDROID" - Client is running the Android SDK. 
+    ///                      - "IOS" - Client is running the iOS SDK. 
+    ///                      - "WEB_APP" - Client is running as a Web App.
+    pub fn check(&self, client_revision: &str) -> RevisionCheckCall<'a, C, A> {
+        RevisionCheckCall {
             hub: self.hub,
-            _quest_id: quest_id.to_string(),
-            _milestone_id: milestone_id.to_string(),
-            _request_id: request_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-}
-
-
-
-/// A builder providing access to all methods supported on *achievementDefinition* resources.
-/// It is not used directly, but through the `Games` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
-/// extern crate google_games1 as games1;
-/// 
-/// # #[test] fn egal() {
-/// use std::default::Default;
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// use games1::Games;
-/// 
-/// let secret: ApplicationSecret = Default::default();
-/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Games::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `list(...)`
-/// // to build up your call.
-/// let rb = hub.achievement_definitions();
-/// # }
-/// ```
-pub struct AchievementDefinitionMethods<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Games<C, A>,
-}
-
-impl<'a, C, A> MethodsBuilder for AchievementDefinitionMethods<'a, C, A> {}
-
-impl<'a, C, A> AchievementDefinitionMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Lists all the achievement definitions for your application.
-    pub fn list(&self) -> AchievementDefinitionListCall<'a, C, A> {
-        AchievementDefinitionListCall {
-            hub: self.hub,
-            _page_token: Default::default(),
-            _max_results: Default::default(),
-            _language: Default::default(),
+            _client_revision: client_revision.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -5361,6 +5049,256 @@ impl<'a, C, A> AchievementIncrementCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
+/// Updates multiple achievements for the currently authenticated player.
+///
+/// A builder for the *updateMultiple* method supported by a *achievement* resource.
+/// It is not used directly, but through a `AchievementMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_games1 as games1;
+/// use games1::AchievementUpdateMultipleRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use games1::Games;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Games::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AchievementUpdateMultipleRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.achievements().update_multiple(req)
+///              .builtin_game_id("no")
+///              .doit();
+/// # }
+/// ```
+pub struct AchievementUpdateMultipleCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Games<C, A>,
+    _request: AchievementUpdateMultipleRequest,
+    _builtin_game_id: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AchievementUpdateMultipleCall<'a, C, A> {}
+
+impl<'a, C, A> AchievementUpdateMultipleCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, AchievementUpdateMultipleResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "games.achievements.updateMultiple",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        if let Some(value) = self._builtin_game_id {
+            params.push(("builtinGameId", value.to_string()));
+        }
+        for &field in ["alt", "builtinGameId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "achievements/updateMultiple";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AchievementUpdateMultipleRequest) -> AchievementUpdateMultipleCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Override used only by built-in games in Play Games application.
+    ///
+    /// Sets the *builtin game id* query property to the given value.
+    pub fn builtin_game_id(mut self, new_value: &str) -> AchievementUpdateMultipleCall<'a, C, A> {
+        self._builtin_game_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AchievementUpdateMultipleCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementUpdateMultipleCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementUpdateMultipleCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Sets the steps for the currently authenticated player towards unlocking an achievement. If the steps parameter is less than the current number of steps that the player already gained for the achievement, the achievement is not modified.
 ///
 /// A builder for the *setStepsAtLeast* method supported by a *achievement* resource.
@@ -5602,256 +5540,6 @@ impl<'a, C, A> AchievementSetStepsAtLeastCall<'a, C, A> where C: BorrowMut<hyper
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> AchievementSetStepsAtLeastCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Updates multiple achievements for the currently authenticated player.
-///
-/// A builder for the *updateMultiple* method supported by a *achievement* resource.
-/// It is not used directly, but through a `AchievementMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_games1 as games1;
-/// use games1::AchievementUpdateMultipleRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use games1::Games;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Games::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = AchievementUpdateMultipleRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.achievements().update_multiple(req)
-///              .builtin_game_id("justo")
-///              .doit();
-/// # }
-/// ```
-pub struct AchievementUpdateMultipleCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Games<C, A>,
-    _request: AchievementUpdateMultipleRequest,
-    _builtin_game_id: Option<String>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for AchievementUpdateMultipleCall<'a, C, A> {}
-
-impl<'a, C, A> AchievementUpdateMultipleCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, AchievementUpdateMultipleResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "games.achievements.updateMultiple",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        if let Some(value) = self._builtin_game_id {
-            params.push(("builtinGameId", value.to_string()));
-        }
-        for &field in ["alt", "builtinGameId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "achievements/updateMultiple";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AchievementUpdateMultipleRequest) -> AchievementUpdateMultipleCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Override used only by built-in games in Play Games application.
-    ///
-    /// Sets the *builtin game id* query property to the given value.
-    pub fn builtin_game_id(mut self, new_value: &str) -> AchievementUpdateMultipleCall<'a, C, A> {
-        self._builtin_game_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AchievementUpdateMultipleCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementUpdateMultipleCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementUpdateMultipleCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7873,10 +7561,10 @@ impl<'a, C, A> PlayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Indicates that the currently authorized user will participate in the quest.
+/// Lists the scores in a leaderboard, starting from the top.
 ///
-/// A builder for the *accept* method supported by a *quest* resource.
-/// It is not used directly, but through a `QuestMethods` instance.
+/// A builder for the *list* method supported by a *score* resource.
+/// It is not used directly, but through a `ScoreMethods` instance.
 ///
 /// # Example
 ///
@@ -7900,29 +7588,35 @@ impl<'a, C, A> PlayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.quests().accept("questId")
-///              .language("dolore")
+/// let result = hub.scores().list("leaderboardId", "collection", "timeSpan")
+///              .page_token("aliquyam")
+///              .max_results(-73)
+///              .language("Lorem")
 ///              .doit();
 /// # }
 /// ```
-pub struct QuestAcceptCall<'a, C, A>
+pub struct ScoreListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Games<C, A>,
-    _quest_id: String,
+    _leaderboard_id: String,
+    _collection: String,
+    _time_span: String,
+    _page_token: Option<String>,
+    _max_results: Option<i32>,
     _language: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for QuestAcceptCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ScoreListCall<'a, C, A> {}
 
-impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Quest)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, LeaderboardScores)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -7930,14 +7624,22 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "games.quests.accept",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("questId", self._quest_id.to_string()));
+        dlg.begin(MethodInfo { id: "games.scores.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
+        params.push(("leaderboardId", self._leaderboard_id.to_string()));
+        params.push(("collection", self._collection.to_string()));
+        params.push(("timeSpan", self._time_span.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "questId", "language"].iter() {
+        for &field in ["alt", "leaderboardId", "collection", "timeSpan", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7949,12 +7651,12 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "quests/{questId}/accept";
+        let mut url = self.hub._base_url.clone() + "leaderboards/{leaderboardId}/scores/{collection}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{questId}", "questId")].iter() {
+        for &(find_this, param_name) in [("{leaderboardId}", "leaderboardId"), ("{collection}", "collection")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -7965,8 +7667,8 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["questId"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["collection", "leaderboardId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -7996,7 +7698,7 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8049,20 +7751,54 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// The ID of the quest.
+    /// The ID of the leaderboard.
     ///
-    /// Sets the *quest id* path property to the given value.
+    /// Sets the *leaderboard id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn quest_id(mut self, new_value: &str) -> QuestAcceptCall<'a, C, A> {
-        self._quest_id = new_value.to_string();
+    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreListCall<'a, C, A> {
+        self._leaderboard_id = new_value.to_string();
+        self
+    }
+    /// The collection of scores you're requesting.
+    ///
+    /// Sets the *collection* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn collection(mut self, new_value: &str) -> ScoreListCall<'a, C, A> {
+        self._collection = new_value.to_string();
+        self
+    }
+    /// The time span for the scores and ranks you're requesting.
+    ///
+    /// Sets the *time span* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn time_span(mut self, new_value: &str) -> ScoreListCall<'a, C, A> {
+        self._time_span = new_value.to_string();
+        self
+    }
+    /// The token returned by the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ScoreListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of leaderboard scores to return in the response. For any response, the actual number of leaderboard scores returned may be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: i32) -> ScoreListCall<'a, C, A> {
+        self._max_results = Some(new_value);
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> QuestAcceptCall<'a, C, A> {
+    pub fn language(mut self, new_value: &str) -> ScoreListCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -8072,7 +7808,7 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> QuestAcceptCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ScoreListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8093,7 +7829,7 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> QuestAcceptCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8113,7 +7849,7 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> QuestAcceptCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8125,10 +7861,11 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Get a list of quests for your application and the currently authenticated player.
+/// Get high scores, and optionally ranks, in leaderboards for the currently authenticated player. For a specific time span, leaderboardId can be set to ALL to retrieve data for all leaderboards in a given time span.
+/// NOTE: You cannot ask for 'ALL' leaderboards and 'ALL' timeSpans in the same request; only one parameter may be set to 'ALL'.
 ///
-/// A builder for the *list* method supported by a *quest* resource.
-/// It is not used directly, but through a `QuestMethods` instance.
+/// A builder for the *get* method supported by a *score* resource.
+/// It is not used directly, but through a `ScoreMethods` instance.
 ///
 /// # Example
 ///
@@ -8152,33 +7889,37 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.quests().list("playerId")
-///              .page_token("aliquyam")
-///              .max_results(-73)
-///              .language("Lorem")
+/// let result = hub.scores().get("playerId", "leaderboardId", "timeSpan")
+///              .page_token("et")
+///              .max_results(-40)
+///              .language("sanctus")
+///              .include_rank_type("et")
 ///              .doit();
 /// # }
 /// ```
-pub struct QuestListCall<'a, C, A>
+pub struct ScoreGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Games<C, A>,
     _player_id: String,
+    _leaderboard_id: String,
+    _time_span: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
+    _include_rank_type: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for QuestListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ScoreGetCall<'a, C, A> {}
 
-impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ScoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, QuestListResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, PlayerLeaderboardScoreListResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -8186,10 +7927,12 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "games.quests.list",
+        dlg.begin(MethodInfo { id: "games.scores.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("playerId", self._player_id.to_string()));
+        params.push(("leaderboardId", self._leaderboard_id.to_string()));
+        params.push(("timeSpan", self._time_span.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -8199,7 +7942,10 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "playerId", "pageToken", "maxResults", "language"].iter() {
+        if let Some(value) = self._include_rank_type {
+            params.push(("includeRankType", value.to_string()));
+        }
+        for &field in ["alt", "playerId", "leaderboardId", "timeSpan", "pageToken", "maxResults", "language", "includeRankType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8211,12 +7957,12 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "players/{playerId}/quests";
+        let mut url = self.hub._base_url.clone() + "players/{playerId}/leaderboards/{leaderboardId}/scores/{timeSpan}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{playerId}", "playerId")].iter() {
+        for &(find_this, param_name) in [("{playerId}", "playerId"), ("{leaderboardId}", "leaderboardId"), ("{timeSpan}", "timeSpan")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -8227,8 +7973,8 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["playerId"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["timeSpan", "leaderboardId", "playerId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -8317,29 +8063,56 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn player_id(mut self, new_value: &str) -> QuestListCall<'a, C, A> {
+    pub fn player_id(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
         self._player_id = new_value.to_string();
+        self
+    }
+    /// The ID of the leaderboard. Can be set to 'ALL' to retrieve data for all leaderboards for this application.
+    ///
+    /// Sets the *leaderboard id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
+        self._leaderboard_id = new_value.to_string();
+        self
+    }
+    /// The time span for the scores and ranks you're requesting.
+    ///
+    /// Sets the *time span* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn time_span(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
+        self._time_span = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> QuestListCall<'a, C, A> {
+    pub fn page_token(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The maximum number of quest resources to return in the response, used for paging. For any response, the actual number of quest resources returned may be less than the specified maxResults. Acceptable values are 1 to 50, inclusive. (Default: 50).
+    /// The maximum number of leaderboard scores to return in the response. For any response, the actual number of leaderboard scores returned may be less than the specified maxResults.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> QuestListCall<'a, C, A> {
+    pub fn max_results(mut self, new_value: i32) -> ScoreGetCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> QuestListCall<'a, C, A> {
+    pub fn language(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
         self._language = Some(new_value.to_string());
+        self
+    }
+    /// The types of ranks to return. If the parameter is omitted, no ranks will be returned.
+    ///
+    /// Sets the *include rank type* query property to the given value.
+    pub fn include_rank_type(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
+        self._include_rank_type = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -8348,7 +8121,7 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> QuestListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ScoreGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8369,7 +8142,7 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> QuestListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8389,7 +8162,857 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> QuestListCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Submits a score to the specified leaderboard.
+///
+/// A builder for the *submit* method supported by a *score* resource.
+/// It is not used directly, but through a `ScoreMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_games1 as games1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use games1::Games;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Games::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.scores().submit("leaderboardId", "score")
+///              .score_tag("consetetur")
+///              .language("ut")
+///              .doit();
+/// # }
+/// ```
+pub struct ScoreSubmitCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Games<C, A>,
+    _leaderboard_id: String,
+    _score: String,
+    _score_tag: Option<String>,
+    _language: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ScoreSubmitCall<'a, C, A> {}
+
+impl<'a, C, A> ScoreSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, PlayerScoreResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "games.scores.submit",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("leaderboardId", self._leaderboard_id.to_string()));
+        params.push(("score", self._score.to_string()));
+        if let Some(value) = self._score_tag {
+            params.push(("scoreTag", value.to_string()));
+        }
+        if let Some(value) = self._language {
+            params.push(("language", value.to_string()));
+        }
+        for &field in ["alt", "leaderboardId", "score", "scoreTag", "language"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "leaderboards/{leaderboardId}/scores";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{leaderboardId}", "leaderboardId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["leaderboardId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the leaderboard.
+    ///
+    /// Sets the *leaderboard id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreSubmitCall<'a, C, A> {
+        self._leaderboard_id = new_value.to_string();
+        self
+    }
+    /// The score you're submitting. The submitted score is ignored if it is worse than a previously submitted score, where worse depends on the leaderboard sort order. The meaning of the score value depends on the leaderboard format type. For fixed-point, the score represents the raw value. For time, the score represents elapsed time in milliseconds. For currency, the score represents a value in micro units.
+    ///
+    /// Sets the *score* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn score(mut self, new_value: &str) -> ScoreSubmitCall<'a, C, A> {
+        self._score = new_value.to_string();
+        self
+    }
+    /// Additional information about the score you're submitting. Values must contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
+    ///
+    /// Sets the *score tag* query property to the given value.
+    pub fn score_tag(mut self, new_value: &str) -> ScoreSubmitCall<'a, C, A> {
+        self._score_tag = Some(new_value.to_string());
+        self
+    }
+    /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
+    pub fn language(mut self, new_value: &str) -> ScoreSubmitCall<'a, C, A> {
+        self._language = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ScoreSubmitCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreSubmitCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreSubmitCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Submits multiple scores to leaderboards.
+///
+/// A builder for the *submitMultiple* method supported by a *score* resource.
+/// It is not used directly, but through a `ScoreMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_games1 as games1;
+/// use games1::PlayerScoreSubmissionList;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use games1::Games;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Games::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = PlayerScoreSubmissionList::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.scores().submit_multiple(req)
+///              .language("ea")
+///              .doit();
+/// # }
+/// ```
+pub struct ScoreSubmitMultipleCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Games<C, A>,
+    _request: PlayerScoreSubmissionList,
+    _language: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ScoreSubmitMultipleCall<'a, C, A> {}
+
+impl<'a, C, A> ScoreSubmitMultipleCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, PlayerScoreListResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "games.scores.submitMultiple",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        if let Some(value) = self._language {
+            params.push(("language", value.to_string()));
+        }
+        for &field in ["alt", "language"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "leaderboards/scores";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: PlayerScoreSubmissionList) -> ScoreSubmitMultipleCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
+    pub fn language(mut self, new_value: &str) -> ScoreSubmitMultipleCall<'a, C, A> {
+        self._language = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ScoreSubmitMultipleCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreSubmitMultipleCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreSubmitMultipleCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists the scores in a leaderboard around (and including) a player's score.
+///
+/// A builder for the *listWindow* method supported by a *score* resource.
+/// It is not used directly, but through a `ScoreMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_games1 as games1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use games1::Games;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Games::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.scores().list_window("leaderboardId", "collection", "timeSpan")
+///              .return_top_if_absent(true)
+///              .results_above(-23)
+///              .page_token("consetetur")
+///              .max_results(-52)
+///              .language("voluptua.")
+///              .doit();
+/// # }
+/// ```
+pub struct ScoreListWindowCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Games<C, A>,
+    _leaderboard_id: String,
+    _collection: String,
+    _time_span: String,
+    _return_top_if_absent: Option<bool>,
+    _results_above: Option<i32>,
+    _page_token: Option<String>,
+    _max_results: Option<i32>,
+    _language: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ScoreListWindowCall<'a, C, A> {}
+
+impl<'a, C, A> ScoreListWindowCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, LeaderboardScores)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "games.scores.listWindow",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
+        params.push(("leaderboardId", self._leaderboard_id.to_string()));
+        params.push(("collection", self._collection.to_string()));
+        params.push(("timeSpan", self._time_span.to_string()));
+        if let Some(value) = self._return_top_if_absent {
+            params.push(("returnTopIfAbsent", value.to_string()));
+        }
+        if let Some(value) = self._results_above {
+            params.push(("resultsAbove", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        if let Some(value) = self._language {
+            params.push(("language", value.to_string()));
+        }
+        for &field in ["alt", "leaderboardId", "collection", "timeSpan", "returnTopIfAbsent", "resultsAbove", "pageToken", "maxResults", "language"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "leaderboards/{leaderboardId}/window/{collection}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{leaderboardId}", "leaderboardId"), ("{collection}", "collection")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["collection", "leaderboardId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the leaderboard.
+    ///
+    /// Sets the *leaderboard id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, A> {
+        self._leaderboard_id = new_value.to_string();
+        self
+    }
+    /// The collection of scores you're requesting.
+    ///
+    /// Sets the *collection* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn collection(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, A> {
+        self._collection = new_value.to_string();
+        self
+    }
+    /// The time span for the scores and ranks you're requesting.
+    ///
+    /// Sets the *time span* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn time_span(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, A> {
+        self._time_span = new_value.to_string();
+        self
+    }
+    /// True if the top scores should be returned when the player is not in the leaderboard. Defaults to true.
+    ///
+    /// Sets the *return top if absent* query property to the given value.
+    pub fn return_top_if_absent(mut self, new_value: bool) -> ScoreListWindowCall<'a, C, A> {
+        self._return_top_if_absent = Some(new_value);
+        self
+    }
+    /// The preferred number of scores to return above the player's score. More scores may be returned if the player is at the bottom of the leaderboard; fewer may be returned if the player is at the top. Must be less than or equal to maxResults.
+    ///
+    /// Sets the *results above* query property to the given value.
+    pub fn results_above(mut self, new_value: i32) -> ScoreListWindowCall<'a, C, A> {
+        self._results_above = Some(new_value);
+        self
+    }
+    /// The token returned by the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of leaderboard scores to return in the response. For any response, the actual number of leaderboard scores returned may be less than the specified maxResults.
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: i32) -> ScoreListWindowCall<'a, C, A> {
+        self._max_results = Some(new_value);
+        self
+    }
+    /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
+    pub fn language(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, A> {
+        self._language = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ScoreListWindowCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreListWindowCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreListWindowCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8429,7 +9052,7 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.snapshots().get("snapshotId")
-///              .language("et")
+///              .language("gubergren")
 ///              .doit();
 /// # }
 /// ```
@@ -8681,9 +9304,9 @@ impl<'a, C, A> SnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.snapshots().list("playerId")
-///              .page_token("et")
-///              .max_results(-40)
-///              .language("sanctus")
+///              .page_token("sit")
+///              .max_results(-26)
+///              .language("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -9186,11 +9809,11 @@ impl<'a, C, A> TurnBasedMatcheDismisCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().sync()
-///              .page_token("amet")
-///              .max_results(-23)
-///              .max_completed_matches(-45)
-///              .language("ut")
-///              .include_match_data(true)
+///              .page_token("consetetur")
+///              .max_results(-44)
+///              .max_completed_matches(-76)
+///              .language("sadipscing")
+///              .include_match_data(false)
 ///              .doit();
 /// # }
 /// ```
@@ -9453,7 +10076,7 @@ impl<'a, C, A> TurnBasedMatcheSyncCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().decline("matchId")
-///              .language("dolor")
+///              .language("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -9705,7 +10328,7 @@ impl<'a, C, A> TurnBasedMatcheDeclineCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().get("matchId")
-///              .language("dolor")
+///              .language("aliquyam")
 ///              .include_match_data(true)
 ///              .doit();
 /// # }
@@ -9930,6 +10553,289 @@ impl<'a, C, A> TurnBasedMatcheGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> TurnBasedMatcheGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Finish a turn-based match. Each player should make this call once, after all results are in. Only the player whose turn it is may make the first call to Finish, and can pass in the final match state.
+///
+/// A builder for the *finish* method supported by a *turnBasedMatche* resource.
+/// It is not used directly, but through a `TurnBasedMatcheMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_games1 as games1;
+/// use games1::TurnBasedMatchResults;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use games1::Games;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Games::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = TurnBasedMatchResults::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.turn_based_matches().finish(req, "matchId")
+///              .language("clita")
+///              .doit();
+/// # }
+/// ```
+pub struct TurnBasedMatcheFinishCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Games<C, A>,
+    _request: TurnBasedMatchResults,
+    _match_id: String,
+    _language: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for TurnBasedMatcheFinishCall<'a, C, A> {}
+
+impl<'a, C, A> TurnBasedMatcheFinishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, TurnBasedMatch)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "games.turnBasedMatches.finish",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("matchId", self._match_id.to_string()));
+        if let Some(value) = self._language {
+            params.push(("language", value.to_string()));
+        }
+        for &field in ["alt", "matchId", "language"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "turnbasedmatches/{matchId}/finish";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{matchId}", "matchId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["matchId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: TurnBasedMatchResults) -> TurnBasedMatcheFinishCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the match.
+    ///
+    /// Sets the *match id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheFinishCall<'a, C, A> {
+        self._match_id = new_value.to_string();
+        self
+    }
+    /// The preferred language to use for strings returned by this method.
+    ///
+    /// Sets the *language* query property to the given value.
+    pub fn language(mut self, new_value: &str) -> TurnBasedMatcheFinishCall<'a, C, A> {
+        self._language = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> TurnBasedMatcheFinishCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheFinishCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> TurnBasedMatcheFinishCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10219,7 +11125,7 @@ impl<'a, C, A> TurnBasedMatcheCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().join("matchId")
-///              .language("voluptua.")
+///              .language("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -10470,9 +11376,9 @@ impl<'a, C, A> TurnBasedMatcheJoinCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.turn_based_matches().leave_turn("matchId", -11)
-///              .pending_participant_id("justo")
-///              .language("sit")
+/// let result = hub.turn_based_matches().leave_turn("matchId", -7)
+///              .pending_participant_id("takimata")
+///              .language("At")
 ///              .doit();
 /// # }
 /// ```
@@ -10948,289 +11854,6 @@ impl<'a, C, A> TurnBasedMatcheCancelCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Finish a turn-based match. Each player should make this call once, after all results are in. Only the player whose turn it is may make the first call to Finish, and can pass in the final match state.
-///
-/// A builder for the *finish* method supported by a *turnBasedMatche* resource.
-/// It is not used directly, but through a `TurnBasedMatcheMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_games1 as games1;
-/// use games1::TurnBasedMatchResults;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use games1::Games;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Games::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = TurnBasedMatchResults::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.turn_based_matches().finish(req, "matchId")
-///              .language("rebum.")
-///              .doit();
-/// # }
-/// ```
-pub struct TurnBasedMatcheFinishCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Games<C, A>,
-    _request: TurnBasedMatchResults,
-    _match_id: String,
-    _language: Option<String>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for TurnBasedMatcheFinishCall<'a, C, A> {}
-
-impl<'a, C, A> TurnBasedMatcheFinishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, TurnBasedMatch)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "games.turnBasedMatches.finish",
-                               http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("matchId", self._match_id.to_string()));
-        if let Some(value) = self._language {
-            params.push(("language", value.to_string()));
-        }
-        for &field in ["alt", "matchId", "language"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "turnbasedmatches/{matchId}/finish";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{matchId}", "matchId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["matchId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TurnBasedMatchResults) -> TurnBasedMatcheFinishCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the match.
-    ///
-    /// Sets the *match id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheFinishCall<'a, C, A> {
-        self._match_id = new_value.to_string();
-        self
-    }
-    /// The preferred language to use for strings returned by this method.
-    ///
-    /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> TurnBasedMatcheFinishCall<'a, C, A> {
-        self._language = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> TurnBasedMatcheFinishCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheFinishCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TurnBasedMatcheFinishCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Leave a turn-based match when it is not the current player's turn, without canceling the match.
 ///
 /// A builder for the *leave* method supported by a *turnBasedMatche* resource.
@@ -11259,7 +11882,7 @@ impl<'a, C, A> TurnBasedMatcheFinishCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().leave("matchId")
-///              .language("sadipscing")
+///              .language("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -11511,11 +12134,11 @@ impl<'a, C, A> TurnBasedMatcheLeaveCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().list()
-///              .page_token("vero")
-///              .max_results(-95)
-///              .max_completed_matches(-88)
-///              .language("consetetur")
-///              .include_match_data(false)
+///              .page_token("sadipscing")
+///              .max_results(-66)
+///              .max_completed_matches(-33)
+///              .language("nonumy")
+///              .include_match_data(true)
 ///              .doit();
 /// # }
 /// ```
@@ -11784,7 +12407,7 @@ impl<'a, C, A> TurnBasedMatcheListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().take_turn(req, "matchId")
-///              .language("aliquyam")
+///              .language("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -12061,8 +12684,8 @@ impl<'a, C, A> TurnBasedMatcheTakeTurnCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().rematch("matchId")
-///              .request_id("et")
-///              .language("clita")
+///              .request_id("consetetur")
+///              .language("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -12565,8 +13188,8 @@ impl<'a, C, A> ApplicationVerifyCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.applications().get("applicationId")
-///              .platform_type("nonumy")
-///              .language("kasd")
+///              .platform_type("gubergren")
+///              .language("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -12829,7 +13452,7 @@ impl<'a, C, A> ApplicationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.applications().played()
-///              .builtin_game_id("sanctus")
+///              .builtin_game_id("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -13037,7 +13660,7 @@ impl<'a, C, A> ApplicationPlayedCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().get("roomId")
-///              .language("At")
+///              .language("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -13295,7 +13918,7 @@ impl<'a, C, A> RoomGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().leave(req, "roomId")
-///              .language("invidunt")
+///              .language("ipsum")
 ///              .doit();
 /// # }
 /// ```
@@ -13572,9 +14195,9 @@ impl<'a, C, A> RoomLeaveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().list()
-///              .page_token("ea")
-///              .max_results(-95)
-///              .language("rebum.")
+///              .page_token("aliquyam")
+///              .max_results(-69)
+///              .language("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -13821,7 +14444,7 @@ impl<'a, C, A> RoomListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().report_status(req, "roomId")
-///              .language("nonumy")
+///              .language("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -14104,7 +14727,7 @@ impl<'a, C, A> RoomReportStatuCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().create(req)
-///              .language("sed")
+///              .language("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -14348,7 +14971,7 @@ impl<'a, C, A> RoomCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().decline("roomId")
-///              .language("sit")
+///              .language("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -14835,7 +15458,7 @@ impl<'a, C, A> RoomDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().join(req, "roomId")
-///              .language("labore")
+///              .language("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -15084,286 +15707,10 @@ impl<'a, C, A> RoomJoinCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 }
 
 
-/// Submits a score to the specified leaderboard.
+/// Lists all the achievement definitions for your application.
 ///
-/// A builder for the *submit* method supported by a *score* resource.
-/// It is not used directly, but through a `ScoreMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_games1 as games1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use games1::Games;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Games::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.scores().submit("leaderboardId", "score")
-///              .score_tag("gubergren")
-///              .language("aliquyam")
-///              .doit();
-/// # }
-/// ```
-pub struct ScoreSubmitCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Games<C, A>,
-    _leaderboard_id: String,
-    _score: String,
-    _score_tag: Option<String>,
-    _language: Option<String>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ScoreSubmitCall<'a, C, A> {}
-
-impl<'a, C, A> ScoreSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, PlayerScoreResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "games.scores.submit",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("leaderboardId", self._leaderboard_id.to_string()));
-        params.push(("score", self._score.to_string()));
-        if let Some(value) = self._score_tag {
-            params.push(("scoreTag", value.to_string()));
-        }
-        if let Some(value) = self._language {
-            params.push(("language", value.to_string()));
-        }
-        for &field in ["alt", "leaderboardId", "score", "scoreTag", "language"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "leaderboards/{leaderboardId}/scores";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{leaderboardId}", "leaderboardId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["leaderboardId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the leaderboard.
-    ///
-    /// Sets the *leaderboard id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreSubmitCall<'a, C, A> {
-        self._leaderboard_id = new_value.to_string();
-        self
-    }
-    /// The score you're submitting. The submitted score is ignored if it is worse than a previously submitted score, where worse depends on the leaderboard sort order. The meaning of the score value depends on the leaderboard format type. For fixed-point, the score represents the raw value. For time, the score represents elapsed time in milliseconds. For currency, the score represents a value in micro units.
-    ///
-    /// Sets the *score* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn score(mut self, new_value: &str) -> ScoreSubmitCall<'a, C, A> {
-        self._score = new_value.to_string();
-        self
-    }
-    /// Additional information about the score you're submitting. Values must contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
-    ///
-    /// Sets the *score tag* query property to the given value.
-    pub fn score_tag(mut self, new_value: &str) -> ScoreSubmitCall<'a, C, A> {
-        self._score_tag = Some(new_value.to_string());
-        self
-    }
-    /// The preferred language to use for strings returned by this method.
-    ///
-    /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> ScoreSubmitCall<'a, C, A> {
-        self._language = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ScoreSubmitCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreSubmitCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreSubmitCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Lists the scores in a leaderboard, starting from the top.
-///
-/// A builder for the *list* method supported by a *score* resource.
-/// It is not used directly, but through a `ScoreMethods` instance.
+/// A builder for the *list* method supported by a *achievementDefinition* resource.
+/// It is not used directly, but through a `AchievementDefinitionMethods` instance.
 ///
 /// # Example
 ///
@@ -15387,20 +15734,17 @@ impl<'a, C, A> ScoreSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.scores().list("leaderboardId", "collection", "timeSpan")
-///              .page_token("labore")
-///              .max_results(-54)
-///              .language("aliquyam")
+/// let result = hub.achievement_definitions().list()
+///              .page_token("justo")
+///              .max_results(-57)
+///              .language("clita")
 ///              .doit();
 /// # }
 /// ```
-pub struct ScoreListCall<'a, C, A>
+pub struct AchievementDefinitionListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Games<C, A>,
-    _leaderboard_id: String,
-    _collection: String,
-    _time_span: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
@@ -15409,13 +15753,13 @@ pub struct ScoreListCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ScoreListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for AchievementDefinitionListCall<'a, C, A> {}
 
-impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, LeaderboardScores)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, AchievementDefinitionsListResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -15423,12 +15767,9 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "games.scores.list",
+        dlg.begin(MethodInfo { id: "games.achievementDefinitions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
-        params.push(("leaderboardId", self._leaderboard_id.to_string()));
-        params.push(("collection", self._collection.to_string()));
-        params.push(("timeSpan", self._time_span.to_string()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -15438,7 +15779,7 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        for &field in ["alt", "leaderboardId", "collection", "timeSpan", "pageToken", "maxResults", "language"].iter() {
+        for &field in ["alt", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15450,32 +15791,11 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "leaderboards/{leaderboardId}/scores/{collection}";
+        let mut url = self.hub._base_url.clone() + "achievements";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{leaderboardId}", "leaderboardId"), ("{collection}", "collection")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["collection", "leaderboardId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
@@ -15550,54 +15870,24 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// The ID of the leaderboard.
-    ///
-    /// Sets the *leaderboard id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreListCall<'a, C, A> {
-        self._leaderboard_id = new_value.to_string();
-        self
-    }
-    /// The collection of scores you're requesting.
-    ///
-    /// Sets the *collection* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn collection(mut self, new_value: &str) -> ScoreListCall<'a, C, A> {
-        self._collection = new_value.to_string();
-        self
-    }
-    /// The time span for the scores and ranks you're requesting.
-    ///
-    /// Sets the *time span* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn time_span(mut self, new_value: &str) -> ScoreListCall<'a, C, A> {
-        self._time_span = new_value.to_string();
-        self
-    }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ScoreListCall<'a, C, A> {
+    pub fn page_token(mut self, new_value: &str) -> AchievementDefinitionListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The maximum number of leaderboard scores to return in the response. For any response, the actual number of leaderboard scores returned may be less than the specified maxResults.
+    /// The maximum number of achievement resources to return in the response, used for paging. For any response, the actual number of achievement resources returned may be less than the specified maxResults.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> ScoreListCall<'a, C, A> {
+    pub fn max_results(mut self, new_value: i32) -> AchievementDefinitionListCall<'a, C, A> {
         self._max_results = Some(new_value);
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> ScoreListCall<'a, C, A> {
+    pub fn language(mut self, new_value: &str) -> AchievementDefinitionListCall<'a, C, A> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -15607,7 +15897,7 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ScoreListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AchievementDefinitionListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15628,7 +15918,7 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementDefinitionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15648,894 +15938,7 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Get high scores, and optionally ranks, in leaderboards for the currently authenticated player. For a specific time span, leaderboardId can be set to ALL to retrieve data for all leaderboards in a given time span.
-/// NOTE: You cannot ask for 'ALL' leaderboards and 'ALL' timeSpans in the same request; only one parameter may be set to 'ALL'.
-///
-/// A builder for the *get* method supported by a *score* resource.
-/// It is not used directly, but through a `ScoreMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_games1 as games1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use games1::Games;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Games::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.scores().get("playerId", "leaderboardId", "timeSpan")
-///              .page_token("ut")
-///              .max_results(-70)
-///              .language("est")
-///              .include_rank_type("amet")
-///              .doit();
-/// # }
-/// ```
-pub struct ScoreGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Games<C, A>,
-    _player_id: String,
-    _leaderboard_id: String,
-    _time_span: String,
-    _page_token: Option<String>,
-    _max_results: Option<i32>,
-    _language: Option<String>,
-    _include_rank_type: Option<String>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ScoreGetCall<'a, C, A> {}
-
-impl<'a, C, A> ScoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, PlayerLeaderboardScoreListResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "games.scores.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
-        params.push(("playerId", self._player_id.to_string()));
-        params.push(("leaderboardId", self._leaderboard_id.to_string()));
-        params.push(("timeSpan", self._time_span.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._language {
-            params.push(("language", value.to_string()));
-        }
-        if let Some(value) = self._include_rank_type {
-            params.push(("includeRankType", value.to_string()));
-        }
-        for &field in ["alt", "playerId", "leaderboardId", "timeSpan", "pageToken", "maxResults", "language", "includeRankType"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "players/{playerId}/leaderboards/{leaderboardId}/scores/{timeSpan}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{playerId}", "playerId"), ("{leaderboardId}", "leaderboardId"), ("{timeSpan}", "timeSpan")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["timeSpan", "leaderboardId", "playerId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// A player ID. A value of me may be used in place of the authenticated player's ID.
-    ///
-    /// Sets the *player id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn player_id(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
-        self._player_id = new_value.to_string();
-        self
-    }
-    /// The ID of the leaderboard. Can be set to 'ALL' to retrieve data for all leaderboards for this application.
-    ///
-    /// Sets the *leaderboard id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
-        self._leaderboard_id = new_value.to_string();
-        self
-    }
-    /// The time span for the scores and ranks you're requesting.
-    ///
-    /// Sets the *time span* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn time_span(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
-        self._time_span = new_value.to_string();
-        self
-    }
-    /// The token returned by the previous request.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// The maximum number of leaderboard scores to return in the response. For any response, the actual number of leaderboard scores returned may be less than the specified maxResults.
-    ///
-    /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> ScoreGetCall<'a, C, A> {
-        self._max_results = Some(new_value);
-        self
-    }
-    /// The preferred language to use for strings returned by this method.
-    ///
-    /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
-        self._language = Some(new_value.to_string());
-        self
-    }
-    /// The types of ranks to return. If the parameter is omitted, no ranks will be returned.
-    ///
-    /// Sets the *include rank type* query property to the given value.
-    pub fn include_rank_type(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
-        self._include_rank_type = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ScoreGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Submits multiple scores to leaderboards.
-///
-/// A builder for the *submitMultiple* method supported by a *score* resource.
-/// It is not used directly, but through a `ScoreMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_games1 as games1;
-/// use games1::PlayerScoreSubmissionList;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use games1::Games;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Games::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = PlayerScoreSubmissionList::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.scores().submit_multiple(req)
-///              .language("accusam")
-///              .doit();
-/// # }
-/// ```
-pub struct ScoreSubmitMultipleCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Games<C, A>,
-    _request: PlayerScoreSubmissionList,
-    _language: Option<String>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ScoreSubmitMultipleCall<'a, C, A> {}
-
-impl<'a, C, A> ScoreSubmitMultipleCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, PlayerScoreListResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "games.scores.submitMultiple",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        if let Some(value) = self._language {
-            params.push(("language", value.to_string()));
-        }
-        for &field in ["alt", "language"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "leaderboards/scores";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PlayerScoreSubmissionList) -> ScoreSubmitMultipleCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The preferred language to use for strings returned by this method.
-    ///
-    /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> ScoreSubmitMultipleCall<'a, C, A> {
-        self._language = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ScoreSubmitMultipleCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreSubmitMultipleCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreSubmitMultipleCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Lists the scores in a leaderboard around (and including) a player's score.
-///
-/// A builder for the *listWindow* method supported by a *score* resource.
-/// It is not used directly, but through a `ScoreMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_games1 as games1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use games1::Games;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Games::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.scores().list_window("leaderboardId", "collection", "timeSpan")
-///              .return_top_if_absent(false)
-///              .results_above(-63)
-///              .page_token("invidunt")
-///              .max_results(-87)
-///              .language("dolores")
-///              .doit();
-/// # }
-/// ```
-pub struct ScoreListWindowCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Games<C, A>,
-    _leaderboard_id: String,
-    _collection: String,
-    _time_span: String,
-    _return_top_if_absent: Option<bool>,
-    _results_above: Option<i32>,
-    _page_token: Option<String>,
-    _max_results: Option<i32>,
-    _language: Option<String>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ScoreListWindowCall<'a, C, A> {}
-
-impl<'a, C, A> ScoreListWindowCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, LeaderboardScores)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "games.scores.listWindow",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
-        params.push(("leaderboardId", self._leaderboard_id.to_string()));
-        params.push(("collection", self._collection.to_string()));
-        params.push(("timeSpan", self._time_span.to_string()));
-        if let Some(value) = self._return_top_if_absent {
-            params.push(("returnTopIfAbsent", value.to_string()));
-        }
-        if let Some(value) = self._results_above {
-            params.push(("resultsAbove", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._language {
-            params.push(("language", value.to_string()));
-        }
-        for &field in ["alt", "leaderboardId", "collection", "timeSpan", "returnTopIfAbsent", "resultsAbove", "pageToken", "maxResults", "language"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "leaderboards/{leaderboardId}/window/{collection}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{leaderboardId}", "leaderboardId"), ("{collection}", "collection")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["collection", "leaderboardId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the leaderboard.
-    ///
-    /// Sets the *leaderboard id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, A> {
-        self._leaderboard_id = new_value.to_string();
-        self
-    }
-    /// The collection of scores you're requesting.
-    ///
-    /// Sets the *collection* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn collection(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, A> {
-        self._collection = new_value.to_string();
-        self
-    }
-    /// The time span for the scores and ranks you're requesting.
-    ///
-    /// Sets the *time span* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn time_span(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, A> {
-        self._time_span = new_value.to_string();
-        self
-    }
-    /// True if the top scores should be returned when the player is not in the leaderboard. Defaults to true.
-    ///
-    /// Sets the *return top if absent* query property to the given value.
-    pub fn return_top_if_absent(mut self, new_value: bool) -> ScoreListWindowCall<'a, C, A> {
-        self._return_top_if_absent = Some(new_value);
-        self
-    }
-    /// The preferred number of scores to return above the player's score. More scores may be returned if the player is at the bottom of the leaderboard; fewer may be returned if the player is at the top. Must be less than or equal to maxResults.
-    ///
-    /// Sets the *results above* query property to the given value.
-    pub fn results_above(mut self, new_value: i32) -> ScoreListWindowCall<'a, C, A> {
-        self._results_above = Some(new_value);
-        self
-    }
-    /// The token returned by the previous request.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// The maximum number of leaderboard scores to return in the response. For any response, the actual number of leaderboard scores returned may be less than the specified maxResults.
-    ///
-    /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> ScoreListWindowCall<'a, C, A> {
-        self._max_results = Some(new_value);
-        self
-    }
-    /// The preferred language to use for strings returned by this method.
-    ///
-    /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, A> {
-        self._language = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ScoreListWindowCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreListWindowCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreListWindowCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementDefinitionListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17001,230 +16404,6 @@ impl<'a, C, A> PushtokenUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Checks whether the games client is out of date.
-///
-/// A builder for the *check* method supported by a *revision* resource.
-/// It is not used directly, but through a `RevisionMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_games1 as games1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use games1::Games;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Games::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.revisions().check("clientRevision")
-///              .doit();
-/// # }
-/// ```
-pub struct RevisionCheckCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Games<C, A>,
-    _client_revision: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for RevisionCheckCall<'a, C, A> {}
-
-impl<'a, C, A> RevisionCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, RevisionCheckResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "games.revisions.check",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("clientRevision", self._client_revision.to_string()));
-        for &field in ["alt", "clientRevision"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "revisions/check";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The revision of the client SDK used by your application. Format:
-    /// [PLATFORM_TYPE]:[VERSION_NUMBER]. Possible values of PLATFORM_TYPE are:
-    ///  
-    /// - "ANDROID" - Client is running the Android SDK. 
-    /// - "IOS" - Client is running the iOS SDK. 
-    /// - "WEB_APP" - Client is running as a Web App.
-    ///
-    /// Sets the *client revision* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn client_revision(mut self, new_value: &str) -> RevisionCheckCall<'a, C, A> {
-        self._client_revision = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RevisionCheckCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> RevisionCheckCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionCheckCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Returns a list of the event definitions in this application.
 ///
 /// A builder for the *listDefinitions* method supported by a *event* resource.
@@ -17253,9 +16432,9 @@ impl<'a, C, A> RevisionCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().list_definitions()
-///              .page_token("voluptua.")
-///              .max_results(-19)
-///              .language("sed")
+///              .page_token("invidunt")
+///              .max_results(-87)
+///              .language("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -17502,7 +16681,7 @@ impl<'a, C, A> EventListDefinitionCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().record(req)
-///              .language("aliquyam")
+///              .language("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -17746,9 +16925,9 @@ impl<'a, C, A> EventRecordCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().list_by_player()
-///              .page_token("ea")
-///              .max_results(-17)
-///              .language("et")
+///              .page_token("voluptua.")
+///              .max_results(-19)
+///              .language("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -17961,263 +17140,10 @@ impl<'a, C, A> EventListByPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Report that a reward for the milestone corresponding to milestoneId for the quest corresponding to questId has been claimed by the currently authorized user.
+/// Checks whether the games client is out of date.
 ///
-/// A builder for the *claim* method supported by a *questMilestone* resource.
-/// It is not used directly, but through a `QuestMilestoneMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_games1 as games1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use games1::Games;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Games::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.quest_milestones().claim("questId", "milestoneId", "requestId")
-///              .doit();
-/// # }
-/// ```
-pub struct QuestMilestoneClaimCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Games<C, A>,
-    _quest_id: String,
-    _milestone_id: String,
-    _request_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for QuestMilestoneClaimCall<'a, C, A> {}
-
-impl<'a, C, A> QuestMilestoneClaimCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "games.questMilestones.claim",
-                               http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("questId", self._quest_id.to_string()));
-        params.push(("milestoneId", self._milestone_id.to_string()));
-        params.push(("requestId", self._request_id.to_string()));
-        for &field in ["questId", "milestoneId", "requestId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = self.hub._base_url.clone() + "quests/{questId}/milestones/{milestoneId}/claim";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{questId}", "questId"), ("{milestoneId}", "milestoneId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["milestoneId", "questId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the quest.
-    ///
-    /// Sets the *quest id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn quest_id(mut self, new_value: &str) -> QuestMilestoneClaimCall<'a, C, A> {
-        self._quest_id = new_value.to_string();
-        self
-    }
-    /// The ID of the milestone.
-    ///
-    /// Sets the *milestone id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn milestone_id(mut self, new_value: &str) -> QuestMilestoneClaimCall<'a, C, A> {
-        self._milestone_id = new_value.to_string();
-        self
-    }
-    /// A numeric ID to ensure that the request is handled correctly across retries. Your client application must generate this ID randomly.
-    ///
-    /// Sets the *request id* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request_id(mut self, new_value: &str) -> QuestMilestoneClaimCall<'a, C, A> {
-        self._request_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> QuestMilestoneClaimCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> QuestMilestoneClaimCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> QuestMilestoneClaimCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Lists all the achievement definitions for your application.
-///
-/// A builder for the *list* method supported by a *achievementDefinition* resource.
-/// It is not used directly, but through a `AchievementDefinitionMethods` instance.
+/// A builder for the *check* method supported by a *revision* resource.
+/// It is not used directly, but through a `RevisionMethods` instance.
 ///
 /// # Example
 ///
@@ -18241,32 +17167,27 @@ impl<'a, C, A> QuestMilestoneClaimCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.achievement_definitions().list()
-///              .page_token("invidunt")
-///              .max_results(-15)
-///              .language("Lorem")
+/// let result = hub.revisions().check("clientRevision")
 ///              .doit();
 /// # }
 /// ```
-pub struct AchievementDefinitionListCall<'a, C, A>
+pub struct RevisionCheckCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Games<C, A>,
-    _page_token: Option<String>,
-    _max_results: Option<i32>,
-    _language: Option<String>,
+    _client_revision: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for AchievementDefinitionListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for RevisionCheckCall<'a, C, A> {}
 
-impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> RevisionCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, AchievementDefinitionsListResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, RevisionCheckResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -18274,19 +17195,11 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "games.achievementDefinitions.list",
+        dlg.begin(MethodInfo { id: "games.revisions.check",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._language {
-            params.push(("language", value.to_string()));
-        }
-        for &field in ["alt", "pageToken", "maxResults", "language"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("clientRevision", self._client_revision.to_string()));
+        for &field in ["alt", "clientRevision"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -18298,7 +17211,7 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "achievements";
+        let mut url = self.hub._base_url.clone() + "revisions/check";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -18377,25 +17290,19 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// The token returned by the previous request.
+    /// The revision of the client SDK used by your application. Format:
+    /// [PLATFORM_TYPE]:[VERSION_NUMBER]. Possible values of PLATFORM_TYPE are:
+    ///  
+    /// - "ANDROID" - Client is running the Android SDK. 
+    /// - "IOS" - Client is running the iOS SDK. 
+    /// - "WEB_APP" - Client is running as a Web App.
     ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AchievementDefinitionListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// The maximum number of achievement resources to return in the response, used for paging. For any response, the actual number of achievement resources returned may be less than the specified maxResults.
+    /// Sets the *client revision* query property to the given value.
     ///
-    /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> AchievementDefinitionListCall<'a, C, A> {
-        self._max_results = Some(new_value);
-        self
-    }
-    /// The preferred language to use for strings returned by this method.
-    ///
-    /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> AchievementDefinitionListCall<'a, C, A> {
-        self._language = Some(new_value.to_string());
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn client_revision(mut self, new_value: &str) -> RevisionCheckCall<'a, C, A> {
+        self._client_revision = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -18404,7 +17311,7 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AchievementDefinitionListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> RevisionCheckCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18425,7 +17332,7 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementDefinitionListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> RevisionCheckCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18445,7 +17352,7 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementDefinitionListCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionCheckCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

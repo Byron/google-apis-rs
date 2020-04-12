@@ -246,6 +246,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -259,6 +262,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["options-requested-policy-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1970,7 +1974,9 @@ fn main() {
                   ]),
             ("configs-set-iam-policy",
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
-        existing policy."##),
+        existing policy.
+        
+        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
                     "Details at http://byron.github.io/google-apis-rs/google_runtimeconfig1_beta1_cli/projects_configs-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -2441,7 +2447,7 @@ fn main() {
     
     let mut app = App::new("runtimeconfig1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190624")
+           .version("1.0.13+20200406")
            .about("The Runtime Configurator allows you to dynamically configure and expose variables through Google Cloud Platform. In addition, you can also set Watchers and Waiters that will watch for changes to your data and return based on certain conditions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_runtimeconfig1_beta1_cli")
            .arg(Arg::with_name("url")

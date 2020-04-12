@@ -387,8 +387,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "options.requested-policy-version" => Some(("options.requestedPolicyVersion", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["options", "requested-policy-version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1624,9 +1625,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required.
-        
-        The location name in which the queue will be created.
+                     Some(r##"Required. The location name in which the queue will be created.
         For example: `projects/PROJECT_ID/locations/LOCATION_ID`
         
         The list of allowed locations can be obtained by calling Cloud
@@ -1671,9 +1670,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required.
-        
-        The queue name. For example:
+                     Some(r##"Required. The queue name. For example:
         `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`"##),
                      Some(true),
                      Some(false)),
@@ -1696,9 +1693,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required.
-        
-        The resource name of the queue. For example:
+                     Some(r##"Required. The resource name of the queue. For example:
         `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`"##),
                      Some(true),
                      Some(false)),
@@ -1760,9 +1755,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required.
-        
-        The location name.
+                     Some(r##"Required. The location name.
         For example: `projects/PROJECT_ID/locations/LOCATION_ID`"##),
                      Some(true),
                      Some(false)),
@@ -1851,9 +1844,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required.
-        
-        The queue name. For example:
+                     Some(r##"Required. The queue name. For example:
         `projects/PROJECT_ID/location/LOCATION_ID/queues/QUEUE_ID`"##),
                      Some(true),
                      Some(false)),
@@ -1887,9 +1878,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required.
-        
-        The queue name. For example:
+                     Some(r##"Required. The queue name. For example:
         `projects/PROJECT_ID/location/LOCATION_ID/queues/QUEUE_ID`"##),
                      Some(true),
                      Some(false)),
@@ -1930,9 +1919,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required.
-        
-        The queue name. For example:
+                     Some(r##"Required. The queue name. For example:
         `projects/PROJECT_ID/location/LOCATION_ID/queues/QUEUE_ID`"##),
                      Some(true),
                      Some(false)),
@@ -2004,9 +1991,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required.
-        
-        The queue name. For example:
+                     Some(r##"Required. The queue name. For example:
         `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
         
         The queue must already exist."##),
@@ -2041,9 +2026,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required.
-        
-        The task name. For example:
+                     Some(r##"Required. The task name. For example:
         `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`"##),
                      Some(true),
                      Some(false)),
@@ -2066,9 +2049,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required.
-        
-        The task name. For example:
+                     Some(r##"Required. The task name. For example:
         `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`"##),
                      Some(true),
                      Some(false)),
@@ -2099,9 +2080,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required.
-        
-        The queue name. For example:
+                     Some(r##"Required. The queue name. For example:
         `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`"##),
                      Some(true),
                      Some(false)),
@@ -2147,9 +2126,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required.
-        
-        The task name. For example:
+                     Some(r##"Required. The task name. For example:
         `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`"##),
                      Some(true),
                      Some(false)),
@@ -2213,7 +2190,7 @@ fn main() {
     
     let mut app = App::new("cloudtasks2-beta3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190618")
+           .version("1.0.13+20200331")
            .about("Manages the execution of large numbers of distributed requests.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta3_cli")
            .arg(Arg::with_name("url")

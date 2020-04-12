@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Abusive Experience Report* API at revision *20190624*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Abusive Experience Report* API at revision *20200405*. The CLI is at version *1.0.13*.
 
 ```bash
 abusiveexperiencereport1 [options]
@@ -36,10 +36,6 @@ abusiveexperiencereport1 [options]
   abusiveexperiencereport1 --help
 
 Configuration:
-  [--scope <url>]...
-            Specify the authentication a method should be executed in. Each scope
-            requires the user to grant this application permission to use it.
-            If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.

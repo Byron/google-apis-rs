@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Vision* crate version *1.0.12+20190628*, where *20190628* is the exact revision of the *vision:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Vision* crate version *1.0.13+20200329*, where *20200329* is the exact revision of the *vision:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Vision* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/vision/).
@@ -20,7 +20,7 @@
 //! * [operations](struct.Operation.html)
 //!  * [*cancel*](struct.OperationCancelCall.html), [*delete*](struct.OperationDeleteCall.html), [*get*](struct.OperationGetCall.html) and [*list*](struct.OperationListCall.html)
 //! * projects
-//!  * [*locations operations get*](struct.ProjectLocationOperationGetCall.html), [*locations product sets add product*](struct.ProjectLocationProductSetAddProductCall.html), [*locations product sets create*](struct.ProjectLocationProductSetCreateCall.html), [*locations product sets delete*](struct.ProjectLocationProductSetDeleteCall.html), [*locations product sets get*](struct.ProjectLocationProductSetGetCall.html), [*locations product sets import*](struct.ProjectLocationProductSetImportCall.html), [*locations product sets list*](struct.ProjectLocationProductSetListCall.html), [*locations product sets patch*](struct.ProjectLocationProductSetPatchCall.html), [*locations product sets products list*](struct.ProjectLocationProductSetProductListCall.html), [*locations product sets remove product*](struct.ProjectLocationProductSetRemoveProductCall.html), [*locations products create*](struct.ProjectLocationProductCreateCall.html), [*locations products delete*](struct.ProjectLocationProductDeleteCall.html), [*locations products get*](struct.ProjectLocationProductGetCall.html), [*locations products list*](struct.ProjectLocationProductListCall.html), [*locations products patch*](struct.ProjectLocationProductPatchCall.html), [*locations products reference images create*](struct.ProjectLocationProductReferenceImageCreateCall.html), [*locations products reference images delete*](struct.ProjectLocationProductReferenceImageDeleteCall.html), [*locations products reference images get*](struct.ProjectLocationProductReferenceImageGetCall.html), [*locations products reference images list*](struct.ProjectLocationProductReferenceImageListCall.html) and [*operations get*](struct.ProjectOperationGetCall.html)
+//!  * [*files annotate*](struct.ProjectFileAnnotateCall.html), [*files async batch annotate*](struct.ProjectFileAsyncBatchAnnotateCall.html), [*images annotate*](struct.ProjectImageAnnotateCall.html), [*images async batch annotate*](struct.ProjectImageAsyncBatchAnnotateCall.html), [*locations files annotate*](struct.ProjectLocationFileAnnotateCall.html), [*locations files async batch annotate*](struct.ProjectLocationFileAsyncBatchAnnotateCall.html), [*locations images annotate*](struct.ProjectLocationImageAnnotateCall.html), [*locations images async batch annotate*](struct.ProjectLocationImageAsyncBatchAnnotateCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html), [*locations product sets add product*](struct.ProjectLocationProductSetAddProductCall.html), [*locations product sets create*](struct.ProjectLocationProductSetCreateCall.html), [*locations product sets delete*](struct.ProjectLocationProductSetDeleteCall.html), [*locations product sets get*](struct.ProjectLocationProductSetGetCall.html), [*locations product sets import*](struct.ProjectLocationProductSetImportCall.html), [*locations product sets list*](struct.ProjectLocationProductSetListCall.html), [*locations product sets patch*](struct.ProjectLocationProductSetPatchCall.html), [*locations product sets products list*](struct.ProjectLocationProductSetProductListCall.html), [*locations product sets remove product*](struct.ProjectLocationProductSetRemoveProductCall.html), [*locations products create*](struct.ProjectLocationProductCreateCall.html), [*locations products delete*](struct.ProjectLocationProductDeleteCall.html), [*locations products get*](struct.ProjectLocationProductGetCall.html), [*locations products list*](struct.ProjectLocationProductListCall.html), [*locations products patch*](struct.ProjectLocationProductPatchCall.html), [*locations products purge*](struct.ProjectLocationProductPurgeCall.html), [*locations products reference images create*](struct.ProjectLocationProductReferenceImageCreateCall.html), [*locations products reference images delete*](struct.ProjectLocationProductReferenceImageDeleteCall.html), [*locations products reference images get*](struct.ProjectLocationProductReferenceImageGetCall.html), [*locations products reference images list*](struct.ProjectLocationProductReferenceImageListCall.html) and [*operations get*](struct.ProjectOperationGetCall.html)
 //! 
 //! 
 //! 
@@ -57,11 +57,16 @@
 //! ```ignore
 //! let r = hub.projects().operations_get(...).doit()
 //! let r = hub.operations().list(...).doit()
-//! let r = hub.locations().operations_get(...).doit()
+//! let r = hub.projects().files_async_batch_annotate(...).doit()
 //! let r = hub.images().async_batch_annotate(...).doit()
+//! let r = hub.projects().images_async_batch_annotate(...).doit()
+//! let r = hub.projects().locations_files_async_batch_annotate(...).doit()
 //! let r = hub.operations().cancel(...).doit()
-//! let r = hub.operations().delete(...).doit()
+//! let r = hub.locations().operations_get(...).doit()
 //! let r = hub.files().async_batch_annotate(...).doit()
+//! let r = hub.operations().delete(...).doit()
+//! let r = hub.projects().locations_images_async_batch_annotate(...).doit()
+//! let r = hub.projects().locations_products_purge(...).doit()
 //! let r = hub.operations().get(...).doit()
 //! let r = hub.projects().locations_operations_get(...).doit()
 //! let r = hub.projects().locations_product_sets_import(...).doit()
@@ -344,7 +349,7 @@ impl<'a, C, A> Vision<C, A>
         Vision {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://vision.googleapis.com/".to_string(),
             _root_url: "https://vision.googleapis.com/".to_string(),
         }
@@ -367,7 +372,7 @@ impl<'a, C, A> Vision<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -402,15 +407,30 @@ impl<'a, C, A> Vision<C, A>
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [locations images async batch annotate projects](struct.ProjectLocationImageAsyncBatchAnnotateCall.html) (request)
 /// * [async batch annotate images](struct.ImageAsyncBatchAnnotateCall.html) (request)
+/// * [images async batch annotate projects](struct.ProjectImageAsyncBatchAnnotateCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AsyncBatchAnnotateImagesRequest {
     /// Required. The desired output location and metadata (e.g. format).
     #[serde(rename="outputConfig")]
     pub output_config: Option<OutputConfig>,
-    /// Individual image annotation requests for this batch.
+    /// Required. Individual image annotation requests for this batch.
     pub requests: Option<Vec<AnnotateImageRequest>>,
+    /// Optional. Target project and location to make a call.
+    /// 
+    /// Format: `projects/{project-id}/locations/{location-id}`.
+    /// 
+    /// If no parent is specified, a region will be chosen automatically.
+    /// 
+    /// Supported location-ids:
+    /// `us`: USA country only,
+    /// `asia`: East asia areas, like Japan, Taiwan,
+    /// `eu`: The European Union.
+    /// 
+    /// Example: `projects/project-A/locations/eu`.
+    pub parent: Option<String>,
 }
 
 impl RequestValue for AsyncBatchAnnotateImagesRequest {}
@@ -427,7 +447,7 @@ impl RequestValue for AsyncBatchAnnotateImagesRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AddProductToProductSetRequest {
-    /// The resource name for the Product to be added to this ProductSet.
+    /// Required. The resource name for the Product to be added to this ProductSet.
     /// 
     /// Format is:
     /// `projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`
@@ -525,7 +545,7 @@ pub struct Paragraph {
     pub confidence: Option<f32>,
     /// Additional information detected for the paragraph.
     pub property: Option<TextProperty>,
-    /// List of words in this paragraph.
+    /// List of all words in this paragraph.
     pub words: Option<Vec<Word>>,
 }
 
@@ -540,11 +560,26 @@ impl Part for Paragraph {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [annotate images](struct.ImageAnnotateCall.html) (request)
+/// * [images annotate projects](struct.ProjectImageAnnotateCall.html) (request)
+/// * [locations images annotate projects](struct.ProjectLocationImageAnnotateCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchAnnotateImagesRequest {
-    /// Individual image annotation requests for this batch.
+    /// Required. Individual image annotation requests for this batch.
     pub requests: Option<Vec<AnnotateImageRequest>>,
+    /// Optional. Target project and location to make a call.
+    /// 
+    /// Format: `projects/{project-id}/locations/{location-id}`.
+    /// 
+    /// If no parent is specified, a region will be chosen automatically.
+    /// 
+    /// Supported location-ids:
+    /// `us`: USA country only,
+    /// `asia`: East asia areas, like Japan, Taiwan,
+    /// `eu`: The European Union.
+    /// 
+    /// Example: `projects/project-A/locations/eu`.
+    pub parent: Option<String>,
 }
 
 impl RequestValue for BatchAnnotateImagesRequest {}
@@ -588,6 +623,28 @@ pub struct TextAnnotation {
 impl Part for TextAnnotation {}
 
 
+/// Prediction for what the object in the bounding box is.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ObjectAnnotation {
+    /// The BCP-47 language code, such as "en-US" or "sr-Latn". For more
+    /// information, see
+    /// http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
+    #[serde(rename="languageCode")]
+    pub language_code: Option<String>,
+    /// Score of the result. Range [0, 1].
+    pub score: Option<f32>,
+    /// Object ID that should align with EntityAnnotation mid.
+    pub mid: Option<String>,
+    /// Object name, expressed in its `language_code` language.
+    pub name: Option<String>,
+}
+
+impl Part for ObjectAnnotation {}
+
+
 /// Stores image properties, such as dominant colors.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -609,13 +666,28 @@ impl Part for ImageProperties {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [files annotate projects](struct.ProjectFileAnnotateCall.html) (request)
 /// * [annotate files](struct.FileAnnotateCall.html) (request)
+/// * [locations files annotate projects](struct.ProjectLocationFileAnnotateCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchAnnotateFilesRequest {
-    /// The list of file annotation requests. Right now we support only one
+    /// Required. The list of file annotation requests. Right now we support only one
     /// AnnotateFileRequest in BatchAnnotateFilesRequest.
     pub requests: Option<Vec<AnnotateFileRequest>>,
+    /// Optional. Target project and location to make a call.
+    /// 
+    /// Format: `projects/{project-id}/locations/{location-id}`.
+    /// 
+    /// If no parent is specified, a region will be chosen automatically.
+    /// 
+    /// Supported location-ids:
+    /// `us`: USA country only,
+    /// `asia`: East asia areas, like Japan, Taiwan,
+    /// `eu`: The European Union.
+    /// 
+    /// Example: `projects/project-A/locations/eu`.
+    pub parent: Option<String>,
 }
 
 impl RequestValue for BatchAnnotateFilesRequest {}
@@ -628,6 +700,9 @@ impl RequestValue for BatchAnnotateFilesRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GroupedResult {
+    /// List of generic predictions for the object in the bounding box.
+    #[serde(rename="objectAnnotations")]
+    pub object_annotations: Option<Vec<ObjectAnnotation>>,
     /// List of results, one for each product match.
     pub results: Option<Vec<ResultType>>,
     /// The bounding polygon around the product detected in the query image.
@@ -674,21 +749,6 @@ pub struct ResultType {
 }
 
 impl Part for ResultType {}
-
-
-/// The request message for Operations.CancelOperation.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [cancel operations](struct.OperationCancelCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CancelOperationRequest { _never_set: Option<bool> }
-
-impl RequestValue for CancelOperationRequest {}
 
 
 /// A request to annotate one single file, e.g. a PDF, TIFF or GIF file.
@@ -741,12 +801,12 @@ pub struct ProductSearchParams {
     /// "color: red" is not acceptable because it uses a ':' instead of an '='.
     pub filter: Option<String>,
     /// The list of product categories to search in. Currently, we only consider
-    /// the first category, and either "homegoods-v2", "apparel-v2", or "toys-v2"
-    /// should be specified. The legacy categories "homegoods", "apparel", and
-    /// "toys" are still supported but will be deprecated. For new products, please
-    /// use "homegoods-v2", "apparel-v2", or "toys-v2" for better product search
-    /// accuracy. It is recommended to migrate existing products to these
-    /// categories as well.
+    /// the first category, and either "homegoods-v2", "apparel-v2", "toys-v2",
+    /// "packagedgoods-v1", or "general-v1" should be specified. The legacy
+    /// categories "homegoods", "apparel", and "toys" are still supported but will
+    /// be deprecated. For new products, please use "homegoods-v2", "apparel-v2",
+    /// or "toys-v2" for better product search accuracy. It is recommended to
+    /// migrate existing products to these categories as well.
     #[serde(rename="productCategories")]
     pub product_categories: Option<Vec<String>>,
     /// The resource name of a ProductSet to be searched for similar images.
@@ -756,7 +816,7 @@ pub struct ProductSearchParams {
     #[serde(rename="productSet")]
     pub product_set: Option<String>,
     /// The bounding polygon around the area of interest in the image.
-    /// Optional. If it is not specified, system discretion will be applied.
+    /// If it is not specified, system discretion will be applied.
     #[serde(rename="boundingPoly")]
     pub bounding_poly: Option<BoundingPoly>,
 }
@@ -788,25 +848,6 @@ pub struct Status {
 }
 
 impl Part for Status {}
-
-
-/// A 3D position in the image, used primarily for Face detection landmarks.
-/// A valid Position must have both x and y coordinates.
-/// The position coordinates are in the same scale as the original image.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Position {
-    /// Y coordinate.
-    pub y: Option<f32>,
-    /// X coordinate.
-    pub x: Option<f32>,
-    /// Z coordinate (or depth).
-    pub z: Option<f32>,
-}
-
-impl Part for Position {}
 
 
 /// Additional information detected on the structural component.
@@ -870,6 +911,30 @@ pub struct Block {
 }
 
 impl Part for Block {}
+
+
+/// The type of Google Cloud Vision API detection to perform, and the maximum
+/// number of results to return for that type. Multiple `Feature` objects can
+/// be specified in the `features` list.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Feature {
+    /// Model to use for the feature.
+    /// Supported values: "builtin/stable" (the default if unset) and
+    /// "builtin/latest".
+    pub model: Option<String>,
+    /// The feature type.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Maximum number of results of this type. Does not apply to
+    /// `TEXT_DETECTION`, `DOCUMENT_TEXT_DETECTION`, or `CROP_HINTS`.
+    #[serde(rename="maxResults")]
+    pub max_results: Option<i32>,
+}
+
+impl Part for Feature {}
 
 
 /// Response message for the `ListReferenceImages` method.
@@ -951,28 +1016,23 @@ pub struct NormalizedVertex {
 impl Part for NormalizedVertex {}
 
 
-/// The type of Google Cloud Vision API detection to perform, and the maximum
-/// number of results to return for that type. Multiple `Feature` objects can
-/// be specified in the `features` list.
+/// Request for performing Google Cloud Vision API tasks over a user-provided
+/// image, with user-requested features, and with context information.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Feature {
-    /// Model to use for the feature.
-    /// Supported values: "builtin/stable" (the default if unset) and
-    /// "builtin/latest".
-    pub model: Option<String>,
-    /// The feature type.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// Maximum number of results of this type. Does not apply to
-    /// `TEXT_DETECTION`, `DOCUMENT_TEXT_DETECTION`, or `CROP_HINTS`.
-    #[serde(rename="maxResults")]
-    pub max_results: Option<i32>,
+pub struct AnnotateImageRequest {
+    /// Additional context that may accompany the image.
+    #[serde(rename="imageContext")]
+    pub image_context: Option<ImageContext>,
+    /// The image to be processed.
+    pub image: Option<Image>,
+    /// Requested features.
+    pub features: Option<Vec<Feature>>,
 }
 
-impl Part for Feature {}
+impl Part for AnnotateImageRequest {}
 
 
 /// Set of crop hints that are used to generate new crops when serving images.
@@ -1050,36 +1110,6 @@ pub struct WebDetectionParams {
 impl Part for WebDetectionParams {}
 
 
-/// Set of features pertaining to the image, computed by computer vision
-/// methods over safe-search verticals (for example, adult, spoof, medical,
-/// violence).
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SafeSearchAnnotation {
-    /// Likelihood that this is a medical image.
-    pub medical: Option<String>,
-    /// Likelihood that this image contains violent content.
-    pub violence: Option<String>,
-    /// Spoof likelihood. The likelihood that an modification
-    /// was made to the image's canonical version to make it appear
-    /// funny or offensive.
-    pub spoof: Option<String>,
-    /// Likelihood that the request image contains racy content. Racy content may
-    /// include (but is not limited to) skimpy or sheer clothing, strategically
-    /// covered nudity, lewd or provocative poses, or close-ups of sensitive
-    /// body areas.
-    pub racy: Option<String>,
-    /// Represents the adult content likelihood for the image. Adult content may
-    /// contain elements such as nudity, pornographic images or cartoons, or
-    /// sexual activities.
-    pub adult: Option<String>,
-}
-
-impl Part for SafeSearchAnnotation {}
-
-
 /// Metadata for online images.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1116,7 +1146,11 @@ pub struct Product {
     /// to be supported soon.
     /// 
     /// Multiple values can be assigned to the same key. One product may have up to
-    /// 100 product_labels.
+    /// 500 product_labels.
+    /// 
+    /// Notice that the total number of distinct product_labels over all products
+    /// in one ProductSet cannot exceed 1M, otherwise the product search pipeline
+    /// will refuse to work for that ProductSet.
     #[serde(rename="productLabels")]
     pub product_labels: Option<Vec<KeyValue>>,
     /// The user-provided name for this Product. Must not be empty. Must be at most
@@ -1126,12 +1160,10 @@ pub struct Product {
     /// User-provided metadata to be stored with this product. Must be at most 4096
     /// characters long.
     pub description: Option<String>,
-    /// The category for the product identified by the reference image. This should
+    /// Immutable. The category for the product identified by the reference image. This should
     /// be either "homegoods-v2", "apparel-v2", or "toys-v2". The legacy categories
     /// "homegoods", "apparel", and "toys" are still supported, but these should
     /// not be used for new products.
-    /// 
-    /// This field is immutable.
     #[serde(rename="productCategory")]
     pub product_category: Option<String>,
     /// The resource name of the product.
@@ -1145,6 +1177,67 @@ pub struct Product {
 
 impl RequestValue for Product {}
 impl ResponseResult for Product {}
+
+
+/// Set of features pertaining to the image, computed by computer vision
+/// methods over safe-search verticals (for example, adult, spoof, medical,
+/// violence).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SafeSearchAnnotation {
+    /// Likelihood that this is a medical image.
+    pub medical: Option<String>,
+    /// Likelihood that this image contains violent content.
+    pub violence: Option<String>,
+    /// Spoof likelihood. The likelihood that an modification
+    /// was made to the image's canonical version to make it appear
+    /// funny or offensive.
+    pub spoof: Option<String>,
+    /// Likelihood that the request image contains racy content. Racy content may
+    /// include (but is not limited to) skimpy or sheer clothing, strategically
+    /// covered nudity, lewd or provocative poses, or close-ups of sensitive
+    /// body areas.
+    pub racy: Option<String>,
+    /// Represents the adult content likelihood for the image. Adult content may
+    /// contain elements such as nudity, pornographic images or cartoons, or
+    /// sexual activities.
+    pub adult: Option<String>,
+}
+
+impl Part for SafeSearchAnnotation {}
+
+
+/// The request message for Operations.CancelOperation.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [cancel operations](struct.OperationCancelCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CancelOperationRequest { _never_set: Option<bool> }
+
+impl RequestValue for CancelOperationRequest {}
+
+
+/// Config to control which ProductSet contains the Products to be deleted.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ProductSetPurgeConfig {
+    /// The ProductSet that contains the Products to delete. If a Product is a
+    /// member of product_set_id in addition to other ProductSets, the Product will
+    /// still be deleted.
+    #[serde(rename="productSetId")]
+    pub product_set_id: Option<String>,
+}
+
+impl Part for ProductSetPurgeConfig {}
 
 
 /// Color information consists of RGB channels, score, and the fraction of
@@ -1374,6 +1467,25 @@ pub struct Landmark {
 impl Part for Landmark {}
 
 
+/// A 3D position in the image, used primarily for Face detection landmarks.
+/// A valid Position must have both x and y coordinates.
+/// The position coordinates are in the same scale as the original image.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Position {
+    /// Y coordinate.
+    pub y: Option<f32>,
+    /// X coordinate.
+    pub x: Option<f32>,
+    /// Z coordinate (or depth).
+    pub z: Option<f32>,
+}
+
+impl Part for Position {}
+
+
 /// Request message for the `ImportProductSets` method.
 /// 
 /// # Activities
@@ -1385,7 +1497,7 @@ impl Part for Landmark {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImportProductSetsRequest {
-    /// The input content for the list of requests.
+    /// Required. The input content for the list of requests.
     #[serde(rename="inputConfig")]
     pub input_config: Option<ImportProductSetsInputConfig>,
 }
@@ -1418,11 +1530,16 @@ impl Part for ImportProductSetsInputConfig {}
 /// 
 /// * [operations get projects](struct.ProjectOperationGetCall.html) (response)
 /// * [list operations](struct.OperationListCall.html) (none)
-/// * [operations get locations](struct.LocationOperationGetCall.html) (response)
+/// * [files async batch annotate projects](struct.ProjectFileAsyncBatchAnnotateCall.html) (response)
 /// * [async batch annotate images](struct.ImageAsyncBatchAnnotateCall.html) (response)
+/// * [images async batch annotate projects](struct.ProjectImageAsyncBatchAnnotateCall.html) (response)
+/// * [locations files async batch annotate projects](struct.ProjectLocationFileAsyncBatchAnnotateCall.html) (response)
 /// * [cancel operations](struct.OperationCancelCall.html) (none)
-/// * [delete operations](struct.OperationDeleteCall.html) (none)
+/// * [operations get locations](struct.LocationOperationGetCall.html) (response)
 /// * [async batch annotate files](struct.FileAsyncBatchAnnotateCall.html) (response)
+/// * [delete operations](struct.OperationDeleteCall.html) (none)
+/// * [locations images async batch annotate projects](struct.ProjectLocationImageAsyncBatchAnnotateCall.html) (response)
+/// * [locations products purge projects](struct.ProjectLocationProductPurgeCall.html) (response)
 /// * [get operations](struct.OperationGetCall.html) (response)
 /// * [locations operations get projects](struct.ProjectLocationOperationGetCall.html) (response)
 /// * [locations product sets import projects](struct.ProjectLocationProductSetImportCall.html) (response)
@@ -1544,6 +1661,8 @@ impl Part for ImportProductSetsGcsSource {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [annotate images](struct.ImageAnnotateCall.html) (response)
+/// * [images annotate projects](struct.ProjectImageAnnotateCall.html) (response)
+/// * [locations images annotate projects](struct.ProjectLocationImageAnnotateCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchAnnotateImagesResponse {
@@ -1607,7 +1726,7 @@ impl Part for LatLongRect {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RemoveProductFromProductSetRequest {
-    /// The resource name for the Product to be removed from this ProductSet.
+    /// Required. The resource name for the Product to be removed from this ProductSet.
     /// 
     /// Format is:
     /// `projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`
@@ -1683,7 +1802,9 @@ impl Part for GcsDestination {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [files annotate projects](struct.ProjectFileAnnotateCall.html) (response)
 /// * [annotate files](struct.FileAnnotateCall.html) (response)
+/// * [locations files annotate projects](struct.ProjectLocationFileAnnotateCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchAnnotateFilesResponse {
@@ -1739,12 +1860,27 @@ impl Part for LocationInfo {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [files async batch annotate projects](struct.ProjectFileAsyncBatchAnnotateCall.html) (request)
 /// * [async batch annotate files](struct.FileAsyncBatchAnnotateCall.html) (request)
+/// * [locations files async batch annotate projects](struct.ProjectLocationFileAsyncBatchAnnotateCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AsyncBatchAnnotateFilesRequest {
-    /// Individual async file annotation requests for this batch.
+    /// Required. Individual async file annotation requests for this batch.
     pub requests: Option<Vec<AsyncAnnotateFileRequest>>,
+    /// Optional. Target project and location to make a call.
+    /// 
+    /// Format: `projects/{project-id}/locations/{location-id}`.
+    /// 
+    /// If no parent is specified, a region will be chosen automatically.
+    /// 
+    /// Supported location-ids:
+    /// `us`: USA country only,
+    /// `asia`: East asia areas, like Japan, Taiwan,
+    /// `eu`: The European Union.
+    /// 
+    /// Example: `projects/project-A/locations/eu`.
+    pub parent: Option<String>,
 }
 
 impl RequestValue for AsyncBatchAnnotateFilesRequest {}
@@ -1952,7 +2088,7 @@ pub struct Symbol {
     ///   2----3
     ///   |    |
     ///   1----0
-    ///   and the vertice order will still be (0, 1, 2, 3).
+    ///   and the vertex order will still be (0, 1, 2, 3).
     #[serde(rename="boundingBox")]
     pub bounding_box: Option<BoundingPoly>,
     /// The actual UTF-8 representation of the symbol.
@@ -2058,25 +2194,6 @@ pub struct ListOperationsResponse {
 impl ResponseResult for ListOperationsResponse {}
 
 
-/// Request for performing Google Cloud Vision API tasks over a user-provided
-/// image, with user-requested features, and with context information.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AnnotateImageRequest {
-    /// Additional context that may accompany the image.
-    #[serde(rename="imageContext")]
-    pub image_context: Option<ImageContext>,
-    /// The image to be processed.
-    pub image: Option<Image>,
-    /// Requested features.
-    pub features: Option<Vec<Feature>>,
-}
-
-impl Part for AnnotateImageRequest {}
-
-
 /// Results for a product search request.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2122,47 +2239,30 @@ pub struct CropHint {
 impl Part for CropHint {}
 
 
-/// A `ReferenceImage` represents a product image and its associated metadata,
-/// such as bounding boxes.
+/// Request message for the `PurgeProducts` method.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations products reference images get projects](struct.ProjectLocationProductReferenceImageGetCall.html) (response)
-/// * [locations products reference images create projects](struct.ProjectLocationProductReferenceImageCreateCall.html) (request|response)
+/// * [locations products purge projects](struct.ProjectLocationProductPurgeCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReferenceImage {
-    /// Bounding polygons around the areas of interest in the reference image.
-    /// Optional. If this field is empty, the system will try to detect regions of
-    /// interest. At most 10 bounding polygons will be used.
-    /// 
-    /// The provided shape is converted into a non-rotated rectangle. Once
-    /// converted, the small edge of the rectangle must be greater than or equal
-    /// to 300 pixels. The aspect ratio must be 1:4 or less (i.e. 1:3 is ok; 1:5
-    /// is not).
-    #[serde(rename="boundingPolys")]
-    pub bounding_polys: Option<Vec<BoundingPoly>>,
-    /// The resource name of the reference image.
-    /// 
-    /// Format is:
-    /// 
-    /// `projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID/referenceImages/IMAGE_ID`.
-    /// 
-    /// This field is ignored when creating a reference image.
-    pub name: Option<String>,
-    /// The Google Cloud Storage URI of the reference image.
-    /// 
-    /// The URI must start with `gs://`.
-    /// 
-    /// Required.
-    pub uri: Option<String>,
+pub struct PurgeProductsRequest {
+    /// If delete_orphan_products is true, all Products that are not in any
+    /// ProductSet will be deleted.
+    #[serde(rename="deleteOrphanProducts")]
+    pub delete_orphan_products: Option<bool>,
+    /// The default value is false. Override this value to true to actually perform
+    /// the purge.
+    pub force: Option<bool>,
+    /// Specify which ProductSet contains the Products to be deleted.
+    #[serde(rename="productSetPurgeConfig")]
+    pub product_set_purge_config: Option<ProductSetPurgeConfig>,
 }
 
-impl RequestValue for ReferenceImage {}
-impl ResponseResult for ReferenceImage {}
+impl RequestValue for PurgeProductsRequest {}
 
 
 /// Image context and/or feature-specific parameters.
@@ -2196,6 +2296,47 @@ pub struct ImageContext {
 }
 
 impl Part for ImageContext {}
+
+
+/// A `ReferenceImage` represents a product image and its associated metadata,
+/// such as bounding boxes.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations products reference images get projects](struct.ProjectLocationProductReferenceImageGetCall.html) (response)
+/// * [locations products reference images create projects](struct.ProjectLocationProductReferenceImageCreateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReferenceImage {
+    /// Optional. Bounding polygons around the areas of interest in the reference image.
+    /// If this field is empty, the system will try to detect regions of
+    /// interest. At most 10 bounding polygons will be used.
+    /// 
+    /// The provided shape is converted into a non-rotated rectangle. Once
+    /// converted, the small edge of the rectangle must be greater than or equal
+    /// to 300 pixels. The aspect ratio must be 1:4 or less (i.e. 1:3 is ok; 1:5
+    /// is not).
+    #[serde(rename="boundingPolys")]
+    pub bounding_polys: Option<Vec<BoundingPoly>>,
+    /// The resource name of the reference image.
+    /// 
+    /// Format is:
+    /// 
+    /// `projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID/referenceImages/IMAGE_ID`.
+    /// 
+    /// This field is ignored when creating a reference image.
+    pub name: Option<String>,
+    /// Required. The Google Cloud Storage URI of the reference image.
+    /// 
+    /// The URI must start with `gs://`.
+    pub uri: Option<String>,
+}
+
+impl RequestValue for ReferenceImage {}
+impl ResponseResult for ReferenceImage {}
 
 
 /// Detected page from OCR.
@@ -2487,10 +2628,14 @@ pub struct AnnotateFileResponse {
     /// This field gives the total number of pages in the file.
     #[serde(rename="totalPages")]
     pub total_pages: Option<i32>,
+    /// If set, represents the error message for the failed request. The
+    /// `responses` field will not be set in this case.
+    pub error: Option<Status>,
     /// Information about the file for which this response is generated.
     #[serde(rename="inputConfig")]
     pub input_config: Option<InputConfig>,
-    /// Individual responses to images found within the file.
+    /// Individual responses to images found within the file. This field will be
+    /// empty if the `error` field is set.
     pub responses: Option<Vec<AnnotateImageResponse>>,
 }
 
@@ -2572,16 +2717,15 @@ impl<'a, C, A> OperationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a long-running operation. This method indicates that the client is
-    /// no longer interested in the operation result. It does not cancel the
-    /// operation. If the server doesn't support this method, it returns
-    /// `google.rpc.Code.UNIMPLEMENTED`.
+    /// Gets the latest state of a long-running operation.  Clients can use this
+    /// method to poll the operation result at intervals as recommended by the API
+    /// service.
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the operation resource to be deleted.
-    pub fn delete(&self, name: &str) -> OperationDeleteCall<'a, C, A> {
-        OperationDeleteCall {
+    /// * `name` - The name of the operation resource.
+    pub fn get(&self, name: &str) -> OperationGetCall<'a, C, A> {
+        OperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
             _delegate: Default::default(),
@@ -2592,15 +2736,16 @@ impl<'a, C, A> OperationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the latest state of a long-running operation.  Clients can use this
-    /// method to poll the operation result at intervals as recommended by the API
-    /// service.
+    /// Deletes a long-running operation. This method indicates that the client is
+    /// no longer interested in the operation result. It does not cancel the
+    /// operation. If the server doesn't support this method, it returns
+    /// `google.rpc.Code.UNIMPLEMENTED`.
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the operation resource.
-    pub fn get(&self, name: &str) -> OperationGetCall<'a, C, A> {
-        OperationGetCall {
+    /// * `name` - The name of the operation resource to be deleted.
+    pub fn delete(&self, name: &str) -> OperationDeleteCall<'a, C, A> {
+        OperationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
             _delegate: Default::default(),
@@ -2896,7 +3041,7 @@ impl<'a, C, A> LocationMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Vision::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_operations_get(...)`, `locations_product_sets_add_product(...)`, `locations_product_sets_create(...)`, `locations_product_sets_delete(...)`, `locations_product_sets_get(...)`, `locations_product_sets_import(...)`, `locations_product_sets_list(...)`, `locations_product_sets_patch(...)`, `locations_product_sets_products_list(...)`, `locations_product_sets_remove_product(...)`, `locations_products_create(...)`, `locations_products_delete(...)`, `locations_products_get(...)`, `locations_products_list(...)`, `locations_products_patch(...)`, `locations_products_reference_images_create(...)`, `locations_products_reference_images_delete(...)`, `locations_products_reference_images_get(...)`, `locations_products_reference_images_list(...)` and `operations_get(...)`
+/// // like `files_annotate(...)`, `files_async_batch_annotate(...)`, `images_annotate(...)`, `images_async_batch_annotate(...)`, `locations_files_annotate(...)`, `locations_files_async_batch_annotate(...)`, `locations_images_annotate(...)`, `locations_images_async_batch_annotate(...)`, `locations_operations_get(...)`, `locations_product_sets_add_product(...)`, `locations_product_sets_create(...)`, `locations_product_sets_delete(...)`, `locations_product_sets_get(...)`, `locations_product_sets_import(...)`, `locations_product_sets_list(...)`, `locations_product_sets_patch(...)`, `locations_product_sets_products_list(...)`, `locations_product_sets_remove_product(...)`, `locations_products_create(...)`, `locations_products_delete(...)`, `locations_products_get(...)`, `locations_products_list(...)`, `locations_products_patch(...)`, `locations_products_purge(...)`, `locations_products_reference_images_create(...)`, `locations_products_reference_images_delete(...)`, `locations_products_reference_images_get(...)`, `locations_products_reference_images_list(...)` and `operations_get(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2913,6 +3058,66 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Run image detection and annotation for a batch of images.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Optional. Target project and location to make a call.
+    ///              Format: `projects/{project-id}/locations/{location-id}`.
+    ///              If no parent is specified, a region will be chosen automatically.
+    ///              Supported location-ids:
+    ///                  `us`: USA country only,
+    ///                  `asia`: East asia areas, like Japan, Taiwan,
+    ///                  `eu`: The European Union.
+    ///              Example: `projects/project-A/locations/eu`.
+    pub fn locations_images_annotate(&self, request: BatchAnnotateImagesRequest, parent: &str) -> ProjectLocationImageAnnotateCall<'a, C, A> {
+        ProjectLocationImageAnnotateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Run asynchronous image detection and annotation for a list of images.
+    /// 
+    /// Progress and results can be retrieved through the
+    /// `google.longrunning.Operations` interface.
+    /// `Operation.metadata` contains `OperationMetadata` (metadata).
+    /// `Operation.response` contains `AsyncBatchAnnotateImagesResponse` (results).
+    /// 
+    /// This service will write image annotation outputs to json files in customer
+    /// GCS bucket, each json file containing BatchAnnotateImagesResponse proto.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Optional. Target project and location to make a call.
+    ///              Format: `projects/{project-id}/locations/{location-id}`.
+    ///              If no parent is specified, a region will be chosen automatically.
+    ///              Supported location-ids:
+    ///                  `us`: USA country only,
+    ///                  `asia`: East asia areas, like Japan, Taiwan,
+    ///                  `eu`: The European Union.
+    ///              Example: `projects/project-A/locations/eu`.
+    pub fn images_async_batch_annotate(&self, request: AsyncBatchAnnotateImagesRequest, parent: &str) -> ProjectImageAsyncBatchAnnotateCall<'a, C, A> {
+        ProjectImageAsyncBatchAnnotateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets information associated with a Product.
     /// 
     /// Possible errors:
@@ -2921,7 +3126,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Resource name of the Product to get.
+    /// * `name` - Required. Resource name of the Product to get.
     ///            Format is:
     ///            `projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`
     pub fn locations_products_get(&self, name: &str) -> ProjectLocationProductGetCall<'a, C, A> {
@@ -2944,13 +3149,39 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Resource name of product to delete.
+    /// * `name` - Required. Resource name of product to delete.
     ///            Format is:
     ///            `projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`
     pub fn locations_products_delete(&self, name: &str) -> ProjectLocationProductDeleteCall<'a, C, A> {
         ProjectLocationProductDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Run image detection and annotation for a batch of images.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Optional. Target project and location to make a call.
+    ///              Format: `projects/{project-id}/locations/{location-id}`.
+    ///              If no parent is specified, a region will be chosen automatically.
+    ///              Supported location-ids:
+    ///                  `us`: USA country only,
+    ///                  `asia`: East asia areas, like Japan, Taiwan,
+    ///                  `eu`: The European Union.
+    ///              Example: `projects/project-A/locations/eu`.
+    pub fn images_annotate(&self, request: BatchAnnotateImagesRequest, parent: &str) -> ProjectImageAnnotateCall<'a, C, A> {
+        ProjectImageAnnotateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2969,7 +3200,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The ProductSet resource for which to retrieve Products.
+    /// * `name` - Required. The ProductSet resource for which to retrieve Products.
     ///            Format is:
     ///            `projects/PROJECT_ID/locations/LOC_ID/productSets/PRODUCT_SET_ID`
     pub fn locations_product_sets_products_list(&self, name: &str) -> ProjectLocationProductSetProductListCall<'a, C, A> {
@@ -3005,6 +3236,49 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Asynchronous API to delete all Products in a ProductSet or all Products
+    /// that are in no ProductSet.
+    /// 
+    /// If a Product is a member of the specified ProductSet in addition to other
+    /// ProductSets, the Product will still be deleted.
+    /// 
+    /// It is recommended to not delete the specified ProductSet until after this
+    /// operation has completed. It is also recommended to not add any of the
+    /// Products involved in the batch delete to a new ProductSet while this
+    /// operation is running because those Products may still end up deleted.
+    /// 
+    /// It's not possible to undo the PurgeProducts operation. Therefore, it is
+    /// recommended to keep the csv files used in ImportProductSets (if that was
+    /// how you originally built the Product Set) before starting PurgeProducts, in
+    /// case you need to re-import the data after deletion.
+    /// 
+    /// If the plan is to purge all of the Products from a ProductSet and then
+    /// re-use the empty ProductSet to re-import new Products into the empty
+    /// ProductSet, you must wait until the PurgeProducts operation has finished
+    /// for that ProductSet.
+    /// 
+    /// The google.longrunning.Operation API can be used to keep track of the
+    /// progress and results of the request.
+    /// `Operation.metadata` contains `BatchOperationMetadata`. (progress)
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The project and location in which the Products should be deleted.
+    ///              Format is `projects/PROJECT_ID/locations/LOC_ID`.
+    pub fn locations_products_purge(&self, request: PurgeProductsRequest, parent: &str) -> ProjectLocationProductPurgeCall<'a, C, A> {
+        ProjectLocationProductPurgeCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Permanently deletes a ProductSet. Products and ReferenceImages in the
     /// ProductSet are not deleted.
     /// 
@@ -3012,7 +3286,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Resource name of the ProductSet to delete.
+    /// * `name` - Required. Resource name of the ProductSet to delete.
     ///            Format is:
     ///            `projects/PROJECT_ID/locations/LOC_ID/productSets/PRODUCT_SET_ID`
     pub fn locations_product_sets_delete(&self, name: &str) -> ProjectLocationProductSetDeleteCall<'a, C, A> {
@@ -3032,7 +3306,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name for the ProductSet to modify.
+    /// * `name` - Required. The resource name for the ProductSet to modify.
     ///            Format is:
     ///            `projects/PROJECT_ID/locations/LOC_ID/productSets/PRODUCT_SET_ID`
     pub fn locations_product_sets_remove_product(&self, request: RemoveProductFromProductSetRequest, name: &str) -> ProjectLocationProductSetRemoveProductCall<'a, C, A> {
@@ -3048,23 +3322,52 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists products in an unspecified order.
-    /// 
-    /// Possible errors:
-    /// 
-    /// * Returns INVALID_ARGUMENT if page_size is greater than 100 or less than 1.
+    /// Run asynchronous image detection and annotation for a list of generic
+    /// files, such as PDF files, which may contain multiple pages and multiple
+    /// images per page. Progress and results can be retrieved through the
+    /// `google.longrunning.Operations` interface.
+    /// `Operation.metadata` contains `OperationMetadata` (metadata).
+    /// `Operation.response` contains `AsyncBatchAnnotateFilesResponse` (results).
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The project OR ProductSet from which Products should be listed.
-    ///              Format:
-    ///              `projects/PROJECT_ID/locations/LOC_ID`
-    pub fn locations_products_list(&self, parent: &str) -> ProjectLocationProductListCall<'a, C, A> {
-        ProjectLocationProductListCall {
+    /// * `request` - No description provided.
+    /// * `parent` - Optional. Target project and location to make a call.
+    ///              Format: `projects/{project-id}/locations/{location-id}`.
+    ///              If no parent is specified, a region will be chosen automatically.
+    ///              Supported location-ids:
+    ///                  `us`: USA country only,
+    ///                  `asia`: East asia areas, like Japan, Taiwan,
+    ///                  `eu`: The European Union.
+    ///              Example: `projects/project-A/locations/eu`.
+    pub fn files_async_batch_annotate(&self, request: AsyncBatchAnnotateFilesRequest, parent: &str) -> ProjectFileAsyncBatchAnnotateCall<'a, C, A> {
+        ProjectFileAsyncBatchAnnotateCall {
             hub: self.hub,
+            _request: request,
             _parent: parent.to_string(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets information associated with a ProductSet.
+    /// 
+    /// Possible errors:
+    /// 
+    /// * Returns NOT_FOUND if the ProductSet does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. Resource name of the ProductSet to get.
+    ///            Format is:
+    ///            `projects/PROJECT_ID/locations/LOC_ID/productSets/PRODUCT_SET_ID`
+    pub fn locations_product_sets_get(&self, name: &str) -> ProjectLocationProductSetGetCall<'a, C, A> {
+        ProjectLocationProductSetGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3104,7 +3407,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The project in which the Product should be created.
+    /// * `parent` - Required. The project in which the Product should be created.
     ///              Format is
     ///              `projects/PROJECT_ID/locations/LOC_ID`.
     pub fn locations_products_create(&self, request: Product, parent: &str) -> ProjectLocationProductCreateCall<'a, C, A> {
@@ -3121,21 +3424,54 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets information associated with a ProductSet.
+    /// Lists products in an unspecified order.
     /// 
     /// Possible errors:
     /// 
-    /// * Returns NOT_FOUND if the ProductSet does not exist.
+    /// * Returns INVALID_ARGUMENT if page_size is greater than 100 or less than 1.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Resource name of the ProductSet to get.
-    ///            Format is:
-    ///            `projects/PROJECT_ID/locations/LOG_ID/productSets/PRODUCT_SET_ID`
-    pub fn locations_product_sets_get(&self, name: &str) -> ProjectLocationProductSetGetCall<'a, C, A> {
-        ProjectLocationProductSetGetCall {
+    /// * `parent` - Required. The project OR ProductSet from which Products should be listed.
+    ///              Format:
+    ///              `projects/PROJECT_ID/locations/LOC_ID`
+    pub fn locations_products_list(&self, parent: &str) -> ProjectLocationProductListCall<'a, C, A> {
+        ProjectLocationProductListCall {
             hub: self.hub,
-            _name: name.to_string(),
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Run asynchronous image detection and annotation for a list of generic
+    /// files, such as PDF files, which may contain multiple pages and multiple
+    /// images per page. Progress and results can be retrieved through the
+    /// `google.longrunning.Operations` interface.
+    /// `Operation.metadata` contains `OperationMetadata` (metadata).
+    /// `Operation.response` contains `AsyncBatchAnnotateFilesResponse` (results).
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Optional. Target project and location to make a call.
+    ///              Format: `projects/{project-id}/locations/{location-id}`.
+    ///              If no parent is specified, a region will be chosen automatically.
+    ///              Supported location-ids:
+    ///                  `us`: USA country only,
+    ///                  `asia`: East asia areas, like Japan, Taiwan,
+    ///                  `eu`: The European Union.
+    ///              Example: `projects/project-A/locations/eu`.
+    pub fn locations_files_async_batch_annotate(&self, request: AsyncBatchAnnotateFilesRequest, parent: &str) -> ProjectLocationFileAsyncBatchAnnotateCall<'a, C, A> {
+        ProjectLocationFileAsyncBatchAnnotateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3154,7 +3490,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The project in which the ProductSet should be created.
+    /// * `parent` - Required. The project in which the ProductSet should be created.
     ///              Format is `projects/PROJECT_ID/locations/LOC_ID`.
     pub fn locations_product_sets_create(&self, request: ProductSet, parent: &str) -> ProjectLocationProductSetCreateCall<'a, C, A> {
         ProjectLocationProductSetCreateCall {
@@ -3162,6 +3498,38 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _request: request,
             _parent: parent.to_string(),
             _product_set_id: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Service that performs image detection and annotation for a batch of files.
+    /// Now only "application/pdf", "image/tiff" and "image/gif" are supported.
+    /// 
+    /// This service will extract at most 5 (customers can specify which 5 in
+    /// AnnotateFileRequest.pages) frames (gif) or pages (pdf or tiff) from each
+    /// file provided and perform detection and annotation for each image
+    /// extracted.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Optional. Target project and location to make a call.
+    ///              Format: `projects/{project-id}/locations/{location-id}`.
+    ///              If no parent is specified, a region will be chosen automatically.
+    ///              Supported location-ids:
+    ///                  `us`: USA country only,
+    ///                  `asia`: East asia areas, like Japan, Taiwan,
+    ///                  `eu`: The European Union.
+    ///              Example: `projects/project-A/locations/eu`.
+    pub fn locations_files_annotate(&self, request: BatchAnnotateFilesRequest, parent: &str) -> ProjectLocationFileAnnotateCall<'a, C, A> {
+        ProjectLocationFileAnnotateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3182,7 +3550,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name for the ProductSet to modify.
+    /// * `name` - Required. The resource name for the ProductSet to modify.
     ///            Format is:
     ///            `projects/PROJECT_ID/locations/LOC_ID/productSets/PRODUCT_SET_ID`
     pub fn locations_product_sets_add_product(&self, request: AddProductToProductSetRequest, name: &str) -> ProjectLocationProductSetAddProductCall<'a, C, A> {
@@ -3213,10 +3581,42 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The project in which the ProductSets should be imported.
+    /// * `parent` - Required. The project in which the ProductSets should be imported.
     ///              Format is `projects/PROJECT_ID/locations/LOC_ID`.
     pub fn locations_product_sets_import(&self, request: ImportProductSetsRequest, parent: &str) -> ProjectLocationProductSetImportCall<'a, C, A> {
         ProjectLocationProductSetImportCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Service that performs image detection and annotation for a batch of files.
+    /// Now only "application/pdf", "image/tiff" and "image/gif" are supported.
+    /// 
+    /// This service will extract at most 5 (customers can specify which 5 in
+    /// AnnotateFileRequest.pages) frames (gif) or pages (pdf or tiff) from each
+    /// file provided and perform detection and annotation for each image
+    /// extracted.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Optional. Target project and location to make a call.
+    ///              Format: `projects/{project-id}/locations/{location-id}`.
+    ///              If no parent is specified, a region will be chosen automatically.
+    ///              Supported location-ids:
+    ///                  `us`: USA country only,
+    ///                  `asia`: East asia areas, like Japan, Taiwan,
+    ///                  `eu`: The European Union.
+    ///              Example: `projects/project-A/locations/eu`.
+    pub fn files_annotate(&self, request: BatchAnnotateFilesRequest, parent: &str) -> ProjectFileAnnotateCall<'a, C, A> {
+        ProjectFileAnnotateCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
@@ -3304,7 +3704,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The project from which ProductSets should be listed.
+    /// * `parent` - Required. The project from which ProductSets should be listed.
     ///              Format is `projects/PROJECT_ID/locations/LOC_ID`.
     pub fn locations_product_sets_list(&self, parent: &str) -> ProjectLocationProductSetListCall<'a, C, A> {
         ProjectLocationProductSetListCall {
@@ -3312,6 +3712,40 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _parent: parent.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Run asynchronous image detection and annotation for a list of images.
+    /// 
+    /// Progress and results can be retrieved through the
+    /// `google.longrunning.Operations` interface.
+    /// `Operation.metadata` contains `OperationMetadata` (metadata).
+    /// `Operation.response` contains `AsyncBatchAnnotateImagesResponse` (results).
+    /// 
+    /// This service will write image annotation outputs to json files in customer
+    /// GCS bucket, each json file containing BatchAnnotateImagesResponse proto.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Optional. Target project and location to make a call.
+    ///              Format: `projects/{project-id}/locations/{location-id}`.
+    ///              If no parent is specified, a region will be chosen automatically.
+    ///              Supported location-ids:
+    ///                  `us`: USA country only,
+    ///                  `asia`: East asia areas, like Japan, Taiwan,
+    ///                  `eu`: The European Union.
+    ///              Example: `projects/project-A/locations/eu`.
+    pub fn locations_images_async_batch_annotate(&self, request: AsyncBatchAnnotateImagesRequest, parent: &str) -> ProjectLocationImageAsyncBatchAnnotateCall<'a, C, A> {
+        ProjectLocationImageAsyncBatchAnnotateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3343,7 +3777,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Resource name of the product in which to create the reference image.
+    /// * `parent` - Required. Resource name of the product in which to create the reference image.
     ///              Format is
     ///              `projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`.
     pub fn locations_products_reference_images_create(&self, request: ReferenceImage, parent: &str) -> ProjectLocationProductReferenceImageCreateCall<'a, C, A> {
@@ -3370,7 +3804,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the reference image to delete.
+    /// * `name` - Required. The resource name of the reference image to delete.
     ///            Format is:
     ///            `projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID/referenceImages/IMAGE_ID`
     pub fn locations_products_reference_images_delete(&self, name: &str) -> ProjectLocationProductReferenceImageDeleteCall<'a, C, A> {
@@ -3393,7 +3827,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the ReferenceImage to get.
+    /// * `name` - Required. The resource name of the ReferenceImage to get.
     ///            Format is:
     ///            `projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID/referenceImages/IMAGE_ID`.
     pub fn locations_products_reference_images_get(&self, name: &str) -> ProjectLocationProductReferenceImageGetCall<'a, C, A> {
@@ -3418,7 +3852,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Resource name of the product containing the reference images.
+    /// * `parent` - Required. Resource name of the product containing the reference images.
     ///              Format is
     ///              `projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`.
     pub fn locations_products_reference_images_list(&self, parent: &str) -> ProjectLocationProductReferenceImageListCall<'a, C, A> {
@@ -3735,6 +4169,256 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
+/// Gets the latest state of a long-running operation.  Clients can use this
+/// method to poll the operation result at intervals as recommended by the API
+/// service.
+///
+/// A builder for the *get* method supported by a *operation* resource.
+/// It is not used directly, but through a `OperationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_vision1 as vision1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use vision1::Vision;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Vision::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.operations().get("name")
+///              .doit();
+/// # }
+/// ```
+pub struct OperationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Vision<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OperationGetCall<'a, C, A> {}
+
+impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "vision.operations.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the operation resource.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OperationGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Deletes a long-running operation. This method indicates that the client is
 /// no longer interested in the operation result. It does not cancel the
 /// operation. If the server doesn't support this method, it returns
@@ -3975,256 +4659,6 @@ impl<'a, C, A> OperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> OperationDeleteCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Gets the latest state of a long-running operation.  Clients can use this
-/// method to poll the operation result at intervals as recommended by the API
-/// service.
-///
-/// A builder for the *get* method supported by a *operation* resource.
-/// It is not used directly, but through a `OperationMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_vision1 as vision1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use vision1::Vision;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Vision::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.operations().get("name")
-///              .doit();
-/// # }
-/// ```
-pub struct OperationGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Vision<C, A>,
-    _name: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for OperationGetCall<'a, C, A> {}
-
-impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "vision.operations.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/{+name}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The name of the operation resource.
-    ///
-    /// Sets the *name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a, C, A> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OperationGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5761,6 +6195,594 @@ impl<'a, C, A> LocationOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
+/// Run image detection and annotation for a batch of images.
+///
+/// A builder for the *locations.images.annotate* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_vision1 as vision1;
+/// use vision1::BatchAnnotateImagesRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use vision1::Vision;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Vision::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BatchAnnotateImagesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_images_annotate(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationImageAnnotateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Vision<C, A>,
+    _request: BatchAnnotateImagesRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationImageAnnotateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationImageAnnotateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, BatchAnnotateImagesResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "vision.projects.locations.images.annotate",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/images:annotate";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BatchAnnotateImagesRequest) -> ProjectLocationImageAnnotateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Optional. Target project and location to make a call.
+    /// 
+    /// Format: `projects/{project-id}/locations/{location-id}`.
+    /// 
+    /// If no parent is specified, a region will be chosen automatically.
+    /// 
+    /// Supported location-ids:
+    /// `us`: USA country only,
+    /// `asia`: East asia areas, like Japan, Taiwan,
+    /// `eu`: The European Union.
+    /// 
+    /// Example: `projects/project-A/locations/eu`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationImageAnnotateCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationImageAnnotateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationImageAnnotateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationImageAnnotateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Run asynchronous image detection and annotation for a list of images.
+/// 
+/// Progress and results can be retrieved through the
+/// `google.longrunning.Operations` interface.
+/// `Operation.metadata` contains `OperationMetadata` (metadata).
+/// `Operation.response` contains `AsyncBatchAnnotateImagesResponse` (results).
+/// 
+/// This service will write image annotation outputs to json files in customer
+/// GCS bucket, each json file containing BatchAnnotateImagesResponse proto.
+///
+/// A builder for the *images.asyncBatchAnnotate* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_vision1 as vision1;
+/// use vision1::AsyncBatchAnnotateImagesRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use vision1::Vision;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Vision::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AsyncBatchAnnotateImagesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().images_async_batch_annotate(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectImageAsyncBatchAnnotateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Vision<C, A>,
+    _request: AsyncBatchAnnotateImagesRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectImageAsyncBatchAnnotateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectImageAsyncBatchAnnotateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "vision.projects.images.asyncBatchAnnotate",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/images:asyncBatchAnnotate";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AsyncBatchAnnotateImagesRequest) -> ProjectImageAsyncBatchAnnotateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Optional. Target project and location to make a call.
+    /// 
+    /// Format: `projects/{project-id}/locations/{location-id}`.
+    /// 
+    /// If no parent is specified, a region will be chosen automatically.
+    /// 
+    /// Supported location-ids:
+    /// `us`: USA country only,
+    /// `asia`: East asia areas, like Japan, Taiwan,
+    /// `eu`: The European Union.
+    /// 
+    /// Example: `projects/project-A/locations/eu`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectImageAsyncBatchAnnotateCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectImageAsyncBatchAnnotateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectImageAsyncBatchAnnotateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectImageAsyncBatchAnnotateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Gets information associated with a Product.
 /// 
 /// Possible errors:
@@ -5940,7 +6962,7 @@ impl<'a, C, A> ProjectLocationProductGetCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// Resource name of the Product to get.
+    /// Required. Resource name of the Product to get.
     /// 
     /// Format is:
     /// `projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`
@@ -6195,7 +7217,7 @@ impl<'a, C, A> ProjectLocationProductDeleteCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
-    /// Resource name of product to delete.
+    /// Required. Resource name of product to delete.
     /// 
     /// Format is:
     /// `projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`
@@ -6271,6 +7293,296 @@ impl<'a, C, A> ProjectLocationProductDeleteCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
+/// Run image detection and annotation for a batch of images.
+///
+/// A builder for the *images.annotate* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_vision1 as vision1;
+/// use vision1::BatchAnnotateImagesRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use vision1::Vision;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Vision::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BatchAnnotateImagesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().images_annotate(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectImageAnnotateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Vision<C, A>,
+    _request: BatchAnnotateImagesRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectImageAnnotateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectImageAnnotateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, BatchAnnotateImagesResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "vision.projects.images.annotate",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/images:annotate";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BatchAnnotateImagesRequest) -> ProjectImageAnnotateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Optional. Target project and location to make a call.
+    /// 
+    /// Format: `projects/{project-id}/locations/{location-id}`.
+    /// 
+    /// If no parent is specified, a region will be chosen automatically.
+    /// 
+    /// Supported location-ids:
+    /// `us`: USA country only,
+    /// `asia`: East asia areas, like Japan, Taiwan,
+    /// `eu`: The European Union.
+    /// 
+    /// Example: `projects/project-A/locations/eu`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectImageAnnotateCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectImageAnnotateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectImageAnnotateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectImageAnnotateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Lists the Products in a ProductSet, in an unspecified order. If the
 /// ProductSet does not exist, the products field of the response will be
 /// empty.
@@ -6305,8 +7617,8 @@ impl<'a, C, A> ProjectLocationProductDeleteCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_product_sets_products_list("name")
-///              .page_token("et")
-///              .page_size(-17)
+///              .page_token("ipsum")
+///              .page_size(-5)
 ///              .doit();
 /// # }
 /// ```
@@ -6462,7 +7774,7 @@ impl<'a, C, A> ProjectLocationProductSetProductListCall<'a, C, A> where C: Borro
     }
 
 
-    /// The ProductSet resource for which to retrieve Products.
+    /// Required. The ProductSet resource for which to retrieve Products.
     /// 
     /// Format is:
     /// `projects/PROJECT_ID/locations/LOC_ID/productSets/PRODUCT_SET_ID`
@@ -6802,6 +8114,310 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
+/// Asynchronous API to delete all Products in a ProductSet or all Products
+/// that are in no ProductSet.
+/// 
+/// If a Product is a member of the specified ProductSet in addition to other
+/// ProductSets, the Product will still be deleted.
+/// 
+/// It is recommended to not delete the specified ProductSet until after this
+/// operation has completed. It is also recommended to not add any of the
+/// Products involved in the batch delete to a new ProductSet while this
+/// operation is running because those Products may still end up deleted.
+/// 
+/// It's not possible to undo the PurgeProducts operation. Therefore, it is
+/// recommended to keep the csv files used in ImportProductSets (if that was
+/// how you originally built the Product Set) before starting PurgeProducts, in
+/// case you need to re-import the data after deletion.
+/// 
+/// If the plan is to purge all of the Products from a ProductSet and then
+/// re-use the empty ProductSet to re-import new Products into the empty
+/// ProductSet, you must wait until the PurgeProducts operation has finished
+/// for that ProductSet.
+/// 
+/// The google.longrunning.Operation API can be used to keep track of the
+/// progress and results of the request.
+/// `Operation.metadata` contains `BatchOperationMetadata`. (progress)
+///
+/// A builder for the *locations.products.purge* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_vision1 as vision1;
+/// use vision1::PurgeProductsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use vision1::Vision;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Vision::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = PurgeProductsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_products_purge(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationProductPurgeCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Vision<C, A>,
+    _request: PurgeProductsRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationProductPurgeCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationProductPurgeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "vision.projects.locations.products.purge",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/products:purge";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: PurgeProductsRequest) -> ProjectLocationProductPurgeCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The project and location in which the Products should be deleted.
+    /// 
+    /// Format is `projects/PROJECT_ID/locations/LOC_ID`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationProductPurgeCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationProductPurgeCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationProductPurgeCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationProductPurgeCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Permanently deletes a ProductSet. Products and ReferenceImages in the
 /// ProductSet are not deleted.
 /// 
@@ -6980,7 +8596,7 @@ impl<'a, C, A> ProjectLocationProductSetDeleteCall<'a, C, A> where C: BorrowMut<
     }
 
 
-    /// Resource name of the ProductSet to delete.
+    /// Required. Resource name of the ProductSet to delete.
     /// 
     /// Format is:
     /// `projects/PROJECT_ID/locations/LOC_ID/productSets/PRODUCT_SET_ID`
@@ -7262,7 +8878,7 @@ impl<'a, C, A> ProjectLocationProductSetRemoveProductCall<'a, C, A> where C: Bor
         self._request = new_value;
         self
     }
-    /// The resource name for the ProductSet to modify.
+    /// Required. The resource name for the ProductSet to modify.
     /// 
     /// Format is:
     /// `projects/PROJECT_ID/locations/LOC_ID/productSets/PRODUCT_SET_ID`
@@ -7338,13 +8954,308 @@ impl<'a, C, A> ProjectLocationProductSetRemoveProductCall<'a, C, A> where C: Bor
 }
 
 
-/// Lists products in an unspecified order.
+/// Run asynchronous image detection and annotation for a list of generic
+/// files, such as PDF files, which may contain multiple pages and multiple
+/// images per page. Progress and results can be retrieved through the
+/// `google.longrunning.Operations` interface.
+/// `Operation.metadata` contains `OperationMetadata` (metadata).
+/// `Operation.response` contains `AsyncBatchAnnotateFilesResponse` (results).
+///
+/// A builder for the *files.asyncBatchAnnotate* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_vision1 as vision1;
+/// use vision1::AsyncBatchAnnotateFilesRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use vision1::Vision;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Vision::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AsyncBatchAnnotateFilesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().files_async_batch_annotate(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectFileAsyncBatchAnnotateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Vision<C, A>,
+    _request: AsyncBatchAnnotateFilesRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectFileAsyncBatchAnnotateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectFileAsyncBatchAnnotateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "vision.projects.files.asyncBatchAnnotate",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/files:asyncBatchAnnotate";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AsyncBatchAnnotateFilesRequest) -> ProjectFileAsyncBatchAnnotateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Optional. Target project and location to make a call.
+    /// 
+    /// Format: `projects/{project-id}/locations/{location-id}`.
+    /// 
+    /// If no parent is specified, a region will be chosen automatically.
+    /// 
+    /// Supported location-ids:
+    /// `us`: USA country only,
+    /// `asia`: East asia areas, like Japan, Taiwan,
+    /// `eu`: The European Union.
+    /// 
+    /// Example: `projects/project-A/locations/eu`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectFileAsyncBatchAnnotateCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectFileAsyncBatchAnnotateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectFileAsyncBatchAnnotateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectFileAsyncBatchAnnotateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets information associated with a ProductSet.
 /// 
 /// Possible errors:
 /// 
-/// * Returns INVALID_ARGUMENT if page_size is greater than 100 or less than 1.
+/// * Returns NOT_FOUND if the ProductSet does not exist.
 ///
-/// A builder for the *locations.products.list* method supported by a *project* resource.
+/// A builder for the *locations.productSets.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -7369,31 +9280,27 @@ impl<'a, C, A> ProjectLocationProductSetRemoveProductCall<'a, C, A> where C: Bor
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_products_list("parent")
-///              .page_token("duo")
-///              .page_size(-32)
+/// let result = hub.projects().locations_product_sets_get("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationProductListCall<'a, C, A>
+pub struct ProjectLocationProductSetGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Vision<C, A>,
-    _parent: String,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
+    _name: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationProductListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationProductSetGetCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationProductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationProductSetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListProductsResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ProductSet)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -7402,17 +9309,11 @@ impl<'a, C, A> ProjectLocationProductListCall<'a, C, A> where C: BorrowMut<hyper
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "vision.projects.locations.products.list",
+        dlg.begin(MethodInfo { id: "vision.projects.locations.productSets.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7424,12 +9325,12 @@ impl<'a, C, A> ProjectLocationProductListCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+parent}/products";
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -7444,7 +9345,7 @@ impl<'a, C, A> ProjectLocationProductListCall<'a, C, A> where C: BorrowMut<hyper
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["parent"].iter() {
+            for param_name in ["name"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -7527,31 +9428,17 @@ impl<'a, C, A> ProjectLocationProductListCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// The project OR ProductSet from which Products should be listed.
+    /// Required. Resource name of the ProductSet to get.
     /// 
-    /// Format:
-    /// `projects/PROJECT_ID/locations/LOC_ID`
+    /// Format is:
+    /// `projects/PROJECT_ID/locations/LOC_ID/productSets/PRODUCT_SET_ID`
     ///
-    /// Sets the *parent* path property to the given value.
+    /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationProductListCall<'a, C, A> {
-        self._parent = new_value.to_string();
-        self
-    }
-    /// The next_page_token returned from a previous List request, if any.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationProductListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// The maximum number of items to return. Default 10, maximum 100.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationProductListCall<'a, C, A> {
-        self._page_size = Some(new_value);
+    pub fn name(mut self, new_value: &str) -> ProjectLocationProductSetGetCall<'a, C, A> {
+        self._name = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -7560,7 +9447,7 @@ impl<'a, C, A> ProjectLocationProductListCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationProductListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationProductSetGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7585,7 +9472,7 @@ impl<'a, C, A> ProjectLocationProductListCall<'a, C, A> where C: BorrowMut<hyper
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationProductListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationProductSetGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7605,7 +9492,7 @@ impl<'a, C, A> ProjectLocationProductListCall<'a, C, A> where C: BorrowMut<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationProductListCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationProductSetGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7908,7 +9795,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_products_create(req, "parent")
-///              .product_id("eos")
+///              .product_id("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -8085,7 +9972,7 @@ impl<'a, C, A> ProjectLocationProductCreateCall<'a, C, A> where C: BorrowMut<hyp
         self._request = new_value;
         self
     }
-    /// The project in which the Product should be created.
+    /// Required. The project in which the Product should be created.
     /// 
     /// Format is
     /// `projects/PROJECT_ID/locations/LOC_ID`.
@@ -8171,13 +10058,13 @@ impl<'a, C, A> ProjectLocationProductCreateCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Gets information associated with a ProductSet.
+/// Lists products in an unspecified order.
 /// 
 /// Possible errors:
 /// 
-/// * Returns NOT_FOUND if the ProductSet does not exist.
+/// * Returns INVALID_ARGUMENT if page_size is greater than 100 or less than 1.
 ///
-/// A builder for the *locations.productSets.get* method supported by a *project* resource.
+/// A builder for the *locations.products.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -8202,27 +10089,31 @@ impl<'a, C, A> ProjectLocationProductCreateCall<'a, C, A> where C: BorrowMut<hyp
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_product_sets_get("name")
+/// let result = hub.projects().locations_products_list("parent")
+///              .page_token("elitr")
+///              .page_size(-97)
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationProductSetGetCall<'a, C, A>
+pub struct ProjectLocationProductListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Vision<C, A>,
-    _name: String,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationProductSetGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationProductListCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationProductSetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationProductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ProductSet)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListProductsResponse)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -8231,11 +10122,17 @@ impl<'a, C, A> ProjectLocationProductSetGetCall<'a, C, A> where C: BorrowMut<hyp
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "vision.projects.locations.productSets.get",
+        dlg.begin(MethodInfo { id: "vision.projects.locations.products.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8247,12 +10144,12 @@ impl<'a, C, A> ProjectLocationProductSetGetCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/products";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -8267,7 +10164,7 @@ impl<'a, C, A> ProjectLocationProductSetGetCall<'a, C, A> where C: BorrowMut<hyp
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -8350,17 +10247,31 @@ impl<'a, C, A> ProjectLocationProductSetGetCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
-    /// Resource name of the ProductSet to get.
+    /// Required. The project OR ProductSet from which Products should be listed.
     /// 
-    /// Format is:
-    /// `projects/PROJECT_ID/locations/LOG_ID/productSets/PRODUCT_SET_ID`
+    /// Format:
+    /// `projects/PROJECT_ID/locations/LOC_ID`
     ///
-    /// Sets the *name* path property to the given value.
+    /// Sets the *parent* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationProductSetGetCall<'a, C, A> {
-        self._name = new_value.to_string();
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationProductListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The next_page_token returned from a previous List request, if any.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationProductListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of items to return. Default 10, maximum 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationProductListCall<'a, C, A> {
+        self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -8369,7 +10280,7 @@ impl<'a, C, A> ProjectLocationProductSetGetCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationProductSetGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationProductListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8394,7 +10305,7 @@ impl<'a, C, A> ProjectLocationProductSetGetCall<'a, C, A> where C: BorrowMut<hyp
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationProductSetGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationProductListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8414,7 +10325,302 @@ impl<'a, C, A> ProjectLocationProductSetGetCall<'a, C, A> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationProductSetGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationProductListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Run asynchronous image detection and annotation for a list of generic
+/// files, such as PDF files, which may contain multiple pages and multiple
+/// images per page. Progress and results can be retrieved through the
+/// `google.longrunning.Operations` interface.
+/// `Operation.metadata` contains `OperationMetadata` (metadata).
+/// `Operation.response` contains `AsyncBatchAnnotateFilesResponse` (results).
+///
+/// A builder for the *locations.files.asyncBatchAnnotate* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_vision1 as vision1;
+/// use vision1::AsyncBatchAnnotateFilesRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use vision1::Vision;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Vision::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AsyncBatchAnnotateFilesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_files_async_batch_annotate(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationFileAsyncBatchAnnotateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Vision<C, A>,
+    _request: AsyncBatchAnnotateFilesRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationFileAsyncBatchAnnotateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationFileAsyncBatchAnnotateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "vision.projects.locations.files.asyncBatchAnnotate",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/files:asyncBatchAnnotate";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AsyncBatchAnnotateFilesRequest) -> ProjectLocationFileAsyncBatchAnnotateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Optional. Target project and location to make a call.
+    /// 
+    /// Format: `projects/{project-id}/locations/{location-id}`.
+    /// 
+    /// If no parent is specified, a region will be chosen automatically.
+    /// 
+    /// Supported location-ids:
+    /// `us`: USA country only,
+    /// `asia`: East asia areas, like Japan, Taiwan,
+    /// `eu`: The European Union.
+    /// 
+    /// Example: `projects/project-A/locations/eu`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationFileAsyncBatchAnnotateCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationFileAsyncBatchAnnotateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationFileAsyncBatchAnnotateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationFileAsyncBatchAnnotateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8465,7 +10671,7 @@ impl<'a, C, A> ProjectLocationProductSetGetCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_product_sets_create(req, "parent")
-///              .product_set_id("dolor")
+///              .product_set_id("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -8642,7 +10848,7 @@ impl<'a, C, A> ProjectLocationProductSetCreateCall<'a, C, A> where C: BorrowMut<
         self._request = new_value;
         self
     }
-    /// The project in which the ProductSet should be created.
+    /// Required. The project in which the ProductSet should be created.
     /// 
     /// Format is `projects/PROJECT_ID/locations/LOC_ID`.
     ///
@@ -8716,6 +10922,302 @@ impl<'a, C, A> ProjectLocationProductSetCreateCall<'a, C, A> where C: BorrowMut<
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationProductSetCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Service that performs image detection and annotation for a batch of files.
+/// Now only "application/pdf", "image/tiff" and "image/gif" are supported.
+/// 
+/// This service will extract at most 5 (customers can specify which 5 in
+/// AnnotateFileRequest.pages) frames (gif) or pages (pdf or tiff) from each
+/// file provided and perform detection and annotation for each image
+/// extracted.
+///
+/// A builder for the *locations.files.annotate* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_vision1 as vision1;
+/// use vision1::BatchAnnotateFilesRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use vision1::Vision;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Vision::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BatchAnnotateFilesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_files_annotate(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationFileAnnotateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Vision<C, A>,
+    _request: BatchAnnotateFilesRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationFileAnnotateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationFileAnnotateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, BatchAnnotateFilesResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "vision.projects.locations.files.annotate",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/files:annotate";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BatchAnnotateFilesRequest) -> ProjectLocationFileAnnotateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Optional. Target project and location to make a call.
+    /// 
+    /// Format: `projects/{project-id}/locations/{location-id}`.
+    /// 
+    /// If no parent is specified, a region will be chosen automatically.
+    /// 
+    /// Supported location-ids:
+    /// `us`: USA country only,
+    /// `asia`: East asia areas, like Japan, Taiwan,
+    /// `eu`: The European Union.
+    /// 
+    /// Example: `projects/project-A/locations/eu`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationFileAnnotateCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationFileAnnotateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationFileAnnotateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationFileAnnotateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8940,7 +11442,7 @@ impl<'a, C, A> ProjectLocationProductSetAddProductCall<'a, C, A> where C: Borrow
         self._request = new_value;
         self
     }
-    /// The resource name for the ProductSet to modify.
+    /// Required. The resource name for the ProductSet to modify.
     /// 
     /// Format is:
     /// `projects/PROJECT_ID/locations/LOC_ID/productSets/PRODUCT_SET_ID`
@@ -9232,7 +11734,7 @@ impl<'a, C, A> ProjectLocationProductSetImportCall<'a, C, A> where C: BorrowMut<
         self._request = new_value;
         self
     }
-    /// The project in which the ProductSets should be imported.
+    /// Required. The project in which the ProductSets should be imported.
     /// 
     /// Format is `projects/PROJECT_ID/locations/LOC_ID`.
     ///
@@ -9307,6 +11809,302 @@ impl<'a, C, A> ProjectLocationProductSetImportCall<'a, C, A> where C: BorrowMut<
 }
 
 
+/// Service that performs image detection and annotation for a batch of files.
+/// Now only "application/pdf", "image/tiff" and "image/gif" are supported.
+/// 
+/// This service will extract at most 5 (customers can specify which 5 in
+/// AnnotateFileRequest.pages) frames (gif) or pages (pdf or tiff) from each
+/// file provided and perform detection and annotation for each image
+/// extracted.
+///
+/// A builder for the *files.annotate* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_vision1 as vision1;
+/// use vision1::BatchAnnotateFilesRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use vision1::Vision;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Vision::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BatchAnnotateFilesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().files_annotate(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectFileAnnotateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Vision<C, A>,
+    _request: BatchAnnotateFilesRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectFileAnnotateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectFileAnnotateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, BatchAnnotateFilesResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "vision.projects.files.annotate",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/files:annotate";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BatchAnnotateFilesRequest) -> ProjectFileAnnotateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Optional. Target project and location to make a call.
+    /// 
+    /// Format: `projects/{project-id}/locations/{location-id}`.
+    /// 
+    /// If no parent is specified, a region will be chosen automatically.
+    /// 
+    /// Supported location-ids:
+    /// `us`: USA country only,
+    /// `asia`: East asia areas, like Japan, Taiwan,
+    /// `eu`: The European Union.
+    /// 
+    /// Example: `projects/project-A/locations/eu`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectFileAnnotateCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectFileAnnotateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectFileAnnotateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectFileAnnotateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Makes changes to a Product resource.
 /// Only the `display_name`, `description`, and `labels` fields can be updated
 /// right now.
@@ -9355,7 +12153,7 @@ impl<'a, C, A> ProjectLocationProductSetImportCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_products_patch(req, "name")
-///              .update_mask("no")
+///              .update_mask("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -9662,7 +12460,7 @@ impl<'a, C, A> ProjectLocationProductPatchCall<'a, C, A> where C: BorrowMut<hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_product_sets_patch(req, "name")
-///              .update_mask("eirmod")
+///              .update_mask("duo")
 ///              .doit();
 /// # }
 /// ```
@@ -9960,8 +12758,8 @@ impl<'a, C, A> ProjectLocationProductSetPatchCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_product_sets_list("parent")
-///              .page_token("invidunt")
-///              .page_size(-82)
+///              .page_token("eirmod")
+///              .page_size(-58)
 ///              .doit();
 /// # }
 /// ```
@@ -10117,7 +12915,7 @@ impl<'a, C, A> ProjectLocationProductSetListCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// The project from which ProductSets should be listed.
+    /// Required. The project from which ProductSets should be listed.
     /// 
     /// Format is `projects/PROJECT_ID/locations/LOC_ID`.
     ///
@@ -10206,6 +13004,304 @@ impl<'a, C, A> ProjectLocationProductSetListCall<'a, C, A> where C: BorrowMut<hy
 }
 
 
+/// Run asynchronous image detection and annotation for a list of images.
+/// 
+/// Progress and results can be retrieved through the
+/// `google.longrunning.Operations` interface.
+/// `Operation.metadata` contains `OperationMetadata` (metadata).
+/// `Operation.response` contains `AsyncBatchAnnotateImagesResponse` (results).
+/// 
+/// This service will write image annotation outputs to json files in customer
+/// GCS bucket, each json file containing BatchAnnotateImagesResponse proto.
+///
+/// A builder for the *locations.images.asyncBatchAnnotate* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_vision1 as vision1;
+/// use vision1::AsyncBatchAnnotateImagesRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use vision1::Vision;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Vision::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AsyncBatchAnnotateImagesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_images_async_batch_annotate(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationImageAsyncBatchAnnotateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Vision<C, A>,
+    _request: AsyncBatchAnnotateImagesRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationImageAsyncBatchAnnotateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationImageAsyncBatchAnnotateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "vision.projects.locations.images.asyncBatchAnnotate",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/images:asyncBatchAnnotate";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AsyncBatchAnnotateImagesRequest) -> ProjectLocationImageAsyncBatchAnnotateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Optional. Target project and location to make a call.
+    /// 
+    /// Format: `projects/{project-id}/locations/{location-id}`.
+    /// 
+    /// If no parent is specified, a region will be chosen automatically.
+    /// 
+    /// Supported location-ids:
+    /// `us`: USA country only,
+    /// `asia`: East asia areas, like Japan, Taiwan,
+    /// `eu`: The European Union.
+    /// 
+    /// Example: `projects/project-A/locations/eu`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationImageAsyncBatchAnnotateCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationImageAsyncBatchAnnotateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationImageAsyncBatchAnnotateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationImageAsyncBatchAnnotateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Creates and returns a new ReferenceImage resource.
 /// 
 /// The `bounding_poly` field is optional. If `bounding_poly` is not specified,
@@ -10258,7 +13354,7 @@ impl<'a, C, A> ProjectLocationProductSetListCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_products_reference_images_create(req, "parent")
-///              .reference_image_id("Lorem")
+///              .reference_image_id("et")
 ///              .doit();
 /// # }
 /// ```
@@ -10435,7 +13531,7 @@ impl<'a, C, A> ProjectLocationProductReferenceImageCreateCall<'a, C, A> where C:
         self._request = new_value;
         self
     }
-    /// Resource name of the product in which to create the reference image.
+    /// Required. Resource name of the product in which to create the reference image.
     /// 
     /// Format is
     /// `projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`.
@@ -10702,7 +13798,7 @@ impl<'a, C, A> ProjectLocationProductReferenceImageDeleteCall<'a, C, A> where C:
     }
 
 
-    /// The resource name of the reference image to delete.
+    /// Required. The resource name of the reference image to delete.
     /// 
     /// Format is:
     /// 
@@ -10958,7 +14054,7 @@ impl<'a, C, A> ProjectLocationProductReferenceImageGetCall<'a, C, A> where C: Bo
     }
 
 
-    /// The resource name of the ReferenceImage to get.
+    /// Required. The resource name of the ReferenceImage to get.
     /// 
     /// Format is:
     /// 
@@ -11069,8 +14165,8 @@ impl<'a, C, A> ProjectLocationProductReferenceImageGetCall<'a, C, A> where C: Bo
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_products_reference_images_list("parent")
-///              .page_token("et")
-///              .page_size(-40)
+///              .page_token("sed")
+///              .page_size(-3)
 ///              .doit();
 /// # }
 /// ```
@@ -11226,7 +14322,7 @@ impl<'a, C, A> ProjectLocationProductReferenceImageListCall<'a, C, A> where C: B
     }
 
 
-    /// Resource name of the product containing the reference images.
+    /// Required. Resource name of the product containing the reference images.
     /// 
     /// Format is
     /// `projects/PROJECT_ID/locations/LOC_ID/products/PRODUCT_ID`.

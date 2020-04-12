@@ -46,6 +46,92 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
+    fn _projects_explain(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "http-body.data" => Some(("httpBody.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-body.content-type" => Some(("httpBody.contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["content-type", "data", "http-body"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudMlV1__ExplainRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().explain(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_get_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().get_config(opt.value_of("name").unwrap_or(""));
@@ -232,14 +318,28 @@ impl<'n> Engine<'n> {
                     "prediction-input.region" => Some(("predictionInput.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "prediction-input.input-paths" => Some(("predictionInput.inputPaths", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "prediction-input.output-data-format" => Some(("predictionInput.outputDataFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.worker-type" => Some(("trainingInput.workerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.parameter-server-config.tpu-tf-version" => Some(("trainingInput.parameterServerConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.parameter-server-config.accelerator-config.count" => Some(("trainingInput.parameterServerConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.parameter-server-config.accelerator-config.type" => Some(("trainingInput.parameterServerConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.parameter-server-config.image-uri" => Some(("trainingInput.parameterServerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.runtime-version" => Some(("trainingInput.runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.scale-tier" => Some(("trainingInput.scaleTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.master-type" => Some(("trainingInput.masterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.job-dir" => Some(("trainingInput.jobDir", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.scheduling.max-running-time" => Some(("trainingInput.scheduling.maxRunningTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.parameter-server-count" => Some(("trainingInput.parameterServerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "training-input.evaluator-count" => Some(("trainingInput.evaluatorCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "training-input.worker-type" => Some(("trainingInput.workerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.scale-tier" => Some(("trainingInput.scaleTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.package-uris" => Some(("trainingInput.packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "training-input.worker-config.tpu-tf-version" => Some(("trainingInput.workerConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.worker-config.accelerator-config.count" => Some(("trainingInput.workerConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.worker-config.accelerator-config.type" => Some(("trainingInput.workerConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.worker-config.image-uri" => Some(("trainingInput.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.evaluator-config.tpu-tf-version" => Some(("trainingInput.evaluatorConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.evaluator-config.accelerator-config.count" => Some(("trainingInput.evaluatorConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.evaluator-config.accelerator-config.type" => Some(("trainingInput.evaluatorConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.evaluator-config.image-uri" => Some(("trainingInput.evaluatorConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.use-chief-in-tf-config" => Some(("trainingInput.useChiefInTfConfig", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "training-input.master-config.tpu-tf-version" => Some(("trainingInput.masterConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.master-config.accelerator-config.count" => Some(("trainingInput.masterConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.master-config.accelerator-config.type" => Some(("trainingInput.masterConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.master-config.image-uri" => Some(("trainingInput.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.runtime-version" => Some(("trainingInput.runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.hyperparameters.max-trials" => Some(("trainingInput.hyperparameters.maxTrials", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "training-input.hyperparameters.goal" => Some(("trainingInput.hyperparameters.goal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.hyperparameters.algorithm" => Some(("trainingInput.hyperparameters.algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -248,24 +348,18 @@ impl<'n> Engine<'n> {
                     "training-input.hyperparameters.resume-previous-job-id" => Some(("trainingInput.hyperparameters.resumePreviousJobId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.hyperparameters.hyperparameter-metric-tag" => Some(("trainingInput.hyperparameters.hyperparameterMetricTag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.hyperparameters.max-parallel-trials" => Some(("trainingInput.hyperparameters.maxParallelTrials", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "training-input.region" => Some(("trainingInput.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.args" => Some(("trainingInput.args", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "training-input.python-module" => Some(("trainingInput.pythonModule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.python-version" => Some(("trainingInput.pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.job-dir" => Some(("trainingInput.jobDir", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.package-uris" => Some(("trainingInput.packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "training-input.worker-count" => Some(("trainingInput.workerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "training-input.encryption-config.kms-key-name" => Some(("trainingInput.encryptionConfig.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.parameter-server-config.tpu-tf-version" => Some(("trainingInput.parameterServerConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.parameter-server-config.accelerator-config.count" => Some(("trainingInput.parameterServerConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.parameter-server-config.accelerator-config.type" => Some(("trainingInput.parameterServerConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.parameter-server-config.image-uri" => Some(("trainingInput.parameterServerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.region" => Some(("trainingInput.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.python-version" => Some(("trainingInput.pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.evaluator-type" => Some(("trainingInput.evaluatorType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.parameter-server-type" => Some(("trainingInput.parameterServerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.worker-config.tpu-tf-version" => Some(("trainingInput.workerConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.worker-config.accelerator-config.count" => Some(("trainingInput.workerConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.worker-config.accelerator-config.type" => Some(("trainingInput.workerConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.worker-config.image-uri" => Some(("trainingInput.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.max-running-time" => Some(("trainingInput.maxRunningTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.master-config.tpu-tf-version" => Some(("trainingInput.masterConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.master-config.accelerator-config.count" => Some(("trainingInput.masterConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.master-config.accelerator-config.type" => Some(("trainingInput.masterConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.master-config.image-uri" => Some(("trainingInput.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.parameter-server-count" => Some(("trainingInput.parameterServerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "prediction-output.node-hours" => Some(("predictionOutput.nodeHours", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "prediction-output.output-path" => Some(("predictionOutput.outputPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -273,7 +367,7 @@ impl<'n> Engine<'n> {
                     "prediction-output.error-count" => Some(("predictionOutput.errorCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "algorithm", "args", "batch-size", "built-in-algorithm-output", "completed-trial-count", "consumed-ml-units", "count", "create-time", "data-format", "enable-trial-early-stopping", "end-time", "error-count", "error-message", "etag", "framework", "goal", "hyperparameter-metric-tag", "hyperparameters", "image-uri", "input-paths", "is-built-in-algorithm-job", "is-hyperparameter-tuning-job", "job-dir", "job-id", "labels", "master-config", "master-type", "max-failed-trials", "max-parallel-trials", "max-running-time", "max-trials", "max-worker-count", "model-name", "model-path", "node-hours", "output-data-format", "output-path", "package-uris", "parameter-server-config", "parameter-server-count", "parameter-server-type", "prediction-count", "prediction-input", "prediction-output", "python-module", "python-version", "region", "resume-previous-job-id", "runtime-version", "scale-tier", "signature-name", "start-time", "state", "tpu-tf-version", "training-input", "training-output", "type", "uri", "version-name", "worker-config", "worker-count", "worker-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "algorithm", "args", "batch-size", "built-in-algorithm-output", "completed-trial-count", "consumed-ml-units", "count", "create-time", "data-format", "enable-trial-early-stopping", "encryption-config", "end-time", "error-count", "error-message", "etag", "evaluator-config", "evaluator-count", "evaluator-type", "framework", "goal", "hyperparameter-metric-tag", "hyperparameters", "image-uri", "input-paths", "is-built-in-algorithm-job", "is-hyperparameter-tuning-job", "job-dir", "job-id", "kms-key-name", "labels", "master-config", "master-type", "max-failed-trials", "max-parallel-trials", "max-running-time", "max-trials", "max-worker-count", "model-name", "model-path", "node-hours", "output-data-format", "output-path", "package-uris", "parameter-server-config", "parameter-server-count", "parameter-server-type", "prediction-count", "prediction-input", "prediction-output", "python-module", "python-version", "region", "resume-previous-job-id", "runtime-version", "scale-tier", "scheduling", "signature-name", "start-time", "state", "tpu-tf-version", "training-input", "training-output", "type", "uri", "use-chief-in-tf-config", "version-name", "worker-config", "worker-count", "worker-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -391,6 +485,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -404,6 +501,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["options-requested-policy-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -549,14 +647,28 @@ impl<'n> Engine<'n> {
                     "prediction-input.region" => Some(("predictionInput.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "prediction-input.input-paths" => Some(("predictionInput.inputPaths", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "prediction-input.output-data-format" => Some(("predictionInput.outputDataFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.worker-type" => Some(("trainingInput.workerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.parameter-server-config.tpu-tf-version" => Some(("trainingInput.parameterServerConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.parameter-server-config.accelerator-config.count" => Some(("trainingInput.parameterServerConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.parameter-server-config.accelerator-config.type" => Some(("trainingInput.parameterServerConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.parameter-server-config.image-uri" => Some(("trainingInput.parameterServerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.runtime-version" => Some(("trainingInput.runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.scale-tier" => Some(("trainingInput.scaleTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.master-type" => Some(("trainingInput.masterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.job-dir" => Some(("trainingInput.jobDir", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.scheduling.max-running-time" => Some(("trainingInput.scheduling.maxRunningTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.parameter-server-count" => Some(("trainingInput.parameterServerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "training-input.evaluator-count" => Some(("trainingInput.evaluatorCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "training-input.worker-type" => Some(("trainingInput.workerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.scale-tier" => Some(("trainingInput.scaleTier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.package-uris" => Some(("trainingInput.packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "training-input.worker-config.tpu-tf-version" => Some(("trainingInput.workerConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.worker-config.accelerator-config.count" => Some(("trainingInput.workerConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.worker-config.accelerator-config.type" => Some(("trainingInput.workerConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.worker-config.image-uri" => Some(("trainingInput.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.evaluator-config.tpu-tf-version" => Some(("trainingInput.evaluatorConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.evaluator-config.accelerator-config.count" => Some(("trainingInput.evaluatorConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.evaluator-config.accelerator-config.type" => Some(("trainingInput.evaluatorConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.evaluator-config.image-uri" => Some(("trainingInput.evaluatorConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.use-chief-in-tf-config" => Some(("trainingInput.useChiefInTfConfig", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "training-input.master-config.tpu-tf-version" => Some(("trainingInput.masterConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.master-config.accelerator-config.count" => Some(("trainingInput.masterConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.master-config.accelerator-config.type" => Some(("trainingInput.masterConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.master-config.image-uri" => Some(("trainingInput.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.runtime-version" => Some(("trainingInput.runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.hyperparameters.max-trials" => Some(("trainingInput.hyperparameters.maxTrials", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "training-input.hyperparameters.goal" => Some(("trainingInput.hyperparameters.goal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.hyperparameters.algorithm" => Some(("trainingInput.hyperparameters.algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -565,24 +677,18 @@ impl<'n> Engine<'n> {
                     "training-input.hyperparameters.resume-previous-job-id" => Some(("trainingInput.hyperparameters.resumePreviousJobId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.hyperparameters.hyperparameter-metric-tag" => Some(("trainingInput.hyperparameters.hyperparameterMetricTag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.hyperparameters.max-parallel-trials" => Some(("trainingInput.hyperparameters.maxParallelTrials", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "training-input.region" => Some(("trainingInput.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.args" => Some(("trainingInput.args", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "training-input.python-module" => Some(("trainingInput.pythonModule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.python-version" => Some(("trainingInput.pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.job-dir" => Some(("trainingInput.jobDir", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.package-uris" => Some(("trainingInput.packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "training-input.worker-count" => Some(("trainingInput.workerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "training-input.encryption-config.kms-key-name" => Some(("trainingInput.encryptionConfig.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.parameter-server-config.tpu-tf-version" => Some(("trainingInput.parameterServerConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.parameter-server-config.accelerator-config.count" => Some(("trainingInput.parameterServerConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.parameter-server-config.accelerator-config.type" => Some(("trainingInput.parameterServerConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.parameter-server-config.image-uri" => Some(("trainingInput.parameterServerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.region" => Some(("trainingInput.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.python-version" => Some(("trainingInput.pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "training-input.evaluator-type" => Some(("trainingInput.evaluatorType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "training-input.parameter-server-type" => Some(("trainingInput.parameterServerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.worker-config.tpu-tf-version" => Some(("trainingInput.workerConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.worker-config.accelerator-config.count" => Some(("trainingInput.workerConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.worker-config.accelerator-config.type" => Some(("trainingInput.workerConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.worker-config.image-uri" => Some(("trainingInput.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.max-running-time" => Some(("trainingInput.maxRunningTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.master-config.tpu-tf-version" => Some(("trainingInput.masterConfig.tpuTfVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.master-config.accelerator-config.count" => Some(("trainingInput.masterConfig.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.master-config.accelerator-config.type" => Some(("trainingInput.masterConfig.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.master-config.image-uri" => Some(("trainingInput.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-input.parameter-server-count" => Some(("trainingInput.parameterServerCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "prediction-output.node-hours" => Some(("predictionOutput.nodeHours", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "prediction-output.output-path" => Some(("predictionOutput.outputPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -590,7 +696,7 @@ impl<'n> Engine<'n> {
                     "prediction-output.error-count" => Some(("predictionOutput.errorCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "algorithm", "args", "batch-size", "built-in-algorithm-output", "completed-trial-count", "consumed-ml-units", "count", "create-time", "data-format", "enable-trial-early-stopping", "end-time", "error-count", "error-message", "etag", "framework", "goal", "hyperparameter-metric-tag", "hyperparameters", "image-uri", "input-paths", "is-built-in-algorithm-job", "is-hyperparameter-tuning-job", "job-dir", "job-id", "labels", "master-config", "master-type", "max-failed-trials", "max-parallel-trials", "max-running-time", "max-trials", "max-worker-count", "model-name", "model-path", "node-hours", "output-data-format", "output-path", "package-uris", "parameter-server-config", "parameter-server-count", "parameter-server-type", "prediction-count", "prediction-input", "prediction-output", "python-module", "python-version", "region", "resume-previous-job-id", "runtime-version", "scale-tier", "signature-name", "start-time", "state", "tpu-tf-version", "training-input", "training-output", "type", "uri", "version-name", "worker-config", "worker-count", "worker-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "algorithm", "args", "batch-size", "built-in-algorithm-output", "completed-trial-count", "consumed-ml-units", "count", "create-time", "data-format", "enable-trial-early-stopping", "encryption-config", "end-time", "error-count", "error-message", "etag", "evaluator-config", "evaluator-count", "evaluator-type", "framework", "goal", "hyperparameter-metric-tag", "hyperparameters", "image-uri", "input-paths", "is-built-in-algorithm-job", "is-hyperparameter-tuning-job", "job-dir", "job-id", "kms-key-name", "labels", "master-config", "master-type", "max-failed-trials", "max-parallel-trials", "max-running-time", "max-trials", "max-worker-count", "model-name", "model-path", "node-hours", "output-data-format", "output-path", "package-uris", "parameter-server-config", "parameter-server-count", "parameter-server-type", "prediction-count", "prediction-input", "prediction-output", "python-module", "python-version", "region", "resume-previous-job-id", "runtime-version", "scale-tier", "scheduling", "signature-name", "start-time", "state", "tpu-tf-version", "training-input", "training-output", "type", "uri", "use-chief-in-tf-config", "version-name", "worker-config", "worker-count", "worker-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -937,6 +1043,1038 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_locations_operations_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_operations_cancel(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_operations_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_studies_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "inactive-reason" => Some(("inactiveReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "study-config.automated-stopping-config.decay-curve-stopping-config.use-elapsed-time" => Some(("studyConfig.automatedStoppingConfig.decayCurveStoppingConfig.useElapsedTime", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "study-config.automated-stopping-config.median-automated-stopping-config.use-elapsed-time" => Some(("studyConfig.automatedStoppingConfig.medianAutomatedStoppingConfig.useElapsedTime", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "study-config.algorithm" => Some(("studyConfig.algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "automated-stopping-config", "create-time", "decay-curve-stopping-config", "inactive-reason", "median-automated-stopping-config", "name", "state", "study-config", "use-elapsed-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudMlV1__Study = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_studies_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "study-id" => {
+                    call = call.study_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["study-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_studies_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_studies_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_studies_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_studies_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_studies_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_studies_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_studies_trials_add_measurement(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "measurement.elapsed-time" => Some(("measurement.elapsedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "measurement.step-count" => Some(("measurement.stepCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["elapsed-time", "measurement", "step-count"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudMlV1__AddTrialMeasurementRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_studies_trials_add_measurement(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_studies_trials_check_early_stopping_state(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudMlV1__CheckTrialEarlyStoppingStateRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_studies_trials_check_early_stopping_state(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_studies_trials_complete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "infeasible-reason" => Some(("infeasibleReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "final-measurement.elapsed-time" => Some(("finalMeasurement.elapsedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "final-measurement.step-count" => Some(("finalMeasurement.stepCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "trial-infeasible" => Some(("trialInfeasible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["elapsed-time", "final-measurement", "infeasible-reason", "step-count", "trial-infeasible"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudMlV1__CompleteTrialRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_studies_trials_complete(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_studies_trials_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "infeasible-reason" => Some(("infeasibleReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "final-measurement.elapsed-time" => Some(("finalMeasurement.elapsedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "final-measurement.step-count" => Some(("finalMeasurement.stepCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-id" => Some(("clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trial-infeasible" => Some(("trialInfeasible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["client-id", "elapsed-time", "end-time", "final-measurement", "infeasible-reason", "name", "start-time", "state", "step-count", "trial-infeasible"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudMlV1__Trial = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_studies_trials_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_studies_trials_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_studies_trials_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_studies_trials_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_studies_trials_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_studies_trials_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_studies_trials_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_studies_trials_stop(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudMlV1__StopTrialRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_studies_trials_stop(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_studies_trials_suggest(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "suggestion-count" => Some(("suggestionCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "client-id" => Some(("clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["client-id", "suggestion-count"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudMlV1__SuggestTrialsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_studies_trials_suggest(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_models_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -965,29 +2103,36 @@ impl<'n> Engine<'n> {
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "regions" => Some(("regions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-version.auto-scaling.min-nodes" => Some(("defaultVersion.autoScaling.minNodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "default-version.error-message" => Some(("defaultVersion.errorMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.accelerator-config.count" => Some(("defaultVersion.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.accelerator-config.type" => Some(("defaultVersion.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.labels" => Some(("defaultVersion.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "default-version.prediction-class" => Some(("defaultVersion.predictionClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.service-account" => Some(("defaultVersion.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.package-uris" => Some(("defaultVersion.packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "default-version.state" => Some(("defaultVersion.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.etag" => Some(("defaultVersion.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.last-use-time" => Some(("defaultVersion.lastUseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.deployment-uri" => Some(("defaultVersion.deploymentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.explanation-config.xrai-attribution.num-integral-steps" => Some(("defaultVersion.explanationConfig.xraiAttribution.numIntegralSteps", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "default-version.explanation-config.sampled-shapley-attribution.num-paths" => Some(("defaultVersion.explanationConfig.sampledShapleyAttribution.numPaths", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "default-version.explanation-config.integrated-gradients-attribution.num-integral-steps" => Some(("defaultVersion.explanationConfig.integratedGradientsAttribution.numIntegralSteps", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "default-version.is-default" => Some(("defaultVersion.isDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "default-version.machine-type" => Some(("defaultVersion.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.description" => Some(("defaultVersion.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.runtime-version" => Some(("defaultVersion.runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.manual-scaling.nodes" => Some(("defaultVersion.manualScaling.nodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "default-version.prediction-class" => Some(("defaultVersion.predictionClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-version.labels" => Some(("defaultVersion.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "default-version.service-account" => Some(("defaultVersion.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-version.state" => Some(("defaultVersion.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-version.python-version" => Some(("defaultVersion.pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.error-message" => Some(("defaultVersion.errorMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.framework" => Some(("defaultVersion.framework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-version.package-uris" => Some(("defaultVersion.packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "default-version.etag" => Some(("defaultVersion.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-version.last-use-time" => Some(("defaultVersion.lastUseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-version.deployment-uri" => Some(("defaultVersion.deploymentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.create-time" => Some(("defaultVersion.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-version.is-default" => Some(("defaultVersion.isDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "default-version.name" => Some(("defaultVersion.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.auto-scaling.min-nodes" => Some(("defaultVersion.autoScaling.minNodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "default-version.python-version" => Some(("defaultVersion.pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.request-logging-config.sampling-percentage" => Some(("defaultVersion.requestLoggingConfig.samplingPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "default-version.request-logging-config.bigquery-table-name" => Some(("defaultVersion.requestLoggingConfig.bigqueryTableName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "online-prediction-logging" => Some(("onlinePredictionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-scaling", "create-time", "default-version", "deployment-uri", "description", "error-message", "etag", "framework", "is-default", "labels", "last-use-time", "machine-type", "manual-scaling", "min-nodes", "name", "nodes", "online-prediction-console-logging", "online-prediction-logging", "package-uris", "prediction-class", "python-version", "regions", "runtime-version", "service-account", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "auto-scaling", "bigquery-table-name", "count", "create-time", "default-version", "deployment-uri", "description", "error-message", "etag", "explanation-config", "framework", "integrated-gradients-attribution", "is-default", "labels", "last-use-time", "machine-type", "manual-scaling", "min-nodes", "name", "nodes", "num-integral-steps", "num-paths", "online-prediction-console-logging", "online-prediction-logging", "package-uris", "prediction-class", "python-version", "regions", "request-logging-config", "runtime-version", "sampled-shapley-attribution", "sampling-percentage", "service-account", "state", "type", "xrai-attribution"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1157,6 +2302,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1170,6 +2318,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["options-requested-policy-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1293,29 +2442,36 @@ impl<'n> Engine<'n> {
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "regions" => Some(("regions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-version.auto-scaling.min-nodes" => Some(("defaultVersion.autoScaling.minNodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "default-version.error-message" => Some(("defaultVersion.errorMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.accelerator-config.count" => Some(("defaultVersion.acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.accelerator-config.type" => Some(("defaultVersion.acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.labels" => Some(("defaultVersion.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "default-version.prediction-class" => Some(("defaultVersion.predictionClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.service-account" => Some(("defaultVersion.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.package-uris" => Some(("defaultVersion.packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "default-version.state" => Some(("defaultVersion.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.etag" => Some(("defaultVersion.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.last-use-time" => Some(("defaultVersion.lastUseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.deployment-uri" => Some(("defaultVersion.deploymentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.explanation-config.xrai-attribution.num-integral-steps" => Some(("defaultVersion.explanationConfig.xraiAttribution.numIntegralSteps", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "default-version.explanation-config.sampled-shapley-attribution.num-paths" => Some(("defaultVersion.explanationConfig.sampledShapleyAttribution.numPaths", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "default-version.explanation-config.integrated-gradients-attribution.num-integral-steps" => Some(("defaultVersion.explanationConfig.integratedGradientsAttribution.numIntegralSteps", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "default-version.is-default" => Some(("defaultVersion.isDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "default-version.machine-type" => Some(("defaultVersion.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.description" => Some(("defaultVersion.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.runtime-version" => Some(("defaultVersion.runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.manual-scaling.nodes" => Some(("defaultVersion.manualScaling.nodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "default-version.prediction-class" => Some(("defaultVersion.predictionClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-version.labels" => Some(("defaultVersion.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "default-version.service-account" => Some(("defaultVersion.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-version.state" => Some(("defaultVersion.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-version.python-version" => Some(("defaultVersion.pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.error-message" => Some(("defaultVersion.errorMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.framework" => Some(("defaultVersion.framework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-version.package-uris" => Some(("defaultVersion.packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "default-version.etag" => Some(("defaultVersion.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-version.last-use-time" => Some(("defaultVersion.lastUseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-version.deployment-uri" => Some(("defaultVersion.deploymentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-version.create-time" => Some(("defaultVersion.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "default-version.is-default" => Some(("defaultVersion.isDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "default-version.name" => Some(("defaultVersion.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.auto-scaling.min-nodes" => Some(("defaultVersion.autoScaling.minNodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "default-version.python-version" => Some(("defaultVersion.pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-version.request-logging-config.sampling-percentage" => Some(("defaultVersion.requestLoggingConfig.samplingPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "default-version.request-logging-config.bigquery-table-name" => Some(("defaultVersion.requestLoggingConfig.bigqueryTableName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "online-prediction-logging" => Some(("onlinePredictionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-scaling", "create-time", "default-version", "deployment-uri", "description", "error-message", "etag", "framework", "is-default", "labels", "last-use-time", "machine-type", "manual-scaling", "min-nodes", "name", "nodes", "online-prediction-console-logging", "online-prediction-logging", "package-uris", "prediction-class", "python-version", "regions", "runtime-version", "service-account", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "auto-scaling", "bigquery-table-name", "count", "create-time", "default-version", "deployment-uri", "description", "error-message", "etag", "explanation-config", "framework", "integrated-gradients-attribution", "is-default", "labels", "last-use-time", "machine-type", "manual-scaling", "min-nodes", "name", "nodes", "num-integral-steps", "num-paths", "online-prediction-console-logging", "online-prediction-logging", "package-uris", "prediction-class", "python-version", "regions", "request-logging-config", "runtime-version", "sampled-shapley-attribution", "sampling-percentage", "service-account", "state", "type", "xrai-attribution"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1574,27 +2730,34 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "auto-scaling.min-nodes" => Some(("autoScaling.minNodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "error-message" => Some(("errorMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "accelerator-config.count" => Some(("acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "accelerator-config.type" => Some(("acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "prediction-class" => Some(("predictionClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package-uris" => Some(("packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-use-time" => Some(("lastUseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deployment-uri" => Some(("deploymentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "explanation-config.xrai-attribution.num-integral-steps" => Some(("explanationConfig.xraiAttribution.numIntegralSteps", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "explanation-config.sampled-shapley-attribution.num-paths" => Some(("explanationConfig.sampledShapleyAttribution.numPaths", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "explanation-config.integrated-gradients-attribution.num-integral-steps" => Some(("explanationConfig.integratedGradientsAttribution.numIntegralSteps", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "is-default" => Some(("isDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "machine-type" => Some(("machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-version" => Some(("runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "manual-scaling.nodes" => Some(("manualScaling.nodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "prediction-class" => Some(("predictionClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "python-version" => Some(("pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "error-message" => Some(("errorMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "framework" => Some(("framework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "package-uris" => Some(("packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-use-time" => Some(("lastUseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "deployment-uri" => Some(("deploymentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "is-default" => Some(("isDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "auto-scaling.min-nodes" => Some(("autoScaling.minNodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "python-version" => Some(("pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "request-logging-config.sampling-percentage" => Some(("requestLoggingConfig.samplingPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "request-logging-config.bigquery-table-name" => Some(("requestLoggingConfig.bigqueryTableName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-scaling", "create-time", "deployment-uri", "description", "error-message", "etag", "framework", "is-default", "labels", "last-use-time", "machine-type", "manual-scaling", "min-nodes", "name", "nodes", "package-uris", "prediction-class", "python-version", "runtime-version", "service-account", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "auto-scaling", "bigquery-table-name", "count", "create-time", "deployment-uri", "description", "error-message", "etag", "explanation-config", "framework", "integrated-gradients-attribution", "is-default", "labels", "last-use-time", "machine-type", "manual-scaling", "min-nodes", "name", "nodes", "num-integral-steps", "num-paths", "package-uris", "prediction-class", "python-version", "request-logging-config", "runtime-version", "sampled-shapley-attribution", "sampling-percentage", "service-account", "state", "type", "xrai-attribution"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1843,27 +3006,34 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "auto-scaling.min-nodes" => Some(("autoScaling.minNodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "error-message" => Some(("errorMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "accelerator-config.count" => Some(("acceleratorConfig.count", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "accelerator-config.type" => Some(("acceleratorConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "prediction-class" => Some(("predictionClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "package-uris" => Some(("packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-use-time" => Some(("lastUseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deployment-uri" => Some(("deploymentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "explanation-config.xrai-attribution.num-integral-steps" => Some(("explanationConfig.xraiAttribution.numIntegralSteps", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "explanation-config.sampled-shapley-attribution.num-paths" => Some(("explanationConfig.sampledShapleyAttribution.numPaths", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "explanation-config.integrated-gradients-attribution.num-integral-steps" => Some(("explanationConfig.integratedGradientsAttribution.numIntegralSteps", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "is-default" => Some(("isDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "machine-type" => Some(("machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-version" => Some(("runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "manual-scaling.nodes" => Some(("manualScaling.nodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "prediction-class" => Some(("predictionClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "python-version" => Some(("pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "error-message" => Some(("errorMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "framework" => Some(("framework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "package-uris" => Some(("packageUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-use-time" => Some(("lastUseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "deployment-uri" => Some(("deploymentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "is-default" => Some(("isDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "auto-scaling.min-nodes" => Some(("autoScaling.minNodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "python-version" => Some(("pythonVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "request-logging-config.sampling-percentage" => Some(("requestLoggingConfig.samplingPercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "request-logging-config.bigquery-table-name" => Some(("requestLoggingConfig.bigqueryTableName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-scaling", "create-time", "deployment-uri", "description", "error-message", "etag", "framework", "is-default", "labels", "last-use-time", "machine-type", "manual-scaling", "min-nodes", "name", "nodes", "package-uris", "prediction-class", "python-version", "runtime-version", "service-account", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-config", "auto-scaling", "bigquery-table-name", "count", "create-time", "deployment-uri", "description", "error-message", "etag", "explanation-config", "framework", "integrated-gradients-attribution", "is-default", "labels", "last-use-time", "machine-type", "manual-scaling", "min-nodes", "name", "nodes", "num-integral-steps", "num-paths", "package-uris", "prediction-class", "python-version", "request-logging-config", "runtime-version", "sampled-shapley-attribution", "sampling-percentage", "service-account", "state", "type", "xrai-attribution"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2270,6 +3440,9 @@ impl<'n> Engine<'n> {
         match self.opt.subcommand() {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
+                    ("explain", Some(opt)) => {
+                        call_result = self._projects_explain(opt, dry_run, &mut err);
+                    },
                     ("get-config", Some(opt)) => {
                         call_result = self._projects_get_config(opt, dry_run, &mut err);
                     },
@@ -2302,6 +3475,51 @@ impl<'n> Engine<'n> {
                     },
                     ("locations-list", Some(opt)) => {
                         call_result = self._projects_locations_list(opt, dry_run, &mut err);
+                    },
+                    ("locations-operations-cancel", Some(opt)) => {
+                        call_result = self._projects_locations_operations_cancel(opt, dry_run, &mut err);
+                    },
+                    ("locations-operations-get", Some(opt)) => {
+                        call_result = self._projects_locations_operations_get(opt, dry_run, &mut err);
+                    },
+                    ("locations-studies-create", Some(opt)) => {
+                        call_result = self._projects_locations_studies_create(opt, dry_run, &mut err);
+                    },
+                    ("locations-studies-delete", Some(opt)) => {
+                        call_result = self._projects_locations_studies_delete(opt, dry_run, &mut err);
+                    },
+                    ("locations-studies-get", Some(opt)) => {
+                        call_result = self._projects_locations_studies_get(opt, dry_run, &mut err);
+                    },
+                    ("locations-studies-list", Some(opt)) => {
+                        call_result = self._projects_locations_studies_list(opt, dry_run, &mut err);
+                    },
+                    ("locations-studies-trials-add-measurement", Some(opt)) => {
+                        call_result = self._projects_locations_studies_trials_add_measurement(opt, dry_run, &mut err);
+                    },
+                    ("locations-studies-trials-check-early-stopping-state", Some(opt)) => {
+                        call_result = self._projects_locations_studies_trials_check_early_stopping_state(opt, dry_run, &mut err);
+                    },
+                    ("locations-studies-trials-complete", Some(opt)) => {
+                        call_result = self._projects_locations_studies_trials_complete(opt, dry_run, &mut err);
+                    },
+                    ("locations-studies-trials-create", Some(opt)) => {
+                        call_result = self._projects_locations_studies_trials_create(opt, dry_run, &mut err);
+                    },
+                    ("locations-studies-trials-delete", Some(opt)) => {
+                        call_result = self._projects_locations_studies_trials_delete(opt, dry_run, &mut err);
+                    },
+                    ("locations-studies-trials-get", Some(opt)) => {
+                        call_result = self._projects_locations_studies_trials_get(opt, dry_run, &mut err);
+                    },
+                    ("locations-studies-trials-list", Some(opt)) => {
+                        call_result = self._projects_locations_studies_trials_list(opt, dry_run, &mut err);
+                    },
+                    ("locations-studies-trials-stop", Some(opt)) => {
+                        call_result = self._projects_locations_studies_trials_stop(opt, dry_run, &mut err);
+                    },
+                    ("locations-studies-trials-suggest", Some(opt)) => {
+                        call_result = self._projects_locations_studies_trials_suggest(opt, dry_run, &mut err);
                     },
                     ("models-create", Some(opt)) => {
                         call_result = self._projects_models_create(opt, dry_run, &mut err);
@@ -2448,7 +3666,39 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'get-config', 'jobs-cancel', 'jobs-create', 'jobs-get', 'jobs-get-iam-policy', 'jobs-list', 'jobs-patch', 'jobs-set-iam-policy', 'jobs-test-iam-permissions', 'locations-get', 'locations-list', 'models-create', 'models-delete', 'models-get', 'models-get-iam-policy', 'models-list', 'models-patch', 'models-set-iam-policy', 'models-test-iam-permissions', 'models-versions-create', 'models-versions-delete', 'models-versions-get', 'models-versions-list', 'models-versions-patch', 'models-versions-set-default', 'operations-cancel', 'operations-get', 'operations-list' and 'predict'", vec![
+        ("projects", "methods: 'explain', 'get-config', 'jobs-cancel', 'jobs-create', 'jobs-get', 'jobs-get-iam-policy', 'jobs-list', 'jobs-patch', 'jobs-set-iam-policy', 'jobs-test-iam-permissions', 'locations-get', 'locations-list', 'locations-operations-cancel', 'locations-operations-get', 'locations-studies-create', 'locations-studies-delete', 'locations-studies-get', 'locations-studies-list', 'locations-studies-trials-add-measurement', 'locations-studies-trials-check-early-stopping-state', 'locations-studies-trials-complete', 'locations-studies-trials-create', 'locations-studies-trials-delete', 'locations-studies-trials-get', 'locations-studies-trials-list', 'locations-studies-trials-stop', 'locations-studies-trials-suggest', 'models-create', 'models-delete', 'models-get', 'models-get-iam-policy', 'models-list', 'models-patch', 'models-set-iam-policy', 'models-test-iam-permissions', 'models-versions-create', 'models-versions-delete', 'models-versions-get', 'models-versions-list', 'models-versions-patch', 'models-versions-set-default', 'operations-cancel', 'operations-get', 'operations-list' and 'predict'", vec![
+            ("explain",
+                    Some(r##"Performs explanation on the data in the request.
+        AI Platform implements a custom `explain` verb on top of an HTTP POST
+        method."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_explain",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The resource name of a model or a version.
+        
+        Authorization: requires the `predict` permission on the specified resource."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("get-config",
                     Some(r##"Get the service account information associated with your project. You need
         this information in order to grant the service account permissions for
@@ -2634,7 +3884,9 @@ fn main() {
                   ]),
             ("jobs-set-iam-policy",
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
-        existing policy."##),
+        existing policy.
+        
+        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_jobs-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -2743,12 +3995,399 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-operations-cancel",
+                    Some(r##"Starts asynchronous cancellation on a long-running operation.  The server
+        makes a best effort to cancel the operation, but success is not
+        guaranteed.  If the server doesn't support this method, it returns
+        `google.rpc.Code.UNIMPLEMENTED`.  Clients can use
+        Operations.GetOperation or
+        other methods to check whether the cancellation succeeded or whether the
+        operation completed despite cancellation. On successful cancellation,
+        the operation is not deleted; instead, it becomes an operation with
+        an Operation.error value with a google.rpc.Status.code of 1,
+        corresponding to `Code.CANCELLED`."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-operations-cancel",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the operation resource to be cancelled."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-operations-get",
+                    Some(r##"Gets the latest state of a long-running operation.  Clients can use this
+        method to poll the operation result at intervals as recommended by the API
+        service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-operations-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the operation resource."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-studies-create",
+                    Some(r##"Creates a study."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The project and location that the study belongs to.
+        Format: projects/{project}/locations/{location}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-studies-delete",
+                    Some(r##"Deletes a study."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The study name."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-studies-get",
+                    Some(r##"Gets a study."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The study name."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-studies-list",
+                    Some(r##"Lists all the studies in a region for an associated project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The project and location that the study belongs to.
+        Format: projects/{project}/locations/{location}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-studies-trials-add-measurement",
+                    Some(r##"Adds a measurement of the objective metrics to a Trial. This measurement
+        is assumed to have been taken before the Trial is complete."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-trials-add-measurement",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The trial name."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-studies-trials-check-early-stopping-state",
+                    Some(r##"Checks whether a trial should stop or not."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-trials-check-early-stopping-state",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The trial name."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-studies-trials-complete",
+                    Some(r##"Marks a Trial as complete."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-trials-complete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The trial name."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-studies-trials-create",
+                    Some(r##"Adds a user provided trial to a Study."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-trials-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the study that the trial belongs to."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-studies-trials-delete",
+                    Some(r##"Deletes a Trial."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-trials-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The trial name."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-studies-trials-get",
+                    Some(r##"Gets a Trial."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-trials-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The trial name."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-studies-trials-list",
+                    Some(r##"Lists the trials associated with a Study."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-trials-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the study that the trial belongs to."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-studies-trials-stop",
+                    Some(r##"Stops a trial."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-trials-stop",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The trial name."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-studies-trials-suggest",
+                    Some(r##"Returns a long-running operation associated with the generation of trial
+        suggestions."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_locations-studies-trials-suggest",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the study that the trial belongs to."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("models-create",
                     Some(r##"Creates a model which will later contain one or more versions.
         
         You must add at least one version before you can request predictions from
         the model. Add versions by calling
-        [projects.models.versions.create](/ml-engine/reference/rest/v1/projects.models.versions/create)."##),
+        projects.models.versions.create."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_models-create",
                   vec![
                     (Some(r##"parent"##),
@@ -2780,7 +4419,7 @@ fn main() {
         
         You can only delete a model if there are no versions in it. You can delete
         versions by calling
-        [projects.models.versions.delete](/ml-engine/reference/rest/v1/projects.models.versions/delete)."##),
+        projects.models.versions.delete."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_models-delete",
                   vec![
                     (Some(r##"name"##),
@@ -2911,7 +4550,9 @@ fn main() {
                   ]),
             ("models-set-iam-policy",
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
-        existing policy."##),
+        existing policy.
+        
+        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_models-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -2982,7 +4623,7 @@ fn main() {
         model. When you add a version to a model that already has one or more
         versions, the default version does not automatically change. If you want a
         new version to be the default, you must call
-        [projects.models.versions.setDefault](/ml-engine/reference/rest/v1/projects.models.versions/setDefault)."##),
+        projects.models.versions.setDefault."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_models-versions-create",
                   vec![
                     (Some(r##"parent"##),
@@ -3023,7 +4664,7 @@ fn main() {
                      None,
                      Some(r##"Required. The name of the version. You can get the names of all the
         versions of a model by calling
-        [projects.models.versions.list](/ml-engine/reference/rest/v1/projects.models.versions/list)."##),
+        projects.models.versions.list."##),
                      Some(true),
                      Some(false)),
         
@@ -3043,7 +4684,7 @@ fn main() {
                     Some(r##"Gets information about a model version.
         
         Models can have multiple versions. You can call
-        [projects.models.versions.list](/ml-engine/reference/rest/v1/projects.models.versions/list)
+        projects.models.versions.list
         to get the same information that this method returns for all of the
         versions of a model."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_models-versions-get",
@@ -3098,8 +4739,8 @@ fn main() {
             ("models-versions-patch",
                     Some(r##"Updates the specified Version resource.
         
-        Currently the only update-able fields are `description` and
-        `autoScaling.minNodes`."##),
+        Currently the only update-able fields are `description`,
+        `requestLoggingConfig`, `autoScaling.minNodes`, and `manualScaling.nodes`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_models-versions-patch",
                   vec![
                     (Some(r##"name"##),
@@ -3141,7 +4782,7 @@ fn main() {
                      None,
                      Some(r##"Required. The name of the version to make the default for the model. You
         can get the names of all the versions of a model by calling
-        [projects.models.versions.list](/ml-engine/reference/rest/v1/projects.models.versions/list)."##),
+        projects.models.versions.list."##),
                      Some(true),
                      Some(false)),
         
@@ -3250,10 +4891,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("predict",
-                    Some(r##"Performs prediction on the data in the request.
-        AI Platform implements a custom `predict` verb on top of an HTTP POST
-        method. <p>For details of the request and response format, see the **guide
-        to the [predict request format](/ml-engine/docs/v1/predict-request)**."##),
+                    Some(r##"Performs online prediction on the data in the request.
+        
+        <div>{% dynamic include "/ai-platform/includes/___predict-request" %}</div>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_ml1_cli/projects_predict",
                   vec![
                     (Some(r##"name"##),
@@ -3288,7 +4928,7 @@ fn main() {
     
     let mut app = App::new("ml1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190621")
+           .version("1.0.13+20200328")
            .about("An API to enable creating and using machine learning models.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_ml1_cli")
            .arg(Arg::with_name("url")

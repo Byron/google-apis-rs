@@ -329,6 +329,58 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _folders_delete_access_approval_settings(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().delete_access_approval_settings(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _folders_get_access_approval_settings(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.folders().get_access_approval_settings(opt.value_of("name").unwrap_or(""));
@@ -404,10 +456,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "enrolled-ancestor" => Some(("enrolledAncestor", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "notification-emails" => Some(("notificationEmails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "notification-emails"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["enrolled-ancestor", "name", "notification-emails"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -421,6 +474,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -434,6 +490,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -750,6 +807,58 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _organizations_delete_access_approval_settings(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().delete_access_approval_settings(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _organizations_get_access_approval_settings(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.organizations().get_access_approval_settings(opt.value_of("name").unwrap_or(""));
@@ -825,10 +934,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "enrolled-ancestor" => Some(("enrolledAncestor", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "notification-emails" => Some(("notificationEmails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "notification-emails"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["enrolled-ancestor", "name", "notification-emails"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -842,6 +952,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -855,6 +968,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1171,6 +1285,58 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_delete_access_approval_settings(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().delete_access_approval_settings(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_get_access_approval_settings(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().get_access_approval_settings(opt.value_of("name").unwrap_or(""));
@@ -1246,10 +1412,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "enrolled-ancestor" => Some(("enrolledAncestor", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "notification-emails" => Some(("notificationEmails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "notification-emails"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["enrolled-ancestor", "name", "notification-emails"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1263,6 +1430,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1276,6 +1446,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1328,6 +1499,9 @@ impl<'n> Engine<'n> {
                     ("approval-requests-list", Some(opt)) => {
                         call_result = self._folders_approval_requests_list(opt, dry_run, &mut err);
                     },
+                    ("delete-access-approval-settings", Some(opt)) => {
+                        call_result = self._folders_delete_access_approval_settings(opt, dry_run, &mut err);
+                    },
                     ("get-access-approval-settings", Some(opt)) => {
                         call_result = self._folders_get_access_approval_settings(opt, dry_run, &mut err);
                     },
@@ -1354,6 +1528,9 @@ impl<'n> Engine<'n> {
                     ("approval-requests-list", Some(opt)) => {
                         call_result = self._organizations_approval_requests_list(opt, dry_run, &mut err);
                     },
+                    ("delete-access-approval-settings", Some(opt)) => {
+                        call_result = self._organizations_delete_access_approval_settings(opt, dry_run, &mut err);
+                    },
                     ("get-access-approval-settings", Some(opt)) => {
                         call_result = self._organizations_get_access_approval_settings(opt, dry_run, &mut err);
                     },
@@ -1379,6 +1556,9 @@ impl<'n> Engine<'n> {
                     },
                     ("approval-requests-list", Some(opt)) => {
                         call_result = self._projects_approval_requests_list(opt, dry_run, &mut err);
+                    },
+                    ("delete-access-approval-settings", Some(opt)) => {
+                        call_result = self._projects_delete_access_approval_settings(opt, dry_run, &mut err);
                     },
                     ("get-access-approval-settings", Some(opt)) => {
                         call_result = self._projects_get_access_approval_settings(opt, dry_run, &mut err);
@@ -1477,7 +1657,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("folders", "methods: 'approval-requests-approve', 'approval-requests-dismiss', 'approval-requests-get', 'approval-requests-list', 'get-access-approval-settings' and 'update-access-approval-settings'", vec![
+        ("folders", "methods: 'approval-requests-approve', 'approval-requests-dismiss', 'approval-requests-get', 'approval-requests-list', 'delete-access-approval-settings', 'get-access-approval-settings' and 'update-access-approval-settings'", vec![
             ("approval-requests-approve",
                     Some(r##"Approves a request and returns the updated ApprovalRequest.
         
@@ -1593,6 +1773,33 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("delete-access-approval-settings",
+                    Some(r##"Deletes the settings associated with a project, folder, or organization.
+        This will have the effect of disabling Access Approval for the project,
+        folder, or organization, but only if all ancestors also have Access
+        Approval disabled. If Access Approval is enabled at a higher level of the
+        hierarchy, then Access Approval will still be enabled at this level as
+        the settings are inherited."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_beta1_cli/folders_delete-access-approval-settings",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Name of the AccessApprovalSettings to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("get-access-approval-settings",
                     Some(r##"Gets the settings associated with a project, folder, or organization."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_beta1_cli/folders_get-access-approval-settings",
@@ -1617,7 +1824,7 @@ fn main() {
                   ]),
             ("update-access-approval-settings",
                     Some(r##"Updates the settings associated with a project, folder, or organization.
-        Completely replaces the existing settings."##),
+        Settings to update are determined by the value of field_mask."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_beta1_cli/folders_update-access-approval-settings",
                   vec![
                     (Some(r##"name"##),
@@ -1651,7 +1858,7 @@ fn main() {
                   ]),
             ]),
         
-        ("organizations", "methods: 'approval-requests-approve', 'approval-requests-dismiss', 'approval-requests-get', 'approval-requests-list', 'get-access-approval-settings' and 'update-access-approval-settings'", vec![
+        ("organizations", "methods: 'approval-requests-approve', 'approval-requests-dismiss', 'approval-requests-get', 'approval-requests-list', 'delete-access-approval-settings', 'get-access-approval-settings' and 'update-access-approval-settings'", vec![
             ("approval-requests-approve",
                     Some(r##"Approves a request and returns the updated ApprovalRequest.
         
@@ -1767,6 +1974,33 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("delete-access-approval-settings",
+                    Some(r##"Deletes the settings associated with a project, folder, or organization.
+        This will have the effect of disabling Access Approval for the project,
+        folder, or organization, but only if all ancestors also have Access
+        Approval disabled. If Access Approval is enabled at a higher level of the
+        hierarchy, then Access Approval will still be enabled at this level as
+        the settings are inherited."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_beta1_cli/organizations_delete-access-approval-settings",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Name of the AccessApprovalSettings to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("get-access-approval-settings",
                     Some(r##"Gets the settings associated with a project, folder, or organization."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_beta1_cli/organizations_get-access-approval-settings",
@@ -1791,7 +2025,7 @@ fn main() {
                   ]),
             ("update-access-approval-settings",
                     Some(r##"Updates the settings associated with a project, folder, or organization.
-        Completely replaces the existing settings."##),
+        Settings to update are determined by the value of field_mask."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_beta1_cli/organizations_update-access-approval-settings",
                   vec![
                     (Some(r##"name"##),
@@ -1825,7 +2059,7 @@ fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'approval-requests-approve', 'approval-requests-dismiss', 'approval-requests-get', 'approval-requests-list', 'get-access-approval-settings' and 'update-access-approval-settings'", vec![
+        ("projects", "methods: 'approval-requests-approve', 'approval-requests-dismiss', 'approval-requests-get', 'approval-requests-list', 'delete-access-approval-settings', 'get-access-approval-settings' and 'update-access-approval-settings'", vec![
             ("approval-requests-approve",
                     Some(r##"Approves a request and returns the updated ApprovalRequest.
         
@@ -1941,6 +2175,33 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("delete-access-approval-settings",
+                    Some(r##"Deletes the settings associated with a project, folder, or organization.
+        This will have the effect of disabling Access Approval for the project,
+        folder, or organization, but only if all ancestors also have Access
+        Approval disabled. If Access Approval is enabled at a higher level of the
+        hierarchy, then Access Approval will still be enabled at this level as
+        the settings are inherited."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_beta1_cli/projects_delete-access-approval-settings",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Name of the AccessApprovalSettings to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("get-access-approval-settings",
                     Some(r##"Gets the settings associated with a project, folder, or organization."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_beta1_cli/projects_get-access-approval-settings",
@@ -1965,7 +2226,7 @@ fn main() {
                   ]),
             ("update-access-approval-settings",
                     Some(r##"Updates the settings associated with a project, folder, or organization.
-        Completely replaces the existing settings."##),
+        Settings to update are determined by the value of field_mask."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_beta1_cli/projects_update-access-approval-settings",
                   vec![
                     (Some(r##"name"##),
@@ -2003,7 +2264,7 @@ fn main() {
     
     let mut app = App::new("accessapproval1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190628")
+           .version("1.0.13+20200409")
            .about("An API for controlling access to data by Google personnel.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_accessapproval1_beta1_cli")
            .arg(Arg::with_name("url")

@@ -244,6 +244,92 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_add_google_analytics(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "analytics-account-id" => Some(("analyticsAccountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "analytics-property-id" => Some(("analyticsPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analytics-account-id", "analytics-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AddGoogleAnalyticsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().add_google_analytics(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_android_apps_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1028,6 +1114,58 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_get_analytics_details(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().get_analytics_details(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_ios_apps_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1530,6 +1668,91 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_remove_analytics(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "analytics-property-id" => Some(("analyticsPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analytics-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::RemoveAnalyticsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().remove_analytics(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_search_apps(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().search_apps(opt.value_of("parent").unwrap_or(""));
@@ -1966,6 +2189,9 @@ impl<'n> Engine<'n> {
                     ("add-firebase", Some(opt)) => {
                         call_result = self._projects_add_firebase(opt, dry_run, &mut err);
                     },
+                    ("add-google-analytics", Some(opt)) => {
+                        call_result = self._projects_add_google_analytics(opt, dry_run, &mut err);
+                    },
                     ("android-apps-create", Some(opt)) => {
                         call_result = self._projects_android_apps_create(opt, dry_run, &mut err);
                     },
@@ -2002,6 +2228,9 @@ impl<'n> Engine<'n> {
                     ("get-admin-sdk-config", Some(opt)) => {
                         call_result = self._projects_get_admin_sdk_config(opt, dry_run, &mut err);
                     },
+                    ("get-analytics-details", Some(opt)) => {
+                        call_result = self._projects_get_analytics_details(opt, dry_run, &mut err);
+                    },
                     ("ios-apps-create", Some(opt)) => {
                         call_result = self._projects_ios_apps_create(opt, dry_run, &mut err);
                     },
@@ -2022,6 +2251,9 @@ impl<'n> Engine<'n> {
                     },
                     ("patch", Some(opt)) => {
                         call_result = self._projects_patch(opt, dry_run, &mut err);
+                    },
+                    ("remove-analytics", Some(opt)) => {
+                        call_result = self._projects_remove_analytics(opt, dry_run, &mut err);
                     },
                     ("search-apps", Some(opt)) => {
                         call_result = self._projects_search_apps(opt, dry_run, &mut err);
@@ -2190,7 +2422,7 @@ fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'add-firebase', 'android-apps-create', 'android-apps-get', 'android-apps-get-config', 'android-apps-list', 'android-apps-patch', 'android-apps-sha-create', 'android-apps-sha-delete', 'android-apps-sha-list', 'available-locations-list', 'default-location-finalize', 'get', 'get-admin-sdk-config', 'ios-apps-create', 'ios-apps-get', 'ios-apps-get-config', 'ios-apps-list', 'ios-apps-patch', 'list', 'patch', 'search-apps', 'web-apps-create', 'web-apps-get', 'web-apps-get-config', 'web-apps-list' and 'web-apps-patch'", vec![
+        ("projects", "methods: 'add-firebase', 'add-google-analytics', 'android-apps-create', 'android-apps-get', 'android-apps-get-config', 'android-apps-list', 'android-apps-patch', 'android-apps-sha-create', 'android-apps-sha-delete', 'android-apps-sha-list', 'available-locations-list', 'default-location-finalize', 'get', 'get-admin-sdk-config', 'get-analytics-details', 'ios-apps-create', 'ios-apps-get', 'ios-apps-get-config', 'ios-apps-list', 'ios-apps-patch', 'list', 'patch', 'remove-analytics', 'search-apps', 'web-apps-create', 'web-apps-get', 'web-apps-get-config', 'web-apps-list' and 'web-apps-patch'", vec![
             ("add-firebase",
                     Some(r##"Adds Firebase resources to the specified existing
         [Google Cloud Platform (GCP) `Project`]
@@ -2215,8 +2447,6 @@ fn main() {
         <br>
         <br>This method does not modify any billing account information on the
         underlying GCP `Project`.
-        <br>
-        <br>All fields listed in the [request body](#request-body) are required.
         <br>
         <br>To call `AddFirebase`, a member must be an Editor or Owner for the
         existing GCP `Project`. Service accounts cannot call `AddFirebase`."##),
@@ -2251,6 +2481,88 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("add-google-analytics",
+                    Some(r##"Links a FirebaseProject with an existing
+        [Google Analytics account](http://www.google.com/analytics/).
+        <br>
+        <br>Using this call, you can either:
+        <ul>
+        <li>Specify an `analyticsAccountId` to provision a new Google Analytics
+        property within the specified account and associate the new property with
+        your `FirebaseProject`.</li>
+        <li>Specify an existing `analyticsPropertyId` to associate the property
+        with your `FirebaseProject`.</li>
+        </ul>
+        <br>
+        Note that when you call `AddGoogleAnalytics`:
+        <ol>
+        <li>The first check determines if any existing data streams in the
+        Google Analytics property correspond to any existing Firebase Apps in your
+        `FirebaseProject` (based on the `packageName` or `bundleId` associated with
+        the data stream). Then, as applicable, the data streams and apps are
+        linked. Note that this auto-linking only applies to Android Apps and iOS
+        Apps.</li>
+        <li>If no corresponding data streams are found for your Firebase Apps,
+        new data streams are provisioned in the Google Analytics property
+        for each of your Firebase Apps. Note that a new data stream is always
+        provisioned for a Web App even if it was previously associated with a
+        data stream in your Analytics property.</li>
+        </ol>
+        Learn more about the hierarchy and structure of Google Analytics
+        accounts in the
+        [Analytics
+        documentation](https://support.google.com/analytics/answer/9303323).
+        <br>
+        <br>The result of this call is an [`Operation`](../../v1beta1/operations).
+        Poll the `Operation` to track the provisioning process by calling
+        GetOperation until
+        [`done`](../../v1beta1/operations#Operation.FIELDS.done) is `true`. When
+        `done` is `true`, the `Operation` has either succeeded or failed. If the
+        `Operation` succeeded, its
+        [`response`](../../v1beta1/operations#Operation.FIELDS.response) is set to
+        an AnalyticsDetails; if the `Operation` failed, its
+        [`error`](../../v1beta1/operations#Operation.FIELDS.error) is set to a
+        google.rpc.Status.
+        <br>
+        <br>To call `AddGoogleAnalytics`, a member must be an Owner for
+        the existing `FirebaseProject` and have the
+        [`Edit` permission](https://support.google.com/analytics/answer/2884495)
+        for the Google Analytics account.
+        <br>
+        <br>If a `FirebaseProject` already has Google Analytics enabled, and you
+        call `AddGoogleAnalytics` using an `analyticsPropertyId` that's different
+        from the currently associated property, then the call will fail. Analytics
+        may have already been enabled in the Firebase console or by specifying
+        `timeZone` and `regionCode` in the call to
+        [`AddFirebase`](../../v1beta1/projects/addFirebase)."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_add-google-analytics",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The parent `FirebaseProject` to link to an existing Google Analytics
+        account, in the format:
+        <br><code>projects/<var>projectId</var></code>"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("android-apps-create",
                     Some(r##"Requests that a new AndroidApp be created.
         <br>
@@ -2261,7 +2573,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent Project for which to list Apps, in the format:
+                     Some(r##"The parent Project in which to create an App, in the format:
         <br><code>projects/<var>projectId</var></code>"##),
                      Some(true),
                      Some(false)),
@@ -2483,18 +2795,20 @@ fn main() {
                     Some(r##"Returns a list of valid Google Cloud Platform (GCP) resource locations for
         the specified Project (including a FirebaseProject).
         <br>
-        <br>The default GCP resource location of a project defines the geographical
-        location where project resources, such as Cloud Firestore, will be
-        provisioned by default.
+        <br>One of these locations can be selected as the Project's [_default_ GCP
+        resource location](https://firebase.google.com/docs/projects/locations),
+        which is the geographical location where project resources, such as Cloud
+        Firestore, will be provisioned by default. However, if the default GCP
+        resource location has already been set for the Project, then this setting
+        cannot be changed.
         <br>
-        <br>The returned list are the available
-        [GCP resource
-        locations](https://firebase.google.com/docs/projects/locations). <br>
-        <br>This call checks for any location restrictions for the specified
-        Project and, thus, might return a subset of all possible GCP resource
-        locations. To list all GCP resource locations (regardless of any
-        restrictions), call the endpoint without specifying a `projectId` (that is,
-        `/v1beta1/{parent=projects/-}/listAvailableLocations`).
+        <br>This call checks for any possible
+        [location
+        restrictions](https://cloud.google.com/resource-manager/docs/organization-policy/defining-locations)
+        for the specified Project and, thus, might return a subset of all possible
+        GCP resource locations. To list all GCP resource locations (regardless of
+        any restrictions), call the endpoint without specifying a `projectId` (that
+        is, `/v1beta1/{parent=projects/-}/listAvailableLocations`).
         <br>
         <br>To call `ListAvailableLocations` with a specified project, a member
         must be at minimum a Viewer of the project. Calls without a specified
@@ -2640,6 +2954,33 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("get-analytics-details",
+                    Some(r##"Gets the Google Analytics details currently associated with a
+        FirebaseProject.
+        <br>
+        <br>If the `FirebaseProject` is not yet linked to Google Analytics, then
+        the response to `GetAnalyticsDetails` is NOT_FOUND."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_get-analytics-details",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The fully qualified resource name, in the format:
+        <br><code>projects/<var>projectId</var>/analyticsDetails</code>"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("ios-apps-create",
                     Some(r##"Requests that a new IosApp be created.
         <br>
@@ -2650,7 +2991,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent Project for which to list Apps, in the format:
+                     Some(r##"The parent Project in which to create an App, in the format:
         <br><code>projects/<var>projectId</var></code>"##),
                      Some(true),
                      Some(false)),
@@ -2843,6 +3184,52 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("remove-analytics",
+                    Some(r##"Unlinks the specified `FirebaseProject` from its Google Analytics account.
+        <br>
+        <br>This call removes the association of the specified `FirebaseProject`
+        with its current Google Analytics property. However, this call does not
+        delete the Google Analytics resources, such as the Google Analytics
+        property or any data streams.
+        <br>
+        <br>These resources may be re-associated later to the `FirebaseProject` by
+        calling
+        [`AddGoogleAnalytics`](../../v1beta1/projects/addGoogleAnalytics) and
+        specifying the same `analyticsPropertyId`. For Android Apps and iOS Apps,
+        this call re-links data streams with their corresponding apps. However,
+        for Web Apps, this call provisions a <em>new</em> data stream for each Web
+        App.
+        <br>
+        <br>To call `RemoveAnalytics`, a member must be an Owner for
+        the `FirebaseProject`."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli/projects_remove-analytics",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The parent `FirebaseProject` to unlink from its Google Analytics account,
+        in the format:
+        <br><code>projects/<var>projectId</var></code>"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("search-apps",
                     Some(r##"A convenience method that lists all available Apps for the specified
         FirebaseProject.
@@ -2881,7 +3268,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent Project for which to list Apps, in the format:
+                     Some(r##"The parent Project in which to create an App, in the format:
         <br><code>projects/<var>projectId</var></code>"##),
                      Some(true),
                      Some(false)),
@@ -3019,7 +3406,7 @@ fn main() {
     
     let mut app = App::new("firebase1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190703")
+           .version("1.0.13+20200407")
            .about("The Firebase Management API enables programmatic setup and management of Firebase projects, including a project's Firebase resources and Firebase apps.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli")
            .arg(Arg::with_name("url")

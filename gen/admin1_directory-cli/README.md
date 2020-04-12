@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *directory* API at revision *20190214*. The CLI is at version *1.0.12*.
+This documentation was generated from the *directory* API at revision *20200204*. The CLI is at version *1.0.13*.
 
 ```bash
 admin1-directory [options]
@@ -94,9 +94,6 @@ admin1-directory [options]
                 update <customer-id> <org-unit-path>... (-r <kv>)... [-p <v>]... [-o <out>]
         privileges
                 list <customer> [-p <v>]... [-o <out>]
-        resolved-app-access-settings
-                get-settings [-p <v>]... [-o <out>]
-                list-trusted-apps [-p <v>]... [-o <out>]
         resources
                 buildings-delete <customer> <building-id> [-p <v>]...
                 buildings-get <customer> <building-id> [-p <v>]... [-o <out>]

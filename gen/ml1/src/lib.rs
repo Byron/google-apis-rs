@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Machine Learning Engine* crate version *1.0.12+20190621*, where *20190621* is the exact revision of the *ml:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Cloud Machine Learning Engine* crate version *1.0.13+20200328*, where *20200328* is the exact revision of the *ml:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Cloud Machine Learning Engine* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/ml/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.CloudMachineLearningEngine.html) ... 
 //! 
 //! * projects
-//!  * [*get config*](struct.ProjectGetConfigCall.html), [*jobs cancel*](struct.ProjectJobCancelCall.html), [*jobs create*](struct.ProjectJobCreateCall.html), [*jobs get*](struct.ProjectJobGetCall.html), [*jobs get iam policy*](struct.ProjectJobGetIamPolicyCall.html), [*jobs list*](struct.ProjectJobListCall.html), [*jobs patch*](struct.ProjectJobPatchCall.html), [*jobs set iam policy*](struct.ProjectJobSetIamPolicyCall.html), [*jobs test iam permissions*](struct.ProjectJobTestIamPermissionCall.html), [*locations get*](struct.ProjectLocationGetCall.html), [*locations list*](struct.ProjectLocationListCall.html), [*models create*](struct.ProjectModelCreateCall.html), [*models delete*](struct.ProjectModelDeleteCall.html), [*models get*](struct.ProjectModelGetCall.html), [*models get iam policy*](struct.ProjectModelGetIamPolicyCall.html), [*models list*](struct.ProjectModelListCall.html), [*models patch*](struct.ProjectModelPatchCall.html), [*models set iam policy*](struct.ProjectModelSetIamPolicyCall.html), [*models test iam permissions*](struct.ProjectModelTestIamPermissionCall.html), [*models versions create*](struct.ProjectModelVersionCreateCall.html), [*models versions delete*](struct.ProjectModelVersionDeleteCall.html), [*models versions get*](struct.ProjectModelVersionGetCall.html), [*models versions list*](struct.ProjectModelVersionListCall.html), [*models versions patch*](struct.ProjectModelVersionPatchCall.html), [*models versions set default*](struct.ProjectModelVersionSetDefaultCall.html), [*operations cancel*](struct.ProjectOperationCancelCall.html), [*operations get*](struct.ProjectOperationGetCall.html), [*operations list*](struct.ProjectOperationListCall.html) and [*predict*](struct.ProjectPredictCall.html)
+//!  * [*explain*](struct.ProjectExplainCall.html), [*get config*](struct.ProjectGetConfigCall.html), [*jobs cancel*](struct.ProjectJobCancelCall.html), [*jobs create*](struct.ProjectJobCreateCall.html), [*jobs get*](struct.ProjectJobGetCall.html), [*jobs get iam policy*](struct.ProjectJobGetIamPolicyCall.html), [*jobs list*](struct.ProjectJobListCall.html), [*jobs patch*](struct.ProjectJobPatchCall.html), [*jobs set iam policy*](struct.ProjectJobSetIamPolicyCall.html), [*jobs test iam permissions*](struct.ProjectJobTestIamPermissionCall.html), [*locations get*](struct.ProjectLocationGetCall.html), [*locations list*](struct.ProjectLocationListCall.html), [*locations operations cancel*](struct.ProjectLocationOperationCancelCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html), [*locations studies create*](struct.ProjectLocationStudyCreateCall.html), [*locations studies delete*](struct.ProjectLocationStudyDeleteCall.html), [*locations studies get*](struct.ProjectLocationStudyGetCall.html), [*locations studies list*](struct.ProjectLocationStudyListCall.html), [*locations studies trials add measurement*](struct.ProjectLocationStudyTrialAddMeasurementCall.html), [*locations studies trials check early stopping state*](struct.ProjectLocationStudyTrialCheckEarlyStoppingStateCall.html), [*locations studies trials complete*](struct.ProjectLocationStudyTrialCompleteCall.html), [*locations studies trials create*](struct.ProjectLocationStudyTrialCreateCall.html), [*locations studies trials delete*](struct.ProjectLocationStudyTrialDeleteCall.html), [*locations studies trials get*](struct.ProjectLocationStudyTrialGetCall.html), [*locations studies trials list*](struct.ProjectLocationStudyTrialListCall.html), [*locations studies trials stop*](struct.ProjectLocationStudyTrialStopCall.html), [*locations studies trials suggest*](struct.ProjectLocationStudyTrialSuggestCall.html), [*models create*](struct.ProjectModelCreateCall.html), [*models delete*](struct.ProjectModelDeleteCall.html), [*models get*](struct.ProjectModelGetCall.html), [*models get iam policy*](struct.ProjectModelGetIamPolicyCall.html), [*models list*](struct.ProjectModelListCall.html), [*models patch*](struct.ProjectModelPatchCall.html), [*models set iam policy*](struct.ProjectModelSetIamPolicyCall.html), [*models test iam permissions*](struct.ProjectModelTestIamPermissionCall.html), [*models versions create*](struct.ProjectModelVersionCreateCall.html), [*models versions delete*](struct.ProjectModelVersionDeleteCall.html), [*models versions get*](struct.ProjectModelVersionGetCall.html), [*models versions list*](struct.ProjectModelVersionListCall.html), [*models versions patch*](struct.ProjectModelVersionPatchCall.html), [*models versions set default*](struct.ProjectModelVersionSetDefaultCall.html), [*operations cancel*](struct.ProjectOperationCancelCall.html), [*operations get*](struct.ProjectOperationGetCall.html), [*operations list*](struct.ProjectOperationListCall.html) and [*predict*](struct.ProjectPredictCall.html)
 //! 
 //! 
 //! 
@@ -47,10 +47,13 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.projects().locations_studies_trials_suggest(...).doit()
 //! let r = hub.projects().models_versions_create(...).doit()
 //! let r = hub.projects().models_versions_patch(...).doit()
 //! let r = hub.projects().operations_get(...).doit()
 //! let r = hub.projects().models_versions_delete(...).doit()
+//! let r = hub.projects().locations_operations_get(...).doit()
+//! let r = hub.projects().locations_studies_trials_check_early_stopping_state(...).doit()
 //! let r = hub.projects().models_delete(...).doit()
 //! let r = hub.projects().models_patch(...).doit()
 //! ```
@@ -237,12 +240,16 @@ pub use cmn::*;
 pub enum Scope {
     /// View and manage your data across Google Cloud Platform services
     CloudPlatform,
+
+    /// View your data across Google Cloud Platform services
+    CloudPlatformReadOnly,
 }
 
 impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
+            Scope::CloudPlatformReadOnly => "https://www.googleapis.com/auth/cloud-platform.read-only",
         }
     }
 }
@@ -336,7 +343,7 @@ impl<'a, C, A> CloudMachineLearningEngine<C, A>
         CloudMachineLearningEngine {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://ml.googleapis.com/".to_string(),
             _root_url: "https://ml.googleapis.com/".to_string(),
         }
@@ -347,7 +354,7 @@ impl<'a, C, A> CloudMachineLearningEngine<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -400,88 +407,42 @@ pub struct GoogleCloudMlV1__BuiltInAlgorithmOutput {
 impl Part for GoogleCloudMlV1__BuiltInAlgorithmOutput {}
 
 
-/// Represents the configuration for a replica in a cluster.
+/// Attributes credit by computing the Aumann-Shapley value taking advantage
+/// of the model's fully differentiable structure. Refer to this paper for
+/// more details: http://proceedings.mlr.press/v70/sundararajan17a.html
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__ReplicaConfig {
-    /// TensorFlow version used in the custom container. This field is required if
-    /// the replica is a TPU worker that uses a custom container. Otherwise, do not
-    /// specify this field.
-    #[serde(rename="tpuTfVersion")]
-    pub tpu_tf_version: Option<String>,
-    /// Represents the type and number of accelerators used by the replica.
-    /// [Learn about restrictions on accelerator configurations for
-    /// training.](/ml-engine/docs/tensorflow/using-gpus#compute-engine-machine-types-with-gpu)
-    #[serde(rename="acceleratorConfig")]
-    pub accelerator_config: Option<GoogleCloudMlV1__AcceleratorConfig>,
-    /// The Docker image to run on the replica. This image must be in Container
-    /// Registry. Learn more about [configuring custom
-    /// containers](/ml-engine/docs/distributed-training-containers).
-    #[serde(rename="imageUri")]
-    pub image_uri: Option<String>,
+pub struct GoogleCloudMlV1__IntegratedGradientsAttribution {
+    /// Number of steps for approximating the path integral.
+    /// A good value to start is 50 and gradually increase until the
+    /// sum to diff property is met within the desired error range.
+    #[serde(rename="numIntegralSteps")]
+    pub num_integral_steps: Option<i32>,
 }
 
-impl Part for GoogleCloudMlV1__ReplicaConfig {}
+impl Part for GoogleCloudMlV1__IntegratedGradientsAttribution {}
 
 
-/// Response message for the ListJobs method.
+/// Request for explanations to be issued against a trained model.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [jobs list projects](struct.ProjectJobListCall.html) (response)
+/// * [explain projects](struct.ProjectExplainCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__ListJobsResponse {
-    /// Optional. Pass this token as the `page_token` field of the request for a
-    /// subsequent call.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of jobs.
-    pub jobs: Option<Vec<GoogleCloudMlV1__Job>>,
+pub struct GoogleCloudMlV1__ExplainRequest {
+    /// Required.
+    /// The explanation request body.
+    #[serde(rename="httpBody")]
+    pub http_body: Option<GoogleApi__HttpBody>,
 }
 
-impl ResponseResult for GoogleCloudMlV1__ListJobsResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__Config {
-    /// The service account Cloud ML uses to run on TPU node.
-    #[serde(rename="tpuServiceAccount")]
-    pub tpu_service_account: Option<String>,
-}
-
-impl Part for GoogleCloudMlV1__Config {}
-
-
-/// Response message for the ListVersions method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [models versions list projects](struct.ProjectModelVersionListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__ListVersionsResponse {
-    /// Optional. Pass this token as the `page_token` field of the request for a
-    /// subsequent call.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of versions.
-    pub versions: Option<Vec<GoogleCloudMlV1__Version>>,
-}
-
-impl ResponseResult for GoogleCloudMlV1__ListVersionsResponse {}
+impl RequestValue for GoogleCloudMlV1__ExplainRequest {}
 
 
 /// Request message for the SetDefaultVersion request.
@@ -499,24 +460,77 @@ pub struct GoogleCloudMlV1__SetDefaultVersionRequest { _never_set: Option<bool> 
 impl RequestValue for GoogleCloudMlV1__SetDefaultVersionRequest {}
 
 
-/// There is no detailed description.
+/// A message representing a Measurement.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations get projects](struct.ProjectLocationGetCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__Location {
-    /// no description provided
-    pub name: Option<String>,
-    /// Capabilities available in the location.
-    pub capabilities: Option<Vec<GoogleCloudMlV1__Capability>>,
+pub struct GoogleCloudMlV1__Measurement {
+    /// Time that the Trial has been running at the point of this Measurement.
+    #[serde(rename="elapsedTime")]
+    pub elapsed_time: Option<String>,
+    /// Provides a list of metrics that act as inputs into the objective
+    /// function.
+    pub metrics: Option<Vec<GoogleCloudMlV1_Measurement_Metric>>,
+    /// The number of steps a machine learning model has been trained for.
+    /// Must be non-negative.
+    #[serde(rename="stepCount")]
+    pub step_count: Option<String>,
 }
 
-impl ResponseResult for GoogleCloudMlV1__Location {}
+impl Part for GoogleCloudMlV1__Measurement {}
+
+
+/// Represents the configuration for a replica in a cluster.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__ReplicaConfig {
+    /// The AI Platform runtime version that includes a TensorFlow version matching
+    /// the one used in the custom container. This field is required if the replica
+    /// is a TPU worker that uses a custom container. Otherwise, do not specify
+    /// this field. This must be a [runtime version that currently supports
+    /// training with
+    /// TPUs](/ml-engine/docs/tensorflow/runtime-version-list#tpu-support).
+    /// 
+    /// Note that the version of TensorFlow included in a runtime version may
+    /// differ from the numbering of the runtime version itself, because it may
+    /// have a different [patch
+    /// version](https://www.tensorflow.org/guide/version_compat#semantic_versioning_20).
+    /// In this field, you must specify the runtime version (TensorFlow minor
+    /// version). For example, if your custom container runs TensorFlow `1.x.y`,
+    /// specify `1.x`.
+    #[serde(rename="tpuTfVersion")]
+    pub tpu_tf_version: Option<String>,
+    /// Represents the type and number of accelerators used by the replica.
+    /// [Learn about restrictions on accelerator configurations for
+    /// training.](/ai-platform/training/docs/using-gpus#compute-engine-machine-types-with-gpu)
+    #[serde(rename="acceleratorConfig")]
+    pub accelerator_config: Option<GoogleCloudMlV1__AcceleratorConfig>,
+    /// The Docker image to run on the replica. This image must be in Container
+    /// Registry. Learn more about [configuring custom
+    /// containers](/ai-platform/training/docs/distributed-training-containers).
+    #[serde(rename="imageUri")]
+    pub image_uri: Option<String>,
+}
+
+impl Part for GoogleCloudMlV1__ReplicaConfig {}
+
+
+/// Represents a metric to optimize.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1_StudyConfig_MetricSpec {
+    /// Required. The name of the metric.
+    pub metric: Option<String>,
+    /// Required. The optimization goal of the metric.
+    pub goal: Option<String>,
+}
+
+impl Part for GoogleCloudMlV1_StudyConfig_MetricSpec {}
 
 
 /// Represents the result of a single hyperparameter tuning trial from a
@@ -560,87 +574,19 @@ pub struct GoogleCloudMlV1__HyperparameterOutput {
 impl Part for GoogleCloudMlV1__HyperparameterOutput {}
 
 
-/// Defines an Identity and Access Management (IAM) policy. It is used to
-/// specify access control policies for Cloud Platform resources.
-/// 
-/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
-/// `members` to a `role`, where the members can be user accounts, Google groups,
-/// Google domains, and service accounts. A `role` is a named list of permissions
-/// defined by IAM.
-/// 
-/// **JSON Example**
-/// 
-/// ````text
-/// {
-///   "bindings": [
-///     {
-///       "role": "roles/owner",
-///       "members": [
-///         "user:mike@example.com",
-///         "group:admins@example.com",
-///         "domain:google.com",
-///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
-///       ]
-///     },
-///     {
-///       "role": "roles/viewer",
-///       "members": ["user:sean@example.com"]
-///     }
-///   ]
-/// }
-/// ````
-/// 
-/// **YAML Example**
-/// 
-/// ````text
-/// bindings:
-/// - members:
-///   - user:mike@example.com
-///   - group:admins@example.com
-///   - domain:google.com
-///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///   role: roles/owner
-/// - members:
-///   - user:sean@example.com
-///   role: roles/viewer
-/// ````
-/// 
-/// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam/docs).
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [models set iam policy projects](struct.ProjectModelSetIamPolicyCall.html) (response)
-/// * [jobs set iam policy projects](struct.ProjectJobSetIamPolicyCall.html) (response)
-/// * [models get iam policy projects](struct.ProjectModelGetIamPolicyCall.html) (response)
-/// * [jobs get iam policy projects](struct.ProjectJobGetIamPolicyCall.html) (response)
+/// * [locations studies trials stop projects](struct.ProjectLocationStudyTrialStopCall.html) (request)
+/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleIamV1__Policy {
-    /// Specifies cloud audit logging configuration for this policy.
-    #[serde(rename="auditConfigs")]
-    pub audit_configs: Option<Vec<GoogleIamV1__AuditConfig>>,
-    /// `etag` is used for optimistic concurrency control as a way to help
-    /// prevent simultaneous updates of a policy from overwriting each other.
-    /// It is strongly suggested that systems make use of the `etag` in the
-    /// read-modify-write cycle to perform policy updates in order to avoid race
-    /// conditions: An `etag` is returned in the response to `getIamPolicy`, and
-    /// systems are expected to put that etag in the request to `setIamPolicy` to
-    /// ensure that their change will be applied to the same version of the policy.
-    /// 
-    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
-    /// policy is overwritten blindly.
-    pub etag: Option<String>,
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
-    pub bindings: Option<Vec<GoogleIamV1__Binding>>,
-    /// Deprecated.
-    pub version: Option<i32>,
-}
+pub struct GoogleCloudMlV1__StopTrialRequest { _never_set: Option<bool> }
 
-impl ResponseResult for GoogleIamV1__Policy {}
+impl RequestValue for GoogleCloudMlV1__StopTrialRequest {}
 
 
 /// Message that represents an arbitrary HTTP body. It should only be used for
@@ -691,6 +637,7 @@ impl ResponseResult for GoogleIamV1__Policy {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [explain projects](struct.ProjectExplainCall.html) (response)
 /// * [predict projects](struct.ProjectPredictCall.html) (response)
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleApi__HttpBody {
@@ -724,246 +671,83 @@ impl ResponseResult for GoogleApi__HttpBody {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [locations studies delete projects](struct.ProjectLocationStudyDeleteCall.html) (response)
 /// * [jobs cancel projects](struct.ProjectJobCancelCall.html) (response)
 /// * [operations cancel projects](struct.ProjectOperationCancelCall.html) (response)
+/// * [locations studies trials delete projects](struct.ProjectLocationStudyTrialDeleteCall.html) (response)
+/// * [locations operations cancel projects](struct.ProjectLocationOperationCancelCall.html) (response)
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleProtobuf__Empty { _never_set: Option<bool> }
 
 impl ResponseResult for GoogleProtobuf__Empty {}
 
 
-/// Represents a set of hyperparameters to optimize.
+/// Represents results of a prediction job.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__HyperparameterSpec {
-    /// Optional. How many training trials should be attempted to optimize
-    /// the specified hyperparameters.
-    /// 
-    /// Defaults to one.
-    #[serde(rename="maxTrials")]
-    pub max_trials: Option<i32>,
-    /// Required. The type of goal to use for tuning. Available types are
-    /// `MAXIMIZE` and `MINIMIZE`.
-    /// 
-    /// Defaults to `MAXIMIZE`.
-    pub goal: Option<String>,
-    /// Optional. The search algorithm specified for the hyperparameter
-    /// tuning job.
-    /// Uses the default AI Platform hyperparameter tuning
-    /// algorithm if unspecified.
-    pub algorithm: Option<String>,
-    /// Optional. The number of failed trials that need to be seen before failing
-    /// the hyperparameter tuning job. You can specify this field to override the
-    /// default failing criteria for AI Platform hyperparameter tuning jobs.
-    /// 
-    /// Defaults to zero, which means the service decides when a hyperparameter
-    /// job should fail.
-    #[serde(rename="maxFailedTrials")]
-    pub max_failed_trials: Option<i32>,
-    /// Optional. Indicates if the hyperparameter tuning job enables auto trial
-    /// early stopping.
-    #[serde(rename="enableTrialEarlyStopping")]
-    pub enable_trial_early_stopping: Option<bool>,
-    /// Optional. The prior hyperparameter tuning job id that users hope to
-    /// continue with. The job id will be used to find the corresponding vizier
-    /// study guid and resume the study.
-    #[serde(rename="resumePreviousJobId")]
-    pub resume_previous_job_id: Option<String>,
-    /// Required. The set of parameters to tune.
-    pub params: Option<Vec<GoogleCloudMlV1__ParameterSpec>>,
-    /// Optional. The TensorFlow summary tag name to use for optimizing trials. For
-    /// current versions of TensorFlow, this tag name should exactly match what is
-    /// shown in TensorBoard, including all scopes.  For versions of TensorFlow
-    /// prior to 0.12, this should be only the tag passed to tf.Summary.
-    /// By default, "training/hptuning/metric" will be used.
-    #[serde(rename="hyperparameterMetricTag")]
-    pub hyperparameter_metric_tag: Option<String>,
-    /// Optional. The number of training trials to run concurrently.
-    /// You can reduce the time it takes to perform hyperparameter tuning by adding
-    /// trials in parallel. However, each trail only benefits from the information
-    /// gained in completed trials. That means that a trial does not get access to
-    /// the results of trials running at the same time, which could reduce the
-    /// quality of the overall optimization.
-    /// 
-    /// Each trial will use the same scale tier and machine types.
-    /// 
-    /// Defaults to one.
-    #[serde(rename="maxParallelTrials")]
-    pub max_parallel_trials: Option<i32>,
+pub struct GoogleCloudMlV1__PredictionOutput {
+    /// Node hours used by the batch prediction job.
+    #[serde(rename="nodeHours")]
+    pub node_hours: Option<f64>,
+    /// The output Google Cloud Storage location provided at the job creation time.
+    #[serde(rename="outputPath")]
+    pub output_path: Option<String>,
+    /// The number of generated predictions.
+    #[serde(rename="predictionCount")]
+    pub prediction_count: Option<String>,
+    /// The number of data instances which resulted in errors.
+    #[serde(rename="errorCount")]
+    pub error_count: Option<String>,
 }
 
-impl Part for GoogleCloudMlV1__HyperparameterSpec {}
+impl Part for GoogleCloudMlV1__PredictionOutput {}
 
 
-/// An observed value of a metric.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1_HyperparameterOutput_HyperparameterMetric {
-    /// The global training step for this metric.
-    #[serde(rename="trainingStep")]
-    pub training_step: Option<String>,
-    /// The objective value at this training step.
-    #[serde(rename="objectiveValue")]
-    pub objective_value: Option<f64>,
+pub struct GoogleCloudMlV1_StudyConfigParameterSpec_CategoricalValueSpec {
+    /// Must be specified if type is `CATEGORICAL`.
+    /// The list of possible categories.
+    pub values: Option<Vec<String>>,
 }
 
-impl Part for GoogleCloudMlV1_HyperparameterOutput_HyperparameterMetric {}
+impl Part for GoogleCloudMlV1_StudyConfigParameterSpec_CategoricalValueSpec {}
 
 
-/// This resource represents a long-running operation that is the result of a
-/// network API call.
+/// Represents the spec to match integer values from parent parameter.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [models versions create projects](struct.ProjectModelVersionCreateCall.html) (response)
-/// * [models versions patch projects](struct.ProjectModelVersionPatchCall.html) (response)
-/// * [operations get projects](struct.ProjectOperationGetCall.html) (response)
-/// * [models versions delete projects](struct.ProjectModelVersionDeleteCall.html) (response)
-/// * [models delete projects](struct.ProjectModelDeleteCall.html) (response)
-/// * [models patch projects](struct.ProjectModelPatchCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleLongrunning__Operation {
-    /// The error result of the operation in case of failure or cancellation.
-    pub error: Option<GoogleRpc__Status>,
-    /// If the value is `false`, it means the operation is still in progress.
-    /// If `true`, the operation is completed, and either `error` or `response` is
-    /// available.
-    pub done: Option<bool>,
-    /// The normal response of the operation in case of success.  If the original
-    /// method returns no data on success, such as `Delete`, the response is
-    /// `google.protobuf.Empty`.  If the original method is standard
-    /// `Get`/`Create`/`Update`, the response should be the resource.  For other
-    /// methods, the response should have the type `XxxResponse`, where `Xxx`
-    /// is the original method name.  For example, if the original method name
-    /// is `TakeSnapshot()`, the inferred response type is
-    /// `TakeSnapshotResponse`.
-    pub response: Option<HashMap<String, String>>,
-    /// The server-assigned name, which is only unique within the same service that
-    /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should be a resource name ending with `operations/{unique_id}`.
-    pub name: Option<String>,
-    /// Service-specific metadata associated with the operation.  It typically
-    /// contains progress information and common metadata such as create time.
-    /// Some services might not provide such metadata.  Any method that returns a
-    /// long-running operation should document the metadata type, if any.
-    pub metadata: Option<HashMap<String, String>>,
+pub struct GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentIntValueSpec {
+    /// Matches values of the parent parameter with type 'INTEGER'.
+    /// All values must lie in `integer_value_spec` of parent parameter.
+    pub values: Option<Vec<String>>,
 }
 
-impl ResponseResult for GoogleLongrunning__Operation {}
+impl Part for GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentIntValueSpec {}
 
 
-/// Represents a machine learning solution.
+/// There is no detailed description.
 /// 
-/// A model can have multiple versions, each of which is a deployed, trained
-/// model ready to receive prediction requests. The model itself is just a
-/// container.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [models get projects](struct.ProjectModelGetCall.html) (response)
-/// * [models patch projects](struct.ProjectModelPatchCall.html) (request)
-/// * [models create projects](struct.ProjectModelCreateCall.html) (request|response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__Model {
-    /// Optional. The description specified for the model when it was created.
-    pub description: Option<String>,
-    /// Optional. If true, online prediction nodes send `stderr` and `stdout`
-    /// streams to Stackdriver Logging. These can be more verbose than the standard
-    /// access logs (see `onlinePredictionLogging`) and can incur higher cost.
-    /// However, they are helpful for debugging. Note that
-    /// [Stackdriver logs may incur a cost](/stackdriver/pricing), especially if
-    /// your project receives prediction requests at a high QPS. Estimate your
-    /// costs before enabling this option.
-    /// 
-    /// Default is false.
-    #[serde(rename="onlinePredictionConsoleLogging")]
-    pub online_prediction_console_logging: Option<bool>,
-    /// Optional. One or more labels that you can add, to organize your models.
-    /// Each label is a key-value pair, where both the key and the value are
-    /// arbitrary strings that you supply.
-    /// For more information, see the documentation on
-    /// <a href="/ml-engine/docs/tensorflow/resource-labels">using labels</a>.
-    pub labels: Option<HashMap<String, String>>,
-    /// Optional. The list of regions where the model is going to be deployed.
-    /// Currently only one region per model is supported.
-    /// Defaults to 'us-central1' if nothing is set.
-    /// See the <a href="/ml-engine/docs/tensorflow/regions">available regions</a>
-    /// for AI Platform services.
-    /// Note:
-    /// 
-    /// * No matter where a model is deployed, it can always be accessed by
-    ///   users from anywhere, both for online and batch prediction.
-    /// * The region for a batch prediction job is set by the region field when
-    ///   submitting the batch prediction job and does not take its value from
-    ///   this field.
-    pub regions: Option<Vec<String>>,
-    /// `etag` is used for optimistic concurrency control as a way to help
-    /// prevent simultaneous updates of a model from overwriting each other.
-    /// It is strongly suggested that systems make use of the `etag` in the
-    /// read-modify-write cycle to perform model updates in order to avoid race
-    /// conditions: An `etag` is returned in the response to `GetModel`, and
-    /// systems are expected to put that etag in the request to `UpdateModel` to
-    /// ensure that their change will be applied to the model as intended.
-    pub etag: Option<String>,
-    /// Output only. The default version of the model. This version will be used to
-    /// handle prediction requests that do not specify a version.
-    /// 
-    /// You can change the default version by calling
-    /// [projects.methods.versions.setDefault](/ml-engine/reference/rest/v1/projects.models.versions/setDefault).
-    #[serde(rename="defaultVersion")]
-    pub default_version: Option<GoogleCloudMlV1__Version>,
-    /// Optional. If true, online prediction access logs are sent to StackDriver
-    /// Logging. These logs are like standard server access logs, containing
-    /// information like timestamp and latency for each request. Note that
-    /// [Stackdriver logs may incur a cost](/stackdriver/pricing), especially if
-    /// your project receives prediction requests at a high queries per second rate
-    /// (QPS). Estimate your costs before enabling this option.
-    /// 
-    /// Default is false.
-    #[serde(rename="onlinePredictionLogging")]
-    pub online_prediction_logging: Option<bool>,
-    /// Required. The name specified for the model when it was created.
-    /// 
-    /// The model name must be unique within the project it is created in.
-    pub name: Option<String>,
+pub struct GoogleCloudMlV1_StudyConfigParameterSpec_IntegerValueSpec {
+    /// Must be specified if type is `INTEGER`. Maximum value of the parameter.
+    #[serde(rename="maxValue")]
+    pub max_value: Option<String>,
+    /// Must be specified if type is `INTEGER`. Minimum value of the parameter.
+    #[serde(rename="minValue")]
+    pub min_value: Option<String>,
 }
 
-impl RequestValue for GoogleCloudMlV1__Model {}
-impl ResponseResult for GoogleCloudMlV1__Model {}
-
-
-/// Request message for `TestIamPermissions` method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [jobs test iam permissions projects](struct.ProjectJobTestIamPermissionCall.html) (request)
-/// * [models test iam permissions projects](struct.ProjectModelTestIamPermissionCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleIamV1__TestIamPermissionsRequest {
-    /// The set of permissions to check for the `resource`. Permissions with
-    /// wildcards (such as '*' or 'storage.*') are not allowed. For more
-    /// information see
-    /// [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
-    pub permissions: Option<Vec<String>>,
-}
-
-impl RequestValue for GoogleIamV1__TestIamPermissionsRequest {}
+impl Part for GoogleCloudMlV1_StudyConfigParameterSpec_IntegerValueSpec {}
 
 
 /// Represents a single hyperparameter to optimize.
@@ -1010,185 +794,73 @@ pub struct GoogleCloudMlV1__ParameterSpec {
 impl Part for GoogleCloudMlV1__ParameterSpec {}
 
 
-/// Specifies the audit configuration for a service.
-/// The configuration determines which permission types are logged, and what
-/// identities, if any, are exempted from logging.
-/// An AuditConfig must have one or more AuditLogConfigs.
+/// The request message for the CompleteTrial service method.
 /// 
-/// If there are AuditConfigs for both `allServices` and a specific service,
-/// the union of the two AuditConfigs is used for that service: the log_types
-/// specified in each AuditConfig are enabled, and the exempted_members in each
-/// AuditLogConfig are exempted.
+/// # Activities
 /// 
-/// Example Policy with multiple AuditConfigs:
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// ````text
-/// {
-///   "audit_configs": [
-///     {
-///       "service": "allServices"
-///       "audit_log_configs": [
-///         {
-///           "log_type": "DATA_READ",
-///           "exempted_members": [
-///             "user:foo@gmail.com"
-///           ]
-///         },
-///         {
-///           "log_type": "DATA_WRITE",
-///         },
-///         {
-///           "log_type": "ADMIN_READ",
-///         }
-///       ]
-///     },
-///     {
-///       "service": "fooservice.googleapis.com"
-///       "audit_log_configs": [
-///         {
-///           "log_type": "DATA_READ",
-///         },
-///         {
-///           "log_type": "DATA_WRITE",
-///           "exempted_members": [
-///             "user:bar@gmail.com"
-///           ]
-///         }
-///       ]
-///     }
-///   ]
-/// }
-/// ````
+/// * [locations studies trials complete projects](struct.ProjectLocationStudyTrialCompleteCall.html) (request)
 /// 
-/// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
-/// logging. It also exempts foo@gmail.com from DATA_READ logging, and
-/// bar@gmail.com from DATA_WRITE logging.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleIamV1__AuditConfig {
-    /// The configuration for logging of each type of permission.
-    #[serde(rename="auditLogConfigs")]
-    pub audit_log_configs: Option<Vec<GoogleIamV1__AuditLogConfig>>,
-    /// Specifies a service that will be enabled for audit logging.
-    /// For example, `storage.googleapis.com`, `cloudsql.googleapis.com`.
-    /// `allServices` is a special value that covers all services.
-    pub service: Option<String>,
+pub struct GoogleCloudMlV1__CompleteTrialRequest {
+    /// Optional. A human readable reason why the Trial was infeasible. This should
+    /// only be provided if `trial_infeasible` is true.
+    #[serde(rename="infeasibleReason")]
+    pub infeasible_reason: Option<String>,
+    /// Optional. If provided, it will be used as the completed trial's
+    /// final_measurement; Otherwise, the service will auto-select a
+    /// previously reported measurement as the final-measurement
+    #[serde(rename="finalMeasurement")]
+    pub final_measurement: Option<GoogleCloudMlV1__Measurement>,
+    /// Optional. True if the trial cannot be run with the given Parameter, and
+    /// final_measurement will be ignored.
+    #[serde(rename="trialInfeasible")]
+    pub trial_infeasible: Option<bool>,
 }
 
-impl Part for GoogleIamV1__AuditConfig {}
+impl RequestValue for GoogleCloudMlV1__CompleteTrialRequest {}
 
 
-/// Represents input parameters for a training job. When using the
-/// gcloud command to submit your training job, you can specify
-/// the input parameters as command-line arguments and/or in a YAML configuration
-/// file referenced from the --config command-line argument. For
-/// details, see the guide to
-/// <a href="/ml-engine/docs/tensorflow/training-jobs">submitting a training
-/// job</a>.
+/// Represents input parameters for a training job. When using the gcloud command
+/// to submit your training job, you can specify the input parameters as
+/// command-line arguments and/or in a YAML configuration file referenced from
+/// the --config command-line argument. For details, see the guide to [submitting
+/// a training job](/ai-platform/training/docs/training-jobs).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__TrainingInput {
-    /// Optional. The AI Platform runtime version to use for training. If not
-    /// set, AI Platform uses the default stable version, 1.0. For more
-    /// information, see the
-    /// <a href="/ml-engine/docs/runtime-version-list">runtime version list</a>
-    /// and
-    /// <a href="/ml-engine/docs/versioning">how to manage runtime versions</a>.
+    /// Optional. Specifies the type of virtual machine to use for your training
+    /// job's evaluator nodes.
+    /// 
+    /// The supported values are the same as those described in the entry for
+    /// `masterType`.
+    /// 
+    /// This value must be consistent with the category of machine type that
+    /// `masterType` uses. In other words, both must be Compute Engine machine
+    /// types or both must be legacy machine types.
+    /// 
+    /// This value must be present when `scaleTier` is set to `CUSTOM` and
+    /// `evaluatorCount` is greater than zero.
+    #[serde(rename="evaluatorType")]
+    pub evaluator_type: Option<String>,
+    /// Optional. The AI Platform runtime version to use for training. You must
+    /// either specify this field or specify `masterConfig.imageUri`.
+    /// 
+    /// For more information, see the [runtime version
+    /// list](/ai-platform/training/docs/runtime-version-list) and learn [how to
+    /// manage runtime versions](/ai-platform/training/docs/versioning).
     #[serde(rename="runtimeVersion")]
     pub runtime_version: Option<String>,
     /// Optional. Specifies the type of virtual machine to use for your training
-    /// job's master worker.
+    /// job's master worker. You must specify this field when `scaleTier` is set to
+    /// `CUSTOM`.
     /// 
+    /// You can use certain Compute Engine machine types directly in this field.
     /// The following types are supported:
-    /// 
-    /// <dl>
-    ///   <dt>standard</dt>
-    ///   <dd>
-    ///   A basic machine configuration suitable for training simple models with
-    ///   small to moderate datasets.
-    ///   </dd>
-    ///   <dt>large_model</dt>
-    ///   <dd>
-    ///   A machine with a lot of memory, specially suited for parameter servers
-    ///   when your model is large (having many hidden layers or layers with very
-    ///   large numbers of nodes).
-    ///   </dd>
-    ///   <dt>complex_model_s</dt>
-    ///   <dd>
-    ///   A machine suitable for the master and workers of the cluster when your
-    ///   model requires more computation than the standard machine can handle
-    ///   satisfactorily.
-    ///   </dd>
-    ///   <dt>complex_model_m</dt>
-    ///   <dd>
-    ///   A machine with roughly twice the number of cores and roughly double the
-    ///   memory of <i>complex_model_s</i>.
-    ///   </dd>
-    ///   <dt>complex_model_l</dt>
-    ///   <dd>
-    ///   A machine with roughly twice the number of cores and roughly double the
-    ///   memory of <i>complex_model_m</i>.
-    ///   </dd>
-    ///   <dt>standard_gpu</dt>
-    ///   <dd>
-    ///   A machine equivalent to <i>standard</i> that
-    ///   also includes a single NVIDIA Tesla K80 GPU. See more about
-    ///   <a href="/ml-engine/docs/tensorflow/using-gpus">using GPUs to
-    ///   train your model</a>.
-    ///   </dd>
-    ///   <dt>complex_model_m_gpu</dt>
-    ///   <dd>
-    ///   A machine equivalent to <i>complex_model_m</i> that also includes
-    ///   four NVIDIA Tesla K80 GPUs.
-    ///   </dd>
-    ///   <dt>complex_model_l_gpu</dt>
-    ///   <dd>
-    ///   A machine equivalent to <i>complex_model_l</i> that also includes
-    ///   eight NVIDIA Tesla K80 GPUs.
-    ///   </dd>
-    ///   <dt>standard_p100</dt>
-    ///   <dd>
-    ///   A machine equivalent to <i>standard</i> that
-    ///   also includes a single NVIDIA Tesla P100 GPU.
-    ///   </dd>
-    ///   <dt>complex_model_m_p100</dt>
-    ///   <dd>
-    ///   A machine equivalent to <i>complex_model_m</i> that also includes
-    ///   four NVIDIA Tesla P100 GPUs.
-    ///   </dd>
-    ///   <dt>standard_v100</dt>
-    ///   <dd>
-    ///   A machine equivalent to <i>standard</i> that
-    ///   also includes a single NVIDIA Tesla V100 GPU.
-    ///   </dd>
-    ///   <dt>large_model_v100</dt>
-    ///   <dd>
-    ///   A machine equivalent to <i>large_model</i> that
-    ///   also includes a single NVIDIA Tesla V100 GPU.
-    ///   </dd>
-    ///   <dt>complex_model_m_v100</dt>
-    ///   <dd>
-    ///   A machine equivalent to <i>complex_model_m</i> that
-    ///   also includes four NVIDIA Tesla V100 GPUs.
-    ///   </dd>
-    ///   <dt>complex_model_l_v100</dt>
-    ///   <dd>
-    ///   A machine equivalent to <i>complex_model_l</i> that
-    ///   also includes eight NVIDIA Tesla V100 GPUs.
-    ///   </dd>
-    ///   <dt>cloud_tpu</dt>
-    ///   <dd>
-    ///   A TPU VM including one Cloud TPU. See more about
-    ///   <a href="/ml-engine/docs/tensorflow/using-tpus">using TPUs to train
-    ///   your model</a>.
-    ///   </dd>
-    /// </dl>
-    /// 
-    /// You may also use certain Compute Engine machine types directly in this
-    /// field. The following types are supported:
     /// 
     /// - `n1-standard-4`
     /// - `n1-standard-8`
@@ -1208,15 +880,43 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// - `n1-highcpu-64`
     /// - `n1-highcpu-96`
     /// 
-    /// See more about [using Compute Engine machine
-    /// types](/ml-engine/docs/tensorflow/machine-types#compute-engine-machine-types).
+    /// Learn more about [using Compute Engine machine
+    /// types](/ml-engine/docs/machine-types#compute-engine-machine-types).
     /// 
-    /// You must set this value when `scaleTier` is set to `CUSTOM`.
+    /// Alternatively, you can use the following legacy machine types:
+    /// 
+    /// - `standard`
+    /// - `large_model`
+    /// - `complex_model_s`
+    /// - `complex_model_m`
+    /// - `complex_model_l`
+    /// - `standard_gpu`
+    /// - `complex_model_m_gpu`
+    /// - `complex_model_l_gpu`
+    /// - `standard_p100`
+    /// - `complex_model_m_p100`
+    /// - `standard_v100`
+    /// - `large_model_v100`
+    /// - `complex_model_m_v100`
+    /// - `complex_model_l_v100`
+    /// 
+    /// Learn more about [using legacy machine
+    /// types](/ml-engine/docs/machine-types#legacy-machine-types).
+    /// 
+    /// Finally, if you want to use a TPU for training, specify `cloud_tpu` in this
+    /// field. Learn more about the [special configuration options for training
+    /// with
+    /// TPUs](/ml-engine/docs/tensorflow/using-tpus#configuring_a_custom_tpu_machine).
     #[serde(rename="masterType")]
     pub master_type: Option<String>,
     /// Optional. The set of Hyperparameters to tune.
     pub hyperparameters: Option<GoogleCloudMlV1__HyperparameterSpec>,
-    /// Optional. Command line arguments to pass to the program.
+    /// Optional. Arguments passed to the training.
+    /// - If it is a python package training:
+    ///   It will be passed as command line argument to the program.
+    /// - If it is a custom container training,
+    ///   It will be passed as an argument to the custom container
+    ///   image.
     pub args: Option<Vec<String>>,
     /// Required. The Python module name to run after installing the packages.
     #[serde(rename="pythonModule")]
@@ -1236,19 +936,33 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// The default value is zero.
     #[serde(rename="workerCount")]
     pub worker_count: Option<String>,
-    /// Optional. The maximum job running time. The default is 7 days.
-    #[serde(rename="maxRunningTime")]
-    pub max_running_time: Option<String>,
+    /// Optional. Scheduling options for a training job.
+    pub scheduling: Option<GoogleCloudMlV1__Scheduling>,
+    /// Custom encryption key options for a training job. If this is set,
+    /// then all resources created by the training job will be encrypted with the
+    /// provided encryption key.
+    #[serde(rename="encryptionConfig")]
+    pub encryption_config: Option<GoogleCloudMlV1__EncryptionConfig>,
     /// Optional. The number of parameter server replicas to use for the training
     /// job. Each replica in the cluster will be of the type specified in
     /// `parameter_server_type`.
     /// 
-    /// This value can only be used when `scale_tier` is set to `CUSTOM`.If you
+    /// This value can only be used when `scale_tier` is set to `CUSTOM`. If you
     /// set this value, you must also set `parameter_server_type`.
     /// 
     /// The default value is zero.
     #[serde(rename="parameterServerCount")]
     pub parameter_server_count: Option<String>,
+    /// Optional. The number of evaluator replicas to use for the training job.
+    /// Each replica in the cluster will be of the type specified in
+    /// `evaluator_type`.
+    /// 
+    /// This value can only be used when `scale_tier` is set to `CUSTOM`. If you
+    /// set this value, you must also set `evaluator_type`.
+    /// 
+    /// The default value is zero.
+    #[serde(rename="evaluatorCount")]
+    pub evaluator_count: Option<String>,
     /// Optional. Specifies the type of virtual machine to use for your training
     /// job's worker nodes.
     /// 
@@ -1256,8 +970,8 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// `masterType`.
     /// 
     /// This value must be consistent with the category of machine type that
-    /// `masterType` uses. In other words, both must be AI Platform machine
-    /// types or both must be Compute Engine machine types.
+    /// `masterType` uses. In other words, both must be Compute Engine machine
+    /// types or both must be legacy machine types.
     /// 
     /// If you use `cloud_tpu` for this value, see special instructions for
     /// [configuring a custom TPU
@@ -1270,29 +984,38 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// Optional. The configuration for parameter servers.
     /// 
     /// You should only set `parameterServerConfig.acceleratorConfig` if
-    /// `parameterServerConfigType` is set to a Compute Engine machine type. [Learn
+    /// `parameterServerType` is set to a Compute Engine machine type. [Learn
     /// about restrictions on accelerator configurations for
-    /// training.](/ml-engine/docs/tensorflow/using-gpus#compute-engine-machine-types-with-gpu)
+    /// training.](/ai-platform/training/docs/using-gpus#compute-engine-machine-types-with-gpu)
     /// 
     /// Set `parameterServerConfig.imageUri` only if you build a custom image for
     /// your parameter server. If `parameterServerConfig.imageUri` has not been
-    /// set, AI Platform uses the value of `masterConfig.imageUri`.
+    /// set, AI Platform uses the value of `masterConfig.imageUri` .
     /// Learn more about [configuring custom
-    /// containers](/ml-engine/docs/distributed-training-containers).
+    /// containers](/ai-platform/training/docs/distributed-training-containers).
     #[serde(rename="parameterServerConfig")]
     pub parameter_server_config: Option<GoogleCloudMlV1__ReplicaConfig>,
     /// Required. Specifies the machine types, the number of replicas for workers
     /// and parameter servers.
     #[serde(rename="scaleTier")]
     pub scale_tier: Option<String>,
-    /// Required. The Google Compute Engine region to run the training job in.
-    /// See the <a href="/ml-engine/docs/tensorflow/regions">available regions</a>
-    /// for AI Platform services.
+    /// Required. The region to run the training job in. See the [available
+    /// regions](/ai-platform/training/docs/regions) for AI Platform Training.
     pub region: Option<String>,
-    /// Optional. The version of Python used in training. If not set, the default
-    /// version is '2.7'. Python '3.5' is available when `runtime_version` is set
-    /// to '1.4' and above. Python '2.7' works with all supported
-    /// <a href="/ml-engine/docs/runtime-version-list">runtime versions</a>.
+    /// Optional. The version of Python used in training. You must either specify
+    /// this field or specify `masterConfig.imageUri`.
+    /// 
+    /// The following Python versions are available:
+    /// 
+    /// * Python '3.7' is available when `runtime_version` is set to '1.15' or
+    ///   later.
+    /// * Python '3.5' is available when `runtime_version` is set to a version
+    ///   from '1.4' to '1.14'.
+    /// * Python '2.7' is available when `runtime_version` is set to '1.15' or
+    ///   earlier.
+    /// 
+    /// Read more about the Python versions available for [each runtime
+    /// version](/ml-engine/docs/runtime-version-list).
     #[serde(rename="pythonVersion")]
     pub python_version: Option<String>,
     /// Required. The Google Cloud Storage location of the packages with
@@ -1305,15 +1028,29 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// You should only set `workerConfig.acceleratorConfig` if `workerType` is set
     /// to a Compute Engine machine type. [Learn about restrictions on accelerator
     /// configurations for
-    /// training.](/ml-engine/docs/tensorflow/using-gpus#compute-engine-machine-types-with-gpu)
+    /// training.](/ai-platform/training/docs/using-gpus#compute-engine-machine-types-with-gpu)
     /// 
     /// Set `workerConfig.imageUri` only if you build a custom image for your
     /// worker. If `workerConfig.imageUri` has not been set, AI Platform uses
-    /// the value of `masterConfig.imageUri`. Learn more about
-    /// [configuring custom
-    /// containers](/ml-engine/docs/distributed-training-containers).
+    /// the value of `masterConfig.imageUri` .
+    /// Learn more about [configuring custom
+    /// containers](/ai-platform/training/docs/distributed-training-containers).
     #[serde(rename="workerConfig")]
     pub worker_config: Option<GoogleCloudMlV1__ReplicaConfig>,
+    /// Optional. The configuration for evaluators.
+    /// 
+    /// You should only set `evaluatorConfig.acceleratorConfig` if
+    /// `evaluatorType` is set to a Compute Engine machine type. [Learn
+    /// about restrictions on accelerator configurations for
+    /// training.](/ai-platform/training/docs/using-gpus#compute-engine-machine-types-with-gpu)
+    /// 
+    /// Set `evaluatorConfig.imageUri` only if you build a custom image for
+    /// your evaluator. If `evaluatorConfig.imageUri` has not been
+    /// set, AI Platform uses the value of `masterConfig.imageUri` .
+    /// Learn more about [configuring custom
+    /// containers](/ai-platform/training/docs/distributed-training-containers).
+    #[serde(rename="evaluatorConfig")]
+    pub evaluator_config: Option<GoogleCloudMlV1__ReplicaConfig>,
     /// Optional. Specifies the type of virtual machine to use for your training
     /// job's parameter server.
     /// 
@@ -1321,24 +1058,33 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// `master_type`.
     /// 
     /// This value must be consistent with the category of machine type that
-    /// `masterType` uses. In other words, both must be AI Platform machine
-    /// types or both must be Compute Engine machine types.
+    /// `masterType` uses. In other words, both must be Compute Engine machine
+    /// types or both must be legacy machine types.
     /// 
     /// This value must be present when `scaleTier` is set to `CUSTOM` and
     /// `parameter_server_count` is greater than zero.
     #[serde(rename="parameterServerType")]
     pub parameter_server_type: Option<String>,
+    /// Optional. Use `chief` instead of `master` in the `TF_CONFIG` environment
+    /// variable when training with a custom container. Defaults to `false`. [Learn
+    /// more about this
+    /// field.](/ai-platform/training/docs/distributed-training-details#chief-versus-master)
+    /// 
+    /// This field has no effect for training jobs that don't use a custom
+    /// container.
+    #[serde(rename="useChiefInTfConfig")]
+    pub use_chief_in_tf_config: Option<bool>,
     /// Optional. The configuration for your master worker.
     /// 
     /// You should only set `masterConfig.acceleratorConfig` if `masterType` is set
     /// to a Compute Engine machine type. Learn about [restrictions on accelerator
     /// configurations for
-    /// training.](/ml-engine/docs/tensorflow/using-gpus#compute-engine-machine-types-with-gpu)
+    /// training.](/ai-platform/training/docs/using-gpus#compute-engine-machine-types-with-gpu)
     /// 
     /// Set `masterConfig.imageUri` only if you build a custom image. Only one of
-    /// `masterConfig.imageUri` and `runtimeVersion` should be set. Learn more about
-    /// [configuring custom
-    /// containers](/ml-engine/docs/distributed-training-containers).
+    /// `masterConfig.imageUri` and `runtimeVersion` should be set. Learn more
+    /// about [configuring custom
+    /// containers](/ai-platform/training/docs/distributed-training-containers).
     #[serde(rename="masterConfig")]
     pub master_config: Option<GoogleCloudMlV1__ReplicaConfig>,
 }
@@ -1346,45 +1092,30 @@ pub struct GoogleCloudMlV1__TrainingInput {
 impl Part for GoogleCloudMlV1__TrainingInput {}
 
 
-/// Request for predictions to be issued against a trained model.
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
 /// 
-/// # Activities
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
 /// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [predict projects](struct.ProjectPredictCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__PredictRequest {
-    /// 
-    /// Required. The prediction request body.
-    #[serde(rename="httpBody")]
-    pub http_body: Option<GoogleApi__HttpBody>,
-}
-
-impl RequestValue for GoogleCloudMlV1__PredictRequest {}
-
-
-/// The response message for Operations.ListOperations.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [operations list projects](struct.ProjectOperationListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleLongrunning__ListOperationsResponse {
-    /// The standard List next-page token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// A list of operations that matches the specified filter in the request.
-    pub operations: Option<Vec<GoogleLongrunning__Operation>>,
+pub struct GoogleRpc__Status {
+    /// A developer-facing error message, which should be in English. Any
+    /// user-facing error message should be localized and sent in the
+    /// google.rpc.Status.details field, or localized by the client.
+    pub message: Option<String>,
+    /// The status code, which should be an enum value of google.rpc.Code.
+    pub code: Option<i32>,
+    /// A list of messages that carry the error details.  There is a common set of
+    /// message types for APIs to use.
+    pub details: Option<Vec<HashMap<String, String>>>,
 }
 
-impl ResponseResult for GoogleLongrunning__ListOperationsResponse {}
+impl Part for GoogleRpc__Status {}
 
 
 /// Options for manually scaling a model.
@@ -1403,29 +1134,11 @@ pub struct GoogleCloudMlV1__ManualScaling {
 impl Part for GoogleCloudMlV1__ManualScaling {}
 
 
-/// Response message for the ListModels method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [models list projects](struct.ProjectModelListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__ListModelsResponse {
-    /// The list of models.
-    pub models: Option<Vec<GoogleCloudMlV1__Model>>,
-    /// Optional. Pass this token as the `page_token` field of the request for a
-    /// subsequent call.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-}
-
-impl ResponseResult for GoogleCloudMlV1__ListModelsResponse {}
-
-
 /// Represents a hardware accelerator request config.
+/// Note that the AcceleratorConfig can be used in both Jobs and Versions.
+/// Learn more about [accelerators for training](/ml-engine/docs/using-gpus) and
+/// [accelerators for online
+/// prediction](/ml-engine/docs/machine-types-online-prediction#gpus).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1441,42 +1154,35 @@ pub struct GoogleCloudMlV1__AcceleratorConfig {
 impl Part for GoogleCloudMlV1__AcceleratorConfig {}
 
 
-/// Provides the configuration for logging a type of permissions.
-/// Example:
-/// 
-/// ````text
-/// {
-///   "audit_log_configs": [
-///     {
-///       "log_type": "DATA_READ",
-///       "exempted_members": [
-///         "user:foo@gmail.com"
-///       ]
-///     },
-///     {
-///       "log_type": "DATA_WRITE",
-///     }
-///   ]
-/// }
-/// ````
-/// 
-/// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
-/// foo@gmail.com from DATA_READ logging.
+/// Message holding configuration options for explaining model predictions.
+/// There are two feature attribution methods supported for TensorFlow models:
+/// integrated gradients and sampled Shapley.
+/// [Learn more about feature
+/// attributions.](/ml-engine/docs/ai-explanations/overview)
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleIamV1__AuditLogConfig {
-    /// Specifies the identities that do not cause logging for this type of
-    /// permission.
-    /// Follows the same format of Binding.members.
-    #[serde(rename="exemptedMembers")]
-    pub exempted_members: Option<Vec<String>>,
-    /// The log type that this config enables.
-    #[serde(rename="logType")]
-    pub log_type: Option<String>,
+pub struct GoogleCloudMlV1__ExplanationConfig {
+    /// An attribution method that approximates Shapley values for features that
+    /// contribute to the label being predicted. A sampling strategy is used to
+    /// approximate the value rather than considering all subsets of features.
+    #[serde(rename="sampledShapleyAttribution")]
+    pub sampled_shapley_attribution: Option<GoogleCloudMlV1__SampledShapleyAttribution>,
+    /// Attributes credit by computing the XRAI taking advantage
+    /// of the model's fully differentiable structure. Refer to this paper for
+    /// more details: https://arxiv.org/abs/1906.02825
+    /// Currently only implemented for models with natural image inputs.
+    #[serde(rename="xraiAttribution")]
+    pub xrai_attribution: Option<GoogleCloudMlV1__XraiAttribution>,
+    /// Attributes credit by computing the Aumann-Shapley value taking advantage
+    /// of the model's fully differentiable structure. Refer to this paper for
+    /// more details: http://proceedings.mlr.press/v70/sundararajan17a.html
+    #[serde(rename="integratedGradientsAttribution")]
+    pub integrated_gradients_attribution: Option<GoogleCloudMlV1__IntegratedGradientsAttribution>,
 }
 
-impl Part for GoogleIamV1__AuditLogConfig {}
+impl Part for GoogleCloudMlV1__ExplanationConfig {}
 
 
 /// Request message for the CancelJob method.
@@ -1494,47 +1200,21 @@ pub struct GoogleCloudMlV1__CancelJobRequest { _never_set: Option<bool> }
 impl RequestValue for GoogleCloudMlV1__CancelJobRequest {}
 
 
-/// Response message for `TestIamPermissions` method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [jobs test iam permissions projects](struct.ProjectJobTestIamPermissionCall.html) (response)
-/// * [models test iam permissions projects](struct.ProjectModelTestIamPermissionCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleIamV1__TestIamPermissionsResponse {
-    /// A subset of `TestPermissionsRequest.permissions` that the caller is
-    /// allowed.
-    pub permissions: Option<Vec<String>>,
-}
-
-impl ResponseResult for GoogleIamV1__TestIamPermissionsResponse {}
-
-
-/// Represents results of a prediction job.
+/// Represents a custom encryption key configuration that can be applied to
+/// a resource.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__PredictionOutput {
-    /// Node hours used by the batch prediction job.
-    #[serde(rename="nodeHours")]
-    pub node_hours: Option<f64>,
-    /// The output Google Cloud Storage location provided at the job creation time.
-    #[serde(rename="outputPath")]
-    pub output_path: Option<String>,
-    /// The number of generated predictions.
-    #[serde(rename="predictionCount")]
-    pub prediction_count: Option<String>,
-    /// The number of data instances which resulted in errors.
-    #[serde(rename="errorCount")]
-    pub error_count: Option<String>,
+pub struct GoogleCloudMlV1__EncryptionConfig {
+    /// The Cloud KMS resource identifier of the customer managed encryption key
+    /// used to protect a resource, such as a training job. Has the form:
+    /// `projects/my-project/locations/my-region/keyRings/my-kr/cryptoKeys/my-key`.
+    #[serde(rename="kmsKeyName")]
+    pub kms_key_name: Option<String>,
 }
 
-impl Part for GoogleCloudMlV1__PredictionOutput {}
+impl Part for GoogleCloudMlV1__EncryptionConfig {}
 
 
 /// Represents results of a training job. Output only.
@@ -1627,7 +1307,7 @@ pub struct GoogleIamV1__Binding {
     ///    who is authenticated with a Google account or a service account.
     /// 
     /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` .
+    ///    account. For example, `alice@example.com` .
     /// 
     /// 
     /// * `serviceAccount:{emailid}`: An email address that represents a service
@@ -1635,6 +1315,26 @@ pub struct GoogleIamV1__Binding {
     /// 
     /// * `group:{emailid}`: An email address that represents a Google group.
     ///    For example, `admins@example.com`.
+    /// 
+    /// * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a user that has been recently deleted. For
+    ///    example, `alice@example.com?uid=123456789012345678901`. If the user is
+    ///    recovered, this value reverts to `user:{emailid}` and the recovered user
+    ///    retains the role in the binding.
+    /// 
+    /// * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus
+    ///    unique identifier) representing a service account that has been recently
+    ///    deleted. For example,
+    ///    `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.
+    ///    If the service account is undeleted, this value reverts to
+    ///    `serviceAccount:{emailid}` and the undeleted service account retains the
+    ///    role in the binding.
+    /// 
+    /// * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a Google group that has been recently
+    ///    deleted. For example, `admins@example.com?uid=123456789012345678901`. If
+    ///    the group is recovered, this value reverts to `group:{emailid}` and the
+    ///    recovered group retains the role in the binding.
     /// 
     /// 
     /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
@@ -1647,148 +1347,99 @@ pub struct GoogleIamV1__Binding {
 impl Part for GoogleIamV1__Binding {}
 
 
-/// Represents an expression text. Example:
-/// 
-/// ````text
-/// title: "User account presence"
-/// description: "Determines whether the request has a user account"
-/// expression: "size(request.user) > 0"
-/// ````
+/// An attribution method that approximates Shapley values for features that
+/// contribute to the label being predicted. A sampling strategy is used to
+/// approximate the value rather than considering all subsets of features.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleType__Expr {
-    /// An optional description of the expression. This is a longer text which
-    /// describes the expression, e.g. when hovered over it in a UI.
-    pub description: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
-    pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error
-    /// reporting, e.g. a file name and a position in the file.
-    pub location: Option<String>,
-    /// An optional title for the expression, i.e. a short string describing
-    /// its purpose. This can be used e.g. in UIs which allow to enter the
-    /// expression.
-    pub title: Option<String>,
+pub struct GoogleCloudMlV1__SampledShapleyAttribution {
+    /// The number of feature permutations to consider when approximating the
+    /// Shapley values.
+    #[serde(rename="numPaths")]
+    pub num_paths: Option<i32>,
 }
 
-impl Part for GoogleType__Expr {}
+impl Part for GoogleCloudMlV1__SampledShapleyAttribution {}
 
 
-/// Returns service account information associated with a project.
+/// Represents the spec to match discrete values from parent parameter.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get config projects](struct.ProjectGetConfigCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__GetConfigResponse {
-    /// The project number for `service_account`.
-    #[serde(rename="serviceAccountProject")]
-    pub service_account_project: Option<String>,
+pub struct GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentDiscreteValueSpec {
+    /// Matches values of the parent parameter with type 'DISCRETE'.
+    /// All values must exist in `discrete_value_spec` of parent parameter.
+    pub values: Option<Vec<f64>>,
+}
+
+impl Part for GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentDiscreteValueSpec {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1_AutomatedStoppingConfig_DecayCurveAutomatedStoppingConfig {
+    /// True if measurement.elapsed_time is used as the x-axis of each
+    /// Trials Decay Curve. Otherwise, Measurement.steps will be used as the
+    /// x-axis.
+    #[serde(rename="useElapsedTime")]
+    pub use_elapsed_time: Option<bool>,
+}
+
+impl Part for GoogleCloudMlV1_AutomatedStoppingConfig_DecayCurveAutomatedStoppingConfig {}
+
+
+/// Represents a single parameter to optimize.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1_StudyConfig_ParameterSpec {
+    /// The value spec for a 'DISCRETE' parameter.
+    #[serde(rename="discreteValueSpec")]
+    pub discrete_value_spec: Option<GoogleCloudMlV1_StudyConfigParameterSpec_DiscreteValueSpec>,
+    /// The value spec for a 'CATEGORICAL' parameter.
+    #[serde(rename="categoricalValueSpec")]
+    pub categorical_value_spec: Option<GoogleCloudMlV1_StudyConfigParameterSpec_CategoricalValueSpec>,
     /// no description provided
-    pub config: Option<GoogleCloudMlV1__Config>,
-    /// The service account Cloud ML uses to access resources in the project.
-    #[serde(rename="serviceAccount")]
-    pub service_account: Option<String>,
+    #[serde(rename="parentCategoricalValues")]
+    pub parent_categorical_values: Option<GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentCategoricalValueSpec>,
+    /// The value spec for an 'INTEGER' parameter.
+    #[serde(rename="integerValueSpec")]
+    pub integer_value_spec: Option<GoogleCloudMlV1_StudyConfigParameterSpec_IntegerValueSpec>,
+    /// A child node is active if the parameter's value matches the child node's
+    /// matching_parent_values.
+    /// 
+    /// If two items in child_parameter_specs have the same name, they must have
+    /// disjoint matching_parent_values.
+    #[serde(rename="childParameterSpecs")]
+    pub child_parameter_specs: Option<Vec<GoogleCloudMlV1_StudyConfig_ParameterSpec>>,
+    /// no description provided
+    #[serde(rename="parentDiscreteValues")]
+    pub parent_discrete_values: Option<GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentDiscreteValueSpec>,
+    /// no description provided
+    #[serde(rename="parentIntValues")]
+    pub parent_int_values: Option<GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentIntValueSpec>,
+    /// The value spec for a 'DOUBLE' parameter.
+    #[serde(rename="doubleValueSpec")]
+    pub double_value_spec: Option<GoogleCloudMlV1_StudyConfigParameterSpec_DoubleValueSpec>,
+    /// Required. The parameter name must be unique amongst all ParameterSpecs.
+    pub parameter: Option<String>,
+    /// Required. The type of the parameter.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// How the parameter should be scaled.
+    /// Leave unset for categorical parameters.
+    #[serde(rename="scaleType")]
+    pub scale_type: Option<String>,
 }
 
-impl ResponseResult for GoogleCloudMlV1__GetConfigResponse {}
-
-
-/// Represents a training or prediction job.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [jobs create projects](struct.ProjectJobCreateCall.html) (request|response)
-/// * [jobs patch projects](struct.ProjectJobPatchCall.html) (request|response)
-/// * [jobs get projects](struct.ProjectJobGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__Job {
-    /// The current training job result.
-    #[serde(rename="trainingOutput")]
-    pub training_output: Option<GoogleCloudMlV1__TrainingOutput>,
-    /// Input parameters to create a prediction job.
-    #[serde(rename="predictionInput")]
-    pub prediction_input: Option<GoogleCloudMlV1__PredictionInput>,
-    /// Output only. The details of a failure or a cancellation.
-    #[serde(rename="errorMessage")]
-    pub error_message: Option<String>,
-    /// Required. The user-specified id of the job.
-    #[serde(rename="jobId")]
-    pub job_id: Option<String>,
-    /// Optional. One or more labels that you can add, to organize your jobs.
-    /// Each label is a key-value pair, where both the key and the value are
-    /// arbitrary strings that you supply.
-    /// For more information, see the documentation on
-    /// <a href="/ml-engine/docs/tensorflow/resource-labels">using labels</a>.
-    pub labels: Option<HashMap<String, String>>,
-    /// Output only. The detailed state of a job.
-    pub state: Option<String>,
-    /// `etag` is used for optimistic concurrency control as a way to help
-    /// prevent simultaneous updates of a job from overwriting each other.
-    /// It is strongly suggested that systems make use of the `etag` in the
-    /// read-modify-write cycle to perform job updates in order to avoid race
-    /// conditions: An `etag` is returned in the response to `GetJob`, and
-    /// systems are expected to put that etag in the request to `UpdateJob` to
-    /// ensure that their change will be applied to the same version of the job.
-    pub etag: Option<String>,
-    /// Output only. When the job processing was started.
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
-    /// Input parameters to create a training job.
-    #[serde(rename="trainingInput")]
-    pub training_input: Option<GoogleCloudMlV1__TrainingInput>,
-    /// Output only. When the job processing was completed.
-    #[serde(rename="endTime")]
-    pub end_time: Option<String>,
-    /// The current prediction job result.
-    #[serde(rename="predictionOutput")]
-    pub prediction_output: Option<GoogleCloudMlV1__PredictionOutput>,
-    /// Output only. When the job was created.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
-}
-
-impl RequestValue for GoogleCloudMlV1__Job {}
-impl ResponseResult for GoogleCloudMlV1__Job {}
-
-
-/// The `Status` type defines a logical error model that is suitable for
-/// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
-/// three pieces of data: error code, error message, and error details.
-/// 
-/// You can find out more about this error model and how to work with it in the
-/// [API Design Guide](https://cloud.google.com/apis/design/errors).
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleRpc__Status {
-    /// A developer-facing error message, which should be in English. Any
-    /// user-facing error message should be localized and sent in the
-    /// google.rpc.Status.details field, or localized by the client.
-    pub message: Option<String>,
-    /// The status code, which should be an enum value of google.rpc.Code.
-    pub code: Option<i32>,
-    /// A list of messages that carry the error details.  There is a common set of
-    /// message types for APIs to use.
-    pub details: Option<Vec<HashMap<String, String>>>,
-}
-
-impl Part for GoogleRpc__Status {}
+impl Part for GoogleCloudMlV1_StudyConfig_ParameterSpec {}
 
 
 /// Represents input parameters for a prediction job.
@@ -1862,34 +1513,12 @@ pub struct GoogleCloudMlV1__PredictionInput {
 impl Part for GoogleCloudMlV1__PredictionInput {}
 
 
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations list projects](struct.ProjectLocationListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__ListLocationsResponse {
-    /// Optional. Pass this token as the `page_token` field of the request for a
-    /// subsequent call.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// Locations where at least one type of CMLE capability is available.
-    pub locations: Option<Vec<GoogleCloudMlV1__Location>>,
-}
-
-impl ResponseResult for GoogleCloudMlV1__ListLocationsResponse {}
-
-
 /// Represents a version of the model.
 /// 
 /// Each version is a trained model deployed in the cloud, ready to handle
 /// prediction requests. A model can have multiple versions. You can get
 /// information about all of the versions of a given model by calling
-/// [projects.models.versions.list](/ml-engine/reference/rest/v1/projects.models.versions/list).
+/// projects.models.versions.list.
 /// 
 /// # Activities
 /// 
@@ -1907,30 +1536,42 @@ pub struct GoogleCloudMlV1__Version {
     #[serde(rename="errorMessage")]
     pub error_message: Option<String>,
     /// Optional. The type of machine on which to serve the model. Currently only
-    /// applies to online prediction service.
-    /// <dl>
-    ///   <dt>mls1-c1-m2</dt>
-    ///   <dd>
-    ///   The <b>default</b> machine type, with 1 core and 2 GB RAM. The deprecated
-    ///   name for this machine type is "mls1-highmem-1".
-    ///   </dd>
-    ///   <dt>mls1-c4-m2</dt>
-    ///   <dd>
-    ///   In <b>Beta</b>. This machine type has 4 cores and 2 GB RAM. The
-    ///   deprecated name for this machine type is "mls1-highcpu-4".
-    ///   </dd>
-    /// </dl>
+    /// applies to online prediction service. If this field is not specified, it
+    /// defaults to `mls1-c1-m2`.
+    /// 
+    /// Online prediction supports the following machine types:
+    /// 
+    /// * `mls1-c1-m2`
+    /// * `mls1-c4-m2`
+    /// * `n1-standard-2`
+    /// * `n1-standard-4`
+    /// * `n1-standard-8`
+    /// * `n1-standard-16`
+    /// * `n1-standard-32`
+    /// * `n1-highmem-2`
+    /// * `n1-highmem-4`
+    /// * `n1-highmem-8`
+    /// * `n1-highmem-16`
+    /// * `n1-highmem-32`
+    /// * `n1-highcpu-2`
+    /// * `n1-highcpu-4`
+    /// * `n1-highcpu-8`
+    /// * `n1-highcpu-16`
+    /// * `n1-highcpu-32`
+    /// 
+    /// `mls1-c1-m2` is generally available. All other machine types are available
+    /// in beta. Learn more about the [differences between machine
+    /// types](/ml-engine/docs/machine-types-online-prediction).
     #[serde(rename="machineType")]
     pub machine_type: Option<String>,
     /// Optional. The description specified for the version when it was created.
     pub description: Option<String>,
-    /// Optional. The AI Platform runtime version to use for this deployment.
-    /// If not set, AI Platform uses the default stable version, 1.0. For more
-    /// information, see the
-    /// [runtime version list](/ml-engine/docs/runtime-version-list) and
-    /// [how to manage runtime versions](/ml-engine/docs/versioning).
-    #[serde(rename="runtimeVersion")]
-    pub runtime_version: Option<String>,
+    /// Optional. Accelerator config for using GPUs for online prediction (beta).
+    /// Only specify this field if you have specified a Compute Engine (N1) machine
+    /// type in the `machineType` field. Learn more about [using GPUs for online
+    /// prediction](/ml-engine/docs/machine-types-online-prediction#gpus).
+    #[serde(rename="acceleratorConfig")]
+    pub accelerator_config: Option<GoogleCloudMlV1__AcceleratorConfig>,
     /// Manually select the number of nodes to use for serving the
     /// model. You should generally use `auto_scaling` with an appropriate
     /// `min_nodes` instead, but this option is available if you want more
@@ -1954,14 +1595,26 @@ pub struct GoogleCloudMlV1__Version {
     /// 
     /// Do **not** specify a framework if you're deploying a [custom
     /// prediction routine](/ml-engine/docs/tensorflow/custom-prediction-routines).
+    /// 
+    /// If you specify a [Compute Engine (N1) machine
+    /// type](/ml-engine/docs/machine-types-online-prediction) in the
+    /// `machineType` field, you must specify `TENSORFLOW`
+    /// for the framework.
     pub framework: Option<String>,
     /// Output only. The time the version was created.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
-    /// Required.The name specified for the version when it was created.
+    /// Required. The name specified for the version when it was created.
     /// 
     /// The version name must be unique within the model it is created in.
     pub name: Option<String>,
+    /// Required. The AI Platform runtime version to use for this deployment.
+    /// 
+    /// For more information, see the
+    /// [runtime version list](/ml-engine/docs/runtime-version-list) and
+    /// [how to manage runtime versions](/ml-engine/docs/versioning).
+    #[serde(rename="runtimeVersion")]
+    pub runtime_version: Option<String>,
     /// Optional. The fully qualified name
     /// (<var>module_name</var>.<var>class_name</var>) of a class that implements
     /// the Predictor interface described in this reference field. The module
@@ -1971,11 +1624,13 @@ pub struct GoogleCloudMlV1__Version {
     /// Specify this field if and only if you are deploying a [custom prediction
     /// routine (beta)](/ml-engine/docs/tensorflow/custom-prediction-routines).
     /// If you specify this field, you must set
-    /// [`runtimeVersion`](#Version.FIELDS.runtime_version) to 1.4 or greater.
+    /// [`runtimeVersion`](#Version.FIELDS.runtime_version) to 1.4 or greater and
+    /// you must set `machineType` to a [legacy (MLS1)
+    /// machine type](/ml-engine/docs/machine-types-online-prediction).
     /// 
     /// The following code sample provides the Predictor interface:
     /// 
-    /// ````textpy
+    /// <pre style="max-width: 626px;">
     /// class Predictor(object):
     /// """Interface for constructing custom predictors."""
     /// 
@@ -2011,7 +1666,7 @@ pub struct GoogleCloudMlV1__Version {
     ///         An instance implementing this Predictor class.
     ///     """
     ///     raise NotImplementedError()
-    /// ````
+    /// </pre>
     /// 
     /// Learn more about [the Predictor interface and custom prediction
     /// routines](/ml-engine/docs/tensorflow/custom-prediction-routines).
@@ -2021,6 +1676,10 @@ pub struct GoogleCloudMlV1__Version {
     /// response to increases and decreases in traffic. Care should be
     /// taken to ramp up traffic according to the model's ability to scale
     /// or you will start seeing increases in latency and 429 response codes.
+    /// 
+    /// Note that you cannot use AutoScaling if your version uses
+    /// [GPUs](#Version.FIELDS.accelerator_config). Instead, you must use specify
+    /// `manual_scaling`.
     #[serde(rename="autoScaling")]
     pub auto_scaling: Option<GoogleCloudMlV1__AutoScaling>,
     /// Optional. Specifies the service account for resource access control.
@@ -2042,11 +1701,31 @@ pub struct GoogleCloudMlV1__Version {
     /// [`runtimeVersion`](#Version.FIELDS.runtime_version) to 1.4 or greater.
     #[serde(rename="packageUris")]
     pub package_uris: Option<Vec<String>>,
-    /// Optional. The version of Python used in prediction. If not set, the default
-    /// version is '2.7'. Python '3.5' is available when `runtime_version` is set
-    /// to '1.4' and above. Python '2.7' works with all supported runtime versions.
+    /// Required. The version of Python used in prediction.
+    /// 
+    /// The following Python versions are available:
+    /// 
+    /// * Python '3.7' is available when `runtime_version` is set to '1.15' or
+    ///   later.
+    /// * Python '3.5' is available when `runtime_version` is set to a version
+    ///   from '1.4' to '1.14'.
+    /// * Python '2.7' is available when `runtime_version` is set to '1.15' or
+    ///   earlier.
+    /// 
+    /// Read more about the Python versions available for [each runtime
+    /// version](/ml-engine/docs/runtime-version-list).
     #[serde(rename="pythonVersion")]
     pub python_version: Option<String>,
+    /// Optional. *Only* specify this field in a
+    /// projects.models.versions.patch
+    /// request. Specifying it in a
+    /// projects.models.versions.create
+    /// request has no effect.
+    /// 
+    /// Configures the request-response pair logging on predictions from this
+    /// Version.
+    #[serde(rename="requestLoggingConfig")]
+    pub request_logging_config: Option<GoogleCloudMlV1__RequestLoggingConfig>,
     /// Output only. The state of a version.
     pub state: Option<String>,
     /// `etag` is used for optimistic concurrency control as a way to help
@@ -2067,18 +1746,23 @@ pub struct GoogleCloudMlV1__Version {
     /// information.
     /// 
     /// When passing Version to
-    /// [projects.models.versions.create](/ml-engine/reference/rest/v1/projects.models.versions/create)
+    /// projects.models.versions.create
     /// the model service uses the specified location as the source of the model.
     /// Once deployed, the model version is hosted by the prediction service, so
     /// this location is useful only as a historical record.
     /// The total number of model files can't exceed 1000.
     #[serde(rename="deploymentUri")]
     pub deployment_uri: Option<String>,
+    /// Optional. Configures explainability features on the model's version.
+    /// Some explanation features require additional metadata to be loaded
+    /// as part of the model payload.
+    #[serde(rename="explanationConfig")]
+    pub explanation_config: Option<GoogleCloudMlV1__ExplanationConfig>,
     /// Output only. If true, this version will be used to handle prediction
     /// requests that do not specify a version.
     /// 
     /// You can change the default version by calling
-    /// [projects.methods.versions.setDefault](/ml-engine/reference/rest/v1/projects.models.versions/setDefault).
+    /// projects.methods.versions.setDefault.
     #[serde(rename="isDefault")]
     pub is_default: Option<bool>,
 }
@@ -2087,21 +1771,26 @@ impl RequestValue for GoogleCloudMlV1__Version {}
 impl ResponseResult for GoogleCloudMlV1__Version {}
 
 
-/// There is no detailed description.
+/// Request for predictions to be issued against a trained model.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [predict projects](struct.ProjectPredictCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__Capability {
-    /// Available accelerators for the capability.
-    #[serde(rename="availableAccelerators")]
-    pub available_accelerators: Option<Vec<String>>,
-    /// no description provided
-    #[serde(rename="type")]
-    pub type_: Option<String>,
+pub struct GoogleCloudMlV1__PredictRequest {
+    /// 
+    /// Required. The prediction request body. Refer to the [request body details
+    /// section](#request-body-details) for more information on how to structure
+    /// your request.
+    #[serde(rename="httpBody")]
+    pub http_body: Option<GoogleApi__HttpBody>,
 }
 
-impl Part for GoogleCloudMlV1__Capability {}
+impl RequestValue for GoogleCloudMlV1__PredictRequest {}
 
 
 /// Options for automatically scaling a model.
@@ -2125,9 +1814,20 @@ pub struct GoogleCloudMlV1__AutoScaling {
     /// at least `min_nodes`. You will be charged for the time in which additional
     /// nodes are used.
     /// 
-    /// If not specified, `min_nodes` defaults to 0, in which case, when traffic
-    /// to a model stops (and after a cool-down period), nodes will be shut down
-    /// and no charges will be incurred until traffic to the model resumes.
+    /// If `min_nodes` is not specified and AutoScaling is used with a [legacy
+    /// (MLS1) machine type](/ml-engine/docs/machine-types-online-prediction),
+    /// `min_nodes` defaults to 0, in which case, when traffic to a model stops
+    /// (and after a cool-down period), nodes will be shut down and no charges will
+    /// be incurred until traffic to the model resumes.
+    /// 
+    /// If `min_nodes` is not specified and AutoScaling is used with a [Compute
+    /// Engine (N1) machine type](/ml-engine/docs/machine-types-online-prediction),
+    /// `min_nodes` defaults to 1. `min_nodes` must be at least 1 for use with a
+    /// Compute Engine machine type.
+    /// 
+    /// Note that you cannot use AutoScaling if your version uses
+    /// [GPUs](#Version.FIELDS.accelerator_config). Instead, you must use
+    /// ManualScaling.
     /// 
     /// You can set `min_nodes` when creating the model version, and you can also
     /// update `min_nodes` for an existing version:
@@ -2143,7 +1843,7 @@ pub struct GoogleCloudMlV1__AutoScaling {
     /// 
     /// HTTP request:
     /// 
-    /// <pre>
+    /// <pre style="max-width: 626px;">
     /// PATCH
     /// https://ml.googleapis.com/v1/{name=projects/*/models/*/versions/*}?update_mask=autoScaling.minNodes
     /// -d @./update_body.json
@@ -2153,6 +1853,1224 @@ pub struct GoogleCloudMlV1__AutoScaling {
 }
 
 impl Part for GoogleCloudMlV1__AutoScaling {}
+
+
+/// The median automated stopping rule stops a pending trial if the trial's
+/// best objective_value is strictly below the median 'performance' of all
+/// completed trials reported up to the trial's last measurement.
+/// Currently, 'performance' refers to the running average of the objective
+/// values reported by the trial in each measurement.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1_AutomatedStoppingConfig_MedianAutomatedStoppingConfig {
+    /// True if median automated stopping rule applies on
+    /// measurement.use_elapsed_time. it means that elapsed_time field of
+    /// latest measurement of current trial is used to compute median objective
+    /// value for each completed trials.
+    #[serde(rename="useElapsedTime")]
+    pub use_elapsed_time: Option<bool>,
+}
+
+impl Part for GoogleCloudMlV1_AutomatedStoppingConfig_MedianAutomatedStoppingConfig {}
+
+
+/// Response message for the ListJobs method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [jobs list projects](struct.ProjectJobListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__ListJobsResponse {
+    /// Optional. Pass this token as the `page_token` field of the request for a
+    /// subsequent call.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of jobs.
+    pub jobs: Option<Vec<GoogleCloudMlV1__Job>>,
+}
+
+impl ResponseResult for GoogleCloudMlV1__ListJobsResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__Config {
+    /// The service account Cloud ML uses to run on TPU node.
+    #[serde(rename="tpuServiceAccount")]
+    pub tpu_service_account: Option<String>,
+}
+
+impl Part for GoogleCloudMlV1__Config {}
+
+
+/// Response message for the ListVersions method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [models versions list projects](struct.ProjectModelVersionListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__ListVersionsResponse {
+    /// Optional. Pass this token as the `page_token` field of the request for a
+    /// subsequent call.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of versions.
+    pub versions: Option<Vec<GoogleCloudMlV1__Version>>,
+}
+
+impl ResponseResult for GoogleCloudMlV1__ListVersionsResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations get projects](struct.ProjectLocationGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__Location {
+    /// no description provided
+    pub name: Option<String>,
+    /// Capabilities available in the location.
+    pub capabilities: Option<Vec<GoogleCloudMlV1__Capability>>,
+}
+
+impl ResponseResult for GoogleCloudMlV1__Location {}
+
+
+/// Represents configuration of a study.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__StudyConfig {
+    /// no description provided
+    pub metrics: Option<Vec<GoogleCloudMlV1_StudyConfig_MetricSpec>>,
+    /// Configuration for automated stopping of unpromising Trials.
+    #[serde(rename="automatedStoppingConfig")]
+    pub automated_stopping_config: Option<GoogleCloudMlV1__AutomatedStoppingConfig>,
+    /// The search algorithm specified for the study.
+    pub algorithm: Option<String>,
+    /// Required. The set of parameters to tune.
+    pub parameters: Option<Vec<GoogleCloudMlV1_StudyConfig_ParameterSpec>>,
+}
+
+impl Part for GoogleCloudMlV1__StudyConfig {}
+
+
+/// Represents the spec to match categorical values from parent parameter.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentCategoricalValueSpec {
+    /// Matches values of the parent parameter with type 'CATEGORICAL'.
+    /// All values must exist in `categorical_value_spec` of parent parameter.
+    pub values: Option<Vec<String>>,
+}
+
+impl Part for GoogleCloudMlV1_StudyConfigParameterSpec_MatchingParentCategoricalValueSpec {}
+
+
+/// An Identity and Access Management (IAM) policy, which specifies access
+/// controls for Google Cloud resources.
+/// 
+/// A `Policy` is a collection of `bindings`. A `binding` binds one or more
+/// `members` to a single `role`. Members can be user accounts, service accounts,
+/// Google groups, and domains (such as G Suite). A `role` is a named list of
+/// permissions; each `role` can be an IAM predefined role or a user-created
+/// custom role.
+/// 
+/// Optionally, a `binding` can specify a `condition`, which is a logical
+/// expression that allows access to a resource only if the expression evaluates
+/// to `true`. A condition can add constraints based on attributes of the
+/// request, the resource, or both.
+/// 
+/// **JSON example:**
+/// 
+/// ````text
+/// {
+///   "bindings": [
+///     {
+///       "role": "roles/resourcemanager.organizationAdmin",
+///       "members": [
+///         "user:mike@example.com",
+///         "group:admins@example.com",
+///         "domain:google.com",
+///         "serviceAccount:my-project-id@appspot.gserviceaccount.com"
+///       ]
+///     },
+///     {
+///       "role": "roles/resourcemanager.organizationViewer",
+///       "members": ["user:eve@example.com"],
+///       "condition": {
+///         "title": "expirable access",
+///         "description": "Does not grant access after Sep 2020",
+///         "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')",
+///       }
+///     }
+///   ],
+///   "etag": "BwWWja0YfJA=",
+///   "version": 3
+/// }
+/// ````
+/// 
+/// **YAML example:**
+/// 
+/// ````text
+/// bindings:
+/// - members:
+///   - user:mike@example.com
+///   - group:admins@example.com
+///   - domain:google.com
+///   - serviceAccount:my-project-id@appspot.gserviceaccount.com
+///   role: roles/resourcemanager.organizationAdmin
+/// - members:
+///   - user:eve@example.com
+///   role: roles/resourcemanager.organizationViewer
+///   condition:
+///     title: expirable access
+///     description: Does not grant access after Sep 2020
+///     expression: request.time < timestamp('2020-10-01T00:00:00.000Z')
+/// - etag: BwWWja0YfJA=
+/// - version: 3
+/// ````
+/// 
+/// For a description of IAM and its features, see the
+/// [IAM documentation](https://cloud.google.com/iam/docs/).
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [models set iam policy projects](struct.ProjectModelSetIamPolicyCall.html) (response)
+/// * [jobs set iam policy projects](struct.ProjectJobSetIamPolicyCall.html) (response)
+/// * [models get iam policy projects](struct.ProjectModelGetIamPolicyCall.html) (response)
+/// * [jobs get iam policy projects](struct.ProjectJobGetIamPolicyCall.html) (response)
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleIamV1__Policy {
+    /// Specifies cloud audit logging configuration for this policy.
+    #[serde(rename="auditConfigs")]
+    pub audit_configs: Option<Vec<GoogleIamV1__AuditConfig>>,
+    /// `etag` is used for optimistic concurrency control as a way to help
+    /// prevent simultaneous updates of a policy from overwriting each other.
+    /// It is strongly suggested that systems make use of the `etag` in the
+    /// read-modify-write cycle to perform policy updates in order to avoid race
+    /// conditions: An `etag` is returned in the response to `getIamPolicy`, and
+    /// systems are expected to put that etag in the request to `setIamPolicy` to
+    /// ensure that their change will be applied to the same version of the policy.
+    /// 
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
+    pub etag: Option<String>,
+    /// Associates a list of `members` to a `role`. Optionally, may specify a
+    /// `condition` that determines how and when the `bindings` are applied. Each
+    /// of the `bindings` must contain at least one member.
+    pub bindings: Option<Vec<GoogleIamV1__Binding>>,
+    /// Specifies the format of the policy.
+    /// 
+    /// Valid values are `0`, `1`, and `3`. Requests that specify an invalid value
+    /// are rejected.
+    /// 
+    /// Any operation that affects conditional role bindings must specify version
+    /// `3`. This requirement applies to the following operations:
+    /// 
+    /// * Getting a policy that includes a conditional role binding
+    /// * Adding a conditional role binding to a policy
+    /// * Changing a conditional role binding in a policy
+    /// * Removing any role binding, with or without a condition, from a policy
+    ///   that includes conditions
+    /// 
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
+    /// 
+    /// If a policy does not include any conditions, operations on that policy may
+    /// specify any valid version or leave the field unset.
+    pub version: Option<i32>,
+}
+
+impl ResponseResult for GoogleIamV1__Policy {}
+
+
+/// Represents a set of hyperparameters to optimize.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__HyperparameterSpec {
+    /// Optional. How many training trials should be attempted to optimize
+    /// the specified hyperparameters.
+    /// 
+    /// Defaults to one.
+    #[serde(rename="maxTrials")]
+    pub max_trials: Option<i32>,
+    /// Required. The type of goal to use for tuning. Available types are
+    /// `MAXIMIZE` and `MINIMIZE`.
+    /// 
+    /// Defaults to `MAXIMIZE`.
+    pub goal: Option<String>,
+    /// Optional. The search algorithm specified for the hyperparameter
+    /// tuning job.
+    /// Uses the default AI Platform hyperparameter tuning
+    /// algorithm if unspecified.
+    pub algorithm: Option<String>,
+    /// Optional. The number of failed trials that need to be seen before failing
+    /// the hyperparameter tuning job. You can specify this field to override the
+    /// default failing criteria for AI Platform hyperparameter tuning jobs.
+    /// 
+    /// Defaults to zero, which means the service decides when a hyperparameter
+    /// job should fail.
+    #[serde(rename="maxFailedTrials")]
+    pub max_failed_trials: Option<i32>,
+    /// Optional. Indicates if the hyperparameter tuning job enables auto trial
+    /// early stopping.
+    #[serde(rename="enableTrialEarlyStopping")]
+    pub enable_trial_early_stopping: Option<bool>,
+    /// Optional. The prior hyperparameter tuning job id that users hope to
+    /// continue with. The job id will be used to find the corresponding vizier
+    /// study guid and resume the study.
+    #[serde(rename="resumePreviousJobId")]
+    pub resume_previous_job_id: Option<String>,
+    /// Required. The set of parameters to tune.
+    pub params: Option<Vec<GoogleCloudMlV1__ParameterSpec>>,
+    /// Optional. The TensorFlow summary tag name to use for optimizing trials. For
+    /// current versions of TensorFlow, this tag name should exactly match what is
+    /// shown in TensorBoard, including all scopes.  For versions of TensorFlow
+    /// prior to 0.12, this should be only the tag passed to tf.Summary.
+    /// By default, "training/hptuning/metric" will be used.
+    #[serde(rename="hyperparameterMetricTag")]
+    pub hyperparameter_metric_tag: Option<String>,
+    /// Optional. The number of training trials to run concurrently.
+    /// You can reduce the time it takes to perform hyperparameter tuning by adding
+    /// trials in parallel. However, each trail only benefits from the information
+    /// gained in completed trials. That means that a trial does not get access to
+    /// the results of trials running at the same time, which could reduce the
+    /// quality of the overall optimization.
+    /// 
+    /// Each trial will use the same scale tier and machine types.
+    /// 
+    /// Defaults to one.
+    #[serde(rename="maxParallelTrials")]
+    pub max_parallel_trials: Option<i32>,
+}
+
+impl Part for GoogleCloudMlV1__HyperparameterSpec {}
+
+
+/// An observed value of a metric.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1_HyperparameterOutput_HyperparameterMetric {
+    /// The global training step for this metric.
+    #[serde(rename="trainingStep")]
+    pub training_step: Option<String>,
+    /// The objective value at this training step.
+    #[serde(rename="objectiveValue")]
+    pub objective_value: Option<f64>,
+}
+
+impl Part for GoogleCloudMlV1_HyperparameterOutput_HyperparameterMetric {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1_StudyConfigParameterSpec_DoubleValueSpec {
+    /// Must be specified if type is `DOUBLE`. Maximum value of the parameter.
+    #[serde(rename="maxValue")]
+    pub max_value: Option<f64>,
+    /// Must be specified if type is `DOUBLE`. Minimum value of the parameter.
+    #[serde(rename="minValue")]
+    pub min_value: Option<f64>,
+}
+
+impl Part for GoogleCloudMlV1_StudyConfigParameterSpec_DoubleValueSpec {}
+
+
+/// Represents a training or prediction job.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [jobs create projects](struct.ProjectJobCreateCall.html) (request|response)
+/// * [jobs patch projects](struct.ProjectJobPatchCall.html) (request|response)
+/// * [jobs get projects](struct.ProjectJobGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__Job {
+    /// The current training job result.
+    #[serde(rename="trainingOutput")]
+    pub training_output: Option<GoogleCloudMlV1__TrainingOutput>,
+    /// Input parameters to create a prediction job.
+    #[serde(rename="predictionInput")]
+    pub prediction_input: Option<GoogleCloudMlV1__PredictionInput>,
+    /// Output only. The details of a failure or a cancellation.
+    #[serde(rename="errorMessage")]
+    pub error_message: Option<String>,
+    /// Required. The user-specified id of the job.
+    #[serde(rename="jobId")]
+    pub job_id: Option<String>,
+    /// Optional. One or more labels that you can add, to organize your jobs.
+    /// Each label is a key-value pair, where both the key and the value are
+    /// arbitrary strings that you supply.
+    /// For more information, see the documentation on
+    /// <a href="/ml-engine/docs/tensorflow/resource-labels">using labels</a>.
+    pub labels: Option<HashMap<String, String>>,
+    /// Output only. The detailed state of a job.
+    pub state: Option<String>,
+    /// `etag` is used for optimistic concurrency control as a way to help
+    /// prevent simultaneous updates of a job from overwriting each other.
+    /// It is strongly suggested that systems make use of the `etag` in the
+    /// read-modify-write cycle to perform job updates in order to avoid race
+    /// conditions: An `etag` is returned in the response to `GetJob`, and
+    /// systems are expected to put that etag in the request to `UpdateJob` to
+    /// ensure that their change will be applied to the same version of the job.
+    pub etag: Option<String>,
+    /// Output only. When the job processing was started.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+    /// Input parameters to create a training job.
+    #[serde(rename="trainingInput")]
+    pub training_input: Option<GoogleCloudMlV1__TrainingInput>,
+    /// Output only. When the job processing was completed.
+    #[serde(rename="endTime")]
+    pub end_time: Option<String>,
+    /// The current prediction job result.
+    #[serde(rename="predictionOutput")]
+    pub prediction_output: Option<GoogleCloudMlV1__PredictionOutput>,
+    /// Output only. When the job was created.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+}
+
+impl RequestValue for GoogleCloudMlV1__Job {}
+impl ResponseResult for GoogleCloudMlV1__Job {}
+
+
+/// All parameters related to scheduling of training jobs.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__Scheduling {
+    /// Optional. The maximum job running time, expressed in seconds. The field can
+    /// contain up to nine fractional digits, terminated by `s`. By default there
+    /// is no limit to the running time.
+    /// 
+    /// If the training job is still running after this duration, AI Platform
+    /// Training cancels it.
+    /// 
+    /// For example, if you want to ensure your job runs for no more than 2 hours,
+    /// set this field to `7200s` (2 hours * 60 minutes / hour * 60 seconds /
+    /// minute).
+    /// 
+    /// If you submit your training job using the `gcloud` tool, you can [provide
+    /// this field in a `config.yaml`
+    /// file](/ai-platform/training/docs/training-jobs#formatting_your_configuration_parameters).
+    /// For example:
+    /// 
+    /// ````textyaml
+    /// trainingInput:
+    ///   ...
+    ///   scheduling:
+    ///     maxRunningTime: 7200s
+    ///   ...
+    /// ````
+    #[serde(rename="maxRunningTime")]
+    pub max_running_time: Option<String>,
+}
+
+impl Part for GoogleCloudMlV1__Scheduling {}
+
+
+/// Request message for `TestIamPermissions` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [jobs test iam permissions projects](struct.ProjectJobTestIamPermissionCall.html) (request)
+/// * [models test iam permissions projects](struct.ProjectModelTestIamPermissionCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleIamV1__TestIamPermissionsRequest {
+    /// The set of permissions to check for the `resource`. Permissions with
+    /// wildcards (such as '*' or 'storage.*') are not allowed. For more
+    /// information see
+    /// [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
+    pub permissions: Option<Vec<String>>,
+}
+
+impl RequestValue for GoogleIamV1__TestIamPermissionsRequest {}
+
+
+/// Specifies the audit configuration for a service.
+/// The configuration determines which permission types are logged, and what
+/// identities, if any, are exempted from logging.
+/// An AuditConfig must have one or more AuditLogConfigs.
+/// 
+/// If there are AuditConfigs for both `allServices` and a specific service,
+/// the union of the two AuditConfigs is used for that service: the log_types
+/// specified in each AuditConfig are enabled, and the exempted_members in each
+/// AuditLogConfig are exempted.
+/// 
+/// Example Policy with multiple AuditConfigs:
+/// 
+/// ````text
+/// {
+///   "audit_configs": [
+///     {
+///       "service": "allServices"
+///       "audit_log_configs": [
+///         {
+///           "log_type": "DATA_READ",
+///           "exempted_members": [
+///             "user:jose@example.com"
+///           ]
+///         },
+///         {
+///           "log_type": "DATA_WRITE",
+///         },
+///         {
+///           "log_type": "ADMIN_READ",
+///         }
+///       ]
+///     },
+///     {
+///       "service": "sampleservice.googleapis.com"
+///       "audit_log_configs": [
+///         {
+///           "log_type": "DATA_READ",
+///         },
+///         {
+///           "log_type": "DATA_WRITE",
+///           "exempted_members": [
+///             "user:aliya@example.com"
+///           ]
+///         }
+///       ]
+///     }
+///   ]
+/// }
+/// ````
+/// 
+/// For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
+/// logging. It also exempts jose@example.com from DATA_READ logging, and
+/// aliya@example.com from DATA_WRITE logging.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleIamV1__AuditConfig {
+    /// The configuration for logging of each type of permission.
+    #[serde(rename="auditLogConfigs")]
+    pub audit_log_configs: Option<Vec<GoogleIamV1__AuditLogConfig>>,
+    /// Specifies a service that will be enabled for audit logging.
+    /// For example, `storage.googleapis.com`, `cloudsql.googleapis.com`.
+    /// `allServices` is a special value that covers all services.
+    pub service: Option<String>,
+}
+
+impl Part for GoogleIamV1__AuditConfig {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__Capability {
+    /// Available accelerators for the capability.
+    #[serde(rename="availableAccelerators")]
+    pub available_accelerators: Option<Vec<String>>,
+    /// no description provided
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+}
+
+impl Part for GoogleCloudMlV1__Capability {}
+
+
+/// The response message for Operations.ListOperations.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [operations list projects](struct.ProjectOperationListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleLongrunning__ListOperationsResponse {
+    /// The standard List next-page token.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of operations that matches the specified filter in the request.
+    pub operations: Option<Vec<GoogleLongrunning__Operation>>,
+}
+
+impl ResponseResult for GoogleLongrunning__ListOperationsResponse {}
+
+
+/// Response message for the ListModels method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [models list projects](struct.ProjectModelListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__ListModelsResponse {
+    /// The list of models.
+    pub models: Option<Vec<GoogleCloudMlV1__Model>>,
+    /// Optional. Pass this token as the `page_token` field of the request for a
+    /// subsequent call.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+}
+
+impl ResponseResult for GoogleCloudMlV1__ListModelsResponse {}
+
+
+/// Configuration for logging request-response pairs to a BigQuery table.
+/// Online prediction requests to a model version and the responses to these
+/// requests are converted to raw strings and saved to the specified BigQuery
+/// table. Logging is constrained by [BigQuery quotas and
+/// limits](/bigquery/quotas). If your project exceeds BigQuery quotas or limits,
+/// AI Platform Prediction does not log request-response pairs, but it continues
+/// to serve predictions.
+/// 
+/// If you are using [continuous
+/// evaluation](/ml-engine/docs/continuous-evaluation/), you do not need to
+/// specify this configuration manually. Setting up continuous evaluation
+/// automatically enables logging of request-response pairs.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__RequestLoggingConfig {
+    /// Percentage of requests to be logged, expressed as a fraction from 0 to 1.
+    /// For example, if you want to log 10% of requests, enter `0.1`. The sampling
+    /// window is the lifetime of the model version. Defaults to 0.
+    #[serde(rename="samplingPercentage")]
+    pub sampling_percentage: Option<f64>,
+    /// Required. Fully qualified BigQuery table name in the following format:
+    /// "<var>project_id</var>.<var>dataset_name</var>.<var>table_name</var>"
+    /// 
+    /// The specified table must already exist, and the "Cloud ML Service Agent"
+    /// for your project must have permission to write to it. The table must have
+    /// the following [schema](/bigquery/docs/schemas):
+    /// 
+    /// <table>
+    ///   <tr><th>Field name</th><th style="display: table-cell">Type</th>
+    ///     <th style="display: table-cell">Mode</th></tr>
+    ///   <tr><td>model</td><td>STRING</td><td>REQUIRED</td></tr>
+    ///   <tr><td>model_version</td><td>STRING</td><td>REQUIRED</td></tr>
+    ///   <tr><td>time</td><td>TIMESTAMP</td><td>REQUIRED</td></tr>
+    ///   <tr><td>raw_data</td><td>STRING</td><td>REQUIRED</td></tr>
+    ///   <tr><td>raw_prediction</td><td>STRING</td><td>NULLABLE</td></tr>
+    ///   <tr><td>groundtruth</td><td>STRING</td><td>NULLABLE</td></tr>
+    /// </table>
+    #[serde(rename="bigqueryTableName")]
+    pub bigquery_table_name: Option<String>,
+}
+
+impl Part for GoogleCloudMlV1__RequestLoggingConfig {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1_StudyConfigParameterSpec_DiscreteValueSpec {
+    /// Must be specified if type is `DISCRETE`.
+    /// A list of feasible points.
+    /// The list should be in strictly increasing order. For instance, this
+    /// parameter might have possible settings of 1.5, 2.5, and 4.0. This list
+    /// should not contain more than 1,000 values.
+    pub values: Option<Vec<f64>>,
+}
+
+impl Part for GoogleCloudMlV1_StudyConfigParameterSpec_DiscreteValueSpec {}
+
+
+/// The response message for the ListTrials method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations studies trials list projects](struct.ProjectLocationStudyTrialListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__ListTrialsResponse {
+    /// The trials associated with the study.
+    pub trials: Option<Vec<GoogleCloudMlV1__Trial>>,
+}
+
+impl ResponseResult for GoogleCloudMlV1__ListTrialsResponse {}
+
+
+/// Provides the configuration for logging a type of permissions.
+/// Example:
+/// 
+/// ````text
+/// {
+///   "audit_log_configs": [
+///     {
+///       "log_type": "DATA_READ",
+///       "exempted_members": [
+///         "user:jose@example.com"
+///       ]
+///     },
+///     {
+///       "log_type": "DATA_WRITE",
+///     }
+///   ]
+/// }
+/// ````
+/// 
+/// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
+/// jose@example.com from DATA_READ logging.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleIamV1__AuditLogConfig {
+    /// Specifies the identities that do not cause logging for this type of
+    /// permission.
+    /// Follows the same format of Binding.members.
+    #[serde(rename="exemptedMembers")]
+    pub exempted_members: Option<Vec<String>>,
+    /// The log type that this config enables.
+    #[serde(rename="logType")]
+    pub log_type: Option<String>,
+}
+
+impl Part for GoogleIamV1__AuditLogConfig {}
+
+
+/// A message representing a metric in the measurement.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1_Measurement_Metric {
+    /// Required. Metric name.
+    pub metric: Option<String>,
+    /// Required. The value for this metric.
+    pub value: Option<f64>,
+}
+
+impl Part for GoogleCloudMlV1_Measurement_Metric {}
+
+
+/// A message representing a parameter to be tuned.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1_Trial_Parameter {
+    /// Must be set if ParameterTypeis CATEGORICAL
+    #[serde(rename="stringValue")]
+    pub string_value: Option<String>,
+    /// Must be set if ParameterType is INTEGER
+    #[serde(rename="intValue")]
+    pub int_value: Option<String>,
+    /// Must be set if ParameterType is DOUBLE or DISCRETE.
+    #[serde(rename="floatValue")]
+    pub float_value: Option<f64>,
+    /// The name of the parameter.
+    pub parameter: Option<String>,
+}
+
+impl Part for GoogleCloudMlV1_Trial_Parameter {}
+
+
+/// Configuration for Automated Early Stopping of Trials. If no
+/// implementation_config is set, automated early stopping will not be run.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__AutomatedStoppingConfig {
+    /// no description provided
+    #[serde(rename="decayCurveStoppingConfig")]
+    pub decay_curve_stopping_config: Option<GoogleCloudMlV1_AutomatedStoppingConfig_DecayCurveAutomatedStoppingConfig>,
+    /// no description provided
+    #[serde(rename="medianAutomatedStoppingConfig")]
+    pub median_automated_stopping_config: Option<GoogleCloudMlV1_AutomatedStoppingConfig_MedianAutomatedStoppingConfig>,
+}
+
+impl Part for GoogleCloudMlV1__AutomatedStoppingConfig {}
+
+
+/// Represents a textual expression in the Common Expression Language (CEL)
+/// syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+/// are documented at https://github.com/google/cel-spec.
+/// 
+/// Example (Comparison):
+/// 
+/// ````text
+/// title: "Summary size limit"
+/// description: "Determines if a summary is less than 100 chars"
+/// expression: "document.summary.size() < 100"
+/// ````
+/// 
+/// Example (Equality):
+/// 
+/// ````text
+/// title: "Requestor is owner"
+/// description: "Determines if requestor is the document owner"
+/// expression: "document.owner == request.auth.claims.email"
+/// ````
+/// 
+/// Example (Logic):
+/// 
+/// ````text
+/// title: "Public documents"
+/// description: "Determine whether the document should be publicly visible"
+/// expression: "document.type != 'private' && document.type != 'internal'"
+/// ````
+/// 
+/// Example (Data Manipulation):
+/// 
+/// ````text
+/// title: "Notification string"
+/// description: "Create a notification string with a timestamp."
+/// expression: "'New message received at ' + string(document.create_time)"
+/// ````
+/// 
+/// The exact variables and functions that may be referenced within an expression
+/// are determined by the service that evaluates it. See the service
+/// documentation for additional information.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleType__Expr {
+    /// Optional. Description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
+    /// Textual representation of an expression in Common Expression Language
+    /// syntax.
+    pub expression: Option<String>,
+    /// Optional. String indicating the location of the expression for error
+    /// reporting, e.g. a file name and a position in the file.
+    pub location: Option<String>,
+    /// Optional. Title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
+}
+
+impl Part for GoogleType__Expr {}
+
+
+/// The request message for the CheckTrialEarlyStoppingState service method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations studies trials check early stopping state projects](struct.ProjectLocationStudyTrialCheckEarlyStoppingStateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__CheckTrialEarlyStoppingStateRequest { _never_set: Option<bool> }
+
+impl RequestValue for GoogleCloudMlV1__CheckTrialEarlyStoppingStateRequest {}
+
+
+/// This resource represents a long-running operation that is the result of a
+/// network API call.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations studies trials suggest projects](struct.ProjectLocationStudyTrialSuggestCall.html) (response)
+/// * [models versions create projects](struct.ProjectModelVersionCreateCall.html) (response)
+/// * [models versions patch projects](struct.ProjectModelVersionPatchCall.html) (response)
+/// * [operations get projects](struct.ProjectOperationGetCall.html) (response)
+/// * [models versions delete projects](struct.ProjectModelVersionDeleteCall.html) (response)
+/// * [locations operations get projects](struct.ProjectLocationOperationGetCall.html) (response)
+/// * [locations studies trials check early stopping state projects](struct.ProjectLocationStudyTrialCheckEarlyStoppingStateCall.html) (response)
+/// * [models delete projects](struct.ProjectModelDeleteCall.html) (response)
+/// * [models patch projects](struct.ProjectModelPatchCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleLongrunning__Operation {
+    /// The error result of the operation in case of failure or cancellation.
+    pub error: Option<GoogleRpc__Status>,
+    /// If the value is `false`, it means the operation is still in progress.
+    /// If `true`, the operation is completed, and either `error` or `response` is
+    /// available.
+    pub done: Option<bool>,
+    /// The normal response of the operation in case of success.  If the original
+    /// method returns no data on success, such as `Delete`, the response is
+    /// `google.protobuf.Empty`.  If the original method is standard
+    /// `Get`/`Create`/`Update`, the response should be the resource.  For other
+    /// methods, the response should have the type `XxxResponse`, where `Xxx`
+    /// is the original method name.  For example, if the original method name
+    /// is `TakeSnapshot()`, the inferred response type is
+    /// `TakeSnapshotResponse`.
+    pub response: Option<HashMap<String, String>>,
+    /// The server-assigned name, which is only unique within the same service that
+    /// originally returns it. If you use the default HTTP mapping, the
+    /// `name` should be a resource name ending with `operations/{unique_id}`.
+    pub name: Option<String>,
+    /// Service-specific metadata associated with the operation.  It typically
+    /// contains progress information and common metadata such as create time.
+    /// Some services might not provide such metadata.  Any method that returns a
+    /// long-running operation should document the metadata type, if any.
+    pub metadata: Option<HashMap<String, String>>,
+}
+
+impl ResponseResult for GoogleLongrunning__Operation {}
+
+
+/// A message representing a Trial.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations studies trials add measurement projects](struct.ProjectLocationStudyTrialAddMeasurementCall.html) (response)
+/// * [locations studies trials complete projects](struct.ProjectLocationStudyTrialCompleteCall.html) (response)
+/// * [locations studies trials create projects](struct.ProjectLocationStudyTrialCreateCall.html) (request|response)
+/// * [locations studies trials get projects](struct.ProjectLocationStudyTrialGetCall.html) (response)
+/// * [locations studies trials stop projects](struct.ProjectLocationStudyTrialStopCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__Trial {
+    /// Output only. A human readable string describing why the Trial is
+    /// infeasible. This should only be set if trial_infeasible is true.
+    #[serde(rename="infeasibleReason")]
+    pub infeasible_reason: Option<String>,
+    /// The final Measurement containing the objective value.
+    #[serde(rename="finalMeasurement")]
+    pub final_measurement: Option<GoogleCloudMlV1__Measurement>,
+    /// Output only. Name of the trial assigned by the service.
+    pub name: Option<String>,
+    /// The parameters of the Trial.
+    pub parameters: Option<Vec<GoogleCloudMlV1_Trial_Parameter>>,
+    /// A list of measurements that are strictly lexicographically
+    /// ordered by their induced tuples (steps, elapsed_time).
+    /// These are used for early stopping computations.
+    pub measurements: Option<Vec<GoogleCloudMlV1__Measurement>>,
+    /// Output only. The identifier of the client that originally requested this trial.
+    #[serde(rename="clientId")]
+    pub client_id: Option<String>,
+    /// The detailed state of a trial.
+    pub state: Option<String>,
+    /// Output only. Time the Trial was started.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+    /// Output only. Time the Trial's status changed to COMPLETED.
+    #[serde(rename="endTime")]
+    pub end_time: Option<String>,
+    /// Output only. True if the parameters in this trial should not be attempted again.
+    #[serde(rename="trialInfeasible")]
+    pub trial_infeasible: Option<bool>,
+}
+
+impl RequestValue for GoogleCloudMlV1__Trial {}
+impl ResponseResult for GoogleCloudMlV1__Trial {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations studies list projects](struct.ProjectLocationStudyListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__ListStudiesResponse {
+    /// The Studies associated with the project.
+    pub studies: Option<Vec<GoogleCloudMlV1__Study>>,
+}
+
+impl ResponseResult for GoogleCloudMlV1__ListStudiesResponse {}
+
+
+/// The request message for the AddTrialMeasurement service method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations studies trials add measurement projects](struct.ProjectLocationStudyTrialAddMeasurementCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__AddTrialMeasurementRequest {
+    /// Required. The measurement to be added to a trial.
+    pub measurement: Option<GoogleCloudMlV1__Measurement>,
+}
+
+impl RequestValue for GoogleCloudMlV1__AddTrialMeasurementRequest {}
+
+
+/// Represents a machine learning solution.
+/// 
+/// A model can have multiple versions, each of which is a deployed, trained
+/// model ready to receive prediction requests. The model itself is just a
+/// container.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [models get projects](struct.ProjectModelGetCall.html) (response)
+/// * [models patch projects](struct.ProjectModelPatchCall.html) (request)
+/// * [models create projects](struct.ProjectModelCreateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__Model {
+    /// Optional. The description specified for the model when it was created.
+    pub description: Option<String>,
+    /// Optional. If true, online prediction nodes send `stderr` and `stdout`
+    /// streams to Stackdriver Logging. These can be more verbose than the standard
+    /// access logs (see `onlinePredictionLogging`) and can incur higher cost.
+    /// However, they are helpful for debugging. Note that
+    /// [Stackdriver logs may incur a cost](/stackdriver/pricing), especially if
+    /// your project receives prediction requests at a high QPS. Estimate your
+    /// costs before enabling this option.
+    /// 
+    /// Default is false.
+    #[serde(rename="onlinePredictionConsoleLogging")]
+    pub online_prediction_console_logging: Option<bool>,
+    /// Optional. One or more labels that you can add, to organize your models.
+    /// Each label is a key-value pair, where both the key and the value are
+    /// arbitrary strings that you supply.
+    /// For more information, see the documentation on
+    /// <a href="/ml-engine/docs/tensorflow/resource-labels">using labels</a>.
+    pub labels: Option<HashMap<String, String>>,
+    /// Optional. The list of regions where the model is going to be deployed.
+    /// Only one region per model is supported.
+    /// Defaults to 'us-central1' if nothing is set.
+    /// See the <a href="/ml-engine/docs/tensorflow/regions">available regions</a>
+    /// for AI Platform services.
+    /// Note:
+    /// 
+    /// * No matter where a model is deployed, it can always be accessed by
+    ///   users from anywhere, both for online and batch prediction.
+    /// * The region for a batch prediction job is set by the region field when
+    ///   submitting the batch prediction job and does not take its value from
+    ///   this field.
+    pub regions: Option<Vec<String>>,
+    /// `etag` is used for optimistic concurrency control as a way to help
+    /// prevent simultaneous updates of a model from overwriting each other.
+    /// It is strongly suggested that systems make use of the `etag` in the
+    /// read-modify-write cycle to perform model updates in order to avoid race
+    /// conditions: An `etag` is returned in the response to `GetModel`, and
+    /// systems are expected to put that etag in the request to `UpdateModel` to
+    /// ensure that their change will be applied to the model as intended.
+    pub etag: Option<String>,
+    /// Output only. The default version of the model. This version will be used to
+    /// handle prediction requests that do not specify a version.
+    /// 
+    /// You can change the default version by calling
+    /// projects.models.versions.setDefault.
+    #[serde(rename="defaultVersion")]
+    pub default_version: Option<GoogleCloudMlV1__Version>,
+    /// Optional. If true, online prediction access logs are sent to StackDriver
+    /// Logging. These logs are like standard server access logs, containing
+    /// information like timestamp and latency for each request. Note that
+    /// [Stackdriver logs may incur a cost](/stackdriver/pricing), especially if
+    /// your project receives prediction requests at a high queries per second rate
+    /// (QPS). Estimate your costs before enabling this option.
+    /// 
+    /// Default is false.
+    #[serde(rename="onlinePredictionLogging")]
+    pub online_prediction_logging: Option<bool>,
+    /// Required. The name specified for the model when it was created.
+    /// 
+    /// The model name must be unique within the project it is created in.
+    pub name: Option<String>,
+}
+
+impl RequestValue for GoogleCloudMlV1__Model {}
+impl ResponseResult for GoogleCloudMlV1__Model {}
+
+
+/// Attributes credit by computing the XRAI taking advantage
+/// of the model's fully differentiable structure. Refer to this paper for
+/// more details: https://arxiv.org/abs/1906.02825
+/// Currently only implemented for models with natural image inputs.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__XraiAttribution {
+    /// Number of steps for approximating the path integral.
+    /// A good value to start is 50 and gradually increase until the
+    /// sum to diff property is met within the desired error range.
+    #[serde(rename="numIntegralSteps")]
+    pub num_integral_steps: Option<i32>,
+}
+
+impl Part for GoogleCloudMlV1__XraiAttribution {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations list projects](struct.ProjectLocationListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__ListLocationsResponse {
+    /// Optional. Pass this token as the `page_token` field of the request for a
+    /// subsequent call.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Locations where at least one type of CMLE capability is available.
+    pub locations: Option<Vec<GoogleCloudMlV1__Location>>,
+}
+
+impl ResponseResult for GoogleCloudMlV1__ListLocationsResponse {}
+
+
+/// A message representing a Study.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations studies get projects](struct.ProjectLocationStudyGetCall.html) (response)
+/// * [locations studies create projects](struct.ProjectLocationStudyCreateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__Study {
+    /// Output only. A human readable reason why the Study is inactive.
+    /// This should be empty if a study is ACTIVE or COMPLETED.
+    #[serde(rename="inactiveReason")]
+    pub inactive_reason: Option<String>,
+    /// Output only. The detailed state of a study.
+    pub state: Option<String>,
+    /// Output only. Time that the study was created.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+    /// Required. Configuration of the study.
+    #[serde(rename="studyConfig")]
+    pub study_config: Option<GoogleCloudMlV1__StudyConfig>,
+    /// Output only. The name of a study.
+    pub name: Option<String>,
+}
+
+impl RequestValue for GoogleCloudMlV1__Study {}
+impl ResponseResult for GoogleCloudMlV1__Study {}
+
+
+/// Response message for `TestIamPermissions` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [jobs test iam permissions projects](struct.ProjectJobTestIamPermissionCall.html) (response)
+/// * [models test iam permissions projects](struct.ProjectModelTestIamPermissionCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleIamV1__TestIamPermissionsResponse {
+    /// A subset of `TestPermissionsRequest.permissions` that the caller is
+    /// allowed.
+    pub permissions: Option<Vec<String>>,
+}
+
+impl ResponseResult for GoogleIamV1__TestIamPermissionsResponse {}
+
+
+/// Returns service account information associated with a project.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get config projects](struct.ProjectGetConfigCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__GetConfigResponse {
+    /// The project number for `service_account`.
+    #[serde(rename="serviceAccountProject")]
+    pub service_account_project: Option<String>,
+    /// no description provided
+    pub config: Option<GoogleCloudMlV1__Config>,
+    /// The service account Cloud ML uses to access resources in the project.
+    #[serde(rename="serviceAccount")]
+    pub service_account: Option<String>,
+}
+
+impl ResponseResult for GoogleCloudMlV1__GetConfigResponse {}
+
+
+/// The request message for the SuggestTrial service method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations studies trials suggest projects](struct.ProjectLocationStudyTrialSuggestCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__SuggestTrialsRequest {
+    /// Required. The identifier of the client that is requesting the suggestion.
+    /// 
+    /// If multiple SuggestTrialsRequests have the same `client_id`,
+    /// the service will return the identical suggested trial if the trial is
+    /// pending, and provide a new trial if the last suggested trial was completed.
+    #[serde(rename="clientId")]
+    pub client_id: Option<String>,
+    /// Required. The number of suggestions requested.
+    #[serde(rename="suggestionCount")]
+    pub suggestion_count: Option<i32>,
+}
+
+impl RequestValue for GoogleCloudMlV1__SuggestTrialsRequest {}
 
 
 
@@ -2184,7 +3102,7 @@ impl Part for GoogleCloudMlV1__AutoScaling {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get_config(...)`, `jobs_cancel(...)`, `jobs_create(...)`, `jobs_get(...)`, `jobs_get_iam_policy(...)`, `jobs_list(...)`, `jobs_patch(...)`, `jobs_set_iam_policy(...)`, `jobs_test_iam_permissions(...)`, `locations_get(...)`, `locations_list(...)`, `models_create(...)`, `models_delete(...)`, `models_get(...)`, `models_get_iam_policy(...)`, `models_list(...)`, `models_patch(...)`, `models_set_iam_policy(...)`, `models_test_iam_permissions(...)`, `models_versions_create(...)`, `models_versions_delete(...)`, `models_versions_get(...)`, `models_versions_list(...)`, `models_versions_patch(...)`, `models_versions_set_default(...)`, `operations_cancel(...)`, `operations_get(...)`, `operations_list(...)` and `predict(...)`
+/// // like `explain(...)`, `get_config(...)`, `jobs_cancel(...)`, `jobs_create(...)`, `jobs_get(...)`, `jobs_get_iam_policy(...)`, `jobs_list(...)`, `jobs_patch(...)`, `jobs_set_iam_policy(...)`, `jobs_test_iam_permissions(...)`, `locations_get(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_studies_create(...)`, `locations_studies_delete(...)`, `locations_studies_get(...)`, `locations_studies_list(...)`, `locations_studies_trials_add_measurement(...)`, `locations_studies_trials_check_early_stopping_state(...)`, `locations_studies_trials_complete(...)`, `locations_studies_trials_create(...)`, `locations_studies_trials_delete(...)`, `locations_studies_trials_get(...)`, `locations_studies_trials_list(...)`, `locations_studies_trials_stop(...)`, `locations_studies_trials_suggest(...)`, `models_create(...)`, `models_delete(...)`, `models_get(...)`, `models_get_iam_policy(...)`, `models_list(...)`, `models_patch(...)`, `models_set_iam_policy(...)`, `models_test_iam_permissions(...)`, `models_versions_create(...)`, `models_versions_delete(...)`, `models_versions_get(...)`, `models_versions_list(...)`, `models_versions_patch(...)`, `models_versions_set_default(...)`, `operations_cancel(...)`, `operations_get(...)`, `operations_list(...)` and `predict(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2201,8 +3119,30 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Adds a measurement of the objective metrics to a Trial. This measurement
+    /// is assumed to have been taken before the Trial is complete.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The trial name.
+    pub fn locations_studies_trials_add_measurement(&self, request: GoogleCloudMlV1__AddTrialMeasurementRequest, name: &str) -> ProjectLocationStudyTrialAddMeasurementCall<'a, C, A> {
+        ProjectLocationStudyTrialAddMeasurementCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
+    /// 
+    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
     /// 
     /// # Arguments
     ///
@@ -2222,10 +3162,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Performs prediction on the data in the request.
-    /// AI Platform implements a custom `predict` verb on top of an HTTP POST
-    /// method. <p>For details of the request and response format, see the **guide
-    /// to the [predict request format](/ml-engine/docs/v1/predict-request)**.
+    /// Performs online prediction on the data in the request.
+    /// 
+    /// <div>{% dynamic include "/ai-platform/includes/___predict-request" %}</div>
     /// 
     /// # Arguments
     ///
@@ -2257,7 +3196,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `name` - Required. The name of the version. You can get the names of all the
     ///            versions of a model by calling
-    ///            [projects.models.versions.list](/ml-engine/reference/rest/v1/projects.models.versions/list).
+    ///            projects.models.versions.list.
     pub fn models_versions_delete(&self, name: &str) -> ProjectModelVersionDeleteCall<'a, C, A> {
         ProjectModelVersionDeleteCall {
             hub: self.hub,
@@ -2315,6 +3254,40 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Lists the trials associated with a Study.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The name of the study that the trial belongs to.
+    pub fn locations_studies_trials_list(&self, parent: &str) -> ProjectLocationStudyTrialListCall<'a, C, A> {
+        ProjectLocationStudyTrialListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets a Trial.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The trial name.
+    pub fn locations_studies_trials_get(&self, name: &str) -> ProjectLocationStudyTrialGetCall<'a, C, A> {
+        ProjectLocationStudyTrialGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Designates a version to be the default for the model.
     /// 
     /// The default version is used for prediction requests made against the model
@@ -2329,7 +3302,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the version to make the default for the model. You
     ///            can get the names of all the versions of a model by calling
-    ///            [projects.models.versions.list](/ml-engine/reference/rest/v1/projects.models.versions/list).
+    ///            projects.models.versions.list.
     pub fn models_versions_set_default(&self, request: GoogleCloudMlV1__SetDefaultVersionRequest, name: &str) -> ProjectModelVersionSetDefaultCall<'a, C, A> {
         ProjectModelVersionSetDefaultCall {
             hub: self.hub,
@@ -2366,8 +3339,31 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Creates a study.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The project and location that the study belongs to.
+    ///              Format: projects/{project}/locations/{location}
+    pub fn locations_studies_create(&self, request: GoogleCloudMlV1__Study, parent: &str) -> ProjectLocationStudyCreateCall<'a, C, A> {
+        ProjectLocationStudyCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _study_id: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
+    /// 
+    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
     /// 
     /// # Arguments
     ///
@@ -2379,6 +3375,26 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a long-running operation associated with the generation of trial
+    /// suggestions.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The name of the study that the trial belongs to.
+    pub fn locations_studies_trials_suggest(&self, request: GoogleCloudMlV1__SuggestTrialsRequest, parent: &str) -> ProjectLocationStudyTrialSuggestCall<'a, C, A> {
+        ProjectLocationStudyTrialSuggestCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2399,6 +3415,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectJobGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2407,18 +3424,71 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all locations that provides at least one type of CMLE capability.
+    /// Marks a Trial as complete.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The name of the project for which available locations are to be
-    ///              listed (since some locations might be whitelisted for specific projects).
-    pub fn locations_list(&self, parent: &str) -> ProjectLocationListCall<'a, C, A> {
-        ProjectLocationListCall {
+    /// * `request` - No description provided.
+    /// * `name` - Required. The trial name.
+    pub fn locations_studies_trials_complete(&self, request: GoogleCloudMlV1__CompleteTrialRequest, name: &str) -> ProjectLocationStudyTrialCompleteCall<'a, C, A> {
+        ProjectLocationStudyTrialCompleteCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the latest state of a long-running operation.  Clients can use this
+    /// method to poll the operation result at intervals as recommended by the API
+    /// service.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The name of the operation resource.
+    pub fn locations_operations_get(&self, name: &str) -> ProjectLocationOperationGetCall<'a, C, A> {
+        ProjectLocationOperationGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets a study.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The study name.
+    pub fn locations_studies_get(&self, name: &str) -> ProjectLocationStudyGetCall<'a, C, A> {
+        ProjectLocationStudyGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists all the studies in a region for an associated project.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The project and location that the study belongs to.
+    ///              Format: projects/{project}/locations/{location}
+    pub fn locations_studies_list(&self, parent: &str) -> ProjectLocationStudyListCall<'a, C, A> {
+        ProjectLocationStudyListCall {
             hub: self.hub,
             _parent: parent.to_string(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2463,10 +3533,75 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Starts asynchronous cancellation on a long-running operation.  The server
+    /// makes a best effort to cancel the operation, but success is not
+    /// guaranteed.  If the server doesn't support this method, it returns
+    /// `google.rpc.Code.UNIMPLEMENTED`.  Clients can use
+    /// Operations.GetOperation or
+    /// other methods to check whether the cancellation succeeded or whether the
+    /// operation completed despite cancellation. On successful cancellation,
+    /// the operation is not deleted; instead, it becomes an operation with
+    /// an Operation.error value with a google.rpc.Status.code of 1,
+    /// corresponding to `Code.CANCELLED`.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The name of the operation resource to be cancelled.
+    pub fn locations_operations_cancel(&self, name: &str) -> ProjectLocationOperationCancelCall<'a, C, A> {
+        ProjectLocationOperationCancelCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Performs explanation on the data in the request.
+    /// AI Platform implements a custom `explain` verb on top of an HTTP POST
+    /// method.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The resource name of a model or a version.
+    ///            Authorization: requires the `predict` permission on the specified resource.
+    pub fn explain(&self, request: GoogleCloudMlV1__ExplainRequest, name: &str) -> ProjectExplainCall<'a, C, A> {
+        ProjectExplainCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a Trial.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The trial name.
+    pub fn locations_studies_trials_delete(&self, name: &str) -> ProjectLocationStudyTrialDeleteCall<'a, C, A> {
+        ProjectLocationStudyTrialDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Updates the specified Version resource.
     /// 
-    /// Currently the only update-able fields are `description` and
-    /// `autoScaling.minNodes`.
+    /// Currently the only update-able fields are `description`,
+    /// `requestLoggingConfig`, `autoScaling.minNodes`, and `manualScaling.nodes`.
     /// 
     /// # Arguments
     ///
@@ -2489,7 +3624,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Gets information about a model version.
     /// 
     /// Models can have multiple versions. You can call
-    /// [projects.models.versions.list](/ml-engine/reference/rest/v1/projects.models.versions/list)
+    /// projects.models.versions.list
     /// to get the same information that this method returns for all of the
     /// versions of a model.
     /// 
@@ -2550,6 +3685,25 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Adds a user provided trial to a Study.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The name of the study that the trial belongs to.
+    pub fn locations_studies_trials_create(&self, request: GoogleCloudMlV1__Trial, parent: &str) -> ProjectLocationStudyTrialCreateCall<'a, C, A> {
+        ProjectLocationStudyTrialCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Get the complete list of CMLE capabilities in a location, along with their
     /// location-specific properties.
     /// 
@@ -2559,6 +3713,45 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a, C, A> {
         ProjectLocationGetCall {
             hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// List all locations that provides at least one type of CMLE capability.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The name of the project for which available locations are to be
+    ///              listed (since some locations might be whitelisted for specific projects).
+    pub fn locations_list(&self, parent: &str) -> ProjectLocationListCall<'a, C, A> {
+        ProjectLocationListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Stops a trial.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The trial name.
+    pub fn locations_studies_trials_stop(&self, request: GoogleCloudMlV1__StopTrialRequest, name: &str) -> ProjectLocationStudyTrialStopCall<'a, C, A> {
+        ProjectLocationStudyTrialStopCall {
+            hub: self.hub,
+            _request: request,
             _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2630,7 +3823,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// model. When you add a version to a model that already has one or more
     /// versions, the default version does not automatically change. If you want a
     /// new version to be the default, you must call
-    /// [projects.models.versions.setDefault](/ml-engine/reference/rest/v1/projects.models.versions/setDefault).
+    /// projects.models.versions.setDefault.
     /// 
     /// # Arguments
     ///
@@ -2661,6 +3854,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectModelGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2715,6 +3909,23 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Deletes a study.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The study name.
+    pub fn locations_studies_delete(&self, name: &str) -> ProjectLocationStudyDeleteCall<'a, C, A> {
+        ProjectLocationStudyDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Starts asynchronous cancellation on a long-running operation.  The server
     /// makes a best effort to cancel the operation, but success is not
     /// guaranteed.  If the server doesn't support this method, it returns
@@ -2741,11 +3952,30 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Checks whether a trial should stop or not.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The trial name.
+    pub fn locations_studies_trials_check_early_stopping_state(&self, request: GoogleCloudMlV1__CheckTrialEarlyStoppingStateRequest, name: &str) -> ProjectLocationStudyTrialCheckEarlyStoppingStateCall<'a, C, A> {
+        ProjectLocationStudyTrialCheckEarlyStoppingStateCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Creates a model which will later contain one or more versions.
     /// 
     /// You must add at least one version before you can request predictions from
     /// the model. Add versions by calling
-    /// [projects.models.versions.create](/ml-engine/reference/rest/v1/projects.models.versions/create).
+    /// projects.models.versions.create.
     /// 
     /// # Arguments
     ///
@@ -2768,7 +3998,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// You can only delete a model if there are no versions in it. You can delete
     /// versions by calling
-    /// [projects.models.versions.delete](/ml-engine/reference/rest/v1/projects.models.versions/delete).
+    /// projects.models.versions.delete.
     /// 
     /// # Arguments
     ///
@@ -2860,8 +4090,290 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
+/// Adds a measurement of the objective metrics to a Trial. This measurement
+/// is assumed to have been taken before the Trial is complete.
+///
+/// A builder for the *locations.studies.trials.addMeasurement* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// use ml1::GoogleCloudMlV1__AddTrialMeasurementRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudMlV1__AddTrialMeasurementRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_studies_trials_add_measurement(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationStudyTrialAddMeasurementCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _request: GoogleCloudMlV1__AddTrialMeasurementRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationStudyTrialAddMeasurementCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationStudyTrialAddMeasurementCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudMlV1__Trial)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.locations.studies.trials.addMeasurement",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:addMeasurement";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudMlV1__AddTrialMeasurementRequest) -> ProjectLocationStudyTrialAddMeasurementCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The trial name.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationStudyTrialAddMeasurementCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationStudyTrialAddMeasurementCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationStudyTrialAddMeasurementCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationStudyTrialAddMeasurementCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
+/// 
+/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 ///
 /// A builder for the *jobs.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3141,10 +4653,9 @@ impl<'a, C, A> ProjectJobSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Performs prediction on the data in the request.
-/// AI Platform implements a custom `predict` verb on top of an HTTP POST
-/// method. <p>For details of the request and response format, see the **guide
-/// to the [predict request format](/ml-engine/docs/v1/predict-request)**.
+/// Performs online prediction on the data in the request.
+/// 
+/// <div>{% dynamic include "/ai-platform/includes/___predict-request" %}</div>
 ///
 /// A builder for the *predict* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3608,7 +5119,7 @@ impl<'a, C, A> ProjectModelVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 
     /// Required. The name of the version. You can get the names of all the
     /// versions of a model by calling
-    /// [projects.models.versions.list](/ml-engine/reference/rest/v1/projects.models.versions/list).
+    /// projects.models.versions.list.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4246,6 +5757,502 @@ impl<'a, C, A> ProjectJobTestIamPermissionCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
+/// Lists the trials associated with a Study.
+///
+/// A builder for the *locations.studies.trials.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_studies_trials_list("parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationStudyTrialListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationStudyTrialListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationStudyTrialListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudMlV1__ListTrialsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.locations.studies.trials.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/trials";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the study that the trial belongs to.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationStudyTrialListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationStudyTrialListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationStudyTrialListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationStudyTrialListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets a Trial.
+///
+/// A builder for the *locations.studies.trials.get* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_studies_trials_get("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationStudyTrialGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationStudyTrialGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationStudyTrialGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudMlV1__Trial)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.locations.studies.trials.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The trial name.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationStudyTrialGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationStudyTrialGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationStudyTrialGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationStudyTrialGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Designates a version to be the default for the model.
 /// 
 /// The default version is used for prediction requests made against the model
@@ -4461,7 +6468,7 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
     }
     /// Required. The name of the version to make the default for the model. You
     /// can get the names of all the versions of a model by calling
-    /// [projects.models.versions.list](/ml-engine/reference/rest/v1/projects.models.versions/list).
+    /// projects.models.versions.list.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4571,7 +6578,7 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().models_patch(req, "name")
-///              .update_mask("sea")
+///              .update_mask("gubergren")
 ///              .doit();
 /// # }
 /// ```
@@ -4842,8 +6849,303 @@ impl<'a, C, A> ProjectModelPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
+/// Creates a study.
+///
+/// A builder for the *locations.studies.create* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// use ml1::GoogleCloudMlV1__Study;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudMlV1__Study::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_studies_create(req, "parent")
+///              .study_id("aliquyam")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationStudyCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _request: GoogleCloudMlV1__Study,
+    _parent: String,
+    _study_id: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationStudyCreateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationStudyCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudMlV1__Study)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.locations.studies.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._study_id {
+            params.push(("studyId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "studyId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/studies";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudMlV1__Study) -> ProjectLocationStudyCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The project and location that the study belongs to.
+    /// Format: projects/{project}/locations/{location}
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationStudyCreateCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Required. The ID to use for the study, which will become the final component of
+    /// the study's resource name.
+    ///
+    /// Sets the *study id* query property to the given value.
+    pub fn study_id(mut self, new_value: &str) -> ProjectLocationStudyCreateCall<'a, C, A> {
+        self._study_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationStudyCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationStudyCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationStudyCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
+/// 
+/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 ///
 /// A builder for the *models.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5123,6 +7425,286 @@ impl<'a, C, A> ProjectModelSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
+/// Returns a long-running operation associated with the generation of trial
+/// suggestions.
+///
+/// A builder for the *locations.studies.trials.suggest* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// use ml1::GoogleCloudMlV1__SuggestTrialsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudMlV1__SuggestTrialsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_studies_trials_suggest(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationStudyTrialSuggestCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _request: GoogleCloudMlV1__SuggestTrialsRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationStudyTrialSuggestCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationStudyTrialSuggestCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleLongrunning__Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.locations.studies.trials.suggest",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/trials:suggest";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudMlV1__SuggestTrialsRequest) -> ProjectLocationStudyTrialSuggestCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the study that the trial belongs to.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationStudyTrialSuggestCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationStudyTrialSuggestCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationStudyTrialSuggestCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationStudyTrialSuggestCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Gets the access control policy for a resource.
 /// Returns an empty policy if the resource exists and does not have a policy
 /// set.
@@ -5153,6 +7735,7 @@ impl<'a, C, A> ProjectModelSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().jobs_get_iam_policy("resource")
+///              .options_requested_policy_version(-21)
 ///              .doit();
 /// # }
 /// ```
@@ -5161,6 +7744,7 @@ pub struct ProjectJobGetIamPolicyCall<'a, C, A>
 
     hub: &'a CloudMachineLearningEngine<C, A>,
     _resource: String,
+    _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5183,9 +7767,12 @@ impl<'a, C, A> ProjectJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "ml.projects.jobs.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        if let Some(value) = self._options_requested_policy_version {
+            params.push(("options.requestedPolicyVersion", value.to_string()));
+        }
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5311,6 +7898,20 @@ impl<'a, C, A> ProjectJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._resource = new_value.to_string();
         self
     }
+    /// Optional. The policy format version to be returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectJobGetIamPolicyCall<'a, C, A> {
+        self._options_requested_policy_version = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -5374,9 +7975,290 @@ impl<'a, C, A> ProjectJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// List all locations that provides at least one type of CMLE capability.
+/// Marks a Trial as complete.
 ///
-/// A builder for the *locations.list* method supported by a *project* resource.
+/// A builder for the *locations.studies.trials.complete* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// use ml1::GoogleCloudMlV1__CompleteTrialRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudMlV1__CompleteTrialRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_studies_trials_complete(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationStudyTrialCompleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _request: GoogleCloudMlV1__CompleteTrialRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationStudyTrialCompleteCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationStudyTrialCompleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudMlV1__Trial)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.locations.studies.trials.complete",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:complete";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudMlV1__CompleteTrialRequest) -> ProjectLocationStudyTrialCompleteCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The trial name.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationStudyTrialCompleteCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationStudyTrialCompleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationStudyTrialCompleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationStudyTrialCompleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets the latest state of a long-running operation.  Clients can use this
+/// method to poll the operation result at intervals as recommended by the API
+/// service.
+///
+/// A builder for the *locations.operations.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -5401,31 +8283,27 @@ impl<'a, C, A> ProjectJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_list("parent")
-///              .page_token("sadipscing")
-///              .page_size(-31)
+/// let result = hub.projects().locations_operations_get("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationListCall<'a, C, A>
+pub struct ProjectLocationOperationGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudMachineLearningEngine<C, A>,
-    _parent: String,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
+    _name: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectLocationOperationGetCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudMlV1__ListLocationsResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleLongrunning__Operation)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -5434,17 +8312,11 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "ml.projects.locations.list",
+        dlg.begin(MethodInfo { id: "ml.projects.locations.operations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5456,7 +8328,503 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+parent}/locations";
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the operation resource.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationOperationGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets a study.
+///
+/// A builder for the *locations.studies.get* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_studies_get("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationStudyGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationStudyGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationStudyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudMlV1__Study)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.locations.studies.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The study name.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationStudyGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationStudyGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationStudyGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationStudyGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists all the studies in a region for an associated project.
+///
+/// A builder for the *locations.studies.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_studies_list("parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationStudyListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationStudyListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationStudyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudMlV1__ListStudiesResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.locations.studies.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/studies";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5559,36 +8927,15 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// Required. The name of the project for which available locations are to be
-    /// listed (since some locations might be whitelisted for specific projects).
+    /// Required. The project and location that the study belongs to.
+    /// Format: projects/{project}/locations/{location}
     ///
     /// Sets the *parent* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationListCall<'a, C, A> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationStudyListCall<'a, C, A> {
         self._parent = new_value.to_string();
-        self
-    }
-    /// Optional. A page token to request the next page of results.
-    /// 
-    /// You get the token from the `next_page_token` field of the response from
-    /// the previous call.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Optional. The number of locations to retrieve per "page" of results. If
-    /// there are more remaining results than this number, the response message
-    /// will contain a valid value in the `next_page_token` field.
-    /// 
-    /// The default value is 20, and the maximum page size is 100.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a, C, A> {
-        self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5597,7 +8944,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationStudyListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5622,7 +8969,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationStudyListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5642,7 +8989,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationStudyListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6181,10 +9528,798 @@ impl<'a, C, A> ProjectJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
+/// Starts asynchronous cancellation on a long-running operation.  The server
+/// makes a best effort to cancel the operation, but success is not
+/// guaranteed.  If the server doesn't support this method, it returns
+/// `google.rpc.Code.UNIMPLEMENTED`.  Clients can use
+/// Operations.GetOperation or
+/// other methods to check whether the cancellation succeeded or whether the
+/// operation completed despite cancellation. On successful cancellation,
+/// the operation is not deleted; instead, it becomes an operation with
+/// an Operation.error value with a google.rpc.Status.code of 1,
+/// corresponding to `Code.CANCELLED`.
+///
+/// A builder for the *locations.operations.cancel* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_operations_cancel("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationOperationCancelCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationOperationCancelCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleProtobuf__Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.locations.operations.cancel",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:cancel";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the operation resource to be cancelled.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationCancelCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationOperationCancelCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationCancelCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationCancelCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Performs explanation on the data in the request.
+/// AI Platform implements a custom `explain` verb on top of an HTTP POST
+/// method.
+///
+/// A builder for the *explain* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// use ml1::GoogleCloudMlV1__ExplainRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudMlV1__ExplainRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().explain(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectExplainCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _request: GoogleCloudMlV1__ExplainRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectExplainCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectExplainCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleApi__HttpBody)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.explain",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:explain";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudMlV1__ExplainRequest) -> ProjectExplainCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The resource name of a model or a version.
+    /// 
+    /// Authorization: requires the `predict` permission on the specified resource.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectExplainCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectExplainCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectExplainCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectExplainCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes a Trial.
+///
+/// A builder for the *locations.studies.trials.delete* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_studies_trials_delete("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationStudyTrialDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationStudyTrialDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationStudyTrialDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleProtobuf__Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.locations.studies.trials.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The trial name.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationStudyTrialDeleteCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationStudyTrialDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationStudyTrialDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationStudyTrialDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Updates the specified Version resource.
 /// 
-/// Currently the only update-able fields are `description` and
-/// `autoScaling.minNodes`.
+/// Currently the only update-able fields are `description`,
+/// `requestLoggingConfig`, `autoScaling.minNodes`, and `manualScaling.nodes`.
 ///
 /// A builder for the *models.versions.patch* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6218,7 +10353,7 @@ impl<'a, C, A> ProjectJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().models_versions_patch(req, "name")
-///              .update_mask("justo")
+///              .update_mask("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -6411,12 +10546,18 @@ impl<'a, C, A> ProjectModelVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::
     /// For example, to change the description of a version to "foo", the
     /// `update_mask` parameter would be specified as `description`, and the
     /// `PATCH` request body would specify the new value, as follows:
-    /// {
-    /// "description": "foo"
-    /// }
     /// 
-    /// Currently the only supported update mask fields are `description` and
-    /// `autoScaling.minNodes`.
+    /// ```
+    /// {
+    ///   "description": "foo"
+    /// }
+    /// ```
+    /// 
+    /// Currently the only supported update mask fields are `description`,
+    /// `requestLoggingConfig`, `autoScaling.minNodes`, and `manualScaling.nodes`.
+    /// However, you can only update `manualScaling.nodes` if the version uses a
+    /// [Compute Engine (N1)
+    /// machine type](/ml-engine/docs/machine-types-online-prediction).
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: &str) -> ProjectModelVersionPatchCall<'a, C, A> {
@@ -6489,7 +10630,7 @@ impl<'a, C, A> ProjectModelVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::
 /// Gets information about a model version.
 /// 
 /// Models can have multiple versions. You can call
-/// [projects.models.versions.list](/ml-engine/reference/rest/v1/projects.models.versions/list)
+/// projects.models.versions.list
 /// to get the same information that this method returns for all of the
 /// versions of a model.
 ///
@@ -6775,7 +10916,7 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().jobs_patch(req, "name")
-///              .update_mask("diam")
+///              .update_mask("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -7301,6 +11442,285 @@ impl<'a, C, A> ProjectGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
+/// Adds a user provided trial to a Study.
+///
+/// A builder for the *locations.studies.trials.create* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// use ml1::GoogleCloudMlV1__Trial;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudMlV1__Trial::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_studies_trials_create(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationStudyTrialCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _request: GoogleCloudMlV1__Trial,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationStudyTrialCreateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationStudyTrialCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudMlV1__Trial)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.locations.studies.trials.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/trials";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudMlV1__Trial) -> ProjectLocationStudyTrialCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the study that the trial belongs to.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationStudyTrialCreateCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationStudyTrialCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationStudyTrialCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationStudyTrialCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Get the complete list of CMLE capabilities in a location, along with their
 /// location-specific properties.
 ///
@@ -7539,6 +11959,565 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// List all locations that provides at least one type of CMLE capability.
+///
+/// A builder for the *locations.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_list("parent")
+///              .page_token("labore")
+///              .page_size(-39)
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudMlV1__ListLocationsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.locations.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/locations";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the project for which available locations are to be
+    /// listed (since some locations might be whitelisted for specific projects).
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. A page token to request the next page of results.
+    /// 
+    /// You get the token from the `next_page_token` field of the response from
+    /// the previous call.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The number of locations to retrieve per "page" of results. If
+    /// there are more remaining results than this number, the response message
+    /// will contain a valid value in the `next_page_token` field.
+    /// 
+    /// The default value is 20, and the maximum page size is 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Stops a trial.
+///
+/// A builder for the *locations.studies.trials.stop* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// use ml1::GoogleCloudMlV1__StopTrialRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudMlV1__StopTrialRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_studies_trials_stop(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationStudyTrialStopCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _request: GoogleCloudMlV1__StopTrialRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationStudyTrialStopCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationStudyTrialStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudMlV1__Trial)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.locations.studies.trials.stop",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:stop";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudMlV1__StopTrialRequest) -> ProjectLocationStudyTrialStopCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The trial name.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationStudyTrialStopCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationStudyTrialStopCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationStudyTrialStopCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationStudyTrialStopCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7873,9 +12852,9 @@ impl<'a, C, A> ProjectModelTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().operations_list("name")
-///              .page_token("aliquyam")
-///              .page_size(-9)
-///              .filter("Lorem")
+///              .page_token("accusam")
+///              .page_size(-56)
+///              .filter("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -8136,7 +13115,7 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// model. When you add a version to a model that already has one or more
 /// versions, the default version does not automatically change. If you want a
 /// new version to be the default, you must call
-/// [projects.models.versions.setDefault](/ml-engine/reference/rest/v1/projects.models.versions/setDefault).
+/// projects.models.versions.setDefault.
 ///
 /// A builder for the *models.versions.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -8445,6 +13424,7 @@ impl<'a, C, A> ProjectModelVersionCreateCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().models_get_iam_policy("resource")
+///              .options_requested_policy_version(-21)
 ///              .doit();
 /// # }
 /// ```
@@ -8453,6 +13433,7 @@ pub struct ProjectModelGetIamPolicyCall<'a, C, A>
 
     hub: &'a CloudMachineLearningEngine<C, A>,
     _resource: String,
+    _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8475,9 +13456,12 @@ impl<'a, C, A> ProjectModelGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "ml.projects.models.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        if let Some(value) = self._options_requested_policy_version {
+            params.push(("options.requestedPolicyVersion", value.to_string()));
+        }
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8603,6 +13587,20 @@ impl<'a, C, A> ProjectModelGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
         self._resource = new_value.to_string();
         self
     }
+    /// Optional. The policy format version to be returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectModelGetIamPolicyCall<'a, C, A> {
+        self._options_requested_policy_version = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -8701,9 +13699,9 @@ impl<'a, C, A> ProjectModelGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().models_versions_list("parent")
-///              .page_token("dolor")
-///              .page_size(-39)
-///              .filter("elitr")
+///              .page_token("sanctus")
+///              .page_size(-22)
+///              .filter("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -9214,6 +14212,254 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
+/// Deletes a study.
+///
+/// A builder for the *locations.studies.delete* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_studies_delete("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationStudyDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationStudyDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationStudyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleProtobuf__Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.locations.studies.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The study name.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationStudyDeleteCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationStudyDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationStudyDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationStudyDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Starts asynchronous cancellation on a long-running operation.  The server
 /// makes a best effort to cancel the operation, but success is not
 /// guaranteed.  If the server doesn't support this method, it returns
@@ -9471,11 +14717,290 @@ impl<'a, C, A> ProjectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
+/// Checks whether a trial should stop or not.
+///
+/// A builder for the *locations.studies.trials.checkEarlyStoppingState* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// use ml1::GoogleCloudMlV1__CheckTrialEarlyStoppingStateRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudMlV1__CheckTrialEarlyStoppingStateRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_studies_trials_check_early_stopping_state(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationStudyTrialCheckEarlyStoppingStateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _request: GoogleCloudMlV1__CheckTrialEarlyStoppingStateRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationStudyTrialCheckEarlyStoppingStateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationStudyTrialCheckEarlyStoppingStateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleLongrunning__Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.locations.studies.trials.checkEarlyStoppingState",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:checkEarlyStoppingState";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudMlV1__CheckTrialEarlyStoppingStateRequest) -> ProjectLocationStudyTrialCheckEarlyStoppingStateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The trial name.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationStudyTrialCheckEarlyStoppingStateCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationStudyTrialCheckEarlyStoppingStateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationStudyTrialCheckEarlyStoppingStateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationStudyTrialCheckEarlyStoppingStateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Creates a model which will later contain one or more versions.
 /// 
 /// You must add at least one version before you can request predictions from
 /// the model. Add versions by calling
-/// [projects.models.versions.create](/ml-engine/reference/rest/v1/projects.models.versions/create).
+/// projects.models.versions.create.
 ///
 /// A builder for the *models.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9758,7 +15283,7 @@ impl<'a, C, A> ProjectModelCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// 
 /// You can only delete a model if there are no versions in it. You can delete
 /// versions by calling
-/// [projects.models.versions.delete](/ml-engine/reference/rest/v1/projects.models.versions/delete).
+/// projects.models.versions.delete.
 ///
 /// A builder for the *models.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10037,9 +15562,9 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().jobs_list("parent")
-///              .page_token("invidunt")
-///              .page_size(-82)
-///              .filter("accusam")
+///              .page_token("dolor")
+///              .page_size(-23)
+///              .filter("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -10592,9 +16117,9 @@ impl<'a, C, A> ProjectModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().models_list("parent")
-///              .page_token("et")
-///              .page_size(-70)
-///              .filter("et")
+///              .page_token("Lorem")
+///              .page_size(-11)
+///              .filter("justo")
 ///              .doit();
 /// # }
 /// ```

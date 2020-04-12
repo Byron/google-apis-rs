@@ -1256,7 +1256,9 @@ fn main() {
                   ]),
             ("attestors-set-iam-policy",
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
-        existing policy."##),
+        existing policy.
+        
+        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
                     "Details at http://byron.github.io/google-apis-rs/google_binaryauthorization1_beta1_cli/projects_attestors-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -1405,7 +1407,9 @@ fn main() {
                   ]),
             ("policy-set-iam-policy",
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
-        existing policy."##),
+        existing policy.
+        
+        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
                     "Details at http://byron.github.io/google-apis-rs/google_binaryauthorization1_beta1_cli/projects_policy-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -1507,7 +1511,7 @@ fn main() {
     
     let mut app = App::new("binaryauthorization1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190628")
+           .version("1.0.13+20200327")
            .about("The management interface for Binary Authorization, a system providing policy control for images deployed to Kubernetes Engine clusters.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_binaryauthorization1_beta1_cli")

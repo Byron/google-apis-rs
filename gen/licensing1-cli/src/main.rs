@@ -647,24 +647,26 @@ fn main() {
     let arg_data = [
         ("license-assignments", "methods: 'delete', 'get', 'insert', 'list-for-product', 'list-for-product-and-sku', 'patch' and 'update'", vec![
             ("delete",
-                    Some(r##"Revoke License."##),
+                    Some(r##"Revoke a license."##),
                     "Details at http://byron.github.io/google-apis-rs/google_licensing1_cli/license-assignments_delete",
                   vec![
                     (Some(r##"product-id"##),
                      None,
-                     Some(r##"Name for product"##),
+                     Some(r##"A product's unique identifier. For more information about products in this version of the API, see Products and SKUs."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"sku-id"##),
                      None,
-                     Some(r##"Name for sku"##),
+                     Some(r##"A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"user-id"##),
                      None,
-                     Some(r##"email id or unique Id of the user"##),
+                     Some(r##"The user's current primary email address. If the user's email address changes, use the new email address in your API requests.
+        Since a userId is subject to change, do not use a userId value as a key for persistent data. This key could break if the current user's email address changes.
+        If the userId is suspended, the license status changes."##),
                      Some(true),
                      Some(false)),
         
@@ -675,24 +677,26 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Get license assignment of a particular product and sku for a user"##),
+                    Some(r##"Get a specific user's license by product SKU."##),
                     "Details at http://byron.github.io/google-apis-rs/google_licensing1_cli/license-assignments_get",
                   vec![
                     (Some(r##"product-id"##),
                      None,
-                     Some(r##"Name for product"##),
+                     Some(r##"A product's unique identifier. For more information about products in this version of the API, see Products and SKUs."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"sku-id"##),
                      None,
-                     Some(r##"Name for sku"##),
+                     Some(r##"A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"user-id"##),
                      None,
-                     Some(r##"email id or unique Id of the user"##),
+                     Some(r##"The user's current primary email address. If the user's email address changes, use the new email address in your API requests.
+        Since a userId is subject to change, do not use a userId value as a key for persistent data. This key could break if the current user's email address changes.
+        If the userId is suspended, the license status changes."##),
                      Some(true),
                      Some(false)),
         
@@ -709,18 +713,18 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Assign License."##),
+                    Some(r##"Assign a license."##),
                     "Details at http://byron.github.io/google-apis-rs/google_licensing1_cli/license-assignments_insert",
                   vec![
                     (Some(r##"product-id"##),
                      None,
-                     Some(r##"Name for product"##),
+                     Some(r##"A product's unique identifier. For more information about products in this version of the API, see Products and SKUs."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"sku-id"##),
                      None,
-                     Some(r##"Name for sku"##),
+                     Some(r##"A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs."##),
                      Some(true),
                      Some(false)),
         
@@ -743,18 +747,19 @@ fn main() {
                      Some(false)),
                   ]),
             ("list-for-product",
-                    Some(r##"List license assignments for given product of the customer."##),
+                    Some(r##"List all users assigned licenses for a specific product SKU."##),
                     "Details at http://byron.github.io/google-apis-rs/google_licensing1_cli/license-assignments_list-for-product",
                   vec![
                     (Some(r##"product-id"##),
                      None,
-                     Some(r##"Name for product"##),
+                     Some(r##"A product's unique identifier. For more information about products in this version of the API, see Products and SKUs."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"CustomerId represents the customer for whom licenseassignments are queried"##),
+                     Some(r##"Customer's customerId. A previous version of this API accepted the primary domain name as a value for this field.
+        If the customer is suspended, the server returns an error."##),
                      Some(true),
                      Some(false)),
         
@@ -771,24 +776,25 @@ fn main() {
                      Some(false)),
                   ]),
             ("list-for-product-and-sku",
-                    Some(r##"List license assignments for given product and sku of the customer."##),
+                    Some(r##"List all users assigned licenses for a specific product SKU."##),
                     "Details at http://byron.github.io/google-apis-rs/google_licensing1_cli/license-assignments_list-for-product-and-sku",
                   vec![
                     (Some(r##"product-id"##),
                      None,
-                     Some(r##"Name for product"##),
+                     Some(r##"A product's unique identifier. For more information about products in this version of the API, see Products and SKUs."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"sku-id"##),
                      None,
-                     Some(r##"Name for sku"##),
+                     Some(r##"A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"customer-id"##),
                      None,
-                     Some(r##"CustomerId represents the customer for whom licenseassignments are queried"##),
+                     Some(r##"Customer's customerId. A previous version of this API accepted the primary domain name as a value for this field.
+        If the customer is suspended, the server returns an error."##),
                      Some(true),
                      Some(false)),
         
@@ -805,24 +811,26 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Assign License. This method supports patch semantics."##),
+                    Some(r##"Reassign a user's product SKU with a different SKU in the same product. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_licensing1_cli/license-assignments_patch",
                   vec![
                     (Some(r##"product-id"##),
                      None,
-                     Some(r##"Name for product"##),
+                     Some(r##"A product's unique identifier. For more information about products in this version of the API, see Products and SKUs."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"sku-id"##),
                      None,
-                     Some(r##"Name for sku for which license would be revoked"##),
+                     Some(r##"A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"user-id"##),
                      None,
-                     Some(r##"email id or unique Id of the user"##),
+                     Some(r##"The user's current primary email address. If the user's email address changes, use the new email address in your API requests.
+        Since a userId is subject to change, do not use a userId value as a key for persistent data. This key could break if the current user's email address changes.
+        If the userId is suspended, the license status changes."##),
                      Some(true),
                      Some(false)),
         
@@ -845,24 +853,26 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Assign License."##),
+                    Some(r##"Reassign a user's product SKU with a different SKU in the same product."##),
                     "Details at http://byron.github.io/google-apis-rs/google_licensing1_cli/license-assignments_update",
                   vec![
                     (Some(r##"product-id"##),
                      None,
-                     Some(r##"Name for product"##),
+                     Some(r##"A product's unique identifier. For more information about products in this version of the API, see Products and SKUs."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"sku-id"##),
                      None,
-                     Some(r##"Name for sku for which license would be revoked"##),
+                     Some(r##"A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"user-id"##),
                      None,
-                     Some(r##"email id or unique Id of the user"##),
+                     Some(r##"The user's current primary email address. If the user's email address changes, use the new email address in your API requests.
+        Since a userId is subject to change, do not use a userId value as a key for persistent data. This key could break if the current user's email address changes.
+        If the userId is suspended, the license status changes."##),
                      Some(true),
                      Some(false)),
         
@@ -890,8 +900,8 @@ fn main() {
     
     let mut app = App::new("licensing1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20170213")
-           .about("Views and manages licenses for your domain.")
+           .version("1.0.13+20190916")
+           .about("Licensing API to view and manage licenses for your domain")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_licensing1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

@@ -1,4 +1,4 @@
-site_name: Cloud Asset v1.0.12+20190625
+site_name: Cloud Asset v1.0.13+20200403
 site_url: http://byron.github.io/google-apis-rs/google-cloudasset1-cli
 site_description: A complete library to interact with Cloud Asset (protocol v1)
 
@@ -9,6 +9,11 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['feeds_create.md', 'Feeds', 'Create']
+- ['feeds_delete.md', 'Feeds', 'Delete']
+- ['feeds_get.md', 'Feeds', 'Get']
+- ['feeds_list.md', 'Feeds', 'List']
+- ['feeds_patch.md', 'Feeds', 'Patch']
 - ['methods_batch-get-assets-history.md', 'Methods', 'Batch Get Assets History']
 - ['methods_export-assets.md', 'Methods', 'Export Assets']
 - ['operations_get.md', 'Operations', 'Get']

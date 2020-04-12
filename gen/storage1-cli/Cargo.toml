@@ -4,7 +4,7 @@
 [package]
 
 name = "google-storage1-cli"
-version = "1.0.12+20190624"
+version = "1.0.13+20200326"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with storage (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/storage1-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-storage1]
 path = "../storage1"
-version = "1.0.12+20190624"
+version = "1.0.13+20200326"

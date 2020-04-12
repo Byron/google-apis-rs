@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Access Context Manager* crate version *1.0.12+20190626*, where *20190626* is the exact revision of the *accesscontextmanager:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Access Context Manager* crate version *1.0.13+20200405*, where *20200405* is the exact revision of the *accesscontextmanager:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Access Context Manager* *v1_beta* API can be found at the
 //! [official documentation site](https://cloud.google.com/access-context-manager/docs/reference/rest/).
@@ -342,7 +342,7 @@ impl<'a, C, A> AccessContextManager<C, A>
         AccessContextManager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://accesscontextmanager.googleapis.com/".to_string(),
             _root_url: "https://accesscontextmanager.googleapis.com/".to_string(),
         }
@@ -356,7 +356,7 @@ impl<'a, C, A> AccessContextManager<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -466,11 +466,72 @@ pub struct DevicePolicy {
 impl Part for DevicePolicy {}
 
 
+/// Represents a textual expression in the Common Expression Language (CEL)
+/// syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+/// are documented at https://github.com/google/cel-spec.
+/// 
+/// Example (Comparison):
+/// 
+/// ````text
+/// title: "Summary size limit"
+/// description: "Determines if a summary is less than 100 chars"
+/// expression: "document.summary.size() < 100"
+/// ````
+/// 
+/// Example (Equality):
+/// 
+/// ````text
+/// title: "Requestor is owner"
+/// description: "Determines if requestor is the document owner"
+/// expression: "document.owner == request.auth.claims.email"
+/// ````
+/// 
+/// Example (Logic):
+/// 
+/// ````text
+/// title: "Public documents"
+/// description: "Determine whether the document should be publicly visible"
+/// expression: "document.type != 'private' && document.type != 'internal'"
+/// ````
+/// 
+/// Example (Data Manipulation):
+/// 
+/// ````text
+/// title: "Notification string"
+/// description: "Create a notification string with a timestamp."
+/// expression: "'New message received at ' + string(document.create_time)"
+/// ````
+/// 
+/// The exact variables and functions that may be referenced within an expression
+/// are determined by the service that evaluates it. See the service
+/// documentation for additional information.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Expr {
+    /// Optional. Description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
+    /// Textual representation of an expression in Common Expression Language
+    /// syntax.
+    pub expression: Option<String>,
+    /// Optional. String indicating the location of the expression for error
+    /// reporting, e.g. a file name and a position in the file.
+    pub location: Option<String>,
+    /// Optional. Title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
+}
+
+impl Part for Expr {}
+
+
 /// `AccessPolicy` is a container for `AccessLevels` (which define the necessary
-/// attributes to use GCP services) and `ServicePerimeters` (which define regions
-/// of services able to freely pass data within a perimeter). An access policy is
-/// globally visible within an organization, and the restrictions it specifies
-/// apply to all projects within an organization.
+/// attributes to use Google Cloud services) and `ServicePerimeters` (which
+/// define regions of services able to freely pass data within a perimeter). An
+/// access policy is globally visible within an organization, and the
+/// restrictions it specifies apply to all projects within an organization.
 /// 
 /// # Activities
 /// 
@@ -483,12 +544,6 @@ impl Part for DevicePolicy {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccessPolicy {
-    /// Output only. Time the `AccessPolicy` was updated in UTC.
-    #[serde(rename="updateTime")]
-    pub update_time: Option<String>,
-    /// Output only. Time the `AccessPolicy` was created in UTC.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
     /// Output only. Resource name of the `AccessPolicy`. Format:
     /// `accessPolicies/{policy_id}`
     pub name: Option<String>,
@@ -527,6 +582,21 @@ pub struct ListServicePerimetersResponse {
 impl ResponseResult for ListServicePerimetersResponse {}
 
 
+/// `CustomLevel` is an `AccessLevel` using the Cloud Common Expression Language
+/// to represent the necessary conditions for the level to apply to a request.
+/// See CEL spec at: https://github.com/google/cel-spec
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CustomLevel {
+    /// Required. A Cloud CEL expression evaluating to a boolean.
+    pub expr: Option<Expr>,
+}
+
+impl Part for CustomLevel {}
+
+
 /// A response to `ListAccessPoliciesRequest`.
 /// 
 /// # Activities
@@ -548,26 +618,6 @@ pub struct ListAccessPoliciesResponse {
 }
 
 impl ResponseResult for ListAccessPoliciesResponse {}
-
-
-/// Alpha. Specifies how APIs are allowed to communicate within the Service
-/// Perimeter.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct VpcServiceRestriction {
-    /// Whether to restrict API calls within the Service Perimeter to the list of
-    /// APIs specified in 'allowed_services'.
-    #[serde(rename="enableRestriction")]
-    pub enable_restriction: Option<bool>,
-    /// The list of APIs usable within the Service Perimeter. Must be empty
-    /// unless 'enable_restriction' is True.
-    #[serde(rename="allowedServices")]
-    pub allowed_services: Option<Vec<String>>,
-}
-
-impl Part for VpcServiceRestriction {}
 
 
 /// The `Status` type defines a logical error model that is suitable for
@@ -596,55 +646,36 @@ pub struct Status {
 impl Part for Status {}
 
 
-/// Alpha. Specifies how Access Levels are to be used for accessing the Service
+/// Specifies how APIs are allowed to communicate within the Service
 /// Perimeter.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IngressServiceRestriction {
-    /// Whether to restrict the set of APIs callable outside the Service
-    /// Perimeter via Access Levels.
+pub struct VpcAccessibleServices {
+    /// Whether to restrict API calls within the Service Perimeter to the list of
+    /// APIs specified in 'allowed_services'.
     #[serde(rename="enableRestriction")]
     pub enable_restriction: Option<bool>,
-    /// The list of APIs usable with a valid Access Level. Must be empty unless
-    /// 'enable_restriction' is True.
-    #[serde(rename="allowedServices")]
-    pub allowed_services: Option<Vec<String>>,
-}
-
-impl Part for IngressServiceRestriction {}
-
-
-/// Alpha. Specifies which services are granted access via this Bridge Service
-/// Perimeter.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BridgeServiceRestriction {
-    /// Whether to restrict the set of APIs callable through the Bridge Service
-    /// Perimeter.
-    #[serde(rename="enableRestriction")]
-    pub enable_restriction: Option<bool>,
-    /// The list of APIs usable through the Bridge Perimeter. Must be empty
+    /// The list of APIs usable within the Service Perimeter. Must be empty
     /// unless 'enable_restriction' is True.
     #[serde(rename="allowedServices")]
     pub allowed_services: Option<Vec<String>>,
 }
 
-impl Part for BridgeServiceRestriction {}
+impl Part for VpcAccessibleServices {}
 
 
-/// `ServicePerimeter` describes a set of GCP resources which can freely import
-/// and export data amongst themselves, but not export outside of the
+/// `ServicePerimeter` describes a set of Google Cloud resources which can freely
+/// import and export data amongst themselves, but not export outside of the
 /// `ServicePerimeter`. If a request with a source within this `ServicePerimeter`
 /// has a target outside of the `ServicePerimeter`, the request will be blocked.
 /// Otherwise the request is allowed. There are two types of Service Perimeter -
-/// Regular and Bridge. Regular Service Perimeters cannot overlap, a single GCP
-/// project can only belong to a single regular Service Perimeter. Service
-/// Perimeter Bridges can contain only GCP projects as members, a single GCP
-/// project may belong to multiple Service Perimeter Bridges.
+/// Regular and Bridge. Regular Service Perimeters cannot overlap, a single
+/// Google Cloud project can only belong to a single regular Service Perimeter.
+/// Service Perimeter Bridges can contain only Google Cloud projects as members,
+/// a single Google Cloud project may belong to multiple Service Perimeter
+/// Bridges.
 /// 
 /// # Activities
 /// 
@@ -661,15 +692,6 @@ pub struct ServicePerimeter {
     /// restricted/unrestricted services and access levels that determine perimeter
     /// content and boundaries.
     pub status: Option<ServicePerimeterConfig>,
-    /// Output only. Time the `ServicePerimeter` was updated in UTC.
-    #[serde(rename="updateTime")]
-    pub update_time: Option<String>,
-    /// Required. Resource name for the ServicePerimeter.  The `short_name`
-    /// component must begin with a letter and only include alphanumeric and '_'.
-    /// Format: `accessPolicies/{policy_id}/servicePerimeters/{short_name}`
-    pub name: Option<String>,
-    /// Human readable title. Must be unique within the Policy.
-    pub title: Option<String>,
     /// Perimeter type indicator. A single project is
     /// allowed to be a member of single regular perimeter, but multiple service
     /// perimeter bridges. A project cannot be a included in a perimeter bridge
@@ -678,57 +700,53 @@ pub struct ServicePerimeter {
     /// empty.
     #[serde(rename="perimeterType")]
     pub perimeter_type: Option<String>,
-    /// Output only. Time the `ServicePerimeter` was created in UTC.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
     /// Description of the `ServicePerimeter` and its use. Does not affect
     /// behavior.
     pub description: Option<String>,
+    /// Required. Resource name for the ServicePerimeter.  The `short_name`
+    /// component must begin with a letter and only include alphanumeric and '_'.
+    /// Format: `accessPolicies/{policy_id}/servicePerimeters/{short_name}`
+    pub name: Option<String>,
+    /// Human readable title. Must be unique within the Policy.
+    pub title: Option<String>,
 }
 
 impl RequestValue for ServicePerimeter {}
 impl ResponseResult for ServicePerimeter {}
 
 
-/// `ServicePerimeterConfig` specifies a set of GCP resources that describe
-/// specific Service Perimeter configuration.
+/// `ServicePerimeterConfig` specifies a set of Google Cloud resources that
+/// describe specific Service Perimeter configuration.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServicePerimeterConfig {
-    /// Alpha. Configuration for which services may be used with Access Levels.
-    #[serde(rename="ingressServiceRestriction")]
-    pub ingress_service_restriction: Option<IngressServiceRestriction>,
-    /// GCP services that are subject to the Service Perimeter restrictions. Must
-    /// contain a list of services. For example, if
+    /// Google Cloud services that are subject to the Service Perimeter
+    /// restrictions. Must contain a list of services. For example, if
     /// `storage.googleapis.com` is specified, access to the storage buckets
     /// inside the perimeter must meet the perimeter's access restrictions.
     #[serde(rename="restrictedServices")]
     pub restricted_services: Option<Vec<String>>,
-    /// GCP services that are not subject to the Service Perimeter
+    /// Beta. Configuration for APIs allowed within Perimeter.
+    #[serde(rename="vpcAccessibleServices")]
+    pub vpc_accessible_services: Option<VpcAccessibleServices>,
+    /// A list of Google Cloud resources that are inside of the service perimeter.
+    /// Currently only projects are allowed. Format: `projects/{project_number}`
+    pub resources: Option<Vec<String>>,
+    /// Google Cloud services that are not subject to the Service Perimeter
     /// restrictions. Deprecated. Must be set to a single wildcard "*".
     /// 
     /// The wildcard means that unless explicitly specified by
     /// "restricted_services" list, any service is treated as unrestricted.
     #[serde(rename="unrestrictedServices")]
     pub unrestricted_services: Option<Vec<String>>,
-    /// Alpha. Configuration for within Perimeter allowed APIs.
-    #[serde(rename="vpcServiceRestriction")]
-    pub vpc_service_restriction: Option<VpcServiceRestriction>,
-    /// A list of GCP resources that are inside of the service perimeter.
-    /// Currently only projects are allowed. Format: `projects/{project_number}`
-    pub resources: Option<Vec<String>>,
-    /// Alpha. Configuration for what services are accessible via the Bridge
-    /// Perimeter. Must be empty for non-Bridge Perimeters.
-    #[serde(rename="bridgeServiceRestriction")]
-    pub bridge_service_restriction: Option<BridgeServiceRestriction>,
     /// A list of `AccessLevel` resource names that allow resources within the
     /// `ServicePerimeter` to be accessed from the internet. `AccessLevels` listed
     /// must be in the same policy as this `ServicePerimeter`. Referencing a
     /// nonexistent `AccessLevel` is a syntax error. If no `AccessLevel` names are
-    /// listed, resources within the perimeter can only be accessed via GCP calls
-    /// with request origins within the perimeter. Example:
+    /// listed, resources within the perimeter can only be accessed via Google
+    /// Cloud calls with request origins within the perimeter. Example:
     /// `"accessPolicies/MY_POLICY/accessLevels/MY_LEVEL"`.
     /// For Service Perimeter Bridge, must be empty.
     #[serde(rename="accessLevels")]
@@ -789,8 +807,9 @@ impl Resource for Operation {}
 impl ResponseResult for Operation {}
 
 
-/// An `AccessLevel` is a label that can be applied to requests to GCP services,
-/// along with a list of requirements necessary for the label to be applied.
+/// An `AccessLevel` is a label that can be applied to requests to Google Cloud
+/// services, along with a list of requirements necessary for the label to be
+/// applied.
 /// 
 /// # Activities
 /// 
@@ -803,22 +822,19 @@ impl ResponseResult for Operation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccessLevel {
-    /// Output only. Time the `AccessLevel` was updated in UTC.
-    #[serde(rename="updateTime")]
-    pub update_time: Option<String>,
+    /// A `BasicLevel` composed of `Conditions`.
+    pub basic: Option<BasicLevel>,
+    /// A `CustomLevel` written in the Common Expression Language.
+    pub custom: Option<CustomLevel>,
+    /// Description of the `AccessLevel` and its use. Does not affect behavior.
+    pub description: Option<String>,
     /// Required. Resource name for the Access Level. The `short_name` component
     /// must begin with a letter and only include alphanumeric and '_'. Format:
-    /// `accessPolicies/{policy_id}/accessLevels/{short_name}`
+    /// `accessPolicies/{policy_id}/accessLevels/{short_name}`. The maximum length
+    ///  // of the `short_name` component is 50 characters.
     pub name: Option<String>,
     /// Human readable title. Must be unique within the Policy.
     pub title: Option<String>,
-    /// A `BasicLevel` composed of `Conditions`.
-    pub basic: Option<BasicLevel>,
-    /// Output only. Time the `AccessLevel` was created in UTC.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
-    /// Description of the `AccessLevel` and its use. Does not affect behavior.
-    pub description: Option<String>,
 }
 
 impl RequestValue for AccessLevel {}
@@ -886,7 +902,7 @@ pub struct OsConstraint {
     pub os_type: Option<String>,
     /// Only allows requests from devices with a verified Chrome OS.
     /// Verifications includes requirements that the device is enterprise-managed,
-    /// conformant to Dasher domain policies, and the caller has permission to call
+    /// conformant to domain policies, and the caller has permission to call
     /// the API targeted by the request.
     #[serde(rename="requireVerifiedChromeOs")]
     pub require_verified_chrome_os: Option<bool>,
@@ -1055,7 +1071,7 @@ impl<'a, C, A> AccessPolicyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create an Service Perimeter. The
+    /// Create a Service Perimeter. The
     /// longrunning operation from this RPC will have a successful status once the
     /// Service Perimeter has
     /// propagated to long-lasting storage. Service Perimeters containing
@@ -1080,7 +1096,7 @@ impl<'a, C, A> AccessPolicyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete an Service Perimeter by resource
+    /// Delete a Service Perimeter by resource
     /// name. The longrunning operation from this RPC will have a successful status
     /// once the Service Perimeter has been
     /// removed from long-lasting storage.
@@ -1113,7 +1129,8 @@ impl<'a, C, A> AccessPolicyMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `name` - Required. Resource name for the Access Level. The `short_name` component
     ///            must begin with a letter and only include alphanumeric and '_'. Format:
-    ///            `accessPolicies/{policy_id}/accessLevels/{short_name}`
+    ///            `accessPolicies/{policy_id}/accessLevels/{short_name}`. The maximum length
+    ///             // of the `short_name` component is 50 characters.
     pub fn access_levels_patch(&self, request: AccessLevel, name: &str) -> AccessPolicyAccessLevelPatchCall<'a, C, A> {
         AccessPolicyAccessLevelPatchCall {
             hub: self.hub,
@@ -1273,7 +1290,7 @@ impl<'a, C, A> AccessPolicyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get an Service Perimeter by resource
+    /// Get a Service Perimeter by resource
     /// name.
     /// 
     /// # Arguments
@@ -1314,7 +1331,7 @@ impl<'a, C, A> AccessPolicyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update an Service Perimeter. The
+    /// Update a Service Perimeter. The
     /// longrunning operation from this RPC will have a successful status once the
     /// changes to the Service Perimeter have
     /// propagated to long-lasting storage. Service Perimeter containing
@@ -2175,7 +2192,7 @@ impl<'a, C, A> AccessPolicyAccessLevelCreateCall<'a, C, A> where C: BorrowMut<hy
 }
 
 
-/// Create an Service Perimeter. The
+/// Create a Service Perimeter. The
 /// longrunning operation from this RPC will have a successful status once the
 /// Service Perimeter has
 /// propagated to long-lasting storage. Service Perimeters containing
@@ -2461,7 +2478,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterCreateCall<'a, C, A> where C: BorrowM
 }
 
 
-/// Delete an Service Perimeter by resource
+/// Delete a Service Perimeter by resource
 /// name. The longrunning operation from this RPC will have a successful status
 /// once the Service Perimeter has been
 /// removed from long-lasting storage.
@@ -2932,7 +2949,8 @@ impl<'a, C, A> AccessPolicyAccessLevelPatchCall<'a, C, A> where C: BorrowMut<hyp
     }
     /// Required. Resource name for the Access Level. The `short_name` component
     /// must begin with a letter and only include alphanumeric and '_'. Format:
-    /// `accessPolicies/{policy_id}/accessLevels/{short_name}`
+    /// `accessPolicies/{policy_id}/accessLevels/{short_name}`. The maximum length
+    ///  // of the `short_name` component is 50 characters.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2942,7 +2960,7 @@ impl<'a, C, A> AccessPolicyAccessLevelPatchCall<'a, C, A> where C: BorrowMut<hyp
         self._name = new_value.to_string();
         self
     }
-    /// Required.  Mask to control which fields get updated. Must be non-empty.
+    /// Required. Mask to control which fields get updated. Must be non-empty.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: &str) -> AccessPolicyAccessLevelPatchCall<'a, C, A> {
@@ -4859,7 +4877,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterListCall<'a, C, A> where C: BorrowMut
 }
 
 
-/// Get an Service Perimeter by resource
+/// Get a Service Perimeter by resource
 /// name.
 ///
 /// A builder for the *servicePerimeters.get* method supported by a *accessPolicy* resource.
@@ -5364,7 +5382,7 @@ impl<'a, C, A> AccessPolicyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Update an Service Perimeter. The
+/// Update a Service Perimeter. The
 /// longrunning operation from this RPC will have a successful status once the
 /// changes to the Service Perimeter have
 /// propagated to long-lasting storage. Service Perimeter containing

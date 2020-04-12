@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Fact Check Tools* crate version *1.0.12+20190703*, where *20190703* is the exact revision of the *factchecktools:v1alpha1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Fact Check Tools* crate version *1.0.13+20200409*, where *20200409* is the exact revision of the *factchecktools:v1alpha1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Fact Check Tools* *v1_alpha1* API can be found at the
 //! [official documentation site](https://developers.google.com/fact-check/tools/api/).
@@ -333,7 +333,7 @@ impl<'a, C, A> FactCheckTools<C, A>
         FactCheckTools {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://factchecktools.googleapis.com/".to_string(),
             _root_url: "https://factchecktools.googleapis.com/".to_string(),
         }
@@ -347,7 +347,7 @@ impl<'a, C, A> FactCheckTools<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -588,11 +588,19 @@ impl ResponseResult for GoogleFactcheckingFactchecktoolsV1alpha1FactCheckedClaim
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFactcheckingFactchecktoolsV1alpha1ClaimRating {
-    /// For numeric ratings, the best value possible in the scale from worst to
+    /// Corresponds to `ClaimReview.reviewRating.ratingExplanation`.
+    #[serde(rename="ratingExplanation")]
+    pub rating_explanation: Option<String>,
+    /// For numeric ratings, the worst value possible in the scale from worst to
     /// best.<br>
-    /// Corresponds to `ClaimReview.reviewRating.bestRating`.
-    #[serde(rename="bestRating")]
-    pub best_rating: Option<i32>,
+    /// Corresponds to `ClaimReview.reviewRating.worstRating`.
+    #[serde(rename="worstRating")]
+    pub worst_rating: Option<i32>,
+    /// A numeric rating of this claim, in the range worstRating — bestRating
+    /// inclusive.<br>
+    /// Corresponds to `ClaimReview.reviewRating.ratingValue`.
+    #[serde(rename="ratingValue")]
+    pub rating_value: Option<i32>,
     /// Corresponds to `ClaimReview.reviewRating.image`.
     #[serde(rename="imageUrl")]
     pub image_url: Option<String>,
@@ -600,16 +608,11 @@ pub struct GoogleFactcheckingFactchecktoolsV1alpha1ClaimRating {
     /// Corresponds to `ClaimReview.reviewRating.alternateName`.
     #[serde(rename="textualRating")]
     pub textual_rating: Option<String>,
-    /// A numeric rating of this claim, in the range worstRating — bestRating
-    /// inclusive.<br>
-    /// Corresponds to `ClaimReview.reviewRating.ratingValue`.
-    #[serde(rename="ratingValue")]
-    pub rating_value: Option<i32>,
-    /// For numeric ratings, the worst value possible in the scale from worst to
+    /// For numeric ratings, the best value possible in the scale from worst to
     /// best.<br>
-    /// Corresponds to `ClaimReview.reviewRating.worstRating`.
-    #[serde(rename="worstRating")]
-    pub worst_rating: Option<i32>,
+    /// Corresponds to `ClaimReview.reviewRating.bestRating`.
+    #[serde(rename="bestRating")]
+    pub best_rating: Option<i32>,
 }
 
 impl Part for GoogleFactcheckingFactchecktoolsV1alpha1ClaimRating {}

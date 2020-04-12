@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Drive Activity* crate version *1.0.12+20190702*, where *20190702* is the exact revision of the *driveactivity:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Drive Activity* crate version *1.0.13+20200407*, where *20200407* is the exact revision of the *driveactivity:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Drive Activity* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/activity/).
@@ -333,7 +333,7 @@ impl<'a, C, A> DriveActivityHub<C, A>
         DriveActivityHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://driveactivity.googleapis.com/".to_string(),
             _root_url: "https://driveactivity.googleapis.com/".to_string(),
         }
@@ -344,7 +344,7 @@ impl<'a, C, A> DriveActivityHub<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -662,6 +662,9 @@ impl Part for Permission {}
 pub struct Assignment {
     /// The sub-type of this event.
     pub subtype: Option<String>,
+    /// The user to whom the comment was assigned.
+    #[serde(rename="assignedUser")]
+    pub assigned_user: Option<User>,
 }
 
 impl Part for Assignment {}
@@ -742,7 +745,8 @@ pub struct DriveItem {
     pub name: Option<String>,
     /// The title of the Drive item.
     pub title: Option<String>,
-    /// The Drive item is a folder.
+    /// The Drive item is a folder. Includes information about the type of
+    /// folder.
     #[serde(rename="driveFolder")]
     pub drive_folder: Option<DriveFolder>,
     /// The Drive item is a file.
@@ -803,7 +807,8 @@ pub struct DriveItemReference {
     pub title: Option<String>,
     /// This field is deprecated; please use the `driveFolder` field instead.
     pub folder: Option<Folder>,
-    /// The Drive item is a folder.
+    /// The Drive item is a folder. Includes information about the type of
+    /// folder.
     #[serde(rename="driveFolder")]
     pub drive_folder: Option<DriveFolder>,
 }

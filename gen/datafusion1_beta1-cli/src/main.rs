@@ -121,6 +121,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "state-message" => Some(("stateMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -133,15 +134,16 @@ impl<'n> Engine<'n> {
                     "network-config.ip-allocation" => Some(("networkConfig.ipAllocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-config.network" => Some(("networkConfig.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-endpoint" => Some(("serviceEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state-message" => Some(("stateMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "api-endpoint" => Some(("apiEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gcs-bucket" => Some(("gcsBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enable-stackdriver-monitoring" => Some(("enableStackdriverMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "display-name", "enable-stackdriver-logging", "enable-stackdriver-monitoring", "ip-allocation", "labels", "name", "network", "network-config", "options", "private-instance", "service-account", "service-endpoint", "state", "state-message", "type", "update-time", "version", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["api-endpoint", "create-time", "description", "display-name", "enable-stackdriver-logging", "enable-stackdriver-monitoring", "gcs-bucket", "ip-allocation", "labels", "name", "network", "network-config", "options", "private-instance", "service-account", "service-endpoint", "state", "state-message", "type", "update-time", "version", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -315,6 +317,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -328,6 +333,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["options-requested-policy-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -449,6 +455,7 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "state-message" => Some(("stateMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -461,15 +468,16 @@ impl<'n> Engine<'n> {
                     "network-config.ip-allocation" => Some(("networkConfig.ipAllocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-config.network" => Some(("networkConfig.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-endpoint" => Some(("serviceEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state-message" => Some(("stateMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "api-endpoint" => Some(("apiEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gcs-bucket" => Some(("gcsBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enable-stackdriver-monitoring" => Some(("enableStackdriverMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "display-name", "enable-stackdriver-logging", "enable-stackdriver-monitoring", "ip-allocation", "labels", "name", "network", "network-config", "options", "private-instance", "service-account", "service-endpoint", "state", "state-message", "type", "update-time", "version", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["api-endpoint", "create-time", "description", "display-name", "enable-stackdriver-logging", "enable-stackdriver-monitoring", "gcs-bucket", "ip-allocation", "labels", "name", "network", "network-config", "options", "private-instance", "service-account", "service-endpoint", "state", "state-message", "type", "update-time", "version", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -640,12 +648,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.iam-owned" => Some(("policy.iamOwned", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "iam-owned", "policy", "update-mask", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "update-mask", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -886,6 +893,9 @@ impl<'n> Engine<'n> {
                 "page-size" => {
                     call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
                 },
+                "include-unrevealed-locations" => {
+                    call = call.include_unrevealed_locations(arg_from_str(value.unwrap_or("false"), err, "include-unrevealed-locations", "boolean"));
+                },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 },
@@ -902,7 +912,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "include-unrevealed-locations", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1541,7 +1551,9 @@ fn main() {
                   ]),
             ("locations-instances-set-iam-policy",
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
-        existing policy."##),
+        existing policy.
+        
+        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
                     "Details at http://byron.github.io/google-apis-rs/google_datafusion1_beta1_cli/projects_locations-instances-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -1781,7 +1793,7 @@ fn main() {
     
     let mut app = App::new("datafusion1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190617")
+           .version("1.0.13+20200318")
            .about("Cloud Data Fusion is a fully-managed, cloud native, enterprise data integration service for
                quickly building and managing data pipelines. It provides a graphical interface to increase
                time efficiency and reduce complexity, and allows business users, developers, and data

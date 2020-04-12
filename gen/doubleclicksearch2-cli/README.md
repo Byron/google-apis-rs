@@ -25,14 +25,13 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *doubleclicksearch* API at revision *20190625*. The CLI is at version *1.0.12*.
+This documentation was generated from the *doubleclicksearch* API at revision *20200331*. The CLI is at version *1.0.13*.
 
 ```bash
 doubleclicksearch2 [options]
         conversion
                 get <agency-id> <advertiser-id> <engine-account-id> <end-date> <row-count> <start-date> <start-row> [-p <v>]... [-o <out>]
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
-                patch <advertiser-id> <agency-id> <end-date> <engine-account-id> <row-count> <start-date> <start-row> (-r <kv>)... [-p <v>]... [-o <out>]
                 update (-r <kv>)... [-p <v>]... [-o <out>]
                 update-availability (-r <kv>)... [-p <v>]... [-o <out>]
         reports

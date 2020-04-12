@@ -2,21 +2,21 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games Configuration* crate version *1.0.12+20190627*, where *20190627* is the exact revision of the *gamesConfiguration:v1configuration* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Games Configuration* crate version *1.0.13+20200402*, where *20200402* is the exact revision of the *gamesConfiguration:v1configuration* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Games Configuration* *v1_configuration* API can be found at the
-//! [official documentation site](https://developers.google.com/games/services).
+//! [official documentation site](https://developers.google.com/games/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/gamesconfiguration1_configuration).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.GamesConfiguration.html) ... 
 //! 
 //! * [achievement configurations](struct.AchievementConfiguration.html)
-//!  * [*delete*](struct.AchievementConfigurationDeleteCall.html), [*get*](struct.AchievementConfigurationGetCall.html), [*insert*](struct.AchievementConfigurationInsertCall.html), [*list*](struct.AchievementConfigurationListCall.html), [*patch*](struct.AchievementConfigurationPatchCall.html) and [*update*](struct.AchievementConfigurationUpdateCall.html)
+//!  * [*delete*](struct.AchievementConfigurationDeleteCall.html), [*get*](struct.AchievementConfigurationGetCall.html), [*insert*](struct.AchievementConfigurationInsertCall.html), [*list*](struct.AchievementConfigurationListCall.html) and [*update*](struct.AchievementConfigurationUpdateCall.html)
 //! * [image configurations](struct.ImageConfiguration.html)
 //!  * [*upload*](struct.ImageConfigurationUploadCall.html)
 //! * [leaderboard configurations](struct.LeaderboardConfiguration.html)
-//!  * [*delete*](struct.LeaderboardConfigurationDeleteCall.html), [*get*](struct.LeaderboardConfigurationGetCall.html), [*insert*](struct.LeaderboardConfigurationInsertCall.html), [*list*](struct.LeaderboardConfigurationListCall.html), [*patch*](struct.LeaderboardConfigurationPatchCall.html) and [*update*](struct.LeaderboardConfigurationUpdateCall.html)
+//!  * [*delete*](struct.LeaderboardConfigurationDeleteCall.html), [*get*](struct.LeaderboardConfigurationGetCall.html), [*insert*](struct.LeaderboardConfigurationInsertCall.html), [*list*](struct.LeaderboardConfigurationListCall.html) and [*update*](struct.LeaderboardConfigurationUpdateCall.html)
 //! 
 //! 
 //! Upload supported by ...
@@ -55,12 +55,11 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.achievement_configurations().list(...).doit()
-//! let r = hub.achievement_configurations().update(...).doit()
-//! let r = hub.achievement_configurations().insert(...).doit()
 //! let r = hub.achievement_configurations().get(...).doit()
-//! let r = hub.achievement_configurations().patch(...).doit()
+//! let r = hub.achievement_configurations().list(...).doit()
+//! let r = hub.achievement_configurations().insert(...).doit()
 //! let r = hub.achievement_configurations().delete(...).doit()
+//! let r = hub.achievement_configurations().update(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -334,8 +333,8 @@ impl<'a, C, A> GamesConfiguration<C, A>
         GamesConfiguration {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
-            _base_url: "https://www.googleapis.com/games/v1configuration/".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _base_url: "https://www.googleapis.com/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
@@ -351,7 +350,7 @@ impl<'a, C, A> GamesConfiguration<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -359,7 +358,7 @@ impl<'a, C, A> GamesConfiguration<C, A>
     }
 
     /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/games/v1configuration/`.
+    /// It defaults to `https://www.googleapis.com/`.
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
@@ -379,7 +378,7 @@ impl<'a, C, A> GamesConfiguration<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// This is a JSON template for a number format resource.
+/// A number format resource.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -389,29 +388,29 @@ pub struct GamesNumberFormatConfiguration {
     #[serde(rename="currencyCode")]
     pub currency_code: Option<String>,
     /// The formatting for the number.
-    /// Possible values are:  
-    /// - "NUMERIC" - Numbers are formatted to have no digits or a fixed number of digits after the decimal point according to locale. An optional custom unit can be added.
-    /// - "TIME_DURATION" - Numbers are formatted to hours, minutes and seconds.
-    /// - "CURRENCY" - Numbers are formatted to currency according to locale.
     #[serde(rename="numberFormatType")]
     pub number_format_type: Option<String>,
     /// The number of decimal places for number. Only used for NUMERIC format type.
     #[serde(rename="numDecimalPlaces")]
     pub num_decimal_places: Option<i32>,
-    /// An optional suffix for the NUMERIC format type. These strings follow the same  plural rules as all Android string resources.
+    /// An optional suffix for the NUMERIC format type.  These strings follow the
+    /// same <a
+    /// href="http://developer.android.com/guide/topics/resources/string-resource.html#Plurals">
+    /// plural rules</a> as all Android string resources.
     pub suffix: Option<GamesNumberAffixConfiguration>,
 }
 
 impl Part for GamesNumberFormatConfiguration {}
 
 
-/// This is a JSON template for a localized string bundle resource.
+/// A localized string bundle resource.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalizedStringBundle {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#localizedStringBundle.
+    /// Uniquely identifies the type of this resource. Value is always the fixed
+    /// string <code>gamesConfiguration#localizedStringBundle</code>.
     pub kind: Option<String>,
     /// The locale strings.
     pub translations: Option<Vec<LocalizedString>>,
@@ -420,7 +419,7 @@ pub struct LocalizedStringBundle {
 impl Part for LocalizedStringBundle {}
 
 
-/// This is a JSON template for a localized string resource.
+/// A localized string resource.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -428,7 +427,8 @@ impl Part for LocalizedStringBundle {}
 pub struct LocalizedString {
     /// The locale string.
     pub locale: Option<String>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#localizedString.
+    /// Uniquely identifies the type of this resource. Value is always the fixed
+    /// string <code>gamesConfiguration#localizedString</code>.
     pub kind: Option<String>,
     /// The string value.
     pub value: Option<String>,
@@ -437,7 +437,7 @@ pub struct LocalizedString {
 impl Part for LocalizedString {}
 
 
-/// This is a JSON template for a ListConfigurations response.
+/// A ListConfigurations response.
 /// 
 /// # Activities
 /// 
@@ -453,14 +453,16 @@ pub struct AchievementConfigurationListResponse {
     pub next_page_token: Option<String>,
     /// The achievement configurations.
     pub items: Option<Vec<AchievementConfiguration>>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementConfigurationListResponse.
+    /// Uniquely identifies the type of this resource. Value is always the fixed
+    /// string
+    /// <code>gamesConfiguration#achievementConfigurationListResponse</code>.
     pub kind: Option<String>,
 }
 
 impl ResponseResult for AchievementConfigurationListResponse {}
 
 
-/// This is a JSON template for an image configuration resource.
+/// An image configuration resource.
 /// 
 /// # Activities
 /// 
@@ -476,7 +478,8 @@ pub struct ImageConfiguration {
     /// The resource ID of resource which the image belongs to.
     #[serde(rename="resourceId")]
     pub resource_id: Option<String>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#imageConfiguration.
+    /// Uniquely identifies the type of this resource. Value is always the fixed
+    /// string <code>gamesConfiguration#imageConfiguration</code>.
     pub kind: Option<String>,
     /// The image type for the image.
     #[serde(rename="imageType")]
@@ -487,61 +490,62 @@ impl Resource for ImageConfiguration {}
 impl ResponseResult for ImageConfiguration {}
 
 
-/// This is a JSON template for a number affix resource.
+/// A number affix resource.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GamesNumberAffixConfiguration {
-    /// When the language requires special treatment of "small" numbers (as with 2, 3, and 4 in Czech; or numbers ending 2, 3, or 4 but not 12, 13, or 14 in Polish).
+    /// When the language requires special treatment of "small" numbers (as with 2,
+    /// 3, and 4 in Czech; or numbers ending 2, 3, or 4 but not 12, 13, or 14 in
+    /// Polish).
     pub few: Option<LocalizedStringBundle>,
-    /// When the language requires special treatment of the number 0 (as in Arabic).
+    /// When the language requires special treatment of the number 0 (as in
+    /// Arabic).
     pub zero: Option<LocalizedStringBundle>,
-    /// When the language does not require special treatment of the given quantity (as with all numbers in Chinese, or 42 in English).
+    /// When the language does not require special treatment of the given quantity
+    /// (as with all numbers in Chinese, or 42 in English).
     pub other: Option<LocalizedStringBundle>,
-    /// When the language requires special treatment of "large" numbers (as with numbers ending 11-99 in Maltese).
+    /// When the language requires special treatment of "large" numbers (as with
+    /// numbers ending 11-99 in Maltese).
     pub many: Option<LocalizedStringBundle>,
-    /// When the language requires special treatment of numbers like two (as with 2 in Welsh, or 102 in Slovenian).
+    /// When the language requires special treatment of numbers like two (as with 2
+    /// in Welsh, or 102 in Slovenian).
     pub two: Option<LocalizedStringBundle>,
-    /// When the language requires special treatment of numbers like one (as with the number 1 in English and most other languages; in Russian, any number ending in 1 but not ending in 11 is in this class).
+    /// When the language requires special treatment of numbers like one (as with
+    /// the number 1 in English and most other languages; in Russian, any number
+    /// ending in 1 but not ending in 11 is in this class).
     pub one: Option<LocalizedStringBundle>,
 }
 
 impl Part for GamesNumberAffixConfiguration {}
 
 
-/// This is a JSON template for an achievement configuration resource.
+/// An achievement configuration resource.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list achievement configurations](struct.AchievementConfigurationListCall.html) (none)
-/// * [update achievement configurations](struct.AchievementConfigurationUpdateCall.html) (request|response)
-/// * [insert achievement configurations](struct.AchievementConfigurationInsertCall.html) (request|response)
 /// * [get achievement configurations](struct.AchievementConfigurationGetCall.html) (response)
-/// * [patch achievement configurations](struct.AchievementConfigurationPatchCall.html) (request|response)
+/// * [list achievement configurations](struct.AchievementConfigurationListCall.html) (none)
+/// * [insert achievement configurations](struct.AchievementConfigurationInsertCall.html) (request|response)
 /// * [delete achievement configurations](struct.AchievementConfigurationDeleteCall.html) (none)
+/// * [update achievement configurations](struct.AchievementConfigurationUpdateCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementConfiguration {
     /// The type of the achievement.
-    /// Possible values are:  
-    /// - "STANDARD" - Achievement is either locked or unlocked. 
-    /// - "INCREMENTAL" - Achievement is incremental.
     #[serde(rename="achievementType")]
     pub achievement_type: Option<String>,
-    /// Steps to unlock. Only applicable to incremental achievements.
+    /// Steps to unlock.  Only applicable to incremental achievements.
     #[serde(rename="stepsToUnlock")]
     pub steps_to_unlock: Option<i32>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#achievementConfiguration.
+    /// Uniquely identifies the type of this resource. Value is always the fixed
+    /// string <code>gamesConfiguration#achievementConfiguration</code>.
     pub kind: Option<String>,
     /// The initial state of the achievement.
-    /// Possible values are:  
-    /// - "HIDDEN" - Achievement is hidden. 
-    /// - "REVEALED" - Achievement is revealed. 
-    /// - "UNLOCKED" - Achievement is unlocked.
     #[serde(rename="initialState")]
     pub initial_state: Option<String>,
     /// The token for this resource.
@@ -559,28 +563,25 @@ impl Resource for AchievementConfiguration {}
 impl ResponseResult for AchievementConfiguration {}
 
 
-/// This is a JSON template for an leaderboard configuration resource.
+/// An leaderboard configuration resource.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [insert leaderboard configurations](struct.LeaderboardConfigurationInsertCall.html) (request|response)
-/// * [get leaderboard configurations](struct.LeaderboardConfigurationGetCall.html) (response)
-/// * [patch leaderboard configurations](struct.LeaderboardConfigurationPatchCall.html) (request|response)
 /// * [list leaderboard configurations](struct.LeaderboardConfigurationListCall.html) (none)
-/// * [update leaderboard configurations](struct.LeaderboardConfigurationUpdateCall.html) (request|response)
+/// * [insert leaderboard configurations](struct.LeaderboardConfigurationInsertCall.html) (request|response)
 /// * [delete leaderboard configurations](struct.LeaderboardConfigurationDeleteCall.html) (none)
+/// * [get leaderboard configurations](struct.LeaderboardConfigurationGetCall.html) (response)
+/// * [update leaderboard configurations](struct.LeaderboardConfigurationUpdateCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LeaderboardConfiguration {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#leaderboardConfiguration.
+    /// Uniquely identifies the type of this resource. Value is always the fixed
+    /// string <code>gamesConfiguration#leaderboardConfiguration</code>.
     pub kind: Option<String>,
-    /// The type of the leaderboard.
-    /// Possible values are:  
-    /// - "LARGER_IS_BETTER" - Larger scores posted are ranked higher. 
-    /// - "SMALLER_IS_BETTER" - Smaller scores posted are ranked higher.
+    /// no description provided
     #[serde(rename="scoreOrder")]
     pub score_order: Option<String>,
     /// Minimum score that can be posted to this leaderboard.
@@ -604,7 +605,7 @@ impl Resource for LeaderboardConfiguration {}
 impl ResponseResult for LeaderboardConfiguration {}
 
 
-/// This is a JSON template for a ListConfigurations response.
+/// A ListConfigurations response.
 /// 
 /// # Activities
 /// 
@@ -620,14 +621,16 @@ pub struct LeaderboardConfigurationListResponse {
     pub next_page_token: Option<String>,
     /// The leaderboard configurations.
     pub items: Option<Vec<LeaderboardConfiguration>>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardConfigurationListResponse.
+    /// Uniquely identifies the type of this resource. Value is always the fixed
+    /// string
+    /// <code>gamesConfiguration#leaderboardConfigurationListResponse</code>.
     pub kind: Option<String>,
 }
 
 impl ResponseResult for LeaderboardConfigurationListResponse {}
 
 
-/// This is a JSON template for an achievement configuration detail.
+/// An achievement configuration detail.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -636,7 +639,8 @@ pub struct AchievementConfigurationDetail {
     /// The icon url of this achievement. Writes to this field are ignored.
     #[serde(rename="iconUrl")]
     pub icon_url: Option<String>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#achievementConfigurationDetail.
+    /// Uniquely identifies the type of this resource. Value is always the fixed
+    /// string <code>gamesConfiguration#achievementConfigurationDetail</code>.
     pub kind: Option<String>,
     /// Localized strings for the achievement name.
     pub name: Option<LocalizedStringBundle>,
@@ -653,7 +657,7 @@ pub struct AchievementConfigurationDetail {
 impl Part for AchievementConfigurationDetail {}
 
 
-/// This is a JSON template for a leaderboard configuration detail.
+/// A leaderboard configuration detail.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -665,7 +669,8 @@ pub struct LeaderboardConfigurationDetail {
     /// The icon url of this leaderboard. Writes to this field are ignored.
     #[serde(rename="iconUrl")]
     pub icon_url: Option<String>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#leaderboardConfigurationDetail.
+    /// Uniquely identifies the type of this resource. Value is always the fixed
+    /// string <code>gamesConfiguration#leaderboardConfigurationDetail</code>.
     pub kind: Option<String>,
     /// Localized strings for the leaderboard name.
     pub name: Option<LocalizedStringBundle>,
@@ -767,7 +772,7 @@ impl<'a, C, A> ImageConfigurationMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = GamesConfiguration::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
+/// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.achievement_configurations();
 /// # }
@@ -858,25 +863,6 @@ impl<'a, C, A> AchievementConfigurationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update the metadata of the achievement configuration with the given ID. This method supports patch semantics.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `achievementId` - The ID of the achievement used by this method.
-    pub fn patch(&self, request: AchievementConfiguration, achievement_id: &str) -> AchievementConfigurationPatchCall<'a, C, A> {
-        AchievementConfigurationPatchCall {
-            hub: self.hub,
-            _request: request,
-            _achievement_id: achievement_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Delete the achievement configuration with the given ID.
     /// 
     /// # Arguments
@@ -919,7 +905,7 @@ impl<'a, C, A> AchievementConfigurationMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = GamesConfiguration::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
+/// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.leaderboard_configurations();
 /// # }
@@ -955,33 +941,14 @@ impl<'a, C, A> LeaderboardConfigurationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the metadata of the leaderboard configuration with the given ID.
+    /// Delete the leaderboard configuration with the given ID.
     /// 
     /// # Arguments
     ///
     /// * `leaderboardId` - The ID of the leaderboard.
-    pub fn get(&self, leaderboard_id: &str) -> LeaderboardConfigurationGetCall<'a, C, A> {
-        LeaderboardConfigurationGetCall {
+    pub fn delete(&self, leaderboard_id: &str) -> LeaderboardConfigurationDeleteCall<'a, C, A> {
+        LeaderboardConfigurationDeleteCall {
             hub: self.hub,
-            _leaderboard_id: leaderboard_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Update the metadata of the leaderboard configuration with the given ID. This method supports patch semantics.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `leaderboardId` - The ID of the leaderboard.
-    pub fn patch(&self, request: LeaderboardConfiguration, leaderboard_id: &str) -> LeaderboardConfigurationPatchCall<'a, C, A> {
-        LeaderboardConfigurationPatchCall {
-            hub: self.hub,
-            _request: request,
             _leaderboard_id: leaderboard_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1010,6 +977,23 @@ impl<'a, C, A> LeaderboardConfigurationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Retrieves the metadata of the leaderboard configuration with the given ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `leaderboardId` - The ID of the leaderboard.
+    pub fn get(&self, leaderboard_id: &str) -> LeaderboardConfigurationGetCall<'a, C, A> {
+        LeaderboardConfigurationGetCall {
+            hub: self.hub,
+            _leaderboard_id: leaderboard_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Returns a list of the leaderboard configurations in this application.
     /// 
     /// # Arguments
@@ -1021,23 +1005,6 @@ impl<'a, C, A> LeaderboardConfigurationMethods<'a, C, A> {
             _application_id: application_id.to_string(),
             _page_token: Default::default(),
             _max_results: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Delete the leaderboard configuration with the given ID.
-    /// 
-    /// # Arguments
-    ///
-    /// * `leaderboardId` - The ID of the leaderboard.
-    pub fn delete(&self, leaderboard_id: &str) -> LeaderboardConfigurationDeleteCall<'a, C, A> {
-        LeaderboardConfigurationDeleteCall {
-            hub: self.hub,
-            _leaderboard_id: leaderboard_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1131,8 +1098,6 @@ impl<'a, C, A> ImageConfigurationUploadCall<'a, C, A> where C: BorrowMut<hyper::
         let (mut url, upload_type) =
             if protocol == "simple" {
                 (self.hub._root_url.clone() + "upload/games/v1configuration/images/{resourceId}/imageType/{imageType}", "multipart")
-            } else if protocol == "resumable" {
-                (self.hub._root_url.clone() + "resumable/upload/games/v1configuration/images/{resourceId}/imageType/{imageType}", "resumable")
             } else {
                 unreachable!()
             };
@@ -1166,9 +1131,6 @@ impl<'a, C, A> ImageConfigurationUploadCall<'a, C, A> where C: BorrowMut<hyper::
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
-        let mut should_ask_dlg_for_url = false;
-        let mut upload_url_from_server;
-        let mut upload_url: Option<String> = None;
 
         loop {
             let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
@@ -1185,38 +1147,23 @@ impl<'a, C, A> ImageConfigurationUploadCall<'a, C, A> where C: BorrowMut<hyper::
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
-                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
-                    should_ask_dlg_for_url = false;
-                    upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(hyper::Url::parse(s).unwrap())).unwrap();
-                    hyper::client::Response::new(url, Box::new(cmn::DummyNetworkStream)).and_then(|mut res| {
-                        res.status = hyper::status::StatusCode::Ok;
-                        res.headers.set(Location(upload_url.as_ref().unwrap().clone()));
-                        Ok(res)
-                    })
-                } else {
-                    let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                        .header(UserAgent(self.hub._user_agent.clone()))
-                        .header(auth_header.clone());
-                    if protocol == "simple" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                    reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    if size > 15728640 {
-                    	return Err(Error::UploadSizeLimitExceeded(size, 15728640))
-                    }
-                        req = req.header(ContentType(reader_mime_type.clone()))
-                                 .header(ContentLength(size))
-                                 .body(&mut reader);
-                    }
-                    upload_url_from_server = true;
-                    if protocol == "resumable" {
-                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
-                    }
-    
-                    dlg.pre_request();
-                    req.send()
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+                if protocol == "simple" {
+                    let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                reader.seek(io::SeekFrom::Start(0)).unwrap();
+                if size > 15728640 {
+                	return Err(Error::UploadSizeLimitExceeded(size, 15728640))
                 }
+                    req = req.header(ContentType(reader_mime_type.clone()))
+                             .header(ContentLength(size))
+                             .body(&mut reader);
+                }
+
+                dlg.pre_request();
+                req.send()
             };
 
             match req_result {
@@ -1244,51 +1191,6 @@ impl<'a, C, A> ImageConfigurationUploadCall<'a, C, A> where C: BorrowMut<hyper::
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    if protocol == "resumable" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                        reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 15728640 {
-                        	return Err(Error::UploadSizeLimitExceeded(size, 15728640))
-                        }
-                        let mut client = &mut *self.hub.client.borrow_mut();
-                        let upload_result = {
-                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
-                            if upload_url_from_server {
-                                dlg.store_upload_url(Some(url_str));
-                            }
-
-                            cmn::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
-                                delegate: dlg,
-                                start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
-                                user_agent: &self.hub._user_agent,
-                                auth_header: auth_header.clone(),
-                                url: url_str,
-                                reader: &mut reader,
-                                media_type: reader_mime_type.clone(),
-                                content_length: size
-                            }.upload()
-                        };
-                        match upload_result {
-                            None => {
-                                dlg.finished(false);
-                                return Err(Error::Cancelled)
-                            }
-                            Some(Err(err)) => {
-                                dlg.finished(false);
-                                return Err(Error::HttpError(err))
-                            }
-                            Some(Ok(upload_result)) => {
-                                res = upload_result;
-                                if !res.status.is_success() {
-                                    dlg.store_upload_url(None);
-                                    dlg.finished(false);
-                                    return Err(Error::Failure(res))
-                                }
-                            }
-                        }
-                    }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
@@ -1311,28 +1213,12 @@ impl<'a, C, A> ImageConfigurationUploadCall<'a, C, A> where C: BorrowMut<hyper::
     /// Upload media all at once.
     /// If the upload fails for whichever reason, all progress is lost.
     ///
-    /// * *max size*: 15MB
+    /// * *max size*: 15728640
     /// * *multipart*: yes
     /// * *valid mime types*: 'image/*'
     pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, ImageConfiguration)>
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
-    }
-    /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a
-    /// certain amount of time as the server maintains state temporarily.
-    /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
-    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
-    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
-    /// `cancel_chunk_upload(...)`.
-    ///
-    /// * *max size*: 15MB
-    /// * *multipart*: yes
-    /// * *valid mime types*: 'image/*'
-    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, ImageConfiguration)>
-                where RS: ReadSeek {
-        self.doit(resumeable_stream, mime_type, "resumable")
     }
 
     /// The ID of the resource used by this method.
@@ -1375,13 +1261,17 @@ impl<'a, C, A> ImageConfigurationUploadCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ImageConfigurationUploadCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -1495,7 +1385,7 @@ impl<'a, C, A> AchievementConfigurationListCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "applications/{applicationId}/achievements";
+        let mut url = self.hub._base_url.clone() + "games/v1configuration/applications/{applicationId}/achievements";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Androidpublisher.as_ref().to_string(), ());
         }
@@ -1612,7 +1502,9 @@ impl<'a, C, A> AchievementConfigurationListCall<'a, C, A> where C: BorrowMut<hyp
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The maximum number of resource configurations to return in the response, used for paging. For any response, the actual number of resources returned may be less than the specified maxResults.
+    /// The maximum number of resource configurations to return in the response,
+    /// used for paging. For any response, the actual number of resources returned
+    /// may be less than the specified <code>maxResults</code>.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> AchievementConfigurationListCall<'a, C, A> {
@@ -1639,13 +1531,17 @@ impl<'a, C, A> AchievementConfigurationListCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -1756,7 +1652,7 @@ impl<'a, C, A> AchievementConfigurationUpdateCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "achievements/{achievementId}";
+        let mut url = self.hub._base_url.clone() + "games/v1configuration/achievements/{achievementId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Androidpublisher.as_ref().to_string(), ());
         }
@@ -1910,13 +1806,17 @@ impl<'a, C, A> AchievementConfigurationUpdateCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -2027,7 +1927,7 @@ impl<'a, C, A> AchievementConfigurationInsertCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "applications/{applicationId}/achievements";
+        let mut url = self.hub._base_url.clone() + "games/v1configuration/applications/{applicationId}/achievements";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Androidpublisher.as_ref().to_string(), ());
         }
@@ -2181,13 +2081,17 @@ impl<'a, C, A> AchievementConfigurationInsertCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -2291,7 +2195,7 @@ impl<'a, C, A> AchievementConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "achievements/{achievementId}";
+        let mut url = self.hub._base_url.clone() + "games/v1configuration/achievements/{achievementId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Androidpublisher.as_ref().to_string(), ());
         }
@@ -2421,13 +2325,17 @@ impl<'a, C, A> AchievementConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -2449,277 +2357,6 @@ impl<'a, C, A> AchievementConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> AchievementConfigurationGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Update the metadata of the achievement configuration with the given ID. This method supports patch semantics.
-///
-/// A builder for the *patch* method supported by a *achievementConfiguration* resource.
-/// It is not used directly, but through a `AchievementConfigurationMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_gamesconfiguration1_configuration as gamesconfiguration1_configuration;
-/// use gamesconfiguration1_configuration::AchievementConfiguration;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use gamesconfiguration1_configuration::GamesConfiguration;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = GamesConfiguration::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = AchievementConfiguration::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.achievement_configurations().patch(req, "achievementId")
-///              .doit();
-/// # }
-/// ```
-pub struct AchievementConfigurationPatchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a GamesConfiguration<C, A>,
-    _request: AchievementConfiguration,
-    _achievement_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for AchievementConfigurationPatchCall<'a, C, A> {}
-
-impl<'a, C, A> AchievementConfigurationPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, AchievementConfiguration)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "gamesConfiguration.achievementConfigurations.patch",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("achievementId", self._achievement_id.to_string()));
-        for &field in ["alt", "achievementId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "achievements/{achievementId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Androidpublisher.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{achievementId}", "achievementId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["achievementId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AchievementConfiguration) -> AchievementConfigurationPatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the achievement used by this method.
-    ///
-    /// Sets the *achievement id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationPatchCall<'a, C, A> {
-        self._achievement_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AchievementConfigurationPatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationPatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Androidpublisher`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementConfigurationPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2801,7 +2438,7 @@ impl<'a, C, A> AchievementConfigurationDeleteCall<'a, C, A> where C: BorrowMut<h
         }
 
 
-        let mut url = self.hub._base_url.clone() + "achievements/{achievementId}";
+        let mut url = self.hub._base_url.clone() + "games/v1configuration/achievements/{achievementId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Androidpublisher.as_ref().to_string(), ());
         }
@@ -2921,13 +2558,17 @@ impl<'a, C, A> AchievementConfigurationDeleteCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3038,7 +2679,7 @@ impl<'a, C, A> LeaderboardConfigurationInsertCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "applications/{applicationId}/leaderboards";
+        let mut url = self.hub._base_url.clone() + "games/v1configuration/applications/{applicationId}/leaderboards";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Androidpublisher.as_ref().to_string(), ());
         }
@@ -3192,13 +2833,17 @@ impl<'a, C, A> LeaderboardConfigurationInsertCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3231,9 +2876,9 @@ impl<'a, C, A> LeaderboardConfigurationInsertCall<'a, C, A> where C: BorrowMut<h
 }
 
 
-/// Retrieves the metadata of the leaderboard configuration with the given ID.
+/// Delete the leaderboard configuration with the given ID.
 ///
-/// A builder for the *get* method supported by a *leaderboardConfiguration* resource.
+/// A builder for the *delete* method supported by a *leaderboardConfiguration* resource.
 /// It is not used directly, but through a `LeaderboardConfigurationMethods` instance.
 ///
 /// # Example
@@ -3258,11 +2903,11 @@ impl<'a, C, A> LeaderboardConfigurationInsertCall<'a, C, A> where C: BorrowMut<h
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.leaderboard_configurations().get("leaderboardId")
+/// let result = hub.leaderboard_configurations().delete("leaderboardId")
 ///              .doit();
 /// # }
 /// ```
-pub struct LeaderboardConfigurationGetCall<'a, C, A>
+pub struct LeaderboardConfigurationDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a GamesConfiguration<C, A>,
@@ -3272,13 +2917,13 @@ pub struct LeaderboardConfigurationGetCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for LeaderboardConfigurationGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for LeaderboardConfigurationDeleteCall<'a, C, A> {}
 
-impl<'a, C, A> LeaderboardConfigurationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> LeaderboardConfigurationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, LeaderboardConfiguration)> {
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -3286,11 +2931,11 @@ impl<'a, C, A> LeaderboardConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "gamesConfiguration.leaderboardConfigurations.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "gamesConfiguration.leaderboardConfigurations.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
         params.push(("leaderboardId", self._leaderboard_id.to_string()));
-        for &field in ["alt", "leaderboardId"].iter() {
+        for &field in ["leaderboardId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -3300,9 +2945,8 @@ impl<'a, C, A> LeaderboardConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
             params.push((&name, value.clone()));
         }
 
-        params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "leaderboards/{leaderboardId}";
+        let mut url = self.hub._base_url.clone() + "games/v1configuration/leaderboards/{leaderboardId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Androidpublisher.as_ref().to_string(), ());
         }
@@ -3349,7 +2993,7 @@ impl<'a, C, A> LeaderboardConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3382,17 +3026,7 @@ impl<'a, C, A> LeaderboardConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
+                    let result_value = res;
 
                     dlg.finished(true);
                     return Ok(result_value)
@@ -3408,7 +3042,7 @@ impl<'a, C, A> LeaderboardConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationGetCall<'a, C, A> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationDeleteCall<'a, C, A> {
         self._leaderboard_id = new_value.to_string();
         self
     }
@@ -3418,7 +3052,7 @@ impl<'a, C, A> LeaderboardConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LeaderboardConfigurationGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LeaderboardConfigurationDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -3432,14 +3066,18 @@ impl<'a, C, A> LeaderboardConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationGetCall<'a, C, A>
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3459,278 +3097,7 @@ impl<'a, C, A> LeaderboardConfigurationGetCall<'a, C, A> where C: BorrowMut<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LeaderboardConfigurationGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Update the metadata of the leaderboard configuration with the given ID. This method supports patch semantics.
-///
-/// A builder for the *patch* method supported by a *leaderboardConfiguration* resource.
-/// It is not used directly, but through a `LeaderboardConfigurationMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_gamesconfiguration1_configuration as gamesconfiguration1_configuration;
-/// use gamesconfiguration1_configuration::LeaderboardConfiguration;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use gamesconfiguration1_configuration::GamesConfiguration;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = GamesConfiguration::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = LeaderboardConfiguration::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.leaderboard_configurations().patch(req, "leaderboardId")
-///              .doit();
-/// # }
-/// ```
-pub struct LeaderboardConfigurationPatchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a GamesConfiguration<C, A>,
-    _request: LeaderboardConfiguration,
-    _leaderboard_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for LeaderboardConfigurationPatchCall<'a, C, A> {}
-
-impl<'a, C, A> LeaderboardConfigurationPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, LeaderboardConfiguration)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "gamesConfiguration.leaderboardConfigurations.patch",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("leaderboardId", self._leaderboard_id.to_string()));
-        for &field in ["alt", "leaderboardId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "leaderboards/{leaderboardId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Androidpublisher.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{leaderboardId}", "leaderboardId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["leaderboardId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LeaderboardConfiguration) -> LeaderboardConfigurationPatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the leaderboard.
-    ///
-    /// Sets the *leaderboard id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationPatchCall<'a, C, A> {
-        self._leaderboard_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LeaderboardConfigurationPatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationPatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Androidpublisher`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LeaderboardConfigurationPatchCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LeaderboardConfigurationDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3820,7 +3187,7 @@ impl<'a, C, A> LeaderboardConfigurationUpdateCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "leaderboards/{leaderboardId}";
+        let mut url = self.hub._base_url.clone() + "games/v1configuration/leaderboards/{leaderboardId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Androidpublisher.as_ref().to_string(), ());
         }
@@ -3974,13 +3341,17 @@ impl<'a, C, A> LeaderboardConfigurationUpdateCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4002,6 +3373,250 @@ impl<'a, C, A> LeaderboardConfigurationUpdateCall<'a, C, A> where C: BorrowMut<h
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> LeaderboardConfigurationUpdateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieves the metadata of the leaderboard configuration with the given ID.
+///
+/// A builder for the *get* method supported by a *leaderboardConfiguration* resource.
+/// It is not used directly, but through a `LeaderboardConfigurationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_gamesconfiguration1_configuration as gamesconfiguration1_configuration;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use gamesconfiguration1_configuration::GamesConfiguration;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = GamesConfiguration::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.leaderboard_configurations().get("leaderboardId")
+///              .doit();
+/// # }
+/// ```
+pub struct LeaderboardConfigurationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a GamesConfiguration<C, A>,
+    _leaderboard_id: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for LeaderboardConfigurationGetCall<'a, C, A> {}
+
+impl<'a, C, A> LeaderboardConfigurationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, LeaderboardConfiguration)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "gamesConfiguration.leaderboardConfigurations.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("leaderboardId", self._leaderboard_id.to_string()));
+        for &field in ["alt", "leaderboardId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "games/v1configuration/leaderboards/{leaderboardId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Androidpublisher.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{leaderboardId}", "leaderboardId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["leaderboardId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the leaderboard.
+    ///
+    /// Sets the *leaderboard id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationGetCall<'a, C, A> {
+        self._leaderboard_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LeaderboardConfigurationGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Androidpublisher`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> LeaderboardConfigurationGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4042,7 +3657,7 @@ impl<'a, C, A> LeaderboardConfigurationUpdateCall<'a, C, A> where C: BorrowMut<h
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.leaderboard_configurations().list("applicationId")
 ///              .page_token("et")
-///              .max_results(-41)
+///              .max_results(-17)
 ///              .doit();
 /// # }
 /// ```
@@ -4094,7 +3709,7 @@ impl<'a, C, A> LeaderboardConfigurationListCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "applications/{applicationId}/leaderboards";
+        let mut url = self.hub._base_url.clone() + "games/v1configuration/applications/{applicationId}/leaderboards";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Androidpublisher.as_ref().to_string(), ());
         }
@@ -4211,7 +3826,9 @@ impl<'a, C, A> LeaderboardConfigurationListCall<'a, C, A> where C: BorrowMut<hyp
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The maximum number of resource configurations to return in the response, used for paging. For any response, the actual number of resources returned may be less than the specified maxResults.
+    /// The maximum number of resource configurations to return in the response,
+    /// used for paging. For any response, the actual number of resources returned
+    /// may be less than the specified <code>maxResults</code>.
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> LeaderboardConfigurationListCall<'a, C, A> {
@@ -4238,13 +3855,17 @@ impl<'a, C, A> LeaderboardConfigurationListCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4266,235 +3887,6 @@ impl<'a, C, A> LeaderboardConfigurationListCall<'a, C, A> where C: BorrowMut<hyp
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> LeaderboardConfigurationListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Delete the leaderboard configuration with the given ID.
-///
-/// A builder for the *delete* method supported by a *leaderboardConfiguration* resource.
-/// It is not used directly, but through a `LeaderboardConfigurationMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_gamesconfiguration1_configuration as gamesconfiguration1_configuration;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use gamesconfiguration1_configuration::GamesConfiguration;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = GamesConfiguration::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.leaderboard_configurations().delete("leaderboardId")
-///              .doit();
-/// # }
-/// ```
-pub struct LeaderboardConfigurationDeleteCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a GamesConfiguration<C, A>,
-    _leaderboard_id: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for LeaderboardConfigurationDeleteCall<'a, C, A> {}
-
-impl<'a, C, A> LeaderboardConfigurationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "gamesConfiguration.leaderboardConfigurations.delete",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
-        params.push(("leaderboardId", self._leaderboard_id.to_string()));
-        for &field in ["leaderboardId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = self.hub._base_url.clone() + "leaderboards/{leaderboardId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Androidpublisher.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{leaderboardId}", "leaderboardId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["leaderboardId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the leaderboard.
-    ///
-    /// Sets the *leaderboard id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationDeleteCall<'a, C, A> {
-        self._leaderboard_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> LeaderboardConfigurationDeleteCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationDeleteCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Androidpublisher`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LeaderboardConfigurationDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

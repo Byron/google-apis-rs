@@ -670,6 +670,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "enforce-single-parent" => {
+                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -683,6 +686,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["enforce-single-parent"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -808,6 +812,9 @@ impl<'n> Engine<'n> {
                 "supports-all-drives" => {
                     call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
                 },
+                "enforce-single-parent" => {
+                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -821,7 +828,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
+                                                                           v.extend(["enforce-single-parent", "supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1954,12 +1961,8 @@ impl<'n> Engine<'n> {
                     "sharing-user.permission-id" => Some(("sharingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sharing-user.is-authenticated-user" => Some(("sharingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "sharing-user.email-address" => Some(("sharingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.picture.url" => Some(("trashingUser.picture.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.kind" => Some(("trashingUser.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.display-name" => Some(("trashingUser.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.permission-id" => Some(("trashingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.is-authenticated-user" => Some(("trashingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "trashing-user.email-address" => Some(("trashingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "shortcut-details.target-id" => Some(("shortcutDetails.targetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "shortcut-details.target-mime-type" => Some(("shortcutDetails.targetMimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "download-url" => Some(("downloadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.width" => Some(("videoMediaMetadata.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "video-media-metadata.duration-millis" => Some(("videoMediaMetadata.durationMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1981,11 +1984,13 @@ impl<'n> Engine<'n> {
                     "capabilities.can-move-children-within-team-drive" => Some(("capabilities.canMoveChildrenWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-modify-content" => Some(("capabilities.canModifyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-drive" => Some(("capabilities.canReadDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-restricted-download" => Some(("capabilities.canChangeRestrictedDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-add-my-drive-parent" => Some(("capabilities.canAddMyDriveParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-within-drive" => Some(("capabilities.canMoveChildrenWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-item-within-drive" => Some(("capabilities.canMoveItemWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1995,6 +2000,7 @@ impl<'n> Engine<'n> {
                     "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-out-of-drive" => Some(("capabilities.canMoveChildrenOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash" => Some(("capabilities.canTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-remove-my-drive-parent" => Some(("capabilities.canRemoveMyDriveParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete" => Some(("capabilities.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2042,6 +2048,12 @@ impl<'n> Engine<'n> {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "can-comment" => Some(("canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "quota-bytes-used" => Some(("quotaBytesUsed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.picture.url" => Some(("trashingUser.picture.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.kind" => Some(("trashingUser.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.display-name" => Some(("trashingUser.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.permission-id" => Some(("trashingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.is-authenticated-user" => Some(("trashingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "trashing-user.email-address" => Some(("trashingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "modified-date" => Some(("modifiedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created-date" => Some(("createdDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "team-drive-id" => Some(("teamDriveId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2082,7 +2094,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "file-size" => Some(("fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-add-my-drive-parent", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-modify-content", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-remove-my-drive-parent", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "shortcut-details", "spaces", "starred", "subject-distance", "target-id", "target-mime-type", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2120,6 +2132,9 @@ impl<'n> Engine<'n> {
                 "ocr" => {
                     call = call.ocr(arg_from_str(value.unwrap_or("false"), err, "ocr", "boolean"));
                 },
+                "enforce-single-parent" => {
+                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                },
                 "convert" => {
                     call = call.convert(arg_from_str(value.unwrap_or("false"), err, "convert", "boolean"));
                 },
@@ -2136,7 +2151,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["convert", "ocr-language", "supports-team-drives", "supports-all-drives", "pinned", "visibility", "ocr", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
+                                                                           v.extend(["enforce-single-parent", "convert", "ocr-language", "supports-team-drives", "supports-all-drives", "pinned", "visibility", "ocr", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2509,12 +2524,8 @@ impl<'n> Engine<'n> {
                     "sharing-user.permission-id" => Some(("sharingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sharing-user.is-authenticated-user" => Some(("sharingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "sharing-user.email-address" => Some(("sharingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.picture.url" => Some(("trashingUser.picture.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.kind" => Some(("trashingUser.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.display-name" => Some(("trashingUser.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.permission-id" => Some(("trashingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.is-authenticated-user" => Some(("trashingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "trashing-user.email-address" => Some(("trashingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "shortcut-details.target-id" => Some(("shortcutDetails.targetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "shortcut-details.target-mime-type" => Some(("shortcutDetails.targetMimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "download-url" => Some(("downloadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.width" => Some(("videoMediaMetadata.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "video-media-metadata.duration-millis" => Some(("videoMediaMetadata.durationMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2536,11 +2547,13 @@ impl<'n> Engine<'n> {
                     "capabilities.can-move-children-within-team-drive" => Some(("capabilities.canMoveChildrenWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-modify-content" => Some(("capabilities.canModifyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-drive" => Some(("capabilities.canReadDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-restricted-download" => Some(("capabilities.canChangeRestrictedDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-add-my-drive-parent" => Some(("capabilities.canAddMyDriveParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-within-drive" => Some(("capabilities.canMoveChildrenWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-item-within-drive" => Some(("capabilities.canMoveItemWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2550,6 +2563,7 @@ impl<'n> Engine<'n> {
                     "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-out-of-drive" => Some(("capabilities.canMoveChildrenOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash" => Some(("capabilities.canTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-remove-my-drive-parent" => Some(("capabilities.canRemoveMyDriveParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete" => Some(("capabilities.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2597,6 +2611,12 @@ impl<'n> Engine<'n> {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "can-comment" => Some(("canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "quota-bytes-used" => Some(("quotaBytesUsed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.picture.url" => Some(("trashingUser.picture.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.kind" => Some(("trashingUser.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.display-name" => Some(("trashingUser.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.permission-id" => Some(("trashingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.is-authenticated-user" => Some(("trashingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "trashing-user.email-address" => Some(("trashingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "modified-date" => Some(("modifiedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created-date" => Some(("createdDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "team-drive-id" => Some(("teamDriveId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2637,7 +2657,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "file-size" => Some(("fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-add-my-drive-parent", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-modify-content", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-remove-my-drive-parent", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "shortcut-details", "spaces", "starred", "subject-distance", "target-id", "target-mime-type", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2678,6 +2698,9 @@ impl<'n> Engine<'n> {
                 "ocr" => {
                     call = call.ocr(arg_from_str(value.unwrap_or("false"), err, "ocr", "boolean"));
                 },
+                "enforce-single-parent" => {
+                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                },
                 "convert" => {
                     call = call.convert(arg_from_str(value.unwrap_or("false"), err, "convert", "boolean"));
                 },
@@ -2694,7 +2717,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["convert", "use-content-as-indexable-text", "ocr-language", "supports-team-drives", "supports-all-drives", "pinned", "visibility", "ocr", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
+                                                                           v.extend(["enforce-single-parent", "convert", "use-content-as-indexable-text", "ocr-language", "supports-team-drives", "supports-all-drives", "pinned", "visibility", "ocr", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2875,12 +2898,8 @@ impl<'n> Engine<'n> {
                     "sharing-user.permission-id" => Some(("sharingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sharing-user.is-authenticated-user" => Some(("sharingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "sharing-user.email-address" => Some(("sharingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.picture.url" => Some(("trashingUser.picture.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.kind" => Some(("trashingUser.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.display-name" => Some(("trashingUser.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.permission-id" => Some(("trashingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.is-authenticated-user" => Some(("trashingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "trashing-user.email-address" => Some(("trashingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "shortcut-details.target-id" => Some(("shortcutDetails.targetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "shortcut-details.target-mime-type" => Some(("shortcutDetails.targetMimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "download-url" => Some(("downloadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.width" => Some(("videoMediaMetadata.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "video-media-metadata.duration-millis" => Some(("videoMediaMetadata.durationMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2902,11 +2921,13 @@ impl<'n> Engine<'n> {
                     "capabilities.can-move-children-within-team-drive" => Some(("capabilities.canMoveChildrenWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-modify-content" => Some(("capabilities.canModifyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-drive" => Some(("capabilities.canReadDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-restricted-download" => Some(("capabilities.canChangeRestrictedDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-add-my-drive-parent" => Some(("capabilities.canAddMyDriveParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-within-drive" => Some(("capabilities.canMoveChildrenWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-item-within-drive" => Some(("capabilities.canMoveItemWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2916,6 +2937,7 @@ impl<'n> Engine<'n> {
                     "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-out-of-drive" => Some(("capabilities.canMoveChildrenOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash" => Some(("capabilities.canTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-remove-my-drive-parent" => Some(("capabilities.canRemoveMyDriveParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete" => Some(("capabilities.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2963,6 +2985,12 @@ impl<'n> Engine<'n> {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "can-comment" => Some(("canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "quota-bytes-used" => Some(("quotaBytesUsed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.picture.url" => Some(("trashingUser.picture.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.kind" => Some(("trashingUser.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.display-name" => Some(("trashingUser.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.permission-id" => Some(("trashingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.is-authenticated-user" => Some(("trashingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "trashing-user.email-address" => Some(("trashingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "modified-date" => Some(("modifiedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created-date" => Some(("createdDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "team-drive-id" => Some(("teamDriveId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3003,7 +3031,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "file-size" => Some(("fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-add-my-drive-parent", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-modify-content", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-remove-my-drive-parent", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "shortcut-details", "spaces", "starred", "subject-distance", "target-id", "target-mime-type", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3056,6 +3084,9 @@ impl<'n> Engine<'n> {
                 "modified-date-behavior" => {
                     call = call.modified_date_behavior(value.unwrap_or(""));
                 },
+                "enforce-single-parent" => {
+                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                },
                 "convert" => {
                     call = call.convert(arg_from_str(value.unwrap_or("false"), err, "convert", "boolean"));
                 },
@@ -3075,7 +3106,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["add-parents", "new-revision", "ocr", "remove-parents", "convert", "modified-date-behavior", "use-content-as-indexable-text", "ocr-language", "supports-team-drives", "supports-all-drives", "pinned", "set-modified-date", "update-viewed-date", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
+                                                                           v.extend(["add-parents", "enforce-single-parent", "new-revision", "ocr", "remove-parents", "convert", "modified-date-behavior", "use-content-as-indexable-text", "ocr-language", "supports-team-drives", "supports-all-drives", "pinned", "set-modified-date", "update-viewed-date", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3334,12 +3365,8 @@ impl<'n> Engine<'n> {
                     "sharing-user.permission-id" => Some(("sharingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sharing-user.is-authenticated-user" => Some(("sharingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "sharing-user.email-address" => Some(("sharingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.picture.url" => Some(("trashingUser.picture.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.kind" => Some(("trashingUser.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.display-name" => Some(("trashingUser.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.permission-id" => Some(("trashingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "trashing-user.is-authenticated-user" => Some(("trashingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "trashing-user.email-address" => Some(("trashingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "shortcut-details.target-id" => Some(("shortcutDetails.targetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "shortcut-details.target-mime-type" => Some(("shortcutDetails.targetMimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "download-url" => Some(("downloadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-media-metadata.width" => Some(("videoMediaMetadata.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "video-media-metadata.duration-millis" => Some(("videoMediaMetadata.durationMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3361,11 +3388,13 @@ impl<'n> Engine<'n> {
                     "capabilities.can-move-children-within-team-drive" => Some(("capabilities.canMoveChildrenWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-modify-content" => Some(("capabilities.canModifyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-drive" => Some(("capabilities.canReadDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-restricted-download" => Some(("capabilities.canChangeRestrictedDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-add-my-drive-parent" => Some(("capabilities.canAddMyDriveParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-within-drive" => Some(("capabilities.canMoveChildrenWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-item-within-drive" => Some(("capabilities.canMoveItemWithinDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3375,6 +3404,7 @@ impl<'n> Engine<'n> {
                     "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-children-out-of-drive" => Some(("capabilities.canMoveChildrenOutOfDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-trash" => Some(("capabilities.canTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-remove-my-drive-parent" => Some(("capabilities.canRemoveMyDriveParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete" => Some(("capabilities.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3422,6 +3452,12 @@ impl<'n> Engine<'n> {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "can-comment" => Some(("canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "quota-bytes-used" => Some(("quotaBytesUsed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.picture.url" => Some(("trashingUser.picture.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.kind" => Some(("trashingUser.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.display-name" => Some(("trashingUser.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.permission-id" => Some(("trashingUser.permissionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trashing-user.is-authenticated-user" => Some(("trashingUser.isAuthenticatedUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "trashing-user.email-address" => Some(("trashingUser.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "modified-date" => Some(("modifiedDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created-date" => Some(("createdDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "team-drive-id" => Some(("teamDriveId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3462,7 +3498,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "file-size" => Some(("fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "spaces", "starred", "subject-distance", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "can-add-children", "can-add-my-drive-parent", "can-change-copy-requires-writer-permission", "can-change-restricted-download", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-modify-content", "can-move-children-out-of-drive", "can-move-children-out-of-team-drive", "can-move-children-within-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-drive", "can-move-item-out-of-team-drive", "can-move-item-within-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-drive", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-remove-my-drive-parent", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "copy-requires-writer-permission", "copyable", "created-date", "date", "default-open-with-link", "deleted", "description", "display-name", "domain", "download-url", "drive-id", "duration-millis", "editable", "email-address", "embed-link", "etag", "expiration-date", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owned-by-me", "owner-names", "permission-id", "permission-ids", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shareable", "shared", "shared-with-me-date", "sharing-user", "shortcut-details", "spaces", "starred", "subject-distance", "target-id", "target-mime-type", "team-drive-id", "text", "thumbnail", "thumbnail-link", "thumbnail-version", "title", "trashed", "trashed-date", "trashing-user", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3515,6 +3551,9 @@ impl<'n> Engine<'n> {
                 "modified-date-behavior" => {
                     call = call.modified_date_behavior(value.unwrap_or(""));
                 },
+                "enforce-single-parent" => {
+                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                },
                 "convert" => {
                     call = call.convert(arg_from_str(value.unwrap_or("false"), err, "convert", "boolean"));
                 },
@@ -3534,7 +3573,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["add-parents", "new-revision", "ocr", "remove-parents", "convert", "modified-date-behavior", "use-content-as-indexable-text", "ocr-language", "supports-team-drives", "supports-all-drives", "pinned", "set-modified-date", "update-viewed-date", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
+                                                                           v.extend(["add-parents", "enforce-single-parent", "new-revision", "ocr", "remove-parents", "convert", "modified-date-behavior", "use-content-as-indexable-text", "ocr-language", "supports-team-drives", "supports-all-drives", "pinned", "set-modified-date", "update-viewed-date", "timed-text-track-name", "timed-text-language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3700,6 +3739,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "enforce-single-parent" => {
+                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3713,6 +3755,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["enforce-single-parent"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3839,6 +3882,9 @@ impl<'n> Engine<'n> {
                 "supports-all-drives" => {
                     call = call.supports_all_drives(arg_from_str(value.unwrap_or("false"), err, "supports-all-drives", "boolean"));
                 },
+                "enforce-single-parent" => {
+                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3852,7 +3898,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
+                                                                           v.extend(["enforce-single-parent", "supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4172,6 +4218,12 @@ impl<'n> Engine<'n> {
                 "send-notification-emails" => {
                     call = call.send_notification_emails(arg_from_str(value.unwrap_or("false"), err, "send-notification-emails", "boolean"));
                 },
+                "move-to-new-owners-root" => {
+                    call = call.move_to_new_owners_root(arg_from_str(value.unwrap_or("false"), err, "move-to-new-owners-root", "boolean"));
+                },
+                "enforce-single-parent" => {
+                    call = call.enforce_single_parent(arg_from_str(value.unwrap_or("false"), err, "enforce-single-parent", "boolean"));
+                },
                 "email-message" => {
                     call = call.email_message(value.unwrap_or(""));
                 },
@@ -4188,7 +4240,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["email-message", "send-notification-emails", "use-domain-admin-access", "supports-team-drives", "supports-all-drives"].iter().map(|v|*v));
+                                                                           v.extend(["move-to-new-owners-root", "enforce-single-parent", "supports-team-drives", "supports-all-drives", "send-notification-emails", "use-domain-admin-access", "email-message"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4950,119 +5002,6 @@ impl<'n> Engine<'n> {
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _realtime_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut download_mode = false;
-        let mut call = self.hub.realtime().get(opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "revision" => {
-                    call = call.revision(arg_from_str(value.unwrap_or("-0"), err, "revision", "integer"));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            if key == "alt" && value.unwrap_or("unset") == "media" {
-                                download_mode = true;
-                            }
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["revision"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
-                    if !download_mode {
-                    } else {
-                    io::copy(&mut response, &mut ostream).unwrap();
-                    ostream.flush().unwrap();
-                    }
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _realtime_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.realtime().update(opt.value_of("file-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "base-revision" => {
-                    call = call.base_revision(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["base-revision"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
-        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
-        let mut input_file = input_file_from_opts(vals[1], err);
-        let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            match match protocol {
-                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
-                CallType::Standard => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
                     Ok(())
                 }
             }
@@ -6560,20 +6499,6 @@ impl<'n> Engine<'n> {
                     }
                 }
             },
-            ("realtime", Some(opt)) => {
-                match opt.subcommand() {
-                    ("get", Some(opt)) => {
-                        call_result = self._realtime_get(opt, dry_run, &mut err);
-                    },
-                    ("update", Some(opt)) => {
-                        call_result = self._realtime_update(opt, dry_run, &mut err);
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("realtime".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
-                }
-            },
             ("replies", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
@@ -7092,7 +7017,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates an existing comment. This method supports patch semantics."##),
+                    Some(r##"Updates an existing comment."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/comments_patch",
                   vec![
                     (Some(r##"file-id"##),
@@ -8108,53 +8033,6 @@ fn main() {
                   ]),
             ]),
         
-        ("realtime", "methods: 'get' and 'update'", vec![
-            ("get",
-                    Some(r##"Exports the contents of the Realtime API data model associated with this file as JSON."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/realtime_get",
-                  vec![
-                    (Some(r##"file-id"##),
-                     None,
-                     Some(r##"The ID of the file that the Realtime API data model is associated with."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("update",
-                    Some(r##"Overwrites the Realtime API data model associated with this file with the provided JSON data model."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/realtime_update",
-                  vec![
-                    (Some(r##"file-id"##),
-                     None,
-                     Some(r##"The ID of the file that the Realtime API data model is associated with."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"mode"##),
-                     Some(r##"u"##),
-                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                  ]),
-            ]),
-        
         ("replies", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
             ("delete",
                     Some(r##"Deletes a reply."##),
@@ -8281,7 +8159,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates an existing reply. This method supports patch semantics."##),
+                    Some(r##"Updates an existing reply."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/replies_patch",
                   vec![
                     (Some(r##"file-id"##),
@@ -8436,7 +8314,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates a revision. This method supports patch semantics."##),
+                    Some(r##"Updates a revision."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/revisions_patch",
                   vec![
                     (Some(r##"file-id"##),
@@ -8622,7 +8500,7 @@ fn main() {
     
     let mut app = App::new("drive2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190620")
+           .version("1.0.13+20200326")
            .about("Manages files in Drive including uploading, downloading, searching, detecting changes, and updating sharing permissions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_drive2_cli")
            .arg(Arg::with_name("url")

@@ -25,15 +25,19 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Healthcare* API at revision *20190628*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Cloud Healthcare* API at revision *20200327*. The CLI is at version *1.0.13*.
 
 ```bash
 healthcare1-beta1 [options]
         projects
+                locations-datasets-annotation-stores-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-datasets-annotation-stores-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-annotation-stores-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-deidentify <source-dataset> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-delete <name> [-p <v>]... [-o <out>]
                 locations-datasets-dicom-stores-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-dicom-stores-deidentify <source-store> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-dicom-stores-delete <name> [-p <v>]... [-o <out>]
                 locations-datasets-dicom-stores-export <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-dicom-stores-get <name> [-p <v>]... [-o <out>]
@@ -64,6 +68,7 @@ healthcare1-beta1 [options]
                 locations-datasets-dicom-stores-studies-store-instances <parent> <dicom-web-path> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-dicom-stores-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-fhir-stores-deidentify <source-store> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-delete <name> [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-export <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-fhir--observation-lastn <parent> [-p <v>]... [-o <out>]
@@ -87,6 +92,7 @@ healthcare1-beta1 [options]
                 locations-datasets-fhir-stores-import <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-list <parent> [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-fhir-stores-search <parent> [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-get <name> [-p <v>]... [-o <out>]
@@ -106,6 +112,7 @@ healthcare1-beta1 [options]
                 locations-datasets-hl7-v2-stores-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-hl7-v2-stores-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-list <parent> [-p <v>]... [-o <out>]
+                locations-datasets-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-operations-get <name> [-p <v>]... [-o <out>]
                 locations-datasets-operations-list <name> [-p <v>]... [-o <out>]
                 locations-datasets-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]

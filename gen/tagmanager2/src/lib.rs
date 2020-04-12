@@ -2,10 +2,10 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Tag Manager* crate version *1.0.12+20190516*, where *20190516* is the exact revision of the *tagmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Tag Manager* crate version *1.0.13+20200408*, where *20200408* is the exact revision of the *tagmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Tag Manager* *v2* API can be found at the
-//! [official documentation site](https://developers.google.com/tag-manager/api/v2/).
+//! [official documentation site](https://developers.google.com/tag-manager).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/tagmanager2).
 //! # Features
 //! 
@@ -438,8 +438,8 @@ impl<'a, C, A> TagManager<C, A>
         TagManager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
-            _base_url: "https://www.googleapis.com/tagmanager/v2/".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _base_url: "https://www.googleapis.com/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
@@ -449,7 +449,7 @@ impl<'a, C, A> TagManager<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -457,7 +457,7 @@ impl<'a, C, A> TagManager<C, A>
     }
 
     /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/tagmanager/v2/`.
+    /// It defaults to `https://www.googleapis.com/`.
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
@@ -491,7 +491,9 @@ pub struct SyncWorkspaceResponse {
     /// Indicates whether synchronization caused a merge conflict or sync error.
     #[serde(rename="syncStatus")]
     pub sync_status: Option<SyncStatus>,
-    /// The merge conflict after sync. If this field is not empty, the sync is still treated as successful. But a version cannot be created until all conflicts are resolved.
+    /// The merge conflict after sync.
+    /// If this field is not empty, the sync is still treated as successful.
+    /// But a version cannot be created until all conflicts are resolved.
     #[serde(rename="mergeConflict")]
     pub merge_conflict: Option<Vec<MergeConflict>>,
 }
@@ -525,6 +527,8 @@ impl ResponseResult for CreateBuiltInVariableResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountAccess {
     /// Whether the user has no access, user access, or admin access to an account.
+    /// @mutable tagmanager.accounts.permissions.create
+    /// @mutable tagmanager.accounts.permissions.update
     pub permission: Option<String>,
 }
 
@@ -542,14 +546,17 @@ impl Part for AccountAccess {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RevertTemplateResponse {
-    /// Template as it appears in the latest container version since the last workspace synchronization operation. If no template is present, that means the template was deleted in the latest container version.
+    /// Template as it appears in the latest container version since the last
+    /// workspace synchronization operation. If no template is present, that means
+    /// the template was deleted in the latest container version.
     pub template: Option<CustomTemplate>,
 }
 
 impl ResponseResult for RevertTemplateResponse {}
 
 
-/// Represents a Google Tag Manager Container, which specifies the platform tags will run on, manages workspaces, and retains container versions.
+/// Represents a Google Tag Manager Container, which specifies the platform tags
+/// will run on, manages workspaces, and retains container versions.
 /// 
 /// # Activities
 /// 
@@ -569,19 +576,29 @@ pub struct Container {
     #[serde(rename="containerId")]
     pub container_id: Option<String>,
     /// List of domain names associated with the Container.
+    /// @mutable tagmanager.accounts.containers.create
+    /// @mutable tagmanager.accounts.containers.update
     #[serde(rename="domainName")]
     pub domain_name: Option<Vec<String>>,
     /// Container Notes.
+    /// @mutable tagmanager.accounts.containers.create
+    /// @mutable tagmanager.accounts.containers.update
     pub notes: Option<String>,
     /// Container display name.
+    /// @mutable tagmanager.accounts.containers.create
+    /// @mutable tagmanager.accounts.containers.update
     pub name: Option<String>,
     /// Auto generated link to the tag manager UI
     #[serde(rename="tagManagerUrl")]
     pub tag_manager_url: Option<String>,
-    /// List of Usage Contexts for the Container. Valid values include: web, android, or ios.
+    /// List of Usage Contexts for the Container. Valid values include: <code>web,
+    /// android, or ios</code>.
+    /// @mutable tagmanager.accounts.containers.create
+    /// @mutable tagmanager.accounts.containers.update
     #[serde(rename="usageContext")]
     pub usage_context: Option<Vec<String>>,
-    /// The fingerprint of the GTM Container as computed at storage time. This value is recomputed whenever the account is modified.
+    /// The fingerprint of the GTM Container as computed at storage time.  This
+    /// value is recomputed whenever the account is modified.
     pub fingerprint: Option<String>,
     /// GTM Container's API relative path.
     pub path: Option<String>,
@@ -626,7 +643,8 @@ pub struct Zone {
     /// Auto generated link to the tag manager UI
     #[serde(rename="tagManagerUrl")]
     pub tag_manager_url: Option<String>,
-    /// The fingerprint of the GTM Zone as computed at storage time. This value is recomputed whenever the zone is modified.
+    /// The fingerprint of the GTM Zone as computed at storage time.
+    /// This value is recomputed whenever the zone is modified.
     pub fingerprint: Option<String>,
     /// GTM Zone's API relative path.
     pub path: Option<String>,
@@ -686,7 +704,9 @@ pub struct ListVariablesResponse {
 impl ResponseResult for ListVariablesResponse {}
 
 
-/// Represents a Google Tag Manager Environment. Note that a user can create, delete and update environments of type USER, but can only update the enable_debug and url fields of environments of other types.
+/// Represents a Google Tag Manager Environment. Note that a user can create,
+/// delete and update environments of type USER, but can only update the
+/// enable_debug and url fields of environments of other types.
 /// 
 /// # Activities
 /// 
@@ -703,17 +723,24 @@ pub struct Environment {
     /// The environment authorization code.
     #[serde(rename="authorizationCode")]
     pub authorization_code: Option<String>,
-    /// The environment description. Can be set or changed only on USER type environments.
+    /// The environment description. Can be set or changed only on USER type
+    /// environments.
+    /// @mutable tagmanager.accounts.containers.environments.create
+    /// @mutable tagmanager.accounts.containers.environments.update
     pub description: Option<String>,
     /// GTM Environment ID uniquely identifies the GTM Environment.
     #[serde(rename="environmentId")]
     pub environment_id: Option<String>,
     /// Default preview page url for the environment.
+    /// @mutable tagmanager.accounts.containers.environments.create
+    /// @mutable tagmanager.accounts.containers.environments.update
     pub url: Option<String>,
     /// The last update time-stamp for the authorization code.
     #[serde(rename="authorizationTimestamp")]
-    pub authorization_timestamp: Option<Timestamp>,
+    pub authorization_timestamp: Option<String>,
     /// Whether or not to enable debug by default for the environment.
+    /// @mutable tagmanager.accounts.containers.environments.create
+    /// @mutable tagmanager.accounts.containers.environments.update
     #[serde(rename="enableDebug")]
     pub enable_debug: Option<bool>,
     /// GTM Container ID.
@@ -728,7 +755,8 @@ pub struct Environment {
     /// Represents a link to a container version.
     #[serde(rename="containerVersionId")]
     pub container_version_id: Option<String>,
-    /// The fingerprint of the GTM environment as computed at storage time. This value is recomputed whenever the environment is modified.
+    /// The fingerprint of the GTM environment as computed at storage time.
+    /// This value is recomputed whenever the environment is modified.
     pub fingerprint: Option<String>,
     /// GTM Environment's API relative path.
     pub path: Option<String>,
@@ -738,7 +766,10 @@ pub struct Environment {
     /// The type of this environment.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// The environment display name. Can be set or changed only on USER type environments.
+    /// The environment display name. Can be set or changed only on USER type
+    /// environments.
+    /// @mutable tagmanager.accounts.containers.environments.create
+    /// @mutable tagmanager.accounts.containers.environments.update
     pub name: Option<String>,
 }
 
@@ -760,14 +791,19 @@ impl ResponseResult for Environment {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserPermission {
     /// GTM Container access permissions.
+    /// @mutable tagmanager.accounts.permissions.create
+    /// @mutable tagmanager.accounts.permissions.update
     #[serde(rename="containerAccess")]
     pub container_access: Option<Vec<ContainerAccess>>,
     /// GTM UserPermission's API relative path.
     pub path: Option<String>,
     /// GTM Account access permissions.
+    /// @mutable tagmanager.accounts.permissions.create
+    /// @mutable tagmanager.accounts.permissions.update
     #[serde(rename="accountAccess")]
     pub account_access: Option<AccountAccess>,
     /// User's email address.
+    /// @mutable tagmanager.accounts.permissions.create
     #[serde(rename="emailAddress")]
     pub email_address: Option<String>,
     /// The Account ID uniquely identifies the GTM Account.
@@ -791,7 +827,8 @@ pub struct VariableFormatValue {
     /// The value to convert if a variable value is false.
     #[serde(rename="convertFalseToValue")]
     pub convert_false_to_value: Option<Parameter>,
-    /// The option to convert a string-type variable value to either lowercase or uppercase.
+    /// The option to convert a string-type variable value to either lowercase or
+    /// uppercase.
     #[serde(rename="caseConversionType")]
     pub case_conversion_type: Option<String>,
     /// The value to convert if a variable value is null.
@@ -812,9 +849,13 @@ impl Part for VariableFormatValue {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContainerAccess {
     /// GTM Container ID.
+    /// @mutable tagmanager.accounts.permissions.create
+    /// @mutable tagmanager.accounts.permissions.update
     #[serde(rename="containerId")]
     pub container_id: Option<String>,
     /// List of Container permissions.
+    /// @mutable tagmanager.accounts.permissions.create
+    /// @mutable tagmanager.accounts.permissions.update
     pub permission: Option<String>,
 }
 
@@ -861,8 +902,12 @@ pub struct Folder {
     #[serde(rename="containerId")]
     pub container_id: Option<String>,
     /// User notes on how to apply this folder in the container.
+    /// @mutable tagmanager.accounts.containers.workspaces.folders.create
+    /// @mutable tagmanager.accounts.containers.workspaces.folders.update
     pub notes: Option<String>,
     /// Folder display name.
+    /// @mutable tagmanager.accounts.containers.workspaces.folders.create
+    /// @mutable tagmanager.accounts.containers.workspaces.folders.update
     pub name: Option<String>,
     /// GTM Workspace ID.
     #[serde(rename="workspaceId")]
@@ -870,7 +915,8 @@ pub struct Folder {
     /// Auto generated link to the tag manager UI
     #[serde(rename="tagManagerUrl")]
     pub tag_manager_url: Option<String>,
-    /// The fingerprint of the GTM Folder as computed at storage time. This value is recomputed whenever the folder is modified.
+    /// The fingerprint of the GTM Folder as computed at storage time.
+    /// This value is recomputed whenever the folder is modified.
     pub fingerprint: Option<String>,
     /// GTM Folder's API relative path.
     pub path: Option<String>,
@@ -893,20 +939,62 @@ impl ResponseResult for Folder {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Parameter {
     /// This map parameter's parameters (must have keys; keys must be unique).
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.create
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.update
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
     pub map: Option<Vec<Parameter>>,
     /// This list parameter's parameters (keys will be ignored).
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.create
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.update
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
     pub list: Option<Vec<Parameter>>,
-    /// The named key that uniquely identifies a parameter. Required for top-level parameters, as well as map values. Ignored for list values.
+    /// The named key that uniquely identifies a parameter.  Required for top-level
+    /// parameters, as well as map values.  Ignored for list values.
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.create
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.update
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
     pub key: Option<String>,
-    /// A parameter's value (may contain variable references such as "{{myVariable}}") as appropriate to the specified type.
+    /// A parameter's value (may contain variable references such as
+    /// "{{myVariable}}")
+    /// as appropriate to the specified type.
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.create
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.update
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
     pub value: Option<String>,
-    /// The parameter type. Valid values are: 
-    /// - boolean: The value represents a boolean, represented as 'true' or 'false' 
-    /// - integer: The value represents a 64-bit signed integer value, in base 10 
-    /// - list: A list of parameters should be specified 
-    /// - map: A map of parameters should be specified 
-    /// - template: The value represents any text; this can include variable references (even variable references that might return non-string types) 
-    /// - trigger_reference: The value represents a trigger, represented as the trigger id
+    /// The parameter type.  Valid values are:<ul>
+    /// 
+    /// <li><code>boolean</code>: The value represents a boolean, represented as
+    ///     'true' or 'false'</li>
+    /// <li><code>integer</code>: The value represents a 64-bit signed integer
+    ///     value, in base 10</li>
+    /// <li><code>list</code>: A list of parameters should be specified</li>
+    /// <li><code>map</code>: A map of parameters should be specified</li>
+    /// <li><code>template</code>: The value represents any text; this can include
+    ///     variable references (even variable references that might return
+    ///     non-string types)</li>
+    /// <li><code>trigger_reference</code>: The value represents a trigger,
+    ///     represented as the trigger id</li>
+    /// <li><code>tag_reference</code>: The value represents a tag, represented as
+    ///     the tag name</li>
+    /// </ul>
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.create
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.update
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
@@ -928,7 +1016,8 @@ pub struct QuickPreviewResponse {
     /// The quick previewed container version.
     #[serde(rename="containerVersion")]
     pub container_version: Option<ContainerVersion>,
-    /// Whether quick previewing failed when syncing the workspace to the latest container version.
+    /// Whether quick previewing failed when syncing the workspace to the latest
+    /// container version.
     #[serde(rename="syncStatus")]
     pub sync_status: Option<SyncStatus>,
     /// Were there compiler errors or not.
@@ -950,7 +1039,9 @@ impl ResponseResult for QuickPreviewResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RevertFolderResponse {
-    /// Folder as it appears in the latest container version since the last workspace synchronization operation. If no folder is present, that means the folder was deleted in the latest container version.
+    /// Folder as it appears in the latest container version since the last
+    /// workspace synchronization operation. If no folder is present, that means
+    /// the folder was deleted in the latest container version.
     pub folder: Option<Folder>,
 }
 
@@ -978,7 +1069,8 @@ pub struct ListFoldersResponse {
 impl ResponseResult for ListFoldersResponse {}
 
 
-/// The changes that have occurred in the workspace since the base container version.
+/// The changes that have occurred in the workspace since the base container
+/// version.
 /// 
 /// # Activities
 /// 
@@ -1019,63 +1111,6 @@ pub struct ListTemplatesResponse {
 }
 
 impl ResponseResult for ListTemplatesResponse {}
-
-
-/// A Timestamp represents a point in time independent of any time zone or local calendar, encoded as a count of seconds and fractions of seconds at nanosecond resolution. The count is relative to an epoch at UTC midnight on January 1, 1970, in the proleptic Gregorian calendar which extends the Gregorian calendar backwards to year one.
-/// 
-/// All minutes are 60 seconds long. Leap seconds are "smeared" so that no leap second table is needed for interpretation, using a [24-hour linear smear](https://developers.google.com/time/smear).
-/// 
-/// The range is from 0001-01-01T00:00:00Z to 9999-12-31T23:59:59.999999999Z. By restricting to that range, we ensure that we can convert to and from [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt) date strings.
-/// 
-/// # Examples
-/// 
-/// Example 1: Compute Timestamp from POSIX `time()`.
-/// 
-/// Timestamp timestamp; timestamp.set_seconds(time(NULL)); timestamp.set_nanos(0);
-/// 
-/// Example 2: Compute Timestamp from POSIX `gettimeofday()`.
-/// 
-/// struct timeval tv; gettimeofday(&tv, NULL);
-/// 
-/// Timestamp timestamp; timestamp.set_seconds(tv.tv_sec); timestamp.set_nanos(tv.tv_usec * 1000);
-/// 
-/// Example 3: Compute Timestamp from Win32 `GetSystemTimeAsFileTime()`.
-/// 
-/// FILETIME ft; GetSystemTimeAsFileTime(&ft); UINT64 ticks = (((UINT64)ft.dwHighDateTime) << 32) | ft.dwLowDateTime;
-/// 
-/// // A Windows tick is 100 nanoseconds. Windows epoch 1601-01-01T00:00:00Z // is 11644473600 seconds before Unix epoch 1970-01-01T00:00:00Z. Timestamp timestamp; timestamp.set_seconds((INT64) ((ticks / 10000000) - 11644473600LL)); timestamp.set_nanos((INT32) ((ticks % 10000000) * 100));
-/// 
-/// Example 4: Compute Timestamp from Java `System.currentTimeMillis()`.
-/// 
-/// long millis = System.currentTimeMillis();
-/// 
-/// Timestamp timestamp = Timestamp.newBuilder().setSeconds(millis / 1000) .setNanos((int) ((millis % 1000) * 1000000)).build();
-/// 
-/// 
-/// 
-/// Example 5: Compute Timestamp from current time in Python.
-/// 
-/// timestamp = Timestamp() timestamp.GetCurrentTime()
-/// 
-/// # JSON Mapping
-/// 
-/// In JSON format, the Timestamp type is encoded as a string in the [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt) format. That is, the format is "{year}-{month}-{day}T{hour}:{min}:{sec}[.{frac_sec}]Z" where {year} is always expressed using four digits while {month}, {day}, {hour}, {min}, and {sec} are zero-padded to two digits each. The fractional seconds, which can go up to 9 digits (i.e. up to 1 nanosecond resolution), are optional. The "Z" suffix indicates the timezone ("UTC"); the timezone is required. A proto3 JSON serializer should always use UTC (as indicated by "Z") when printing the Timestamp type and a proto3 JSON parser should be able to accept both UTC and other timezones (as indicated by an offset).
-/// 
-/// For example, "2017-01-15T01:30:15.01Z" encodes 15.01 seconds past 01:30 UTC on January 15, 2017.
-/// 
-/// In JavaScript, one can convert a Date object to this format using the standard [toISOString()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString) method. In Python, a standard `datetime.datetime` object can be converted to this format using [`strftime`](https://docs.python.org/2/library/time.html#time.strftime) with the time format spec '%Y-%m-%dT%H:%M:%S.%fZ'. Likewise, in Java, one can use the Joda Time's [`ISODateTimeFormat.dateTime()`]( http://www.joda.org/joda-time/apidocs/org/joda/time/format/ISODateTimeFormat.html#dateTime%2D%2D ) to obtain a formatter capable of generating timestamps in this format.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Timestamp {
-    /// Non-negative fractions of a second at nanosecond resolution. Negative second values with fractions must still have non-negative nanos values that count forward in time. Must be from 0 to 999,999,999 inclusive.
-    pub nanos: Option<i32>,
-    /// Represents seconds of UTC time since Unix epoch 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to 9999-12-31T23:59:59Z inclusive.
-    pub seconds: Option<String>,
-}
-
-impl Part for Timestamp {}
 
 
 /// Represents a child container of a Zone.
@@ -1121,10 +1156,14 @@ impl ResponseResult for ListTriggersResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MergeConflict {
-    /// The base version entity (since the latest sync operation) that has conflicting changes compared to the workspace. If this field is missing, it means the workspace entity is deleted from the base version.
+    /// The base version entity (since the latest sync operation) that has
+    /// conflicting changes compared to the workspace. If this field is missing,
+    /// it means the workspace entity is deleted from the base version.
     #[serde(rename="entityInBaseVersion")]
     pub entity_in_base_version: Option<Entity>,
-    /// The workspace entity that has conflicting changes compared to the base version. If an entity is deleted in a workspace, it will still appear with a deleted change status.
+    /// The workspace entity that has conflicting changes compared to the
+    /// base version. If an entity is deleted in a workspace, it will still
+    /// appear with a deleted change status.
     #[serde(rename="entityInWorkspace")]
     pub entity_in_workspace: Option<Entity>,
 }
@@ -1132,13 +1171,16 @@ pub struct MergeConflict {
 impl Part for MergeConflict {}
 
 
-/// Represents a reference to atag that fires before another tag in order to set up dependencies.
+/// Represents a reference to atag that fires before another tag in order to
+/// set up dependencies.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetupTag {
-    /// If true, fire the main tag if and only if the setup tag fires successfully. If false, fire the main tag regardless of setup tag firing status.
+    /// If true, fire the main tag if and only if the setup tag fires
+    /// successfully.
+    /// If false, fire the main tag regardless of setup tag firing status.
     #[serde(rename="stopOnSetupFailure")]
     pub stop_on_setup_failure: Option<bool>,
     /// The name of the setup tag.
@@ -1250,7 +1292,9 @@ pub struct ContainerVersion {
     /// The Container Version ID uniquely identifies the GTM Container Version.
     #[serde(rename="containerVersionId")]
     pub container_version_id: Option<String>,
-    /// The fingerprint of the GTM Container Version as computed at storage time. This value is recomputed whenever the container version is modified.
+    /// The fingerprint of the GTM Container Version as computed at
+    /// storage time. This value is recomputed whenever the container version is
+    /// modified.
     pub fingerprint: Option<String>,
     /// The variables in the container that this version was taken from.
     pub variable: Option<Vec<Variable>>,
@@ -1265,16 +1309,20 @@ pub struct ContainerVersion {
     /// The container that this version was taken from.
     pub container: Option<Container>,
     /// Container version display name.
+    /// @mutable tagmanager.accounts.containers.versions.update
     pub name: Option<String>,
     /// The zones in the container that this version was taken from.
     pub zone: Option<Vec<Zone>>,
+    /// The triggers in the container that this version was taken from.
+    pub trigger: Option<Vec<Trigger>>,
     /// Container version description.
+    /// @mutable tagmanager.accounts.containers.versions.update
     pub description: Option<String>,
     /// The built-in variables in the container that this version was taken from.
     #[serde(rename="builtInVariable")]
     pub built_in_variable: Option<Vec<BuiltInVariable>>,
-    /// The triggers in the container that this version was taken from.
-    pub trigger: Option<Vec<Trigger>>,
+    /// The clients in the container that this version was taken from.
+    pub client: Option<Vec<Client>>,
     /// The folders in the container that this version was taken from.
     pub folder: Option<Vec<Folder>>,
 }
@@ -1311,7 +1359,9 @@ impl Part for SyncStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RevertTriggerResponse {
-    /// Trigger as it appears in the latest container version since the last workspace synchronization operation. If no trigger is present, that means the trigger was deleted in the latest container version.
+    /// Trigger as it appears in the latest container version since the last
+    /// workspace synchronization operation. If no trigger is present, that means
+    /// the trigger was deleted in the latest container version.
     pub trigger: Option<Trigger>,
 }
 
@@ -1332,21 +1382,30 @@ impl ResponseResult for RevertTriggerResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Variable {
     /// The start timestamp in milliseconds to schedule a variable.
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.create
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.update
     #[serde(rename="scheduleStartMs")]
     pub schedule_start_ms: Option<String>,
     /// The end timestamp in milliseconds to schedule a variable.
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.create
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.update
     #[serde(rename="scheduleEndMs")]
     pub schedule_end_ms: Option<String>,
     /// GTM Container ID.
     #[serde(rename="containerId")]
     pub container_id: Option<String>,
-    /// For mobile containers only: A list of trigger IDs for enabling conditional variables; the variable is enabled if one of the enabling triggers is true while all the disabling triggers are false. Treated as an unordered set.
+    /// For mobile containers only: A list of trigger IDs for enabling conditional
+    /// variables; the variable is enabled if one of the enabling triggers is true
+    /// while all the disabling triggers are false. Treated as an unordered set.
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.create
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.update
     #[serde(rename="enablingTriggerId")]
     pub enabling_trigger_id: Option<Vec<String>>,
     /// Auto generated link to the tag manager UI
     #[serde(rename="tagManagerUrl")]
     pub tag_manager_url: Option<String>,
-    /// The fingerprint of the GTM Variable as computed at storage time. This value is recomputed whenever the variable is modified.
+    /// The fingerprint of the GTM Variable as computed at storage time.
+    /// This value is recomputed whenever the variable is modified.
     pub fingerprint: Option<String>,
     /// GTM Variable's API relative path.
     pub path: Option<String>,
@@ -1354,13 +1413,19 @@ pub struct Variable {
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Variable display name.
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.create
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.update
     pub name: Option<String>,
     /// The Variable ID uniquely identifies the GTM Variable.
     #[serde(rename="variableId")]
     pub variable_id: Option<String>,
     /// The variable's parameters.
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.create
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.update
     pub parameter: Option<Vec<Parameter>>,
     /// User notes on how to apply this variable in the container.
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.create
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.update
     pub notes: Option<String>,
     /// Option to convert a variable value to other value.
     #[serde(rename="formatValue")]
@@ -1369,12 +1434,18 @@ pub struct Variable {
     #[serde(rename="workspaceId")]
     pub workspace_id: Option<String>,
     /// GTM Variable Type.
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.create
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.update
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Parent folder id.
     #[serde(rename="parentFolderId")]
     pub parent_folder_id: Option<String>,
-    /// For mobile containers only: A list of trigger IDs for disabling conditional variables; the variable is enabled if one of the enabling trigger is true while all the disabling trigger are false. Treated as an unordered set.
+    /// For mobile containers only: A list of trigger IDs for disabling conditional
+    /// variables; the variable is enabled if one of the enabling trigger is true
+    /// while all the disabling trigger are false. Treated as an unordered set.
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.create
+    /// @mutable tagmanager.accounts.containers.workspaces.variables.update
     #[serde(rename="disablingTriggerId")]
     pub disabling_trigger_id: Option<Vec<String>>,
 }
@@ -1394,7 +1465,9 @@ impl ResponseResult for Variable {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RevertVariableResponse {
-    /// Variable as it appears in the latest container version since the last workspace synchronization operation. If no variable is present, that means the variable was deleted in the latest container version.
+    /// Variable as it appears in the latest container version since the last
+    /// workspace synchronization operation. If no variable is present, that means
+    /// the variable was deleted in the latest container version.
     pub variable: Option<Variable>,
 }
 
@@ -1420,7 +1493,11 @@ pub struct CustomTemplate {
     /// GTM Container ID.
     #[serde(rename="containerId")]
     pub container_id: Option<String>,
-    /// The fingerprint of the GTM Custom Template as computed at storage time. This value is recomputed whenever the template is modified.
+    /// A reference to the Community Template Gallery entry.
+    #[serde(rename="galleryReference")]
+    pub gallery_reference: Option<GalleryReference>,
+    /// The fingerprint of the GTM Custom Template as computed at storage time.
+    /// This value is recomputed whenever the template is modified.
     pub fingerprint: Option<String>,
     /// Custom Template display name.
     pub name: Option<String>,
@@ -1450,18 +1527,51 @@ impl ResponseResult for CustomTemplate {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Condition {
-    /// A list of named parameters (key/value), depending on the condition's type. Notes: 
-    /// - For binary operators, include parameters named arg0 and arg1 for specifying the left and right operands, respectively. 
-    /// - At this time, the left operand (arg0) must be a reference to a variable. 
-    /// - For case-insensitive Regex matching, include a boolean parameter named ignore_case that is set to true. If not specified or set to any other value, the matching will be case sensitive. 
-    /// - To negate an operator, include a boolean parameter named negate boolean parameter that is set to true.
+    /// A list of named parameters (key/value), depending on the condition's type.
+    /// Notes:<ul>
+    /// 
+    /// <li>For binary operators, include parameters named <code>arg0</code> and
+    ///    <code>arg1</code> for specifying the left and right operands,
+    ///    respectively.</li>
+    /// <li>At this time, the left operand (<code>arg0</code>) must be a reference
+    ///     to a variable.</li>
+    /// <li>For case-insensitive Regex matching, include a boolean parameter named
+    ///     <code>ignore_case</code> that is set to <code>true</code>.
+    ///     If not specified or set to any other value, the matching will be case
+    ///     sensitive.</li>
+    /// <li>To negate an operator, include a boolean parameter named
+    ///     <code>negate</code> boolean parameter that is set to <code>true</code>.
+    ///     </li>
+    /// </ul>
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
     pub parameter: Option<Vec<Parameter>>,
     /// The type of operator for this condition.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
 
 impl Part for Condition {}
+
+
+/// The result of reverting a built-in variable in a workspace.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [containers workspaces built_in_variables revert accounts](struct.AccountContainerWorkspaceBuiltInVariableRevertCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RevertBuiltInVariableResponse {
+    /// Whether the built-in variable is enabled after reversion.
+    pub enabled: Option<bool>,
+}
+
+impl ResponseResult for RevertBuiltInVariableResponse {}
 
 
 /// Represents a Google Tag Manager Account.
@@ -1555,10 +1665,19 @@ impl Part for Condition {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Account {
     /// Account display name.
+    /// @mutable tagmanager.accounts.create
+    /// @mutable tagmanager.accounts.update
     pub name: Option<String>,
-    /// The fingerprint of the GTM Account as computed at storage time. This value is recomputed whenever the account is modified.
+    /// The fingerprint of the GTM Account as computed at storage time.
+    /// This value is recomputed whenever the account is modified.
     pub fingerprint: Option<String>,
-    /// Whether the account shares data anonymously with Google and others. This flag enables benchmarking by sharing your data in an anonymous form. Google will remove all identifiable information about your website, combine the data with hundreds of other anonymous sites and report aggregate trends in the benchmarking service.
+    /// Whether the account shares data anonymously with Google and others.
+    /// This flag enables benchmarking by sharing your data in an anonymous form.
+    /// Google will remove all identifiable information about your website, combine
+    /// the data with hundreds of other anonymous sites and report aggregate trends
+    /// in the benchmarking service.
+    /// @mutable tagmanager.accounts.create
+    /// @mutable tagmanager.accounts.update
     #[serde(rename="shareData")]
     pub share_data: Option<bool>,
     /// GTM Account's API relative path.
@@ -1603,7 +1722,9 @@ impl Part for ZoneTypeRestriction {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RevertTagResponse {
-    /// Tag as it appears in the latest container version since the last workspace synchronization operation. If no tag is present, that means the tag was deleted in the latest container version.
+    /// Tag as it appears in the latest container version since the last
+    /// workspace synchronization operation. If no tag is present, that means
+    /// the tag was deleted in the latest container version.
     pub tag: Option<Tag>,
 }
 
@@ -1631,7 +1752,10 @@ pub struct ListAccountsResponse {
 impl ResponseResult for ListAccountsResponse {}
 
 
-/// Built-in variables are a special category of variables that are pre-created and non-customizable. They provide common functionality like accessing propeties of the gtm data layer, monitoring clicks, or accessing elements of a page URL.
+/// Built-in variables are a special category of variables that are pre-created
+/// and non-customizable. They provide common functionality like accessing
+/// propeties of the gtm data layer, monitoring clicks, or accessing elements
+/// of a page URL.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1649,6 +1773,8 @@ pub struct BuiltInVariable {
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Type of built-in variable.
+    /// @required.tagmanager.accounts.containers.workspaces.built_in_variable.update
+    /// @mutable tagmanager.accounts.containers.workspaces.built_in_variable.update
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Name of the built-in variable to be used to refer to the built-in variable.
@@ -1656,112 +1782,6 @@ pub struct BuiltInVariable {
 }
 
 impl Part for BuiltInVariable {}
-
-
-/// Represents a Google Tag Manager Trigger
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [containers workspaces triggers update accounts](struct.AccountContainerWorkspaceTriggerUpdateCall.html) (request|response)
-/// * [containers workspaces triggers create accounts](struct.AccountContainerWorkspaceTriggerCreateCall.html) (request|response)
-/// * [containers workspaces triggers get accounts](struct.AccountContainerWorkspaceTriggerGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Trigger {
-    /// Max time to fire Timer Events (in seconds). Only valid for AMP Timer trigger.
-    #[serde(rename="maxTimerLengthSeconds")]
-    pub max_timer_length_seconds: Option<Parameter>,
-    /// A visibility trigger minimum total visible time (in milliseconds). Only valid for AMP Visibility trigger.
-    #[serde(rename="totalTimeMinMilliseconds")]
-    pub total_time_min_milliseconds: Option<Parameter>,
-    /// Globally unique id of the trigger that auto-generates this (a Form Submit, Link Click or Timer listener) if any. Used to make incompatible auto-events work together with trigger filtering based on trigger ids. This value is populated during output generation since the tags implied by triggers don't exist until then. Only valid for Form Submit, Link Click and Timer triggers.
-    #[serde(rename="uniqueTriggerId")]
-    pub unique_trigger_id: Option<Parameter>,
-    /// List of integer percentage values for scroll triggers. The trigger will fire when each percentage is reached when the view is scrolled vertically. Only valid for AMP scroll triggers.
-    #[serde(rename="verticalScrollPercentageList")]
-    pub vertical_scroll_percentage_list: Option<Parameter>,
-    /// A visibility trigger minimum continuous visible time (in milliseconds). Only valid for AMP Visibility trigger.
-    #[serde(rename="continuousTimeMinMilliseconds")]
-    pub continuous_time_min_milliseconds: Option<Parameter>,
-    /// List of integer percentage values for scroll triggers. The trigger will fire when each percentage is reached when the view is scrolled horizontally. Only valid for AMP scroll triggers.
-    #[serde(rename="horizontalScrollPercentageList")]
-    pub horizontal_scroll_percentage_list: Option<Parameter>,
-    /// GTM Account ID.
-    #[serde(rename="accountId")]
-    pub account_id: Option<String>,
-    /// Whether or not we should delay the form submissions or link opening until all of the tags have fired (by preventing the default action and later simulating the default action). Only valid for Form Submission and Link Click triggers.
-    #[serde(rename="waitForTags")]
-    pub wait_for_tags: Option<Parameter>,
-    /// Time between Timer Events to fire (in seconds). Only valid for AMP Timer trigger.
-    #[serde(rename="intervalSeconds")]
-    pub interval_seconds: Option<Parameter>,
-    /// Name of the GTM event that is fired. Only valid for Timer triggers.
-    #[serde(rename="eventName")]
-    pub event_name: Option<Parameter>,
-    /// A visibility trigger CSS selector (i.e. "#id"). Only valid for AMP Visibility trigger.
-    #[serde(rename="visibilitySelector")]
-    pub visibility_selector: Option<Parameter>,
-    /// GTM Workspace ID.
-    #[serde(rename="workspaceId")]
-    pub workspace_id: Option<String>,
-    /// Used in the case of custom event, which is fired iff all Conditions are true.
-    #[serde(rename="customEventFilter")]
-    pub custom_event_filter: Option<Vec<Condition>>,
-    /// Additional parameters.
-    pub parameter: Option<Vec<Parameter>>,
-    /// Parent folder id.
-    #[serde(rename="parentFolderId")]
-    pub parent_folder_id: Option<String>,
-    /// GTM Container ID.
-    #[serde(rename="containerId")]
-    pub container_id: Option<String>,
-    /// A click trigger CSS selector (i.e. "a", "button" etc.). Only valid for AMP Click trigger.
-    pub selector: Option<Parameter>,
-    /// The Trigger ID uniquely identifies the GTM Trigger.
-    #[serde(rename="triggerId")]
-    pub trigger_id: Option<String>,
-    /// Auto generated link to the tag manager UI
-    #[serde(rename="tagManagerUrl")]
-    pub tag_manager_url: Option<String>,
-    /// The fingerprint of the GTM Trigger as computed at storage time. This value is recomputed whenever the trigger is modified.
-    pub fingerprint: Option<String>,
-    /// A visibility trigger maximum percent visibility. Only valid for AMP Visibility trigger.
-    #[serde(rename="visiblePercentageMax")]
-    pub visible_percentage_max: Option<Parameter>,
-    /// GTM Trigger's API relative path.
-    pub path: Option<String>,
-    /// Trigger display name.
-    pub name: Option<String>,
-    /// A visibility trigger minimum percent visibility. Only valid for AMP Visibility trigger.
-    #[serde(rename="visiblePercentageMin")]
-    pub visible_percentage_min: Option<Parameter>,
-    /// Defines the data layer event that causes this trigger.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// User notes on how to apply this trigger in the container.
-    pub notes: Option<String>,
-    /// Time between triggering recurring Timer Events (in milliseconds). Only valid for Timer triggers.
-    pub interval: Option<Parameter>,
-    /// The trigger will only fire iff all Conditions are true.
-    pub filter: Option<Vec<Condition>>,
-    /// How long to wait (in milliseconds) for tags to fire when 'waits_for_tags' above evaluates to true. Only valid for Form Submission and Link Click triggers.
-    #[serde(rename="waitForTagsTimeout")]
-    pub wait_for_tags_timeout: Option<Parameter>,
-    /// Limit of the number of GTM events this Timer Trigger will fire. If no limit is set, we will continue to fire GTM events until the user leaves the page. Only valid for Timer triggers.
-    pub limit: Option<Parameter>,
-    /// Whether or not we should only fire tags if the form submit or link click event is not cancelled by some other event handler (e.g. because of validation). Only valid for Form Submission and Link Click triggers.
-    #[serde(rename="checkValidation")]
-    pub check_validation: Option<Parameter>,
-    /// Used in the case of auto event tracking.
-    #[serde(rename="autoEventFilter")]
-    pub auto_event_filter: Option<Vec<Condition>>,
-}
-
-impl RequestValue for Trigger {}
-impl ResponseResult for Trigger {}
 
 
 /// Publish container version response.
@@ -1821,9 +1841,13 @@ impl ResponseResult for ListWorkspacesResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Tag {
     /// The start timestamp in milliseconds to schedule a tag.
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
     #[serde(rename="scheduleStartMs")]
     pub schedule_start_ms: Option<String>,
     /// The end timestamp in milliseconds to schedule a tag.
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
     #[serde(rename="scheduleEndMs")]
     pub schedule_end_ms: Option<String>,
     /// GTM Container ID.
@@ -1835,20 +1859,46 @@ pub struct Tag {
     /// The Tag ID uniquely identifies the GTM Tag.
     #[serde(rename="tagId")]
     pub tag_id: Option<String>,
+    /// The fingerprint of the GTM Tag as computed at storage time.
+    /// This value is recomputed whenever the tag is modified.
+    pub fingerprint: Option<String>,
     /// Indicates whether the tag is paused, which prevents the tag from firing.
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
     pub paused: Option<bool>,
     /// The list of setup tags. Currently we only allow one.
     #[serde(rename="setupTag")]
     pub setup_tag: Option<Vec<SetupTag>>,
-    /// Blocking rule IDs. If any of the listed rules evaluate to true, the tag will not fire.
+    /// Blocking rule IDs. If any of the listed rules evaluate to true, the tag
+    /// will not fire.
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
     #[serde(rename="blockingRuleId")]
     pub blocking_rule_id: Option<Vec<String>>,
+    /// If non-empty, then the tag display name will be included in the monitoring
+    /// metadata map using the key specified.
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
+    #[serde(rename="monitoringMetadataTagNameKey")]
+    pub monitoring_metadata_tag_name_key: Option<String>,
     /// Auto generated link to the tag manager UI
     #[serde(rename="tagManagerUrl")]
     pub tag_manager_url: Option<String>,
-    /// The fingerprint of the GTM Tag as computed at storage time. This value is recomputed whenever the tag is modified.
-    pub fingerprint: Option<String>,
-    /// Firing rule IDs. A tag will fire when any of the listed rules are true and all of its blockingRuleIds (if any specified) are false.
+    /// A map of key-value pairs of tag metadata to be included in the event data
+    /// for tag monitoring.
+    /// Notes:<ul>
+    /// <li>This parameter must be type <code>MAP</code>.</li>
+    /// <li>Each parameter in the map are type <code>TEMPLATE</code>, however
+    /// cannot contain variable references.</li>
+    /// </ul>
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
+    #[serde(rename="monitoringMetadata")]
+    pub monitoring_metadata: Option<Parameter>,
+    /// Firing rule IDs. A tag will fire when any of the listed rules are true and
+    /// all of its <code>blockingRuleIds</code> (if any specified) are false.
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
     #[serde(rename="firingRuleId")]
     pub firing_rule_id: Option<Vec<String>>,
     /// GTM Tag's API relative path.
@@ -1859,27 +1909,49 @@ pub struct Tag {
     /// GTM Account ID.
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
-    /// Firing trigger IDs. A tag will fire when any of the listed triggers are true and all of its blockingTriggerIds (if any specified) are false.
+    /// Firing trigger IDs. A tag will fire when any of the listed triggers are
+    /// true and all of its <code>blockingTriggerIds</code> (if any specified) are
+    /// false.
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
     #[serde(rename="firingTriggerId")]
     pub firing_trigger_id: Option<Vec<String>>,
     /// Tag display name.
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
     pub name: Option<String>,
     /// The tag's parameters.
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
     pub parameter: Option<Vec<Parameter>>,
     /// User notes on how to apply this tag in the container.
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
     pub notes: Option<String>,
-    /// Blocking trigger IDs. If any of the listed triggers evaluate to true, the tag will not fire.
+    /// Blocking trigger IDs. If any of the listed triggers evaluate to true, the
+    /// tag will not fire.
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
     #[serde(rename="blockingTriggerId")]
     pub blocking_trigger_id: Option<Vec<String>>,
-    /// User defined numeric priority of the tag. Tags are fired asynchronously in order of priority. Tags with higher numeric value fire first. A tag's priority can be a positive or negative value. The default value is 0.
+    /// User defined numeric priority of the tag. Tags are fired asynchronously in
+    /// order of priority. Tags with higher numeric value fire first. A tag's
+    /// priority can be a positive or negative value. The default value is 0.
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
     pub priority: Option<Parameter>,
     /// GTM Workspace ID.
     #[serde(rename="workspaceId")]
     pub workspace_id: Option<String>,
-    /// If set to true, this tag will only fire in the live environment (e.g. not in preview or debug mode).
+    /// If set to true, this tag will only fire in the live environment (e.g. not
+    /// in preview or debug mode).
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
     #[serde(rename="liveOnly")]
     pub live_only: Option<bool>,
     /// GTM Tag Type.
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.create
+    /// @mutable tagmanager.accounts.containers.workspaces.tags.update
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Parent folder id.
@@ -1927,13 +1999,16 @@ impl ResponseResult for FolderEntities {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateContainerVersionResponse {
-    /// Auto generated workspace path created as a result of version creation. This field should only be populated if the created version was not a quick preview.
+    /// Auto generated workspace path created as a result of version creation. This
+    /// field should only be populated if the created version was not a quick
+    /// preview.
     #[serde(rename="newWorkspacePath")]
     pub new_workspace_path: Option<String>,
     /// The container version created.
     #[serde(rename="containerVersion")]
     pub container_version: Option<ContainerVersion>,
-    /// Whether version creation failed when syncing the workspace to the latest container version.
+    /// Whether version creation failed when syncing the workspace to the latest
+    /// container version.
     #[serde(rename="syncStatus")]
     pub sync_status: Option<SyncStatus>,
     /// Compiler errors or not.
@@ -1958,6 +2033,8 @@ impl ResponseResult for CreateContainerVersionResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Workspace {
     /// Workspace description.
+    /// @mutable tagmanager.accounts.containers.workspaces.create
+    /// @mutable tagmanager.accounts.containers.workspaces.update
     pub description: Option<String>,
     /// GTM Container ID.
     #[serde(rename="containerId")]
@@ -1968,7 +2045,8 @@ pub struct Workspace {
     /// Auto generated link to the tag manager UI
     #[serde(rename="tagManagerUrl")]
     pub tag_manager_url: Option<String>,
-    /// The fingerprint of the GTM Workspace as computed at storage time. This value is recomputed whenever the workspace is modified.
+    /// The fingerprint of the GTM Workspace as computed at storage time. This
+    /// value is recomputed whenever the workspace is modified.
     pub fingerprint: Option<String>,
     /// GTM Workspace's API relative path.
     pub path: Option<String>,
@@ -1976,6 +2054,8 @@ pub struct Workspace {
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Workspace display name.
+    /// @mutable tagmanager.accounts.containers.workspaces.create
+    /// @mutable tagmanager.accounts.containers.workspaces.update
     pub name: Option<String>,
 }
 
@@ -1991,7 +2071,8 @@ impl ResponseResult for Workspace {}
 pub struct ZoneBoundary {
     /// The conditions that, when conjoined, make up the boundary.
     pub condition: Option<Vec<Condition>>,
-    /// Custom evaluation trigger IDs. A zone will evaluate its boundary conditions when any of the listed triggers are true.
+    /// Custom evaluation trigger IDs. A zone will evaluate its boundary
+    /// conditions when any of the listed triggers are true.
     #[serde(rename="customEvaluationTriggerId")]
     pub custom_evaluation_trigger_id: Option<Vec<String>>,
 }
@@ -2063,6 +2144,32 @@ pub struct ListTagsResponse {
 impl ResponseResult for ListTagsResponse {}
 
 
+/// Represents the link between a custom template and an entry on the Community
+/// Template Gallery site.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GalleryReference {
+    /// The name of the host for the community gallery template.
+    pub host: Option<String>,
+    /// The version of the community gallery template.
+    pub version: Option<String>,
+    /// The name of the repository for the community gallery template.
+    pub repository: Option<String>,
+    /// If a user has manually edited the community  gallery template.
+    #[serde(rename="isModified")]
+    pub is_modified: Option<bool>,
+    /// The name of the owner for the community gallery template.
+    pub owner: Option<String>,
+    /// The signature of the community gallery template as computed at import time.
+    /// This value is recomputed whenever the template is updated from the gallery.
+    pub signature: Option<String>,
+}
+
+impl Part for GalleryReference {}
+
+
 /// Options for new container versions.
 /// 
 /// # Activities
@@ -2083,7 +2190,8 @@ pub struct CreateContainerVersionRequestVersionOptions {
 impl RequestValue for CreateContainerVersionRequestVersionOptions {}
 
 
-/// A workspace entity that may represent a tag, trigger, variable, or folder in addition to its status in the workspace.
+/// A workspace entity that may represent a tag, trigger, variable, or folder in
+/// addition to its status in the workspace.
 /// 
 /// # Activities
 /// 
@@ -2110,22 +2218,235 @@ pub struct Entity {
 impl RequestValue for Entity {}
 
 
-/// The result of reverting a built-in variable in a workspace.
+/// Represents a Google Tag Manager Trigger
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [containers workspaces built_in_variables revert accounts](struct.AccountContainerWorkspaceBuiltInVariableRevertCall.html) (response)
+/// * [containers workspaces triggers update accounts](struct.AccountContainerWorkspaceTriggerUpdateCall.html) (request|response)
+/// * [containers workspaces triggers create accounts](struct.AccountContainerWorkspaceTriggerCreateCall.html) (request|response)
+/// * [containers workspaces triggers get accounts](struct.AccountContainerWorkspaceTriggerGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RevertBuiltInVariableResponse {
-    /// Whether the built-in variable is enabled after reversion.
-    pub enabled: Option<bool>,
+pub struct Trigger {
+    /// Max time to fire Timer Events (in seconds). Only valid for AMP Timer
+    /// trigger.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    #[serde(rename="maxTimerLengthSeconds")]
+    pub max_timer_length_seconds: Option<Parameter>,
+    /// A visibility trigger minimum total visible time (in milliseconds).
+    /// Only valid for AMP Visibility trigger.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    #[serde(rename="totalTimeMinMilliseconds")]
+    pub total_time_min_milliseconds: Option<Parameter>,
+    /// Globally unique id of the trigger that auto-generates this (a Form Submit,
+    /// Link Click or Timer listener) if any. Used to make incompatible auto-events
+    /// work together with trigger filtering based on trigger ids. This value is
+    /// populated during output generation since the tags implied by triggers don't
+    /// exist until then. Only valid for Form Submit, Link Click and Timer
+    /// triggers.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    #[serde(rename="uniqueTriggerId")]
+    pub unique_trigger_id: Option<Parameter>,
+    /// List of integer percentage values for scroll triggers. The trigger will
+    /// fire when each percentage is reached when the view is scrolled vertically.
+    /// Only valid for AMP scroll triggers.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    #[serde(rename="verticalScrollPercentageList")]
+    pub vertical_scroll_percentage_list: Option<Parameter>,
+    /// A visibility trigger minimum continuous visible time (in milliseconds).
+    /// Only valid for AMP Visibility trigger.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    #[serde(rename="continuousTimeMinMilliseconds")]
+    pub continuous_time_min_milliseconds: Option<Parameter>,
+    /// List of integer percentage values for scroll triggers. The trigger will
+    /// fire when each percentage is reached when the view is scrolled
+    /// horizontally. Only valid for AMP scroll triggers.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    #[serde(rename="horizontalScrollPercentageList")]
+    pub horizontal_scroll_percentage_list: Option<Parameter>,
+    /// GTM Account ID.
+    #[serde(rename="accountId")]
+    pub account_id: Option<String>,
+    /// Whether or not we should delay the form submissions or link opening
+    /// until all of the tags have fired (by preventing the default
+    /// action and later simulating the default action). Only valid for
+    /// Form Submission and Link Click triggers.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    #[serde(rename="waitForTags")]
+    pub wait_for_tags: Option<Parameter>,
+    /// Time between Timer Events to fire (in seconds). Only valid for AMP Timer
+    /// trigger.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    #[serde(rename="intervalSeconds")]
+    pub interval_seconds: Option<Parameter>,
+    /// Name of the GTM event that is fired. Only valid for Timer triggers.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    #[serde(rename="eventName")]
+    pub event_name: Option<Parameter>,
+    /// A visibility trigger CSS selector (i.e. "#id"). Only valid for AMP
+    /// Visibility trigger.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    #[serde(rename="visibilitySelector")]
+    pub visibility_selector: Option<Parameter>,
+    /// GTM Workspace ID.
+    #[serde(rename="workspaceId")]
+    pub workspace_id: Option<String>,
+    /// Used in the case of custom event, which is fired iff all Conditions are
+    /// true.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    #[serde(rename="customEventFilter")]
+    pub custom_event_filter: Option<Vec<Condition>>,
+    /// Additional parameters.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    pub parameter: Option<Vec<Parameter>>,
+    /// Parent folder id.
+    #[serde(rename="parentFolderId")]
+    pub parent_folder_id: Option<String>,
+    /// GTM Container ID.
+    #[serde(rename="containerId")]
+    pub container_id: Option<String>,
+    /// A click trigger CSS selector (i.e. "a", "button" etc.). Only valid for AMP
+    /// Click trigger.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    pub selector: Option<Parameter>,
+    /// The Trigger ID uniquely identifies the GTM Trigger.
+    #[serde(rename="triggerId")]
+    pub trigger_id: Option<String>,
+    /// Auto generated link to the tag manager UI
+    #[serde(rename="tagManagerUrl")]
+    pub tag_manager_url: Option<String>,
+    /// The fingerprint of the GTM Trigger as computed at storage time.
+    /// This value is recomputed whenever the trigger is modified.
+    pub fingerprint: Option<String>,
+    /// A visibility trigger maximum percent visibility. Only valid for AMP
+    /// Visibility trigger.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    #[serde(rename="visiblePercentageMax")]
+    pub visible_percentage_max: Option<Parameter>,
+    /// GTM Trigger's API relative path.
+    pub path: Option<String>,
+    /// Trigger display name.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    pub name: Option<String>,
+    /// A visibility trigger minimum percent visibility. Only valid for AMP
+    /// Visibility trigger.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    #[serde(rename="visiblePercentageMin")]
+    pub visible_percentage_min: Option<Parameter>,
+    /// Defines the data layer event that causes this trigger.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// User notes on how to apply this trigger in the container.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    pub notes: Option<String>,
+    /// Time between triggering recurring Timer Events (in milliseconds). Only
+    /// valid for Timer triggers.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    pub interval: Option<Parameter>,
+    /// The trigger will only fire iff all Conditions are true.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    pub filter: Option<Vec<Condition>>,
+    /// How long to wait (in milliseconds) for tags to fire when 'waits_for_tags'
+    /// above evaluates to <code>true</code>.  Only valid for Form Submission and
+    /// Link Click triggers.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    #[serde(rename="waitForTagsTimeout")]
+    pub wait_for_tags_timeout: Option<Parameter>,
+    /// Limit of the number of GTM events this Timer Trigger will fire. If no limit
+    /// is set, we will continue to fire GTM events until the user leaves the page.
+    /// Only valid for Timer triggers.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    pub limit: Option<Parameter>,
+    /// Whether or not we should only fire tags if the form submit or link click
+    /// event is not cancelled by some other event handler (e.g. because of
+    /// validation). Only valid for Form Submission and Link Click triggers.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    #[serde(rename="checkValidation")]
+    pub check_validation: Option<Parameter>,
+    /// Used in the case of auto event tracking.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    #[serde(rename="autoEventFilter")]
+    pub auto_event_filter: Option<Vec<Condition>>,
 }
 
-impl ResponseResult for RevertBuiltInVariableResponse {}
+impl RequestValue for Trigger {}
+impl ResponseResult for Trigger {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Client {
+    /// Client display name.
+    /// @mutable tagmanager.accounts.containers.workspaces.clients.create
+    /// @mutable tagmanager.accounts.containers.workspaces.clients.update
+    pub name: Option<String>,
+    /// The client's parameters.
+    /// @mutable tagmanager.accounts.containers.workspaces.clients.create
+    /// @mutable tagmanager.accounts.containers.workspaces.clients.update
+    pub parameter: Option<Vec<Parameter>>,
+    /// The Client ID uniquely identifies the GTM client.
+    #[serde(rename="clientId")]
+    pub client_id: Option<String>,
+    /// Priority determines relative firing order.
+    /// @mutable tagmanager.accounts.containers.workspaces.clients.create
+    /// @mutable tagmanager.accounts.containers.workspaces.clients.update
+    pub priority: Option<i32>,
+    /// GTM Container ID.
+    #[serde(rename="containerId")]
+    pub container_id: Option<String>,
+    /// GTM Workspace ID.
+    #[serde(rename="workspaceId")]
+    pub workspace_id: Option<String>,
+    /// Auto generated link to the tag manager UI
+    #[serde(rename="tagManagerUrl")]
+    pub tag_manager_url: Option<String>,
+    /// The fingerprint of the GTM Client as computed at storage time.
+    /// This value is recomputed whenever the client is modified.
+    pub fingerprint: Option<String>,
+    /// GTM client's API relative path.
+    pub path: Option<String>,
+    /// Client type.
+    /// @mutable tagmanager.accounts.containers.workspaces.clients.create
+    /// @mutable tagmanager.accounts.containers.workspaces.clients.update
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// GTM Account ID.
+    #[serde(rename="accountId")]
+    pub account_id: Option<String>,
+}
+
+impl Part for Client {}
 
 
 /// The result of reverting a zone in a workspace.
@@ -2139,20 +2460,25 @@ impl ResponseResult for RevertBuiltInVariableResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RevertZoneResponse {
-    /// Zone as it appears in the latest container version since the last workspace synchronization operation. If no zone is present, that means the zone was deleted in the latest container version.
+    /// Zone as it appears in the latest container version since the last
+    /// workspace synchronization operation. If no zone is present, that means
+    /// the zone was deleted in the latest container version.
     pub zone: Option<Zone>,
 }
 
 impl ResponseResult for RevertZoneResponse {}
 
 
-/// Represents a tag that fires after another tag in order to tear down dependencies.
+/// Represents a tag that fires after another tag in order to tear down
+/// dependencies.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TeardownTag {
-    /// If true, fire the teardown tag if and only if the main tag fires successfully. If false, fire the teardown tag regardless of main tag firing status.
+    /// If true, fire the teardown tag if and only if the main tag fires
+    /// successfully.
+    /// If false, fire the teardown tag regardless of main tag firing status.
     #[serde(rename="stopTeardownOnFailure")]
     pub stop_teardown_on_failure: Option<bool>,
     /// The name of the teardown tag.
@@ -2236,7 +2562,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
+    ///              Example:
+    ///              accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_zones_create(&self, request: Zone, parent: &str) -> AccountContainerWorkspaceZoneCreateCall<'a, C, A> {
         AccountContainerWorkspaceZoneCreateCall {
             hub: self.hub,
@@ -2255,7 +2583,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// * `path` - GTM Folder's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
     pub fn containers_workspaces_folders_move_entities_to_folder(&self, request: Folder, path: &str) -> AccountContainerWorkspaceFolderMoveEntitiesToFolderCall<'a, C, A> {
         AccountContainerWorkspaceFolderMoveEntitiesToFolderCall {
             hub: self.hub,
@@ -2276,7 +2606,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `parent` - GTM Container's API relative path.
+    ///              Example: accounts/{account_id}/containers/{container_id}
     pub fn containers_version_headers_latest(&self, parent: &str) -> AccountContainerVersionHeaderLatestCall<'a, C, A> {
         AccountContainerVersionHeaderLatestCall {
             hub: self.hub,
@@ -2294,7 +2625,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Workspaces's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspaces's API relative path.
+    ///              Example:
+    ///              accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_triggers_create(&self, request: Trigger, parent: &str) -> AccountContainerWorkspaceTriggerCreateCall<'a, C, A> {
         AccountContainerWorkspaceTriggerCreateCall {
             hub: self.hub,
@@ -2312,7 +2645,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - GTM parent Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `parent` - GTM parent Container's API relative path.
+    ///              Example: accounts/{account_id}/containers/{container_id}
     pub fn containers_workspaces_list(&self, parent: &str) -> AccountContainerWorkspaceListCall<'a, C, A> {
         AccountContainerWorkspaceListCall {
             hub: self.hub,
@@ -2330,7 +2664,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM BuiltInVariable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/built_in_variables
+    /// * `path` - GTM BuiltInVariable's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/built_in_variables
     pub fn containers_workspaces_built_in_variables_revert(&self, path: &str) -> AccountContainerWorkspaceBuiltInVariableRevertCall<'a, C, A> {
         AccountContainerWorkspaceBuiltInVariableRevertCall {
             hub: self.hub,
@@ -2348,7 +2684,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM BuiltInVariable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/built_in_variables
+    /// * `path` - GTM BuiltInVariable's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/built_in_variables
     pub fn containers_workspaces_built_in_variables_delete(&self, path: &str) -> AccountContainerWorkspaceBuiltInVariableDeleteCall<'a, C, A> {
         AccountContainerWorkspaceBuiltInVariableDeleteCall {
             hub: self.hub,
@@ -2367,7 +2705,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `parent` - GTM Container's API relative path.
+    ///              Example: accounts/{account_id}/containers/{container_id}
     pub fn containers_environments_create(&self, request: Environment, parent: &str) -> AccountContainerEnvironmentCreateCall<'a, C, A> {
         AccountContainerEnvironmentCreateCall {
             hub: self.hub,
@@ -2385,7 +2724,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// * `path` - GTM ContainerVersion's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/versions/{version_id}
     pub fn containers_versions_publish(&self, path: &str) -> AccountContainerVersionPublishCall<'a, C, A> {
         AccountContainerVersionPublishCall {
             hub: self.hub,
@@ -2403,7 +2744,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    /// * `path` - GTM Custom Template's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
     pub fn containers_workspaces_templates_get(&self, path: &str) -> AccountContainerWorkspaceTemplateGetCall<'a, C, A> {
         AccountContainerWorkspaceTemplateGetCall {
             hub: self.hub,
@@ -2420,7 +2763,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
+    /// * `path` - GTM Zone's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
     pub fn containers_workspaces_zones_revert(&self, path: &str) -> AccountContainerWorkspaceZoneRevertCall<'a, C, A> {
         AccountContainerWorkspaceZoneRevertCall {
             hub: self.hub,
@@ -2439,7 +2784,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
+    ///              Example:
+    ///              accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_tags_create(&self, request: Tag, parent: &str) -> AccountContainerWorkspaceTagCreateCall<'a, C, A> {
         AccountContainerWorkspaceTagCreateCall {
             hub: self.hub,
@@ -2457,7 +2804,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}
+    /// * `path` - GTM Environment's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/environments/{environment_id}
     pub fn containers_environments_delete(&self, path: &str) -> AccountContainerEnvironmentDeleteCall<'a, C, A> {
         AccountContainerEnvironmentDeleteCall {
             hub: self.hub,
@@ -2474,7 +2823,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `path` - GTM Workspace's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_get(&self, path: &str) -> AccountContainerWorkspaceGetCall<'a, C, A> {
         AccountContainerWorkspaceGetCall {
             hub: self.hub,
@@ -2491,7 +2842,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `path` - GTM Container's API relative path.
+    ///            Example: accounts/{account_id}/containers/{container_id}
     pub fn containers_get(&self, path: &str) -> AccountContainerGetCall<'a, C, A> {
         AccountContainerGetCall {
             hub: self.hub,
@@ -2509,7 +2861,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Account's API relative path. Example: accounts/{account_id}
+    /// * `parent` - GTM Account's API relative path.
+    ///              Example: accounts/{account_id}
     pub fn user_permissions_create(&self, request: UserPermission, parent: &str) -> AccountUserPermissionCreateCall<'a, C, A> {
         AccountUserPermissionCreateCall {
             hub: self.hub,
@@ -2527,7 +2880,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
+    ///              Example:
+    ///              accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_folders_list(&self, parent: &str) -> AccountContainerWorkspaceFolderListCall<'a, C, A> {
         AccountContainerWorkspaceFolderListCall {
             hub: self.hub,
@@ -2546,7 +2901,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}
+    /// * `path` - GTM Environment's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/environments/{environment_id}
     pub fn containers_environments_reauthorize(&self, request: Environment, path: &str) -> AccountContainerEnvironmentReauthorizeCall<'a, C, A> {
         AccountContainerEnvironmentReauthorizeCall {
             hub: self.hub,
@@ -2564,7 +2921,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `path` - GTM Workspace's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_delete(&self, path: &str) -> AccountContainerWorkspaceDeleteCall<'a, C, A> {
         AccountContainerWorkspaceDeleteCall {
             hub: self.hub,
@@ -2582,7 +2941,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM parent Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `parent` - GTM parent Container's API relative path.
+    ///              Example: accounts/{account_id}/containers/{container_id}
     pub fn containers_workspaces_create(&self, request: Workspace, parent: &str) -> AccountContainerWorkspaceCreateCall<'a, C, A> {
         AccountContainerWorkspaceCreateCall {
             hub: self.hub,
@@ -2596,11 +2956,13 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all users that have access to the account along with Account and Container user access granted to each of them.
+    /// List all users that have access to the account along with Account and
+    /// Container user access granted to each of them.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - GTM Accounts's API relative path. Example: accounts/{account_id}
+    /// * `parent` - GTM Accounts's API relative path.
+    ///              Example: accounts/{account_id}
     pub fn user_permissions_list(&self, parent: &str) -> AccountUserPermissionListCall<'a, C, A> {
         AccountUserPermissionListCall {
             hub: self.hub,
@@ -2618,7 +2980,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    /// * `path` - GTM Custom Template's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
     pub fn containers_workspaces_templates_delete(&self, path: &str) -> AccountContainerWorkspaceTemplateDeleteCall<'a, C, A> {
         AccountContainerWorkspaceTemplateDeleteCall {
             hub: self.hub,
@@ -2631,11 +2995,14 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Quick previews a workspace by creating a fake container version from all entities in the provided workspace.
+    /// Quick previews a workspace by creating a fake container version from all
+    /// entities in the provided workspace.
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `path` - GTM Workspace's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_quick_preview(&self, path: &str) -> AccountContainerWorkspaceQuickPreviewCall<'a, C, A> {
         AccountContainerWorkspaceQuickPreviewCall {
             hub: self.hub,
@@ -2652,7 +3019,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
+    /// * `path` - GTM Variable's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
     pub fn containers_workspaces_variables_get(&self, path: &str) -> AccountContainerWorkspaceVariableGetCall<'a, C, A> {
         AccountContainerWorkspaceVariableGetCall {
             hub: self.hub,
@@ -2665,11 +3034,14 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the latest version used for synchronization of workspaces when detecting conflicts and errors.
+    /// Sets the latest version used for synchronization of workspaces when
+    /// detecting conflicts and errors.
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// * `path` - GTM ContainerVersion's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/versions/{version_id}
     pub fn containers_versions_set_latest(&self, path: &str) -> AccountContainerVersionSetLatestCall<'a, C, A> {
         AccountContainerVersionSetLatestCall {
             hub: self.hub,
@@ -2687,7 +3059,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
+    /// * `path` - GTM Variable's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
     pub fn containers_workspaces_variables_update(&self, request: Variable, path: &str) -> AccountContainerWorkspaceVariableUpdateCall<'a, C, A> {
         AccountContainerWorkspaceVariableUpdateCall {
             hub: self.hub,
@@ -2706,7 +3080,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `parent` - GTM Container's API relative path.
+    ///              Example: accounts/{account_id}/containers/{container_id}
     pub fn containers_environments_list(&self, parent: &str) -> AccountContainerEnvironmentListCall<'a, C, A> {
         AccountContainerEnvironmentListCall {
             hub: self.hub,
@@ -2724,7 +3099,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
+    ///              Example:
+    ///              accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_tags_list(&self, parent: &str) -> AccountContainerWorkspaceTagListCall<'a, C, A> {
         AccountContainerWorkspaceTagListCall {
             hub: self.hub,
@@ -2742,7 +3119,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
+    ///              Example:
+    ///              accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_templates_list(&self, parent: &str) -> AccountContainerWorkspaceTemplateListCall<'a, C, A> {
         AccountContainerWorkspaceTemplateListCall {
             hub: self.hub,
@@ -2761,7 +3140,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
+    /// * `path` - GTM Zone's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
     pub fn containers_workspaces_zones_update(&self, request: Zone, path: &str) -> AccountContainerWorkspaceZoneUpdateCall<'a, C, A> {
         AccountContainerWorkspaceZoneUpdateCall {
             hub: self.hub,
@@ -2780,7 +3161,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
+    /// * `path` - GTM Zone's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
     pub fn containers_workspaces_zones_get(&self, path: &str) -> AccountContainerWorkspaceZoneGetCall<'a, C, A> {
         AccountContainerWorkspaceZoneGetCall {
             hub: self.hub,
@@ -2793,12 +3176,16 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a Container Version from the entities present in the workspace, deletes the workspace, and sets the base container version to the newly created version.
+    /// Creates a Container Version from the entities present in the workspace,
+    /// deletes the workspace, and sets the base container version to the newly
+    /// created version.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `path` - GTM Workspace's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_create_version(&self, request: CreateContainerVersionRequestVersionOptions, path: &str) -> AccountContainerWorkspaceCreateVersionCall<'a, C, A> {
         AccountContainerWorkspaceCreateVersionCall {
             hub: self.hub,
@@ -2816,7 +3203,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `path` - GTM Container's API relative path.
+    ///            Example: accounts/{account_id}/containers/{container_id}
     pub fn containers_delete(&self, path: &str) -> AccountContainerDeleteCall<'a, C, A> {
         AccountContainerDeleteCall {
             hub: self.hub,
@@ -2834,7 +3222,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
+    ///              Example:
+    ///              accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_templates_create(&self, request: CustomTemplate, parent: &str) -> AccountContainerWorkspaceTemplateCreateCall<'a, C, A> {
         AccountContainerWorkspaceTemplateCreateCall {
             hub: self.hub,
@@ -2852,7 +3242,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// * `path` - GTM ContainerVersion's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/versions/{version_id}
     pub fn containers_versions_delete(&self, path: &str) -> AccountContainerVersionDeleteCall<'a, C, A> {
         AccountContainerVersionDeleteCall {
             hub: self.hub,
@@ -2870,7 +3262,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Accounts's API relative path. Example: accounts/{account_id}
+    /// * `path` - GTM Accounts's API relative path.
+    ///            Example: accounts/{account_id}
     pub fn update(&self, request: Account, path: &str) -> AccountUpdateCall<'a, C, A> {
         AccountUpdateCall {
             hub: self.hub,
@@ -2889,7 +3282,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `parent` - GTM Container's API relative path.
+    ///              Example: accounts/{account_id}/containers/{container_id}
     pub fn containers_version_headers_list(&self, parent: &str) -> AccountContainerVersionHeaderListCall<'a, C, A> {
         AccountContainerVersionHeaderListCall {
             hub: self.hub,
@@ -2908,7 +3302,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
+    ///              Example:
+    ///              accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_built_in_variables_list(&self, parent: &str) -> AccountContainerWorkspaceBuiltInVariableListCall<'a, C, A> {
         AccountContainerWorkspaceBuiltInVariableListCall {
             hub: self.hub,
@@ -2926,7 +3322,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - GTM Workspaces's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspaces's API relative path.
+    ///              Example:
+    ///              accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_triggers_list(&self, parent: &str) -> AccountContainerWorkspaceTriggerListCall<'a, C, A> {
         AccountContainerWorkspaceTriggerListCall {
             hub: self.hub,
@@ -2945,7 +3343,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM UserPermission's API relative path. Example: accounts/{account_id}/user_permissions/{user_permission_id}
+    /// * `path` - GTM UserPermission's API relative path.
+    ///            Example: accounts/{account_id}/user_permissions/{user_permission_id}
     pub fn user_permissions_update(&self, request: UserPermission, path: &str) -> AccountUserPermissionUpdateCall<'a, C, A> {
         AccountUserPermissionUpdateCall {
             hub: self.hub,
@@ -2963,7 +3362,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
+    ///              Example:
+    ///              accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_zones_list(&self, parent: &str) -> AccountContainerWorkspaceZoneListCall<'a, C, A> {
         AccountContainerWorkspaceZoneListCall {
             hub: self.hub,
@@ -2982,7 +3383,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    /// * `path` - GTM Custom Template's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
     pub fn containers_workspaces_templates_update(&self, request: CustomTemplate, path: &str) -> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A> {
         AccountContainerWorkspaceTemplateUpdateCall {
             hub: self.hub,
@@ -3001,7 +3404,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Accounts's API relative path. Example: accounts/{account_id}
+    /// * `path` - GTM Accounts's API relative path.
+    ///            Example: accounts/{account_id}
     pub fn get(&self, path: &str) -> AccountGetCall<'a, C, A> {
         AccountGetCall {
             hub: self.hub,
@@ -3018,7 +3422,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `parent` - GTM Container's API relative path.
+    ///              Example: accounts/{account_id}/containers/{container_id}
     pub fn containers_versions_live(&self, parent: &str) -> AccountContainerVersionLiveCall<'a, C, A> {
         AccountContainerVersionLiveCall {
             hub: self.hub,
@@ -3048,7 +3453,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
+    ///              Example:
+    ///              accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_variables_list(&self, parent: &str) -> AccountContainerWorkspaceVariableListCall<'a, C, A> {
         AccountContainerWorkspaceVariableListCall {
             hub: self.hub,
@@ -3066,7 +3473,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// * `path` - GTM ContainerVersion's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/versions/{version_id}
     pub fn containers_versions_undelete(&self, path: &str) -> AccountContainerVersionUndeleteCall<'a, C, A> {
         AccountContainerVersionUndeleteCall {
             hub: self.hub,
@@ -3083,7 +3492,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
+    /// * `path` - GTM Variable's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
     pub fn containers_workspaces_variables_revert(&self, path: &str) -> AccountContainerWorkspaceVariableRevertCall<'a, C, A> {
         AccountContainerWorkspaceVariableRevertCall {
             hub: self.hub,
@@ -3101,7 +3512,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
+    /// * `path` - GTM Zone's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
     pub fn containers_workspaces_zones_delete(&self, path: &str) -> AccountContainerWorkspaceZoneDeleteCall<'a, C, A> {
         AccountContainerWorkspaceZoneDeleteCall {
             hub: self.hub,
@@ -3118,7 +3531,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// * `path` - GTM Folder's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
     pub fn containers_workspaces_folders_get(&self, path: &str) -> AccountContainerWorkspaceFolderGetCall<'a, C, A> {
         AccountContainerWorkspaceFolderGetCall {
             hub: self.hub,
@@ -3136,7 +3551,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
+    ///              Example:
+    ///              accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_folders_create(&self, request: Folder, parent: &str) -> AccountContainerWorkspaceFolderCreateCall<'a, C, A> {
         AccountContainerWorkspaceFolderCreateCall {
             hub: self.hub,
@@ -3154,7 +3571,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
+    /// * `path` - GTM Tag's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
     pub fn containers_workspaces_tags_delete(&self, path: &str) -> AccountContainerWorkspaceTagDeleteCall<'a, C, A> {
         AccountContainerWorkspaceTagDeleteCall {
             hub: self.hub,
@@ -3172,7 +3591,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `path` - GTM Container's API relative path.
+    ///            Example: accounts/{account_id}/containers/{container_id}
     pub fn containers_update(&self, request: Container, path: &str) -> AccountContainerUpdateCall<'a, C, A> {
         AccountContainerUpdateCall {
             hub: self.hub,
@@ -3191,7 +3611,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}
+    /// * `path` - GTM Environment's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/environments/{environment_id}
     pub fn containers_environments_get(&self, path: &str) -> AccountContainerEnvironmentGetCall<'a, C, A> {
         AccountContainerEnvironmentGetCall {
             hub: self.hub,
@@ -3209,7 +3631,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// * `path` - GTM Folder's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
     pub fn containers_workspaces_folders_update(&self, request: Folder, path: &str) -> AccountContainerWorkspaceFolderUpdateCall<'a, C, A> {
         AccountContainerWorkspaceFolderUpdateCall {
             hub: self.hub,
@@ -3228,7 +3652,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
+    ///              Example:
+    ///              accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_built_in_variables_create(&self, parent: &str) -> AccountContainerWorkspaceBuiltInVariableCreateCall<'a, C, A> {
         AccountContainerWorkspaceBuiltInVariableCreateCall {
             hub: self.hub,
@@ -3246,7 +3672,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - GTM Accounts's API relative path. Example: accounts/{account_id}.
+    /// * `parent` - GTM Accounts's API relative path.
+    ///              Example: accounts/{account_id}.
     pub fn containers_list(&self, parent: &str) -> AccountContainerListCall<'a, C, A> {
         AccountContainerListCall {
             hub: self.hub,
@@ -3264,7 +3691,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// * `path` - GTM Folder's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
     pub fn containers_workspaces_folders_entities(&self, path: &str) -> AccountContainerWorkspaceFolderEntityCall<'a, C, A> {
         AccountContainerWorkspaceFolderEntityCall {
             hub: self.hub,
@@ -3282,7 +3711,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
+    /// * `path` - GTM Trigger's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
     pub fn containers_workspaces_triggers_delete(&self, path: &str) -> AccountContainerWorkspaceTriggerDeleteCall<'a, C, A> {
         AccountContainerWorkspaceTriggerDeleteCall {
             hub: self.hub,
@@ -3299,7 +3730,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// * `path` - GTM Folder's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
     pub fn containers_workspaces_folders_delete(&self, path: &str) -> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> {
         AccountContainerWorkspaceFolderDeleteCall {
             hub: self.hub,
@@ -3312,11 +3745,15 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Syncs a workspace to the latest container version by updating all unmodified workspace entities and displaying conflicts for modified entities.
+    /// Syncs a workspace to the latest container version by updating all
+    /// unmodified workspace entities and displaying conflicts for modified
+    /// entities.
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `path` - GTM Workspace's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_sync(&self, path: &str) -> AccountContainerWorkspaceSyncCall<'a, C, A> {
         AccountContainerWorkspaceSyncCall {
             hub: self.hub,
@@ -3333,7 +3770,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
+    /// * `path` - GTM Tag's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
     pub fn containers_workspaces_tags_revert(&self, path: &str) -> AccountContainerWorkspaceTagRevertCall<'a, C, A> {
         AccountContainerWorkspaceTagRevertCall {
             hub: self.hub,
@@ -3352,7 +3791,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
+    /// * `path` - GTM Tag's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
     pub fn containers_workspaces_tags_update(&self, request: Tag, path: &str) -> AccountContainerWorkspaceTagUpdateCall<'a, C, A> {
         AccountContainerWorkspaceTagUpdateCall {
             hub: self.hub,
@@ -3371,7 +3812,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    /// * `path` - GTM Custom Template's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
     pub fn containers_workspaces_templates_revert(&self, path: &str) -> AccountContainerWorkspaceTemplateRevertCall<'a, C, A> {
         AccountContainerWorkspaceTemplateRevertCall {
             hub: self.hub,
@@ -3390,7 +3833,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Account's API relative path. Example: accounts/{account_id}.
+    /// * `parent` - GTM Account's API relative path.
+    ///              Example: accounts/{account_id}.
     pub fn containers_create(&self, request: Container, parent: &str) -> AccountContainerCreateCall<'a, C, A> {
         AccountContainerCreateCall {
             hub: self.hub,
@@ -3409,7 +3853,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
+    /// * `path` - GTM Trigger's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
     pub fn containers_workspaces_triggers_update(&self, request: Trigger, path: &str) -> AccountContainerWorkspaceTriggerUpdateCall<'a, C, A> {
         AccountContainerWorkspaceTriggerUpdateCall {
             hub: self.hub,
@@ -3429,7 +3875,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
+    ///              Example:
+    ///              accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_variables_create(&self, request: Variable, parent: &str) -> AccountContainerWorkspaceVariableCreateCall<'a, C, A> {
         AccountContainerWorkspaceVariableCreateCall {
             hub: self.hub,
@@ -3447,7 +3895,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM UserPermission's API relative path. Example: accounts/{account_id}/user_permissions/{user_permission_id}
+    /// * `path` - GTM UserPermission's API relative path.
+    ///            Example: accounts/{account_id}/user_permissions/{user_permission_id}
     pub fn user_permissions_get(&self, path: &str) -> AccountUserPermissionGetCall<'a, C, A> {
         AccountUserPermissionGetCall {
             hub: self.hub,
@@ -3464,7 +3913,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
+    /// * `path` - GTM Trigger's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
     pub fn containers_workspaces_triggers_revert(&self, path: &str) -> AccountContainerWorkspaceTriggerRevertCall<'a, C, A> {
         AccountContainerWorkspaceTriggerRevertCall {
             hub: self.hub,
@@ -3482,7 +3933,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
+    /// * `path` - GTM Variable's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
     pub fn containers_workspaces_variables_delete(&self, path: &str) -> AccountContainerWorkspaceVariableDeleteCall<'a, C, A> {
         AccountContainerWorkspaceVariableDeleteCall {
             hub: self.hub,
@@ -3499,7 +3952,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
+    /// * `path` - GTM Tag's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
     pub fn containers_workspaces_tags_get(&self, path: &str) -> AccountContainerWorkspaceTagGetCall<'a, C, A> {
         AccountContainerWorkspaceTagGetCall {
             hub: self.hub,
@@ -3512,12 +3967,15 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resolves a merge conflict for a workspace entity by updating it to the resolved entity passed in the request.
+    /// Resolves a merge conflict for a workspace entity by updating it to the
+    /// resolved entity passed in the request.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `path` - GTM Workspace's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_resolve_conflict(&self, request: Entity, path: &str) -> AccountContainerWorkspaceResolveConflictCall<'a, C, A> {
         AccountContainerWorkspaceResolveConflictCall {
             hub: self.hub,
@@ -3537,7 +3995,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}
+    /// * `path` - GTM Environment's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/environments/{environment_id}
     pub fn containers_environments_update(&self, request: Environment, path: &str) -> AccountContainerEnvironmentUpdateCall<'a, C, A> {
         AccountContainerEnvironmentUpdateCall {
             hub: self.hub,
@@ -3556,7 +4016,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
+    /// * `path` - GTM Trigger's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
     pub fn containers_workspaces_triggers_get(&self, path: &str) -> AccountContainerWorkspaceTriggerGetCall<'a, C, A> {
         AccountContainerWorkspaceTriggerGetCall {
             hub: self.hub,
@@ -3573,7 +4035,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// * `path` - GTM Folder's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
     pub fn containers_workspaces_folders_revert(&self, path: &str) -> AccountContainerWorkspaceFolderRevertCall<'a, C, A> {
         AccountContainerWorkspaceFolderRevertCall {
             hub: self.hub,
@@ -3591,7 +4055,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `path` - GTM Workspace's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_get_status(&self, path: &str) -> AccountContainerWorkspaceGetStatuCall<'a, C, A> {
         AccountContainerWorkspaceGetStatuCall {
             hub: self.hub,
@@ -3609,7 +4075,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// * `path` - GTM ContainerVersion's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/versions/{version_id}
     pub fn containers_versions_update(&self, request: ContainerVersion, path: &str) -> AccountContainerVersionUpdateCall<'a, C, A> {
         AccountContainerVersionUpdateCall {
             hub: self.hub,
@@ -3628,7 +4096,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// * `path` - GTM ContainerVersion's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/versions/{version_id}
     pub fn containers_versions_get(&self, path: &str) -> AccountContainerVersionGetCall<'a, C, A> {
         AccountContainerVersionGetCall {
             hub: self.hub,
@@ -3647,7 +4117,9 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `path` - GTM Workspace's API relative path.
+    ///            Example:
+    ///            accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     pub fn containers_workspaces_update(&self, request: Workspace, path: &str) -> AccountContainerWorkspaceUpdateCall<'a, C, A> {
         AccountContainerWorkspaceUpdateCall {
             hub: self.hub,
@@ -3662,11 +4134,13 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes a user from the account, revoking access to it and all of its containers.
+    /// Removes a user from the account, revoking access to it and all of its
+    /// containers.
     /// 
     /// # Arguments
     ///
-    /// * `path` - GTM UserPermission's API relative path. Example: accounts/{account_id}/user_permissions/{user_permission_id}
+    /// * `path` - GTM UserPermission's API relative path.
+    ///            Example: accounts/{account_id}/user_permissions/{user_permission_id}
     pub fn user_permissions_delete(&self, path: &str) -> AccountUserPermissionDeleteCall<'a, C, A> {
         AccountUserPermissionDeleteCall {
             hub: self.hub,
@@ -3765,7 +4239,7 @@ impl<'a, C, A> AccountContainerWorkspaceZoneCreateCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/zones";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/zones";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -3892,7 +4366,9 @@ impl<'a, C, A> AccountContainerWorkspaceZoneCreateCall<'a, C, A> where C: Borrow
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -3922,13 +4398,17 @@ impl<'a, C, A> AccountContainerWorkspaceZoneCreateCall<'a, C, A> where C: Borrow
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceZoneCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4060,7 +4540,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderMoveEntitiesToFolderCall<'a, C, A>
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{+path}:move_entities_to_folder";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}:move_entities_to_folder";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -4177,7 +4657,9 @@ impl<'a, C, A> AccountContainerWorkspaceFolderMoveEntitiesToFolderCall<'a, C, A>
         self._request = new_value;
         self
     }
-    /// GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// GTM Folder's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -4231,13 +4713,17 @@ impl<'a, C, A> AccountContainerWorkspaceFolderMoveEntitiesToFolderCall<'a, C, A>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceFolderMoveEntitiesToFolderCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4342,7 +4828,7 @@ impl<'a, C, A> AccountContainerVersionHeaderLatestCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/version_headers:latest";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/version_headers:latest";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -4445,7 +4931,8 @@ impl<'a, C, A> AccountContainerVersionHeaderLatestCall<'a, C, A> where C: Borrow
     }
 
 
-    /// GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM Container's API relative path.
+    /// Example: accounts/{account_id}/containers/{container_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -4475,13 +4962,17 @@ impl<'a, C, A> AccountContainerVersionHeaderLatestCall<'a, C, A> where C: Borrow
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionHeaderLatestCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4593,7 +5084,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerCreateCall<'a, C, A> where C: Bor
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/triggers";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/triggers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -4720,7 +5211,9 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerCreateCall<'a, C, A> where C: Bor
         self._request = new_value;
         self
     }
-    /// GTM Workspaces's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspaces's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -4750,13 +5243,17 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerCreateCall<'a, C, A> where C: Bor
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTriggerCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4866,7 +5363,7 @@ impl<'a, C, A> AccountContainerWorkspaceListCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/workspaces";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/workspaces";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -4969,7 +5466,8 @@ impl<'a, C, A> AccountContainerWorkspaceListCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// GTM parent Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM parent Container's API relative path.
+    /// Example: accounts/{account_id}/containers/{container_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -5006,13 +5504,17 @@ impl<'a, C, A> AccountContainerWorkspaceListCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5122,7 +5624,7 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableRevertCall<'a, C, A> wher
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}/built_in_variables:revert";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}/built_in_variables:revert";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -5225,7 +5727,9 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableRevertCall<'a, C, A> wher
     }
 
 
-    /// GTM BuiltInVariable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/built_in_variables
+    /// GTM BuiltInVariable's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/built_in_variables
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -5262,13 +5766,17 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableRevertCall<'a, C, A> wher
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceBuiltInVariableRevertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5379,7 +5887,7 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableDeleteCall<'a, C, A> wher
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -5472,7 +5980,9 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableDeleteCall<'a, C, A> wher
     }
 
 
-    /// GTM BuiltInVariable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/built_in_variables
+    /// GTM BuiltInVariable's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/built_in_variables
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -5510,13 +6020,17 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableDeleteCall<'a, C, A> wher
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceBuiltInVariableDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5628,7 +6142,7 @@ impl<'a, C, A> AccountContainerEnvironmentCreateCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/environments";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/environments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -5755,7 +6269,8 @@ impl<'a, C, A> AccountContainerEnvironmentCreateCall<'a, C, A> where C: BorrowMu
         self._request = new_value;
         self
     }
-    /// GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM Container's API relative path.
+    /// Example: accounts/{account_id}/containers/{container_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -5785,13 +6300,17 @@ impl<'a, C, A> AccountContainerEnvironmentCreateCall<'a, C, A> where C: BorrowMu
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5901,7 +6420,7 @@ impl<'a, C, A> AccountContainerVersionPublishCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}:publish";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}:publish";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Publish.as_ref().to_string(), ());
         }
@@ -6004,7 +6523,9 @@ impl<'a, C, A> AccountContainerVersionPublishCall<'a, C, A> where C: BorrowMut<h
     }
 
 
-    /// GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// GTM ContainerVersion's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/versions/{version_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -6014,7 +6535,8 @@ impl<'a, C, A> AccountContainerVersionPublishCall<'a, C, A> where C: BorrowMut<h
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the container version in storage.
+    /// When provided, this fingerprint must match the fingerprint of the
+    /// container version in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C, A> {
@@ -6041,13 +6563,17 @@ impl<'a, C, A> AccountContainerVersionPublishCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionPublishCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -6152,7 +6678,7 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateGetCall<'a, C, A> where C: Borro
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -6255,7 +6781,9 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateGetCall<'a, C, A> where C: Borro
     }
 
 
-    /// GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    /// GTM Custom Template's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -6285,13 +6813,17 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateGetCall<'a, C, A> where C: Borro
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTemplateGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -6401,7 +6933,7 @@ impl<'a, C, A> AccountContainerWorkspaceZoneRevertCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}:revert";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}:revert";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -6504,7 +7036,9 @@ impl<'a, C, A> AccountContainerWorkspaceZoneRevertCall<'a, C, A> where C: Borrow
     }
 
 
-    /// GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
+    /// GTM Zone's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -6514,7 +7048,8 @@ impl<'a, C, A> AccountContainerWorkspaceZoneRevertCall<'a, C, A> where C: Borrow
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the zone in storage.
+    /// When provided, this fingerprint must match the fingerprint of the zone in
+    /// storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerWorkspaceZoneRevertCall<'a, C, A> {
@@ -6541,13 +7076,17 @@ impl<'a, C, A> AccountContainerWorkspaceZoneRevertCall<'a, C, A> where C: Borrow
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceZoneRevertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -6659,7 +7198,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagCreateCall<'a, C, A> where C: BorrowM
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/tags";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/tags";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -6786,7 +7325,9 @@ impl<'a, C, A> AccountContainerWorkspaceTagCreateCall<'a, C, A> where C: BorrowM
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -6816,13 +7357,17 @@ impl<'a, C, A> AccountContainerWorkspaceTagCreateCall<'a, C, A> where C: BorrowM
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTagCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -6926,7 +7471,7 @@ impl<'a, C, A> AccountContainerEnvironmentDeleteCall<'a, C, A> where C: BorrowMu
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -7019,7 +7564,9 @@ impl<'a, C, A> AccountContainerEnvironmentDeleteCall<'a, C, A> where C: BorrowMu
     }
 
 
-    /// GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}
+    /// GTM Environment's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/environments/{environment_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -7049,13 +7596,17 @@ impl<'a, C, A> AccountContainerEnvironmentDeleteCall<'a, C, A> where C: BorrowMu
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7160,7 +7711,7 @@ impl<'a, C, A> AccountContainerWorkspaceGetCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -7263,7 +7814,9 @@ impl<'a, C, A> AccountContainerWorkspaceGetCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -7293,13 +7846,17 @@ impl<'a, C, A> AccountContainerWorkspaceGetCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7404,7 +7961,7 @@ impl<'a, C, A> AccountContainerGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -7507,7 +8064,8 @@ impl<'a, C, A> AccountContainerGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM Container's API relative path.
+    /// Example: accounts/{account_id}/containers/{container_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -7537,13 +8095,17 @@ impl<'a, C, A> AccountContainerGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7655,7 +8217,7 @@ impl<'a, C, A> AccountUserPermissionCreateCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/user_permissions";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/user_permissions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -7782,7 +8344,8 @@ impl<'a, C, A> AccountUserPermissionCreateCall<'a, C, A> where C: BorrowMut<hype
         self._request = new_value;
         self
     }
-    /// GTM Account's API relative path. Example: accounts/{account_id}
+    /// GTM Account's API relative path.
+    /// Example: accounts/{account_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -7812,13 +8375,17 @@ impl<'a, C, A> AccountUserPermissionCreateCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountUserPermissionCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7928,7 +8495,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderListCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/folders";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/folders";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -8031,7 +8598,9 @@ impl<'a, C, A> AccountContainerWorkspaceFolderListCall<'a, C, A> where C: Borrow
     }
 
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -8068,13 +8637,17 @@ impl<'a, C, A> AccountContainerWorkspaceFolderListCall<'a, C, A> where C: Borrow
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceFolderListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -8186,7 +8759,7 @@ impl<'a, C, A> AccountContainerEnvironmentReauthorizeCall<'a, C, A> where C: Bor
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}:reauthorize";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}:reauthorize";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Publish.as_ref().to_string(), ());
         }
@@ -8313,7 +8886,9 @@ impl<'a, C, A> AccountContainerEnvironmentReauthorizeCall<'a, C, A> where C: Bor
         self._request = new_value;
         self
     }
-    /// GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}
+    /// GTM Environment's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/environments/{environment_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -8343,13 +8918,17 @@ impl<'a, C, A> AccountContainerEnvironmentReauthorizeCall<'a, C, A> where C: Bor
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentReauthorizeCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -8453,7 +9032,7 @@ impl<'a, C, A> AccountContainerWorkspaceDeleteCall<'a, C, A> where C: BorrowMut<
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
@@ -8546,7 +9125,9 @@ impl<'a, C, A> AccountContainerWorkspaceDeleteCall<'a, C, A> where C: BorrowMut<
     }
 
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -8576,13 +9157,17 @@ impl<'a, C, A> AccountContainerWorkspaceDeleteCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -8694,7 +9279,7 @@ impl<'a, C, A> AccountContainerWorkspaceCreateCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/workspaces";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/workspaces";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -8821,7 +9406,8 @@ impl<'a, C, A> AccountContainerWorkspaceCreateCall<'a, C, A> where C: BorrowMut<
         self._request = new_value;
         self
     }
-    /// GTM parent Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM parent Container's API relative path.
+    /// Example: accounts/{account_id}/containers/{container_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -8851,13 +9437,17 @@ impl<'a, C, A> AccountContainerWorkspaceCreateCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -8890,7 +9480,8 @@ impl<'a, C, A> AccountContainerWorkspaceCreateCall<'a, C, A> where C: BorrowMut<
 }
 
 
-/// List all users that have access to the account along with Account and Container user access granted to each of them.
+/// List all users that have access to the account along with Account and
+/// Container user access granted to each of them.
 ///
 /// A builder for the *user_permissions.list* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -8967,7 +9558,7 @@ impl<'a, C, A> AccountUserPermissionListCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/user_permissions";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/user_permissions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -9070,7 +9661,8 @@ impl<'a, C, A> AccountUserPermissionListCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// GTM Accounts's API relative path. Example: accounts/{account_id}
+    /// GTM Accounts's API relative path.
+    /// Example: accounts/{account_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -9107,13 +9699,17 @@ impl<'a, C, A> AccountUserPermissionListCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountUserPermissionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9217,7 +9813,7 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateDeleteCall<'a, C, A> where C: Bo
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -9310,7 +9906,9 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateDeleteCall<'a, C, A> where C: Bo
     }
 
 
-    /// GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    /// GTM Custom Template's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -9340,13 +9938,17 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateDeleteCall<'a, C, A> where C: Bo
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTemplateDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9379,7 +9981,8 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateDeleteCall<'a, C, A> where C: Bo
 }
 
 
-/// Quick previews a workspace by creating a fake container version from all entities in the provided workspace.
+/// Quick previews a workspace by creating a fake container version from all
+/// entities in the provided workspace.
 ///
 /// A builder for the *containers.workspaces.quick_preview* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -9451,7 +10054,7 @@ impl<'a, C, A> AccountContainerWorkspaceQuickPreviewCall<'a, C, A> where C: Borr
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}:quick_preview";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}:quick_preview";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
         }
@@ -9554,7 +10157,9 @@ impl<'a, C, A> AccountContainerWorkspaceQuickPreviewCall<'a, C, A> where C: Borr
     }
 
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -9584,13 +10189,17 @@ impl<'a, C, A> AccountContainerWorkspaceQuickPreviewCall<'a, C, A> where C: Borr
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceQuickPreviewCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9695,7 +10304,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableGetCall<'a, C, A> where C: Borro
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -9798,7 +10407,9 @@ impl<'a, C, A> AccountContainerWorkspaceVariableGetCall<'a, C, A> where C: Borro
     }
 
 
-    /// GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
+    /// GTM Variable's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -9828,13 +10439,17 @@ impl<'a, C, A> AccountContainerWorkspaceVariableGetCall<'a, C, A> where C: Borro
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceVariableGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9867,7 +10482,8 @@ impl<'a, C, A> AccountContainerWorkspaceVariableGetCall<'a, C, A> where C: Borro
 }
 
 
-/// Sets the latest version used for synchronization of workspaces when detecting conflicts and errors.
+/// Sets the latest version used for synchronization of workspaces when
+/// detecting conflicts and errors.
 ///
 /// A builder for the *containers.versions.set_latest* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -9939,7 +10555,7 @@ impl<'a, C, A> AccountContainerVersionSetLatestCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}:set_latest";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}:set_latest";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -10042,7 +10658,9 @@ impl<'a, C, A> AccountContainerVersionSetLatestCall<'a, C, A> where C: BorrowMut
     }
 
 
-    /// GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// GTM ContainerVersion's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/versions/{version_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -10072,13 +10690,17 @@ impl<'a, C, A> AccountContainerVersionSetLatestCall<'a, C, A> where C: BorrowMut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionSetLatestCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -10195,7 +10817,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableUpdateCall<'a, C, A> where C: Bo
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -10322,7 +10944,9 @@ impl<'a, C, A> AccountContainerWorkspaceVariableUpdateCall<'a, C, A> where C: Bo
         self._request = new_value;
         self
     }
-    /// GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
+    /// GTM Variable's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -10332,7 +10956,8 @@ impl<'a, C, A> AccountContainerWorkspaceVariableUpdateCall<'a, C, A> where C: Bo
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the variable in storage.
+    /// When provided, this fingerprint must match the fingerprint of the variable
+    /// in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerWorkspaceVariableUpdateCall<'a, C, A> {
@@ -10359,13 +10984,17 @@ impl<'a, C, A> AccountContainerWorkspaceVariableUpdateCall<'a, C, A> where C: Bo
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceVariableUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -10475,7 +11104,7 @@ impl<'a, C, A> AccountContainerEnvironmentListCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/environments";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/environments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -10578,7 +11207,8 @@ impl<'a, C, A> AccountContainerEnvironmentListCall<'a, C, A> where C: BorrowMut<
     }
 
 
-    /// GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM Container's API relative path.
+    /// Example: accounts/{account_id}/containers/{container_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -10615,13 +11245,17 @@ impl<'a, C, A> AccountContainerEnvironmentListCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -10731,7 +11365,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagListCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/tags";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/tags";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -10834,7 +11468,9 @@ impl<'a, C, A> AccountContainerWorkspaceTagListCall<'a, C, A> where C: BorrowMut
     }
 
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -10871,13 +11507,17 @@ impl<'a, C, A> AccountContainerWorkspaceTagListCall<'a, C, A> where C: BorrowMut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTagListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -10987,7 +11627,7 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateListCall<'a, C, A> where C: Borr
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/templates";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/templates";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -11090,7 +11730,9 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateListCall<'a, C, A> where C: Borr
     }
 
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -11127,13 +11769,17 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateListCall<'a, C, A> where C: Borr
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTemplateListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -11250,7 +11896,7 @@ impl<'a, C, A> AccountContainerWorkspaceZoneUpdateCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -11377,7 +12023,9 @@ impl<'a, C, A> AccountContainerWorkspaceZoneUpdateCall<'a, C, A> where C: Borrow
         self._request = new_value;
         self
     }
-    /// GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
+    /// GTM Zone's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -11387,7 +12035,8 @@ impl<'a, C, A> AccountContainerWorkspaceZoneUpdateCall<'a, C, A> where C: Borrow
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the zone in storage.
+    /// When provided, this fingerprint must match the fingerprint of the zone in
+    /// storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerWorkspaceZoneUpdateCall<'a, C, A> {
@@ -11414,13 +12063,17 @@ impl<'a, C, A> AccountContainerWorkspaceZoneUpdateCall<'a, C, A> where C: Borrow
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceZoneUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -11525,7 +12178,7 @@ impl<'a, C, A> AccountContainerWorkspaceZoneGetCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -11628,7 +12281,9 @@ impl<'a, C, A> AccountContainerWorkspaceZoneGetCall<'a, C, A> where C: BorrowMut
     }
 
 
-    /// GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
+    /// GTM Zone's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -11658,13 +12313,17 @@ impl<'a, C, A> AccountContainerWorkspaceZoneGetCall<'a, C, A> where C: BorrowMut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceZoneGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -11697,7 +12356,9 @@ impl<'a, C, A> AccountContainerWorkspaceZoneGetCall<'a, C, A> where C: BorrowMut
 }
 
 
-/// Creates a Container Version from the entities present in the workspace, deletes the workspace, and sets the base container version to the newly created version.
+/// Creates a Container Version from the entities present in the workspace,
+/// deletes the workspace, and sets the base container version to the newly
+/// created version.
 ///
 /// A builder for the *containers.workspaces.create_version* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -11776,7 +12437,7 @@ impl<'a, C, A> AccountContainerWorkspaceCreateVersionCall<'a, C, A> where C: Bor
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}:create_version";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}:create_version";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
         }
@@ -11903,7 +12564,9 @@ impl<'a, C, A> AccountContainerWorkspaceCreateVersionCall<'a, C, A> where C: Bor
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -11933,13 +12596,17 @@ impl<'a, C, A> AccountContainerWorkspaceCreateVersionCall<'a, C, A> where C: Bor
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceCreateVersionCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -12043,7 +12710,7 @@ impl<'a, C, A> AccountContainerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
@@ -12136,7 +12803,8 @@ impl<'a, C, A> AccountContainerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
-    /// GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM Container's API relative path.
+    /// Example: accounts/{account_id}/containers/{container_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -12166,13 +12834,17 @@ impl<'a, C, A> AccountContainerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -12284,7 +12956,7 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateCreateCall<'a, C, A> where C: Bo
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/templates";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/templates";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -12411,7 +13083,9 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateCreateCall<'a, C, A> where C: Bo
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -12441,13 +13115,17 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateCreateCall<'a, C, A> where C: Bo
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTemplateCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -12551,7 +13229,7 @@ impl<'a, C, A> AccountContainerVersionDeleteCall<'a, C, A> where C: BorrowMut<hy
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
         }
@@ -12644,7 +13322,9 @@ impl<'a, C, A> AccountContainerVersionDeleteCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// GTM ContainerVersion's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/versions/{version_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -12674,13 +13354,17 @@ impl<'a, C, A> AccountContainerVersionDeleteCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -12797,7 +13481,7 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageAccount.as_ref().to_string(), ());
         }
@@ -12924,7 +13608,8 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
-    /// GTM Accounts's API relative path. Example: accounts/{account_id}
+    /// GTM Accounts's API relative path.
+    /// Example: accounts/{account_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -12934,7 +13619,8 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the account in storage.
+    /// When provided, this fingerprint must match the fingerprint of the account
+    /// in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountUpdateCall<'a, C, A> {
@@ -12961,13 +13647,17 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -13082,7 +13772,7 @@ impl<'a, C, A> AccountContainerVersionHeaderListCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/version_headers";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/version_headers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -13185,7 +13875,8 @@ impl<'a, C, A> AccountContainerVersionHeaderListCall<'a, C, A> where C: BorrowMu
     }
 
 
-    /// GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM Container's API relative path.
+    /// Example: accounts/{account_id}/containers/{container_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -13229,13 +13920,17 @@ impl<'a, C, A> AccountContainerVersionHeaderListCall<'a, C, A> where C: BorrowMu
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionHeaderListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -13345,7 +14040,7 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableListCall<'a, C, A> where 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/built_in_variables";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/built_in_variables";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -13448,7 +14143,9 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableListCall<'a, C, A> where 
     }
 
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -13485,13 +14182,17 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableListCall<'a, C, A> where 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceBuiltInVariableListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -13601,7 +14302,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerListCall<'a, C, A> where C: Borro
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/triggers";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/triggers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -13704,7 +14405,9 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerListCall<'a, C, A> where C: Borro
     }
 
 
-    /// GTM Workspaces's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspaces's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -13741,13 +14444,17 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerListCall<'a, C, A> where C: Borro
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTriggerListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -13859,7 +14566,7 @@ impl<'a, C, A> AccountUserPermissionUpdateCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -13986,7 +14693,8 @@ impl<'a, C, A> AccountUserPermissionUpdateCall<'a, C, A> where C: BorrowMut<hype
         self._request = new_value;
         self
     }
-    /// GTM UserPermission's API relative path. Example: accounts/{account_id}/user_permissions/{user_permission_id}
+    /// GTM UserPermission's API relative path.
+    /// Example: accounts/{account_id}/user_permissions/{user_permission_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -14016,13 +14724,17 @@ impl<'a, C, A> AccountUserPermissionUpdateCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountUserPermissionUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -14132,7 +14844,7 @@ impl<'a, C, A> AccountContainerWorkspaceZoneListCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/zones";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/zones";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -14235,7 +14947,9 @@ impl<'a, C, A> AccountContainerWorkspaceZoneListCall<'a, C, A> where C: BorrowMu
     }
 
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -14272,13 +14986,17 @@ impl<'a, C, A> AccountContainerWorkspaceZoneListCall<'a, C, A> where C: BorrowMu
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceZoneListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -14395,7 +15113,7 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A> where C: Bo
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -14522,7 +15240,9 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A> where C: Bo
         self._request = new_value;
         self
     }
-    /// GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    /// GTM Custom Template's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -14532,7 +15252,8 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A> where C: Bo
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the templates in storage.
+    /// When provided, this fingerprint must match the fingerprint of the templates
+    /// in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A> {
@@ -14559,13 +15280,17 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A> where C: Bo
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTemplateUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -14670,7 +15395,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -14773,7 +15498,8 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// GTM Accounts's API relative path. Example: accounts/{account_id}
+    /// GTM Accounts's API relative path.
+    /// Example: accounts/{account_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -14803,13 +15529,17 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -14914,7 +15644,7 @@ impl<'a, C, A> AccountContainerVersionLiveCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/versions:live";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/versions:live";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -15017,7 +15747,8 @@ impl<'a, C, A> AccountContainerVersionLiveCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
-    /// GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM Container's API relative path.
+    /// Example: accounts/{account_id}/containers/{container_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -15047,13 +15778,17 @@ impl<'a, C, A> AccountContainerVersionLiveCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionLiveCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -15160,7 +15895,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/accounts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -15266,13 +16001,17 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -15382,7 +16121,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableListCall<'a, C, A> where C: Borr
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/variables";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/variables";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -15485,7 +16224,9 @@ impl<'a, C, A> AccountContainerWorkspaceVariableListCall<'a, C, A> where C: Borr
     }
 
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -15522,13 +16263,17 @@ impl<'a, C, A> AccountContainerWorkspaceVariableListCall<'a, C, A> where C: Borr
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceVariableListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -15633,7 +16378,7 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}:undelete";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}:undelete";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
         }
@@ -15736,7 +16481,9 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
     }
 
 
-    /// GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// GTM ContainerVersion's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/versions/{version_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -15766,13 +16513,17 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUndeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -15882,7 +16633,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableRevertCall<'a, C, A> where C: Bo
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}:revert";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}:revert";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -15985,7 +16736,9 @@ impl<'a, C, A> AccountContainerWorkspaceVariableRevertCall<'a, C, A> where C: Bo
     }
 
 
-    /// GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
+    /// GTM Variable's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -15995,7 +16748,8 @@ impl<'a, C, A> AccountContainerWorkspaceVariableRevertCall<'a, C, A> where C: Bo
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the variable in storage.
+    /// When provided, this fingerprint must match the fingerprint of the variable
+    /// in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerWorkspaceVariableRevertCall<'a, C, A> {
@@ -16022,13 +16776,17 @@ impl<'a, C, A> AccountContainerWorkspaceVariableRevertCall<'a, C, A> where C: Bo
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceVariableRevertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -16132,7 +16890,7 @@ impl<'a, C, A> AccountContainerWorkspaceZoneDeleteCall<'a, C, A> where C: Borrow
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -16225,7 +16983,9 @@ impl<'a, C, A> AccountContainerWorkspaceZoneDeleteCall<'a, C, A> where C: Borrow
     }
 
 
-    /// GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
+    /// GTM Zone's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -16255,13 +17015,17 @@ impl<'a, C, A> AccountContainerWorkspaceZoneDeleteCall<'a, C, A> where C: Borrow
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceZoneDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -16366,7 +17130,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderGetCall<'a, C, A> where C: BorrowM
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -16469,7 +17233,9 @@ impl<'a, C, A> AccountContainerWorkspaceFolderGetCall<'a, C, A> where C: BorrowM
     }
 
 
-    /// GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// GTM Folder's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -16499,13 +17265,17 @@ impl<'a, C, A> AccountContainerWorkspaceFolderGetCall<'a, C, A> where C: BorrowM
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceFolderGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -16617,7 +17387,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderCreateCall<'a, C, A> where C: Borr
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/folders";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/folders";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -16744,7 +17514,9 @@ impl<'a, C, A> AccountContainerWorkspaceFolderCreateCall<'a, C, A> where C: Borr
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -16774,13 +17546,17 @@ impl<'a, C, A> AccountContainerWorkspaceFolderCreateCall<'a, C, A> where C: Borr
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceFolderCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -16884,7 +17660,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagDeleteCall<'a, C, A> where C: BorrowM
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -16977,7 +17753,9 @@ impl<'a, C, A> AccountContainerWorkspaceTagDeleteCall<'a, C, A> where C: BorrowM
     }
 
 
-    /// GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
+    /// GTM Tag's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -17007,13 +17785,17 @@ impl<'a, C, A> AccountContainerWorkspaceTagDeleteCall<'a, C, A> where C: BorrowM
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTagDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -17130,7 +17912,7 @@ impl<'a, C, A> AccountContainerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -17257,7 +18039,8 @@ impl<'a, C, A> AccountContainerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._request = new_value;
         self
     }
-    /// GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM Container's API relative path.
+    /// Example: accounts/{account_id}/containers/{container_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -17267,7 +18050,8 @@ impl<'a, C, A> AccountContainerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the container in storage.
+    /// When provided, this fingerprint must match the fingerprint of the
+    /// container in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, C, A> {
@@ -17294,13 +18078,17 @@ impl<'a, C, A> AccountContainerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -17405,7 +18193,7 @@ impl<'a, C, A> AccountContainerEnvironmentGetCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -17508,7 +18296,9 @@ impl<'a, C, A> AccountContainerEnvironmentGetCall<'a, C, A> where C: BorrowMut<h
     }
 
 
-    /// GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}
+    /// GTM Environment's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/environments/{environment_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -17538,13 +18328,17 @@ impl<'a, C, A> AccountContainerEnvironmentGetCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -17661,7 +18455,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderUpdateCall<'a, C, A> where C: Borr
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -17788,7 +18582,9 @@ impl<'a, C, A> AccountContainerWorkspaceFolderUpdateCall<'a, C, A> where C: Borr
         self._request = new_value;
         self
     }
-    /// GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// GTM Folder's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -17798,7 +18594,8 @@ impl<'a, C, A> AccountContainerWorkspaceFolderUpdateCall<'a, C, A> where C: Borr
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the folder in storage.
+    /// When provided, this fingerprint must match the fingerprint of the folder in
+    /// storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerWorkspaceFolderUpdateCall<'a, C, A> {
@@ -17825,13 +18622,17 @@ impl<'a, C, A> AccountContainerWorkspaceFolderUpdateCall<'a, C, A> where C: Borr
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceFolderUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -17943,7 +18744,7 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableCreateCall<'a, C, A> wher
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/built_in_variables";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/built_in_variables";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -18046,7 +18847,9 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableCreateCall<'a, C, A> wher
     }
 
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -18084,13 +18887,17 @@ impl<'a, C, A> AccountContainerWorkspaceBuiltInVariableCreateCall<'a, C, A> wher
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceBuiltInVariableCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -18200,7 +19007,7 @@ impl<'a, C, A> AccountContainerListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/containers";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/containers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -18303,7 +19110,8 @@ impl<'a, C, A> AccountContainerListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// GTM Accounts's API relative path. Example: accounts/{account_id}.
+    /// GTM Accounts's API relative path.
+    /// Example: accounts/{account_id}.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -18340,13 +19148,17 @@ impl<'a, C, A> AccountContainerListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -18456,7 +19268,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderEntityCall<'a, C, A> where C: Borr
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}:entities";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}:entities";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -18559,7 +19371,9 @@ impl<'a, C, A> AccountContainerWorkspaceFolderEntityCall<'a, C, A> where C: Borr
     }
 
 
-    /// GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// GTM Folder's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -18596,13 +19410,17 @@ impl<'a, C, A> AccountContainerWorkspaceFolderEntityCall<'a, C, A> where C: Borr
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceFolderEntityCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -18706,7 +19524,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerDeleteCall<'a, C, A> where C: Bor
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -18799,7 +19617,9 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerDeleteCall<'a, C, A> where C: Bor
     }
 
 
-    /// GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
+    /// GTM Trigger's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -18829,13 +19649,17 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerDeleteCall<'a, C, A> where C: Bor
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTriggerDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -18939,7 +19763,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> where C: Borr
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -19032,7 +19856,9 @@ impl<'a, C, A> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> where C: Borr
     }
 
 
-    /// GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// GTM Folder's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -19062,13 +19888,17 @@ impl<'a, C, A> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> where C: Borr
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceFolderDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -19101,7 +19931,9 @@ impl<'a, C, A> AccountContainerWorkspaceFolderDeleteCall<'a, C, A> where C: Borr
 }
 
 
-/// Syncs a workspace to the latest container version by updating all unmodified workspace entities and displaying conflicts for modified entities.
+/// Syncs a workspace to the latest container version by updating all
+/// unmodified workspace entities and displaying conflicts for modified
+/// entities.
 ///
 /// A builder for the *containers.workspaces.sync* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -19173,7 +20005,7 @@ impl<'a, C, A> AccountContainerWorkspaceSyncCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}:sync";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}:sync";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -19276,7 +20108,9 @@ impl<'a, C, A> AccountContainerWorkspaceSyncCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -19306,13 +20140,17 @@ impl<'a, C, A> AccountContainerWorkspaceSyncCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceSyncCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -19422,7 +20260,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagRevertCall<'a, C, A> where C: BorrowM
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}:revert";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}:revert";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -19525,7 +20363,9 @@ impl<'a, C, A> AccountContainerWorkspaceTagRevertCall<'a, C, A> where C: BorrowM
     }
 
 
-    /// GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
+    /// GTM Tag's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -19535,7 +20375,8 @@ impl<'a, C, A> AccountContainerWorkspaceTagRevertCall<'a, C, A> where C: BorrowM
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of thetag in storage.
+    /// When provided, this fingerprint must match the fingerprint of thetag
+    /// in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerWorkspaceTagRevertCall<'a, C, A> {
@@ -19562,13 +20403,17 @@ impl<'a, C, A> AccountContainerWorkspaceTagRevertCall<'a, C, A> where C: BorrowM
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTagRevertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -19685,7 +20530,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagUpdateCall<'a, C, A> where C: BorrowM
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -19812,7 +20657,9 @@ impl<'a, C, A> AccountContainerWorkspaceTagUpdateCall<'a, C, A> where C: BorrowM
         self._request = new_value;
         self
     }
-    /// GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
+    /// GTM Tag's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -19822,7 +20669,8 @@ impl<'a, C, A> AccountContainerWorkspaceTagUpdateCall<'a, C, A> where C: BorrowM
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the tag in storage.
+    /// When provided, this fingerprint must match the fingerprint of the tag in
+    /// storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerWorkspaceTagUpdateCall<'a, C, A> {
@@ -19849,13 +20697,17 @@ impl<'a, C, A> AccountContainerWorkspaceTagUpdateCall<'a, C, A> where C: BorrowM
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTagUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -19965,7 +20817,7 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateRevertCall<'a, C, A> where C: Bo
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}:revert";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}:revert";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -20068,7 +20920,9 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateRevertCall<'a, C, A> where C: Bo
     }
 
 
-    /// GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    /// GTM Custom Template's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -20078,7 +20932,8 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateRevertCall<'a, C, A> where C: Bo
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the template in storage.
+    /// When provided, this fingerprint must match the fingerprint of the template
+    /// in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerWorkspaceTemplateRevertCall<'a, C, A> {
@@ -20105,13 +20960,17 @@ impl<'a, C, A> AccountContainerWorkspaceTemplateRevertCall<'a, C, A> where C: Bo
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTemplateRevertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -20223,7 +21082,7 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/containers";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/containers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -20350,7 +21209,8 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._request = new_value;
         self
     }
-    /// GTM Account's API relative path. Example: accounts/{account_id}.
+    /// GTM Account's API relative path.
+    /// Example: accounts/{account_id}.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -20380,13 +21240,17 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -20503,7 +21367,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerUpdateCall<'a, C, A> where C: Bor
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -20630,7 +21494,9 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerUpdateCall<'a, C, A> where C: Bor
         self._request = new_value;
         self
     }
-    /// GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
+    /// GTM Trigger's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -20640,7 +21506,8 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerUpdateCall<'a, C, A> where C: Bor
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the trigger in storage.
+    /// When provided, this fingerprint must match the fingerprint of the trigger
+    /// in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerWorkspaceTriggerUpdateCall<'a, C, A> {
@@ -20667,13 +21534,17 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerUpdateCall<'a, C, A> where C: Bor
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTriggerUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -20785,7 +21656,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableCreateCall<'a, C, A> where C: Bo
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+parent}/variables";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+parent}/variables";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -20912,7 +21783,9 @@ impl<'a, C, A> AccountContainerWorkspaceVariableCreateCall<'a, C, A> where C: Bo
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -20942,13 +21815,17 @@ impl<'a, C, A> AccountContainerWorkspaceVariableCreateCall<'a, C, A> where C: Bo
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceVariableCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -21053,7 +21930,7 @@ impl<'a, C, A> AccountUserPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -21156,7 +22033,8 @@ impl<'a, C, A> AccountUserPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
-    /// GTM UserPermission's API relative path. Example: accounts/{account_id}/user_permissions/{user_permission_id}
+    /// GTM UserPermission's API relative path.
+    /// Example: accounts/{account_id}/user_permissions/{user_permission_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -21186,13 +22064,17 @@ impl<'a, C, A> AccountUserPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountUserPermissionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -21302,7 +22184,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerRevertCall<'a, C, A> where C: Bor
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}:revert";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}:revert";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -21405,7 +22287,9 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerRevertCall<'a, C, A> where C: Bor
     }
 
 
-    /// GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
+    /// GTM Trigger's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -21415,7 +22299,8 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerRevertCall<'a, C, A> where C: Bor
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the trigger in storage.
+    /// When provided, this fingerprint must match the fingerprint of the trigger
+    /// in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerWorkspaceTriggerRevertCall<'a, C, A> {
@@ -21442,13 +22327,17 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerRevertCall<'a, C, A> where C: Bor
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTriggerRevertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -21552,7 +22441,7 @@ impl<'a, C, A> AccountContainerWorkspaceVariableDeleteCall<'a, C, A> where C: Bo
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -21645,7 +22534,9 @@ impl<'a, C, A> AccountContainerWorkspaceVariableDeleteCall<'a, C, A> where C: Bo
     }
 
 
-    /// GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
+    /// GTM Variable's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -21675,13 +22566,17 @@ impl<'a, C, A> AccountContainerWorkspaceVariableDeleteCall<'a, C, A> where C: Bo
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceVariableDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -21786,7 +22681,7 @@ impl<'a, C, A> AccountContainerWorkspaceTagGetCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -21889,7 +22784,9 @@ impl<'a, C, A> AccountContainerWorkspaceTagGetCall<'a, C, A> where C: BorrowMut<
     }
 
 
-    /// GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
+    /// GTM Tag's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -21919,13 +22816,17 @@ impl<'a, C, A> AccountContainerWorkspaceTagGetCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTagGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -21958,7 +22859,8 @@ impl<'a, C, A> AccountContainerWorkspaceTagGetCall<'a, C, A> where C: BorrowMut<
 }
 
 
-/// Resolves a merge conflict for a workspace entity by updating it to the resolved entity passed in the request.
+/// Resolves a merge conflict for a workspace entity by updating it to the
+/// resolved entity passed in the request.
 ///
 /// A builder for the *containers.workspaces.resolve_conflict* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -22041,7 +22943,7 @@ impl<'a, C, A> AccountContainerWorkspaceResolveConflictCall<'a, C, A> where C: B
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{+path}:resolve_conflict";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}:resolve_conflict";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -22158,7 +23060,9 @@ impl<'a, C, A> AccountContainerWorkspaceResolveConflictCall<'a, C, A> where C: B
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -22168,7 +23072,8 @@ impl<'a, C, A> AccountContainerWorkspaceResolveConflictCall<'a, C, A> where C: B
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the entity_in_workspace in the merge conflict.
+    /// When provided, this fingerprint must match the fingerprint of the
+    /// entity_in_workspace in the merge conflict.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerWorkspaceResolveConflictCall<'a, C, A> {
@@ -22195,13 +23100,17 @@ impl<'a, C, A> AccountContainerWorkspaceResolveConflictCall<'a, C, A> where C: B
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceResolveConflictCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -22318,7 +23227,7 @@ impl<'a, C, A> AccountContainerEnvironmentUpdateCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -22445,7 +23354,9 @@ impl<'a, C, A> AccountContainerEnvironmentUpdateCall<'a, C, A> where C: BorrowMu
         self._request = new_value;
         self
     }
-    /// GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}
+    /// GTM Environment's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/environments/{environment_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -22455,7 +23366,8 @@ impl<'a, C, A> AccountContainerEnvironmentUpdateCall<'a, C, A> where C: BorrowMu
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the environment in storage.
+    /// When provided, this fingerprint must match the fingerprint of the
+    /// environment in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a, C, A> {
@@ -22482,13 +23394,17 @@ impl<'a, C, A> AccountContainerEnvironmentUpdateCall<'a, C, A> where C: BorrowMu
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -22593,7 +23509,7 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerGetCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -22696,7 +23612,9 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerGetCall<'a, C, A> where C: Borrow
     }
 
 
-    /// GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
+    /// GTM Trigger's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -22726,13 +23644,17 @@ impl<'a, C, A> AccountContainerWorkspaceTriggerGetCall<'a, C, A> where C: Borrow
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceTriggerGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -22842,7 +23764,7 @@ impl<'a, C, A> AccountContainerWorkspaceFolderRevertCall<'a, C, A> where C: Borr
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}:revert";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}:revert";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -22945,7 +23867,9 @@ impl<'a, C, A> AccountContainerWorkspaceFolderRevertCall<'a, C, A> where C: Borr
     }
 
 
-    /// GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// GTM Folder's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -22955,7 +23879,8 @@ impl<'a, C, A> AccountContainerWorkspaceFolderRevertCall<'a, C, A> where C: Borr
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the tag in storage.
+    /// When provided, this fingerprint must match the fingerprint of the tag
+    /// in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerWorkspaceFolderRevertCall<'a, C, A> {
@@ -22982,13 +23907,17 @@ impl<'a, C, A> AccountContainerWorkspaceFolderRevertCall<'a, C, A> where C: Borr
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceFolderRevertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -23093,7 +24022,7 @@ impl<'a, C, A> AccountContainerWorkspaceGetStatuCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}/status";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}/status";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -23196,7 +24125,9 @@ impl<'a, C, A> AccountContainerWorkspaceGetStatuCall<'a, C, A> where C: BorrowMu
     }
 
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -23226,13 +24157,17 @@ impl<'a, C, A> AccountContainerWorkspaceGetStatuCall<'a, C, A> where C: BorrowMu
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceGetStatuCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -23349,7 +24284,7 @@ impl<'a, C, A> AccountContainerVersionUpdateCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
         }
@@ -23476,7 +24411,9 @@ impl<'a, C, A> AccountContainerVersionUpdateCall<'a, C, A> where C: BorrowMut<hy
         self._request = new_value;
         self
     }
-    /// GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// GTM ContainerVersion's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/versions/{version_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -23486,7 +24423,8 @@ impl<'a, C, A> AccountContainerVersionUpdateCall<'a, C, A> where C: BorrowMut<hy
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the container version in storage.
+    /// When provided, this fingerprint must match the fingerprint of the
+    /// container version in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C, A> {
@@ -23513,13 +24451,17 @@ impl<'a, C, A> AccountContainerVersionUpdateCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -23629,7 +24571,7 @@ impl<'a, C, A> AccountContainerVersionGetCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -23732,7 +24674,9 @@ impl<'a, C, A> AccountContainerVersionGetCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// GTM ContainerVersion's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/versions/{version_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -23742,7 +24686,8 @@ impl<'a, C, A> AccountContainerVersionGetCall<'a, C, A> where C: BorrowMut<hyper
         self._path = new_value.to_string();
         self
     }
-    /// The GTM ContainerVersion ID. Specify published to retrieve the currently published version.
+    /// The GTM ContainerVersion ID. Specify <code>published</code> to retrieve
+    /// the currently published version.
     ///
     /// Sets the *container version id* query property to the given value.
     pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, C, A> {
@@ -23769,13 +24714,17 @@ impl<'a, C, A> AccountContainerVersionGetCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -23892,7 +24841,7 @@ impl<'a, C, A> AccountContainerWorkspaceUpdateCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -24019,7 +24968,9 @@ impl<'a, C, A> AccountContainerWorkspaceUpdateCall<'a, C, A> where C: BorrowMut<
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
+    /// Example:
+    /// accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -24029,7 +24980,8 @@ impl<'a, C, A> AccountContainerWorkspaceUpdateCall<'a, C, A> where C: BorrowMut<
         self._path = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the workspace in storage.
+    /// When provided, this fingerprint must match the fingerprint of the
+    /// workspace in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerWorkspaceUpdateCall<'a, C, A> {
@@ -24056,13 +25008,17 @@ impl<'a, C, A> AccountContainerWorkspaceUpdateCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerWorkspaceUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -24095,7 +25051,8 @@ impl<'a, C, A> AccountContainerWorkspaceUpdateCall<'a, C, A> where C: BorrowMut<
 }
 
 
-/// Removes a user from the account, revoking access to it and all of its containers.
+/// Removes a user from the account, revoking access to it and all of its
+/// containers.
 ///
 /// A builder for the *user_permissions.delete* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -24166,7 +25123,7 @@ impl<'a, C, A> AccountUserPermissionDeleteCall<'a, C, A> where C: BorrowMut<hype
         }
 
 
-        let mut url = self.hub._base_url.clone() + "{+path}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -24259,7 +25216,8 @@ impl<'a, C, A> AccountUserPermissionDeleteCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
-    /// GTM UserPermission's API relative path. Example: accounts/{account_id}/user_permissions/{user_permission_id}
+    /// GTM UserPermission's API relative path.
+    /// Example: accounts/{account_id}/user_permissions/{user_permission_id}
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -24289,13 +25247,17 @@ impl<'a, C, A> AccountUserPermissionDeleteCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountUserPermissionDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());

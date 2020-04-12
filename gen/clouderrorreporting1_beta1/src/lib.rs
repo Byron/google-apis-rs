@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Clouderrorreporting* crate version *1.0.12+20190626*, where *20190626* is the exact revision of the *clouderrorreporting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Clouderrorreporting* crate version *1.0.13+20200331*, where *20200331* is the exact revision of the *clouderrorreporting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Clouderrorreporting* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/error-reporting/).
@@ -330,7 +330,7 @@ impl<'a, C, A> Clouderrorreporting<C, A>
         Clouderrorreporting {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://clouderrorreporting.googleapis.com/".to_string(),
             _root_url: "https://clouderrorreporting.googleapis.com/".to_string(),
         }
@@ -341,7 +341,7 @@ impl<'a, C, A> Clouderrorreporting<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -489,7 +489,7 @@ pub struct ErrorGroup {
     #[serde(rename="groupId")]
     pub group_id: Option<String>,
     /// The group resource name.
-    /// Example: <code>projects/my-project-123/groups/my-groupid</code>
+    /// Example: <code>projects/my-project-123/groups/CNSgkpnppqKCUw</code>
     pub name: Option<String>,
 }
 
@@ -691,15 +691,15 @@ impl ResponseResult for ListGroupStatsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportedErrorEvent {
-    /// [Required] The service context in which this error has occurred.
+    /// Required. The service context in which this error has occurred.
     #[serde(rename="serviceContext")]
     pub service_context: Option<ServiceContext>,
-    /// [Optional] Time when the event occurred.
+    /// Optional. Time when the event occurred.
     /// If not provided, the time when the event was received by the
     /// Error Reporting system will be used.
     #[serde(rename="eventTime")]
     pub event_time: Option<String>,
-    /// [Required] The error message.
+    /// Required. The error message.
     /// If no `context.reportLocation` is provided, the message must contain a
     /// header (typically consisting of the exception type name and an error
     /// message) and an exception stack trace in one of the supported programming
@@ -724,7 +724,7 @@ pub struct ReportedErrorEvent {
     /// * **Go**: Must be the return value of
     /// [`runtime.Stack()`](https://golang.org/pkg/runtime/debug/#Stack).
     pub message: Option<String>,
-    /// [Optional] A description of the context in which the error occurred.
+    /// Optional. A description of the context in which the error occurred.
     pub context: Option<ErrorContext>,
 }
 
@@ -855,7 +855,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `groupName` - [Required] The group resource name. Written as
+    /// * `groupName` - Required. The group resource name. Written as
     ///                 <code>projects/<var>projectID</var>/groups/<var>group_name</var></code>.
     ///                 Call
     ///                 <a href="/error-reporting/reference/rest/v1beta1/projects.groupStats/list">
@@ -878,11 +878,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectName` - [Required] The resource name of the Google Cloud Platform project. Written
-    ///                   as <code>projects/</code> plus the
-    ///                   <a href="https://support.google.com/cloud/answer/6158840">Google Cloud
-    ///                   Platform project ID</a>.
-    ///                   Example: <code>projects/my-project-123</code>.
+    /// * `projectName` - Required. The resource name of the Google Cloud Platform project. Written
+    ///                   as `projects/{projectID}`, where `{projectID}` is the
+    ///                   [Google Cloud Platform project
+    ///                   ID](https://support.google.com/cloud/answer/6158840).
+    ///                   Example: `projects/my-project-123`.
     pub fn group_stats_list(&self, project_name: &str) -> ProjectGroupStatListCall<'a, C, A> {
         ProjectGroupStatListCall {
             hub: self.hub,
@@ -910,8 +910,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectName` - [Required] The resource name of the Google Cloud Platform project. Written
-    ///                   as `projects/` plus the
+    /// * `projectName` - Required. The resource name of the Google Cloud Platform project. Written
+    ///                   as `projects/{projectID}`, where `{projectID}` is the
     ///                   [Google Cloud Platform project
     ///                   ID](https://support.google.com/cloud/answer/6158840).
     ///                   Example: `projects/my-project-123`.
@@ -931,8 +931,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectName` - [Required] The resource name of the Google Cloud Platform project. Written
-    ///                   as `projects/` plus the
+    /// * `projectName` - Required. The resource name of the Google Cloud Platform project. Written
+    ///                   as `projects/{projectID}`, where `{projectID}` is the
     ///                   [Google Cloud Platform project
     ///                   ID](https://support.google.com/cloud/answer/6158840).
     ///                   Example: `projects/my-project-123`.
@@ -962,7 +962,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The group resource name.
-    ///            Example: <code>projects/my-project-123/groups/my-groupid</code>
+    ///            Example: <code>projects/my-project-123/groups/CNSgkpnppqKCUw</code>
     pub fn groups_update(&self, request: ErrorGroup, name: &str) -> ProjectGroupUpdateCall<'a, C, A> {
         ProjectGroupUpdateCall {
             hub: self.hub,
@@ -984,16 +984,16 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// a `key` parameter. For example:
     /// 
     /// `POST
-    /// https://clouderrorreporting.googleapis.com/v1beta1/projects/example-project/events:report?key=123ABC456`
+    /// https://clouderrorreporting.googleapis.com/v1beta1/{projectName}/events:report?key=123ABC456`
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectName` - [Required] The resource name of the Google Cloud Platform project. Written
-    ///                   as `projects/` plus the
+    /// * `projectName` - Required. The resource name of the Google Cloud Platform project. Written
+    ///                   as `projects/{projectId}`, where `{projectId}` is the
     ///                   [Google Cloud Platform project
-    ///                   ID](https://support.google.com/cloud/answer/6158840). Example:
-    ///                   `projects/my-project-123`.
+    ///                   ID](https://support.google.com/cloud/answer/6158840).
+    ///                   Example: // `projects/my-project-123`.
     pub fn events_report(&self, request: ReportedErrorEvent, project_name: &str) -> ProjectEventReportCall<'a, C, A> {
         ProjectEventReportCall {
             hub: self.hub,
@@ -1189,7 +1189,7 @@ impl<'a, C, A> ProjectGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// [Required] The group resource name. Written as
+    /// Required. The group resource name. Written as
     /// <code>projects/<var>projectID</var>/groups/<var>group_name</var></code>.
     /// Call
     /// <a href="/error-reporting/reference/rest/v1beta1/projects.groupStats/list">
@@ -1501,12 +1501,12 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// [Required] The resource name of the Google Cloud Platform project. Written
-    /// as <code>projects/</code> plus the
-    /// <a href="https://support.google.com/cloud/answer/6158840">Google Cloud
-    /// Platform project ID</a>.
+    /// Required. The resource name of the Google Cloud Platform project. Written
+    /// as `projects/{projectID}`, where `{projectID}` is the
+    /// [Google Cloud Platform project
+    /// ID](https://support.google.com/cloud/answer/6158840).
     /// 
-    /// Example: <code>projects/my-project-123</code>.
+    /// Example: `projects/my-project-123`.
     ///
     /// Sets the *project name* path property to the given value.
     ///
@@ -1516,7 +1516,7 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._project_name = new_value.to_string();
         self
     }
-    /// [Optional] The preferred duration for a single returned `TimedCount`.
+    /// Optional. The preferred duration for a single returned `TimedCount`.
     /// If not set, no timed counts are returned.
     ///
     /// Sets the *timed count duration* query property to the given value.
@@ -1531,7 +1531,7 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._time_range_period = Some(new_value.to_string());
         self
     }
-    /// [Optional] The exact value to match against
+    /// Optional. The exact value to match against
     /// [`ServiceContext.version`](/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.version).
     ///
     /// Sets the *service filter.version* query property to the given value.
@@ -1539,7 +1539,7 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._service_filter_version = Some(new_value.to_string());
         self
     }
-    /// [Optional] The exact value to match against
+    /// Optional. The exact value to match against
     /// [`ServiceContext.service`](/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.service).
     ///
     /// Sets the *service filter.service* query property to the given value.
@@ -1547,7 +1547,7 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._service_filter_service = Some(new_value.to_string());
         self
     }
-    /// [Optional] The exact value to match against
+    /// Optional. The exact value to match against
     /// [`ServiceContext.resource_type`](/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.resource_type).
     ///
     /// Sets the *service filter.resource type* query property to the given value.
@@ -1555,7 +1555,7 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._service_filter_resource_type = Some(new_value.to_string());
         self
     }
-    /// [Optional] A `next_page_token` provided by a previous response. To view
+    /// Optional. A `next_page_token` provided by a previous response. To view
     /// additional results, pass this token along with the identical query
     /// parameters as the first request.
     ///
@@ -1564,7 +1564,7 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// [Optional] The maximum number of results to return per response.
+    /// Optional. The maximum number of results to return per response.
     /// Default is 20.
     ///
     /// Sets the *page size* query property to the given value.
@@ -1572,7 +1572,7 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._page_size = Some(new_value);
         self
     }
-    /// [Optional] The sort order in which the results are returned.
+    /// Optional. The sort order in which the results are returned.
     /// Default is `COUNT_DESC`.
     ///
     /// Sets the *order* query property to the given value.
@@ -1580,7 +1580,7 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._order = Some(new_value.to_string());
         self
     }
-    /// [Optional] List all <code>ErrorGroupStats</code> with these IDs.
+    /// Optional. List all <code>ErrorGroupStats</code> with these IDs.
     ///
     /// Append the given value to the *group id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -1588,7 +1588,7 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._group_id.push(new_value.to_string());
         self
     }
-    /// [Optional] Time where the timed counts shall be aligned if rounded
+    /// Optional. Time where the timed counts shall be aligned if rounded
     /// alignment is chosen. Default is 00:00 UTC.
     ///
     /// Sets the *alignment time* query property to the given value.
@@ -1596,7 +1596,7 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._alignment_time = Some(new_value.to_string());
         self
     }
-    /// [Optional] The alignment of the timed counts to be returned.
+    /// Optional. The alignment of the timed counts to be returned.
     /// Default is `ALIGNMENT_EQUAL_AT_END`.
     ///
     /// Sets the *alignment* query property to the given value.
@@ -1842,10 +1842,11 @@ impl<'a, C, A> ProjectDeleteEventCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// [Required] The resource name of the Google Cloud Platform project. Written
-    /// as `projects/` plus the
+    /// Required. The resource name of the Google Cloud Platform project. Written
+    /// as `projects/{projectID}`, where `{projectID}` is the
     /// [Google Cloud Platform project
     /// ID](https://support.google.com/cloud/answer/6158840).
+    /// 
     /// Example: `projects/my-project-123`.
     ///
     /// Sets the *project name* path property to the given value.
@@ -2129,10 +2130,11 @@ impl<'a, C, A> ProjectEventListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// [Required] The resource name of the Google Cloud Platform project. Written
-    /// as `projects/` plus the
+    /// Required. The resource name of the Google Cloud Platform project. Written
+    /// as `projects/{projectID}`, where `{projectID}` is the
     /// [Google Cloud Platform project
     /// ID](https://support.google.com/cloud/answer/6158840).
+    /// 
     /// Example: `projects/my-project-123`.
     ///
     /// Sets the *project name* path property to the given value.
@@ -2150,7 +2152,7 @@ impl<'a, C, A> ProjectEventListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._time_range_period = Some(new_value.to_string());
         self
     }
-    /// [Optional] The exact value to match against
+    /// Optional. The exact value to match against
     /// [`ServiceContext.version`](/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.version).
     ///
     /// Sets the *service filter.version* query property to the given value.
@@ -2158,7 +2160,7 @@ impl<'a, C, A> ProjectEventListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._service_filter_version = Some(new_value.to_string());
         self
     }
-    /// [Optional] The exact value to match against
+    /// Optional. The exact value to match against
     /// [`ServiceContext.service`](/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.service).
     ///
     /// Sets the *service filter.service* query property to the given value.
@@ -2166,7 +2168,7 @@ impl<'a, C, A> ProjectEventListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._service_filter_service = Some(new_value.to_string());
         self
     }
-    /// [Optional] The exact value to match against
+    /// Optional. The exact value to match against
     /// [`ServiceContext.resource_type`](/error-reporting/reference/rest/v1beta1/ServiceContext#FIELDS.resource_type).
     ///
     /// Sets the *service filter.resource type* query property to the given value.
@@ -2174,21 +2176,21 @@ impl<'a, C, A> ProjectEventListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._service_filter_resource_type = Some(new_value.to_string());
         self
     }
-    /// [Optional] A `next_page_token` provided by a previous response.
+    /// Optional. A `next_page_token` provided by a previous response.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectEventListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// [Optional] The maximum number of results to return per response.
+    /// Optional. The maximum number of results to return per response.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectEventListCall<'a, C, A> {
         self._page_size = Some(new_value);
         self
     }
-    /// [Required] The group for which events shall be returned.
+    /// Required. The group for which events shall be returned.
     ///
     /// Sets the *group id* query property to the given value.
     pub fn group_id(mut self, new_value: &str) -> ProjectEventListCall<'a, C, A> {
@@ -2466,7 +2468,7 @@ impl<'a, C, A> ProjectGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
         self
     }
     /// The group resource name.
-    /// Example: <code>projects/my-project-123/groups/my-groupid</code>
+    /// Example: <code>projects/my-project-123/groups/CNSgkpnppqKCUw</code>
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2547,7 +2549,7 @@ impl<'a, C, A> ProjectGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// a `key` parameter. For example:
 /// 
 /// `POST
-/// https://clouderrorreporting.googleapis.com/v1beta1/projects/example-project/events:report?key=123ABC456`
+/// https://clouderrorreporting.googleapis.com/v1beta1/{projectName}/events:report?key=123ABC456`
 ///
 /// A builder for the *events.report* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2753,11 +2755,12 @@ impl<'a, C, A> ProjectEventReportCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._request = new_value;
         self
     }
-    /// [Required] The resource name of the Google Cloud Platform project. Written
-    /// as `projects/` plus the
+    /// Required. The resource name of the Google Cloud Platform project. Written
+    /// as `projects/{projectId}`, where `{projectId}` is the
     /// [Google Cloud Platform project
-    /// ID](https://support.google.com/cloud/answer/6158840). Example:
-    /// `projects/my-project-123`.
+    /// ID](https://support.google.com/cloud/answer/6158840).
+    /// 
+    /// Example: // `projects/my-project-123`.
     ///
     /// Sets the *project name* path property to the given value.
     ///

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Remote Build Execution* crate version *1.0.12+20190702*, where *20190702* is the exact revision of the *remotebuildexecution:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Remote Build Execution* crate version *1.0.13+20200408*, where *20200408* is the exact revision of the *remotebuildexecution:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Remote Build Execution* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/remote-build-execution/docs/).
@@ -333,7 +333,7 @@ impl<'a, C, A> RemoteBuildExecution<C, A>
         RemoteBuildExecution {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://remotebuildexecution.googleapis.com/".to_string(),
             _root_url: "https://remotebuildexecution.googleapis.com/".to_string(),
         }
@@ -356,7 +356,7 @@ impl<'a, C, A> RemoteBuildExecution<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -407,8 +407,6 @@ impl Part for BuildBazelRemoteExecutionV2PriorityCapabilitiesPriorityRange {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BuildBazelRemoteExecutionV2SymlinkNode {
-    /// The name of the symlink.
-    pub name: Option<String>,
     /// The target path of the symlink. The path separator is a forward slash `/`.
     /// The target path can be relative to the parent directory of the symlink or
     /// it can be an absolute path starting with `/`. Support for absolute paths
@@ -416,6 +414,11 @@ pub struct BuildBazelRemoteExecutionV2SymlinkNode {
     /// API. The canonical form forbids the substrings `/./` and `//` in the target
     /// path. `..` components are allowed anywhere in the target path.
     pub target: Option<String>,
+    /// The node properties of the SymlinkNode.
+    #[serde(rename="nodeProperties")]
+    pub node_properties: Option<Vec<BuildBazelRemoteExecutionV2NodeProperty>>,
+    /// The name of the symlink.
+    pub name: Option<String>,
 }
 
 impl Part for BuildBazelRemoteExecutionV2SymlinkNode {}
@@ -444,6 +447,9 @@ impl Part for BuildBazelRemoteExecutionV2SymlinkNode {}
 /// * The files, directories and symlinks in the directory must each be sorted
 ///   in lexicographical order by path. The path strings must be sorted by code
 ///   point, equivalently, by UTF-8 bytes.
+/// * The NodeProperties of files,
+///   directories, and symlinks must be sorted in lexicographical order by
+///   property name.
 /// 
 /// A `Directory` that obeys the restrictions is said to be in canonical form.
 /// 
@@ -460,7 +466,13 @@ impl Part for BuildBazelRemoteExecutionV2SymlinkNode {}
 ///       digest: {
 ///         hash: "4a73bc9d03...",
 ///         size: 65534
-///       }
+///       },
+///       node_properties: [
+///         {
+///           "name": "MTime",
+///           "value": "2017-01-15T01:30:15.01Z"
+///         }
+///       ]
 ///     }
 ///   ],
 ///   directories: [
@@ -498,6 +510,9 @@ pub struct BuildBazelRemoteExecutionV2Directory {
     pub symlinks: Option<Vec<BuildBazelRemoteExecutionV2SymlinkNode>>,
     /// The subdirectories in the directory.
     pub directories: Option<Vec<BuildBazelRemoteExecutionV2DirectoryNode>>,
+    /// The node properties of the Directory.
+    #[serde(rename="nodeProperties")]
+    pub node_properties: Option<Vec<BuildBazelRemoteExecutionV2NodeProperty>>,
 }
 
 impl Part for BuildBazelRemoteExecutionV2Directory {}
@@ -582,22 +597,6 @@ pub struct BuildBazelRemoteExecutionV2PriorityCapabilities {
 impl Part for BuildBazelRemoteExecutionV2PriorityCapabilities {}
 
 
-/// A request message for
-/// WaitExecution.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [wait execution operations](struct.OperationWaitExecutionCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BuildBazelRemoteExecutionV2WaitExecutionRequest { _never_set: Option<bool> }
-
-impl RequestValue for BuildBazelRemoteExecutionV2WaitExecutionRequest {}
-
-
 /// A request corresponding to a single blob that the client wants to upload.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -633,16 +632,20 @@ pub struct BuildBazelRemoteExecutionV2ActionResult {
     /// may be links to other output files, or input files, or even absolute paths
     /// outside of the working directory, if the server supports
     /// SymlinkAbsolutePathStrategy.ALLOWED.
-    /// For each output file requested in the `output_files` field of the Action,
-    /// if the corresponding file existed after
+    /// For each output file requested in the `output_files` or `output_paths`
+    /// field of the Action, if the corresponding file existed after
     /// the action completed, a single entry will be present either in this field,
     /// or in the `output_files` field, if the file was not a symbolic link.
     /// 
-    /// If an output symbolic link of the same name was found, but its target
-    /// type was not a regular file, the server will return a FAILED_PRECONDITION.
+    /// If an output symbolic link of the same name as listed in `output_files` of
+    /// the Command was found, but its target type was not a regular file, the
+    /// server will return a FAILED_PRECONDITION.
     /// If the action does not produce the requested output, then that output
     /// will be omitted from the list. The server is free to arrange the output
     /// list as desired; clients MUST NOT assume that the output list is sorted.
+    /// 
+    /// DEPRECATED as of v2.1. Servers that wish to be compatible with v2.0 API
+    /// should still populate this field in addition to `output_symlinks`.
     #[serde(rename="outputFileSymlinks")]
     pub output_file_symlinks: Option<Vec<BuildBazelRemoteExecutionV2OutputSymlink>>,
     /// The digest for a blob containing the standard error of the action, which
@@ -669,13 +672,29 @@ pub struct BuildBazelRemoteExecutionV2ActionResult {
     /// ContentAddressableStorage.
     #[serde(rename="stdoutDigest")]
     pub stdout_digest: Option<BuildBazelRemoteExecutionV2Digest>,
-    /// The output files of the action. For each output file requested in the
-    /// `output_files` field of the Action, if the corresponding file existed after
-    /// the action completed, a single entry will be present either in this field,
-    /// or the `output_file_symlinks` field if the file was a symbolic link to
-    /// another file.
+    /// New in v2.1: this field will only be populated if the command
+    /// `output_paths` field was used, and not the pre v2.1 `output_files` or
+    /// `output_directories` fields.
+    /// The output paths of the action that are symbolic links to other paths. Those
+    /// may be links to other outputs, or inputs, or even absolute paths
+    /// outside of the working directory, if the server supports
+    /// SymlinkAbsolutePathStrategy.ALLOWED.
+    /// A single entry for each output requested in `output_paths`
+    /// field of the Action, if the corresponding path existed after
+    /// the action completed and was a symbolic link.
     /// 
-    /// If an output of the same name was found, but was a directory rather
+    /// If the action does not produce a requested output, then that output
+    /// will be omitted from the list. The server is free to arrange the output
+    /// list as desired; clients MUST NOT assume that the output list is sorted.
+    #[serde(rename="outputSymlinks")]
+    pub output_symlinks: Option<Vec<BuildBazelRemoteExecutionV2OutputSymlink>>,
+    /// The output files of the action. For each output file requested in the
+    /// `output_files` or `output_paths` field of the Action, if the corresponding
+    /// file existed after the action completed, a single entry will be present
+    /// either in this field, or the `output_file_symlinks` field if the file was
+    /// a symbolic link to another file (`output_symlinks` field after v2.1).
+    /// 
+    /// If an output listed in `output_files` was found, but was a directory rather
     /// than a regular file, the server will return a FAILED_PRECONDITION.
     /// If the action does not produce the requested output, then that output
     /// will be omitted from the list. The server is free to arrange the output
@@ -697,12 +716,15 @@ pub struct BuildBazelRemoteExecutionV2ActionResult {
     /// If the action does not produce the requested output, then that output
     /// will be omitted from the list. The server is free to arrange the output
     /// list as desired; clients MUST NOT assume that the output list is sorted.
+    /// 
+    /// DEPRECATED as of v2.1. Servers that wish to be compatible with v2.0 API
+    /// should still populate this field in addition to `output_symlinks`.
     #[serde(rename="outputDirectorySymlinks")]
     pub output_directory_symlinks: Option<Vec<BuildBazelRemoteExecutionV2OutputSymlink>>,
     /// The output directories of the action. For each output directory requested
-    /// in the `output_directories` field of the Action, if the corresponding
-    /// directory existed after the action completed, a single entry will be
-    /// present in the output list, which will contain the digest of a
+    /// in the `output_directories` or `output_paths` field of the Action, if the
+    /// corresponding directory existed after the action completed, a single entry
+    /// will be present in the output list, which will contain the digest of a
     /// Tree message containing the
     /// directory tree, and the path equal exactly to the corresponding Action
     /// output_directories member.
@@ -759,7 +781,8 @@ pub struct BuildBazelRemoteExecutionV2ActionResult {
     /// }
     /// ````
     /// 
-    /// If an output of the same name was found, but was not a directory, the
+    /// If an output of the same name as listed in `output_files` of
+    /// the Command was found in `output_directories`, but was not a directory, the
     /// server will return a FAILED_PRECONDITION.
     #[serde(rename="outputDirectories")]
     pub output_directories: Option<Vec<BuildBazelRemoteExecutionV2OutputDirectory>>,
@@ -821,26 +844,6 @@ pub struct BuildBazelRemoteExecutionV2BatchReadBlobsResponse {
 }
 
 impl ResponseResult for BuildBazelRemoteExecutionV2BatchReadBlobsResponse {}
-
-
-/// A `DirectoryNode` represents a child of a
-/// Directory which is itself
-/// a `Directory` and its associated metadata.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BuildBazelRemoteExecutionV2DirectoryNode {
-    /// The name of the directory.
-    pub name: Option<String>,
-    /// The digest of the
-    /// Directory object
-    /// represented. See Digest
-    /// for information about how to take the digest of a proto message.
-    pub digest: Option<BuildBazelRemoteExecutionV2Digest>,
-}
-
-impl Part for BuildBazelRemoteExecutionV2DirectoryNode {}
 
 
 /// An `OutputDirectory` is the output in an `ActionResult` corresponding to a
@@ -924,6 +927,21 @@ pub struct BuildBazelRemoteExecutionV2ActionCacheUpdateCapabilities {
 impl Part for BuildBazelRemoteExecutionV2ActionCacheUpdateCapabilities {}
 
 
+/// A response corresponding to a single blob that the client tried to upload.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BuildBazelRemoteExecutionV2BatchUpdateBlobsResponseResponse {
+    /// The result of attempting to upload that blob.
+    pub status: Option<GoogleRpcStatus>,
+    /// The blob digest to which this response corresponds.
+    pub digest: Option<BuildBazelRemoteExecutionV2Digest>,
+}
+
+impl Part for BuildBazelRemoteExecutionV2BatchUpdateBlobsResponseResponse {}
+
+
 /// Capabilities of the remote cache system.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -952,6 +970,25 @@ pub struct BuildBazelRemoteExecutionV2CacheCapabilities {
 }
 
 impl Part for BuildBazelRemoteExecutionV2CacheCapabilities {}
+
+
+/// A single property for FileNodes,
+/// DirectoryNodes, and
+/// SymlinkNodes. The server is
+/// responsible for specifying the property `name`s that it accepts. If
+/// permitted by the server, the same `name` may occur multiple times.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BuildBazelRemoteExecutionV2NodeProperty {
+    /// The property name.
+    pub name: Option<String>,
+    /// The property value.
+    pub value: Option<String>,
+}
+
+impl Part for BuildBazelRemoteExecutionV2NodeProperty {}
 
 
 /// The full version of a given tool.
@@ -995,21 +1032,24 @@ pub struct BuildBazelRemoteExecutionV2FindMissingBlobsRequest {
 impl RequestValue for BuildBazelRemoteExecutionV2FindMissingBlobsRequest {}
 
 
-/// A response corresponding to a single blob that the client tried to download.
+/// A `DirectoryNode` represents a child of a
+/// Directory which is itself
+/// a `Directory` and its associated metadata.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BuildBazelRemoteExecutionV2BatchReadBlobsResponseResponse {
-    /// The result of attempting to download that blob.
-    pub status: Option<GoogleRpcStatus>,
-    /// The raw binary data.
-    pub data: Option<String>,
-    /// The digest to which this response corresponds.
+pub struct BuildBazelRemoteExecutionV2DirectoryNode {
+    /// The name of the directory.
+    pub name: Option<String>,
+    /// The digest of the
+    /// Directory object
+    /// represented. See Digest
+    /// for information about how to take the digest of a proto message.
     pub digest: Option<BuildBazelRemoteExecutionV2Digest>,
 }
 
-impl Part for BuildBazelRemoteExecutionV2BatchReadBlobsResponseResponse {}
+impl Part for BuildBazelRemoteExecutionV2DirectoryNode {}
 
 
 /// An `OutputSymlink` is similar to a
@@ -1026,6 +1066,10 @@ pub struct BuildBazelRemoteExecutionV2OutputSymlink {
     /// filename. The path separator is a forward slash `/`. Since this is a
     /// relative path, it MUST NOT begin with a leading forward slash.
     pub path: Option<String>,
+    /// The supported node properties of the OutputSymlink, if requested by the
+    /// Action.
+    #[serde(rename="nodeProperties")]
+    pub node_properties: Option<Vec<BuildBazelRemoteExecutionV2NodeProperty>>,
     /// The target path of the symlink. The path separator is a forward slash `/`.
     /// The target path can be relative to the parent directory of the symlink or
     /// it can be an absolute path starting with `/`. Support for absolute paths
@@ -1038,19 +1082,39 @@ pub struct BuildBazelRemoteExecutionV2OutputSymlink {
 impl Part for BuildBazelRemoteExecutionV2OutputSymlink {}
 
 
-/// A response corresponding to a single blob that the client tried to upload.
+/// A response message for
+/// ContentAddressableStorage.BatchUpdateBlobs.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [batch update blobs](struct.BlobBatchUpdateCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BuildBazelRemoteExecutionV2BatchUpdateBlobsResponseResponse {
-    /// The result of attempting to upload that blob.
-    pub status: Option<GoogleRpcStatus>,
-    /// The blob digest to which this response corresponds.
-    pub digest: Option<BuildBazelRemoteExecutionV2Digest>,
+pub struct BuildBazelRemoteExecutionV2BatchUpdateBlobsResponse {
+    /// The responses to the requests.
+    pub responses: Option<Vec<BuildBazelRemoteExecutionV2BatchUpdateBlobsResponseResponse>>,
 }
 
-impl Part for BuildBazelRemoteExecutionV2BatchUpdateBlobsResponseResponse {}
+impl ResponseResult for BuildBazelRemoteExecutionV2BatchUpdateBlobsResponse {}
+
+
+/// A request message for
+/// WaitExecution.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [wait execution operations](struct.OperationWaitExecutionCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BuildBazelRemoteExecutionV2WaitExecutionRequest { _never_set: Option<bool> }
+
+impl RequestValue for BuildBazelRemoteExecutionV2WaitExecutionRequest {}
 
 
 /// The `Status` type defines a logical error model that is suitable for
@@ -1092,6 +1156,9 @@ pub struct BuildBazelRemoteExecutionV2FileNode {
     pub name: Option<String>,
     /// The digest of the file's content.
     pub digest: Option<BuildBazelRemoteExecutionV2Digest>,
+    /// The node properties of the FileNode.
+    #[serde(rename="nodeProperties")]
+    pub node_properties: Option<Vec<BuildBazelRemoteExecutionV2NodeProperty>>,
 }
 
 impl Part for BuildBazelRemoteExecutionV2FileNode {}
@@ -1121,33 +1188,33 @@ pub struct BuildBazelRemoteExecutionV2OutputFile {
     pub contents: Option<String>,
     /// The digest of the file's content.
     pub digest: Option<BuildBazelRemoteExecutionV2Digest>,
+    /// The supported node properties of the OutputFile, if requested by the Action.
+    #[serde(rename="nodeProperties")]
+    pub node_properties: Option<Vec<BuildBazelRemoteExecutionV2NodeProperty>>,
 }
 
 impl Part for BuildBazelRemoteExecutionV2OutputFile {}
 
 
-/// A response message for
-/// ContentAddressableStorage.BatchUpdateBlobs.
+/// A response corresponding to a single blob that the client tried to download.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [batch update blobs](struct.BlobBatchUpdateCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BuildBazelRemoteExecutionV2BatchUpdateBlobsResponse {
-    /// The responses to the requests.
-    pub responses: Option<Vec<BuildBazelRemoteExecutionV2BatchUpdateBlobsResponseResponse>>,
+pub struct BuildBazelRemoteExecutionV2BatchReadBlobsResponseResponse {
+    /// The result of attempting to download that blob.
+    pub status: Option<GoogleRpcStatus>,
+    /// The raw binary data.
+    pub data: Option<String>,
+    /// The digest to which this response corresponds.
+    pub digest: Option<BuildBazelRemoteExecutionV2Digest>,
 }
 
-impl ResponseResult for BuildBazelRemoteExecutionV2BatchUpdateBlobsResponse {}
+impl Part for BuildBazelRemoteExecutionV2BatchReadBlobsResponseResponse {}
 
 
 /// A content digest. A digest for a given blob consists of the size of the blob
-/// and its hash. The hash algorithm to use is defined by the server, but servers
-/// SHOULD use SHA-256.
+/// and its hash. The hash algorithm to use is defined by the server.
 /// 
 /// The size is considered to be an integral part of the digest and cannot be
 /// separated. That is, even if the `hash` field is correctly specified but
@@ -1263,6 +1330,9 @@ pub struct BuildBazelRemoteExecutionV2ExecutionCapabilities {
     /// Supported execution priority range.
     #[serde(rename="executionPriorityCapabilities")]
     pub execution_priority_capabilities: Option<BuildBazelRemoteExecutionV2PriorityCapabilities>,
+    /// Supported node properties.
+    #[serde(rename="supportedNodeProperties")]
+    pub supported_node_properties: Option<Vec<String>>,
     /// Whether remote execution is enabled for the particular server/instance.
     #[serde(rename="execEnabled")]
     pub exec_enabled: Option<bool>,
@@ -1600,6 +1670,9 @@ impl<'a, C, A> BlobMethods<'a, C, A> {
     /// Clients can use this API before uploading blobs to determine which ones are
     /// already present in the CAS and do not need to be uploaded again.
     /// 
+    /// Servers SHOULD increase the TTLs of the referenced blobs if necessary and
+    /// applicable.
+    /// 
     /// There are no method-specific errors.
     /// 
     /// # Arguments
@@ -1730,6 +1803,8 @@ impl<'a, C, A> BlobMethods<'a, C, A> {
     /// 
     /// If part of the tree is missing from the CAS, the server will return the
     /// portion present and omit the rest.
+    /// 
+    /// Errors:
     /// 
     /// * `NOT_FOUND`: The requested tree root is not present in the CAS.
     /// 
@@ -2926,6 +3001,9 @@ impl<'a, C, A> ActionResultUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// Clients can use this API before uploading blobs to determine which ones are
 /// already present in the CAS and do not need to be uploaded again.
 /// 
+/// Servers SHOULD increase the TTLs of the referenced blobs if necessary and
+/// applicable.
+/// 
 /// There are no method-specific errors.
 ///
 /// A builder for the *findMissing* method supported by a *blob* resource.
@@ -3837,6 +3915,8 @@ impl<'a, C, A> BlobBatchReadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// If part of the tree is missing from the CAS, the server will return the
 /// portion present and omit the rest.
 /// 
+/// Errors:
+/// 
 /// * `NOT_FOUND`: The requested tree root is not present in the CAS.
 ///
 /// A builder for the *getTree* method supported by a *blob* resource.
@@ -4063,7 +4143,8 @@ impl<'a, C, A> BlobGetTreeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
     /// A page token, which must be a value received in a previous
     /// GetTreeResponse.
-    /// If present, the server will use it to return the following page of results.
+    /// If present, the server will use that token as an offset, returning only
+    /// that page and the ones that succeed it.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> BlobGetTreeCall<'a, C, A> {

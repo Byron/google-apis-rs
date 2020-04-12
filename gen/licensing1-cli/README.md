@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *licensing* API can be found at the
-[official documentation site](https://developers.google.com/google-apps/licensing/).
+[official documentation site](https://developers.google.com/admin-sdk/licensing/).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *licensing* API at revision *20170213*. The CLI is at version *1.0.12*.
+This documentation was generated from the *licensing* API at revision *20190916*. The CLI is at version *1.0.13*.
 
 ```bash
 licensing1 [options]

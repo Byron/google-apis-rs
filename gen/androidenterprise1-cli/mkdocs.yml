@@ -1,4 +1,4 @@
-site_name: Android Enterprise v1.0.12+20190624
+site_name: Android Enterprise v1.0.13+20200325
 site_url: http://byron.github.io/google-apis-rs/google-androidenterprise1-cli
 site_description: A complete library to interact with Android Enterprise (protocol v1)
 
@@ -13,7 +13,6 @@ pages:
 - ['devices_get.md', 'Devices', 'Get']
 - ['devices_get-state.md', 'Devices', 'Get State']
 - ['devices_list.md', 'Devices', 'List']
-- ['devices_patch.md', 'Devices', 'Patch']
 - ['devices_set-state.md', 'Devices', 'Set State']
 - ['devices_update.md', 'Devices', 'Update']
 - ['enterprises_acknowledge-notification-set.md', 'Enterprises', 'Acknowledge Notification Set']
@@ -33,7 +32,6 @@ pages:
 - ['entitlements_delete.md', 'Entitlements', 'Delete']
 - ['entitlements_get.md', 'Entitlements', 'Get']
 - ['entitlements_list.md', 'Entitlements', 'List']
-- ['entitlements_patch.md', 'Entitlements', 'Patch']
 - ['entitlements_update.md', 'Entitlements', 'Update']
 - ['grouplicenses_get.md', 'Grouplicenses', 'Get']
 - ['grouplicenses_list.md', 'Grouplicenses', 'List']
@@ -41,17 +39,14 @@ pages:
 - ['installs_delete.md', 'Installs', 'Delete']
 - ['installs_get.md', 'Installs', 'Get']
 - ['installs_list.md', 'Installs', 'List']
-- ['installs_patch.md', 'Installs', 'Patch']
 - ['installs_update.md', 'Installs', 'Update']
 - ['managedconfigurationsfordevice_delete.md', 'Managedconfigurationsfordevice', 'Delete']
 - ['managedconfigurationsfordevice_get.md', 'Managedconfigurationsfordevice', 'Get']
 - ['managedconfigurationsfordevice_list.md', 'Managedconfigurationsfordevice', 'List']
-- ['managedconfigurationsfordevice_patch.md', 'Managedconfigurationsfordevice', 'Patch']
 - ['managedconfigurationsfordevice_update.md', 'Managedconfigurationsfordevice', 'Update']
 - ['managedconfigurationsforuser_delete.md', 'Managedconfigurationsforuser', 'Delete']
 - ['managedconfigurationsforuser_get.md', 'Managedconfigurationsforuser', 'Get']
 - ['managedconfigurationsforuser_list.md', 'Managedconfigurationsforuser', 'List']
-- ['managedconfigurationsforuser_patch.md', 'Managedconfigurationsforuser', 'Patch']
 - ['managedconfigurationsforuser_update.md', 'Managedconfigurationsforuser', 'Update']
 - ['managedconfigurationssettings_list.md', 'Managedconfigurationssettings', 'List']
 - ['permissions_get.md', 'Permissions', 'Get']
@@ -69,13 +64,11 @@ pages:
 - ['storelayoutclusters_get.md', 'Storelayoutclusters', 'Get']
 - ['storelayoutclusters_insert.md', 'Storelayoutclusters', 'Insert']
 - ['storelayoutclusters_list.md', 'Storelayoutclusters', 'List']
-- ['storelayoutclusters_patch.md', 'Storelayoutclusters', 'Patch']
 - ['storelayoutclusters_update.md', 'Storelayoutclusters', 'Update']
 - ['storelayoutpages_delete.md', 'Storelayoutpages', 'Delete']
 - ['storelayoutpages_get.md', 'Storelayoutpages', 'Get']
 - ['storelayoutpages_insert.md', 'Storelayoutpages', 'Insert']
 - ['storelayoutpages_list.md', 'Storelayoutpages', 'List']
-- ['storelayoutpages_patch.md', 'Storelayoutpages', 'Patch']
 - ['storelayoutpages_update.md', 'Storelayoutpages', 'Update']
 - ['users_delete.md', 'Users', 'Delete']
 - ['users_generate-authentication-token.md', 'Users', 'Generate Authentication Token']
@@ -84,7 +77,6 @@ pages:
 - ['users_get-available-product-set.md', 'Users', 'Get Available Product Set']
 - ['users_insert.md', 'Users', 'Insert']
 - ['users_list.md', 'Users', 'List']
-- ['users_patch.md', 'Users', 'Patch']
 - ['users_revoke-device-access.md', 'Users', 'Revoke Device Access']
 - ['users_revoke-token.md', 'Users', 'Revoke Token']
 - ['users_set-available-product-set.md', 'Users', 'Set Available Product Set']
@@ -93,7 +85,6 @@ pages:
 - ['webapps_get.md', 'Webapps', 'Get']
 - ['webapps_insert.md', 'Webapps', 'Insert']
 - ['webapps_list.md', 'Webapps', 'List']
-- ['webapps_patch.md', 'Webapps', 'Patch']
 - ['webapps_update.md', 'Webapps', 'Update']
 
 theme: readthedocs

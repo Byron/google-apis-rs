@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Vision* API at revision *20190628*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Vision* API at revision *20200329*. The CLI is at version *1.0.13*.
 
 ```bash
 vision1 [options]
@@ -43,6 +43,14 @@ vision1 [options]
                 get <name> [-p <v>]... [-o <out>]
                 list <name> [-p <v>]... [-o <out>]
         projects
+                files-annotate <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                files-async-batch-annotate <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                images-annotate <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                images-async-batch-annotate <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-files-annotate <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-files-async-batch-annotate <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-images-annotate <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-images-async-batch-annotate <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-product-sets-add-product <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-product-sets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -58,6 +66,7 @@ vision1 [options]
                 locations-products-get <name> [-p <v>]... [-o <out>]
                 locations-products-list <parent> [-p <v>]... [-o <out>]
                 locations-products-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-products-purge <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-products-reference-images-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-products-reference-images-delete <name> [-p <v>]... [-o <out>]
                 locations-products-reference-images-get <name> [-p <v>]... [-o <out>]

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Filestore* crate version *1.0.12+20190627*, where *20190627* is the exact revision of the *file:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Cloud Filestore* crate version *1.0.13+20200406*, where *20200406* is the exact revision of the *file:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Cloud Filestore* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/filestore/).
@@ -334,7 +334,7 @@ impl<'a, C, A> CloudFilestore<C, A>
         CloudFilestore {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://file.googleapis.com/".to_string(),
             _root_url: "https://file.googleapis.com/".to_string(),
         }
@@ -345,7 +345,7 @@ impl<'a, C, A> CloudFilestore<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -408,11 +408,11 @@ impl ResponseResult for ListInstancesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NetworkConfig {
-    /// A /29 CIDR block in one of the
+    /// A /29 CIDR block for Basic or a /23 CIDR block for High Scale in one of the
     /// [internal IP address
     /// ranges](https://www.arin.net/knowledge/address_filters.html) that
     /// identifies the range of IP addresses reserved for this instance. For
-    /// example, 10.0.0.0/29 or 192.168.0.0/29. The range you specify can't overlap
+    /// example, 10.0.0.0/29 or 192.168.0.0/23. The range you specify can't overlap
     /// with either existing subnets or assigned IP address ranges for other Cloud
     /// Filestore instances in the selected VPC network.
     #[serde(rename="reservedIpRange")]
@@ -473,7 +473,7 @@ pub struct Instance {
     /// Output only. Additional information about the instance state, if available.
     #[serde(rename="statusMessage")]
     pub status_message: Option<String>,
-    /// Optional. A description of the instance (2048 characters or less).
+    /// Optional. The description of the instance (2048 characters or less).
     pub description: Option<String>,
 }
 
@@ -808,6 +808,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _name: name.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _include_unrevealed_locations: Default::default(),
             _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1798,7 +1799,8 @@ impl<'a, C, A> ProjectLocationInstanceDeleteCall<'a, C, A> where C: BorrowMut<hy
 /// let result = hub.projects().locations_list("name")
 ///              .page_token("sea")
 ///              .page_size(-90)
-///              .filter("dolores")
+///              .include_unrevealed_locations(true)
+///              .filter("gubergren")
 ///              .doit();
 /// # }
 /// ```
@@ -1809,6 +1811,7 @@ pub struct ProjectLocationListCall<'a, C, A>
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
+    _include_unrevealed_locations: Option<bool>,
     _filter: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
@@ -1832,7 +1835,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "file.projects.locations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -1840,10 +1843,13 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
         }
+        if let Some(value) = self._include_unrevealed_locations {
+            params.push(("includeUnrevealedLocations", value.to_string()));
+        }
         if let Some(value) = self._filter {
             params.push(("filter", value.to_string()));
         }
-        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
+        for &field in ["alt", "name", "pageToken", "pageSize", "includeUnrevealedLocations", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1980,6 +1986,14 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a, C, A> {
         self._page_size = Some(new_value);
+        self
+    }
+    /// If true, the returned list will include locations which are not yet
+    /// revealed.
+    ///
+    /// Sets the *include unrevealed locations* query property to the given value.
+    pub fn include_unrevealed_locations(mut self, new_value: bool) -> ProjectLocationListCall<'a, C, A> {
+        self._include_unrevealed_locations = Some(new_value);
         self
     }
     /// The standard list filter.
@@ -3312,7 +3326,10 @@ impl<'a, C, A> ProjectLocationInstancePatchCall<'a, C, A> where C: BorrowMut<hyp
     /// Mask of fields to update.  At least one path must be supplied in this
     /// field.  The elements of the repeated paths field may only include these
     /// fields:
-    /// "description"
+    /// 
+    /// * "description"
+    /// * "file_shares"
+    /// * "labels"
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: &str) -> ProjectLocationInstancePatchCall<'a, C, A> {
@@ -3705,10 +3722,10 @@ impl<'a, C, A> ProjectLocationInstanceCreateCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_instances_list("parent")
-///              .page_token("diam")
-///              .page_size(-55)
-///              .order_by("Lorem")
-///              .filter("et")
+///              .page_token("ipsum")
+///              .page_size(-5)
+///              .order_by("et")
+///              .filter("duo")
 ///              .doit();
 /// # }
 /// ```

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AlertCenter* crate version *1.0.12+20190628*, where *20190628* is the exact revision of the *alertcenter:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *AlertCenter* crate version *1.0.13+20200406*, where *20200406* is the exact revision of the *alertcenter:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *AlertCenter* *v1_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/alertcenter/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.AlertCenter.html) ... 
 //! 
 //! * [alerts](struct.Alert.html)
-//!  * [*delete*](struct.AlertDeleteCall.html), [*feedback create*](struct.AlertFeedbackCreateCall.html), [*feedback list*](struct.AlertFeedbackListCall.html), [*get*](struct.AlertGetCall.html), [*list*](struct.AlertListCall.html) and [*undelete*](struct.AlertUndeleteCall.html)
+//!  * [*batch delete*](struct.AlertBatchDeleteCall.html), [*batch undelete*](struct.AlertBatchUndeleteCall.html), [*delete*](struct.AlertDeleteCall.html), [*feedback create*](struct.AlertFeedbackCreateCall.html), [*feedback list*](struct.AlertFeedbackListCall.html), [*get*](struct.AlertGetCall.html), [*get metadata*](struct.AlertGetMetadataCall.html), [*list*](struct.AlertListCall.html) and [*undelete*](struct.AlertUndeleteCall.html)
 //! 
 //! Other activities are ...
 //! 
@@ -52,9 +52,12 @@
 //! 
 //! ```ignore
 //! let r = hub.alerts().delete(...).doit()
+//! let r = hub.alerts().batch_undelete(...).doit()
 //! let r = hub.alerts().undelete(...).doit()
 //! let r = hub.alerts().get(...).doit()
+//! let r = hub.alerts().batch_delete(...).doit()
 //! let r = hub.alerts().list(...).doit()
+//! let r = hub.alerts().get_metadata(...).doit()
 //! let r = hub.alerts().feedback_list(...).doit()
 //! let r = hub.alerts().feedback_create(...).doit()
 //! ```
@@ -336,7 +339,7 @@ impl<'a, C, A> AlertCenter<C, A>
         AlertCenter {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://alertcenter.googleapis.com/".to_string(),
             _root_url: "https://alertcenter.googleapis.com/".to_string(),
         }
@@ -350,7 +353,7 @@ impl<'a, C, A> AlertCenter<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -441,40 +444,6 @@ pub struct Notification {
 impl Part for Notification {}
 
 
-/// A customer feedback about an alert.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [feedback create alerts](struct.AlertFeedbackCreateCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AlertFeedback {
-    /// Output only. The unique identifier for the feedback.
-    #[serde(rename="feedbackId")]
-    pub feedback_id: Option<String>,
-    /// Output only. The alert identifier.
-    #[serde(rename="alertId")]
-    pub alert_id: Option<String>,
-    /// Output only. The unique identifier of the Google account of the customer.
-    #[serde(rename="customerId")]
-    pub customer_id: Option<String>,
-    /// Required. The type of the feedback.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// Output only. The time this feedback was created.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
-    /// Output only. The email of the user that provided the feedback.
-    pub email: Option<String>,
-}
-
-impl RequestValue for AlertFeedback {}
-impl ResponseResult for AlertFeedback {}
-
-
 /// Response message for an alert feedback listing request.
 /// 
 /// # Activities
@@ -492,6 +461,61 @@ pub struct ListAlertFeedbackResponse {
 }
 
 impl ResponseResult for ListAlertFeedbackResponse {}
+
+
+/// An alert metadata.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get metadata alerts](struct.AlertGetMetadataCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AlertMetadata {
+    /// The current status of the alert.
+    /// The supported values are the following:
+    /// 
+    /// * NOT_STARTED
+    /// * IN_PROGRESS
+    /// * CLOSED
+    pub status: Option<String>,
+    /// The email address of the user assigned to the alert.
+    pub assignee: Option<String>,
+    /// Output only. The time this metadata was last updated.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
+    /// Optional. `etag` is used for optimistic concurrency control as a way to
+    /// help prevent simultaneous updates of an alert metadata from overwriting
+    /// each other. It is strongly suggested that systems make use of the `etag` in
+    /// the read-modify-write cycle to perform metatdata updates in order to avoid
+    /// race conditions: An `etag` is returned in the response which contains alert
+    /// metadata, and systems are expected to put that etag in the request to
+    /// update alert metadata to ensure that their change will be applied to the
+    /// same version of the alert metadata.
+    /// 
+    /// If no `etag` is provided in the call to update alert metadata, then the
+    /// existing alert metadata is overwritten blindly.
+    pub etag: Option<String>,
+    /// The severity value of the alert. Alert Center will set this field at alert
+    /// creation time, default's to an empty string when it could not be
+    /// determined.
+    /// The supported values for update actions on this field are the following:
+    /// 
+    /// * HIGH
+    /// * MEDIUM
+    /// * LOW
+    pub severity: Option<String>,
+    /// Output only. The alert identifier.
+    #[serde(rename="alertId")]
+    pub alert_id: Option<String>,
+    /// Output only. The unique identifier of the Google account of the customer.
+    #[serde(rename="customerId")]
+    pub customer_id: Option<String>,
+}
+
+impl ResponseResult for AlertMetadata {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated
@@ -516,6 +540,54 @@ impl ResponseResult for ListAlertFeedbackResponse {}
 pub struct Empty { _never_set: Option<bool> }
 
 impl ResponseResult for Empty {}
+
+
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
+/// 
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Status {
+    /// A developer-facing error message, which should be in English. Any
+    /// user-facing error message should be localized and sent in the
+    /// google.rpc.Status.details field, or localized by the client.
+    pub message: Option<String>,
+    /// The status code, which should be an enum value of google.rpc.Code.
+    pub code: Option<i32>,
+    /// A list of messages that carry the error details.  There is a common set of
+    /// message types for APIs to use.
+    pub details: Option<Vec<HashMap<String, String>>>,
+}
+
+impl Part for Status {}
+
+
+/// Response to batch delete operation on alerts.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [batch delete alerts](struct.AlertBatchDeleteCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchDeleteAlertsResponse {
+    /// The status details for each failed alert_id.
+    #[serde(rename="failedAlertStatus")]
+    pub failed_alert_status: Option<HashMap<String, Status>>,
+    /// The successful list of alert IDs.
+    #[serde(rename="successAlertIds")]
+    pub success_alert_ids: Option<Vec<String>>,
+}
+
+impl ResponseResult for BatchDeleteAlertsResponse {}
 
 
 /// Customer-level settings.
@@ -546,9 +618,12 @@ impl ResponseResult for Settings {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [delete alerts](struct.AlertDeleteCall.html) (none)
+/// * [batch undelete alerts](struct.AlertBatchUndeleteCall.html) (none)
 /// * [undelete alerts](struct.AlertUndeleteCall.html) (response)
 /// * [get alerts](struct.AlertGetCall.html) (response)
+/// * [batch delete alerts](struct.AlertBatchDeleteCall.html) (none)
 /// * [list alerts](struct.AlertListCall.html) (none)
+/// * [get metadata alerts](struct.AlertGetMetadataCall.html) (none)
 /// * [feedback list alerts](struct.AlertFeedbackListCall.html) (none)
 /// * [feedback create alerts](struct.AlertFeedbackCreateCall.html) (none)
 /// 
@@ -565,6 +640,8 @@ pub struct Alert {
     /// Optional. The data associated with this alert, for example
     /// google.apps.alertcenter.type.DeviceCompromised.
     pub data: Option<HashMap<String, String>>,
+    /// Output only. The metadata associated with this alert.
+    pub metadata: Option<AlertMetadata>,
     /// Output only. The time this alert was created.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
@@ -577,9 +654,20 @@ pub struct Alert {
     /// * Mobile device management
     /// * Gmail phishing
     /// * Domain wide takeout
-    /// * Government attack warning
+    /// * State sponsored attack
     /// * Google identity
     pub source: Option<String>,
+    /// Optional. `etag` is used for optimistic concurrency control as a way to help
+    /// prevent simultaneous updates of an alert from overwriting each other.
+    /// It is strongly suggested that systems make use of the `etag` in the
+    /// read-modify-write cycle to perform alert updates in order to avoid race
+    /// conditions: An `etag` is returned in the response which contains alerts,
+    /// and systems are expected to put that etag in the request to update alert to
+    /// ensure that their change will be applied to the same version of the alert.
+    /// 
+    /// If no `etag` is provided in the call to update alert, then the existing
+    /// alert is overwritten blindly.
+    pub etag: Option<String>,
     /// Required. The time the event that caused this alert was started or
     /// detected.
     #[serde(rename="startTime")]
@@ -630,6 +718,108 @@ pub struct UndeleteAlertRequest {
 impl RequestValue for UndeleteAlertRequest {}
 
 
+/// A customer feedback about an alert.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [feedback create alerts](struct.AlertFeedbackCreateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AlertFeedback {
+    /// Output only. The unique identifier for the feedback.
+    #[serde(rename="feedbackId")]
+    pub feedback_id: Option<String>,
+    /// Output only. The alert identifier.
+    #[serde(rename="alertId")]
+    pub alert_id: Option<String>,
+    /// Output only. The unique identifier of the Google account of the customer.
+    #[serde(rename="customerId")]
+    pub customer_id: Option<String>,
+    /// Required. The type of the feedback.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Output only. The time this feedback was created.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+    /// Output only. The email of the user that provided the feedback.
+    pub email: Option<String>,
+}
+
+impl RequestValue for AlertFeedback {}
+impl ResponseResult for AlertFeedback {}
+
+
+/// A request to perform batch delete on alerts.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [batch delete alerts](struct.AlertBatchDeleteCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchDeleteAlertsRequest {
+    /// Optional. The unique identifier of the G Suite organization account of the
+    /// customer the alerts are associated with.
+    #[serde(rename="customerId")]
+    pub customer_id: Option<String>,
+    /// Required. list of alert IDs.
+    #[serde(rename="alertId")]
+    pub alert_id: Option<Vec<String>>,
+}
+
+impl RequestValue for BatchDeleteAlertsRequest {}
+
+
+/// Response to batch undelete operation on alerts.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [batch undelete alerts](struct.AlertBatchUndeleteCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchUndeleteAlertsResponse {
+    /// The status details for each failed alert_id.
+    #[serde(rename="failedAlertStatus")]
+    pub failed_alert_status: Option<HashMap<String, Status>>,
+    /// The successful list of alert IDs.
+    #[serde(rename="successAlertIds")]
+    pub success_alert_ids: Option<Vec<String>>,
+}
+
+impl ResponseResult for BatchUndeleteAlertsResponse {}
+
+
+/// A request to perform batch undelete on alerts.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [batch undelete alerts](struct.AlertBatchUndeleteCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchUndeleteAlertsRequest {
+    /// Optional. The unique identifier of the G Suite organization account of the
+    /// customer the alerts are associated with.
+    #[serde(rename="customerId")]
+    pub customer_id: Option<String>,
+    /// Required. list of alert IDs.
+    #[serde(rename="alertId")]
+    pub alert_id: Option<Vec<String>>,
+}
+
+impl RequestValue for BatchUndeleteAlertsRequest {}
+
+
 
 // ###################
 // MethodBuilders ###
@@ -659,7 +849,7 @@ impl RequestValue for UndeleteAlertRequest {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = AlertCenter::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `delete(...)`, `feedback_create(...)`, `feedback_list(...)`, `get(...)`, `list(...)` and `undelete(...)`
+/// // like `batch_delete(...)`, `batch_undelete(...)`, `delete(...)`, `feedback_create(...)`, `feedback_list(...)`, `get(...)`, `get_metadata(...)`, `list(...)` and `undelete(...)`
 /// // to build up your call.
 /// let rb = hub.alerts();
 /// # }
@@ -690,6 +880,23 @@ impl<'a, C, A> AlertMethods<'a, C, A> {
             hub: self.hub,
             _alert_id: alert_id.to_string(),
             _customer_id: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Performs batch undelete operation on alerts.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn batch_undelete(&self, request: BatchUndeleteAlertsRequest) -> AlertBatchUndeleteCall<'a, C, A> {
+        AlertBatchUndeleteCall {
+            hub: self.hub,
+            _request: request,
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -740,6 +947,23 @@ impl<'a, C, A> AlertMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Performs batch delete operation on alerts.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn batch_delete(&self, request: BatchDeleteAlertsRequest) -> AlertBatchDeleteCall<'a, C, A> {
+        AlertBatchDeleteCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Lists the alerts.
     pub fn list(&self) -> AlertListCall<'a, C, A> {
         AlertListCall {
@@ -748,6 +972,25 @@ impl<'a, C, A> AlertMethods<'a, C, A> {
             _page_size: Default::default(),
             _order_by: Default::default(),
             _filter: Default::default(),
+            _customer_id: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns the metadata of an alert. Attempting to get metadata for
+    /// a non-existent alert returns `NOT_FOUND` error.
+    /// 
+    /// # Arguments
+    ///
+    /// * `alertId` - Required. The identifier of the alert this metadata belongs to.
+    pub fn get_metadata(&self, alert_id: &str) -> AlertGetMetadataCall<'a, C, A> {
+        AlertGetMetadataCall {
+            hub: self.hub,
+            _alert_id: alert_id.to_string(),
             _customer_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -779,7 +1022,9 @@ impl<'a, C, A> AlertMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Creates new feedback for an alert. Attempting to create a feedback for
-    /// a non-existent alert returns `NOT_FOUND` error.
+    /// a non-existent alert returns `NOT_FOUND` error. Attempting to create a
+    /// feedback for an alert that is marked for deletion returns
+    /// `FAILED_PRECONDITION' error.
     /// 
     /// # Arguments
     ///
@@ -841,15 +1086,10 @@ impl<'a, C, A> MethodMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the customer-level settings.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn update_settings(&self, request: Settings) -> MethodUpdateSettingCall<'a, C, A> {
-        MethodUpdateSettingCall {
+    /// Returns customer-level settings.
+    pub fn get_settings(&self) -> MethodGetSettingCall<'a, C, A> {
+        MethodGetSettingCall {
             hub: self.hub,
-            _request: request,
             _customer_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -859,10 +1099,15 @@ impl<'a, C, A> MethodMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns customer-level settings.
-    pub fn get_settings(&self) -> MethodGetSettingCall<'a, C, A> {
-        MethodGetSettingCall {
+    /// Updates the customer-level settings.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn update_settings(&self, request: Settings) -> MethodUpdateSettingCall<'a, C, A> {
+        MethodUpdateSettingCall {
             hub: self.hub,
+            _request: request,
             _customer_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1130,6 +1375,248 @@ impl<'a, C, A> AlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> AlertDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Performs batch undelete operation on alerts.
+///
+/// A builder for the *batchUndelete* method supported by a *alert* resource.
+/// It is not used directly, but through a `AlertMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
+/// use alertcenter1_beta1::BatchUndeleteAlertsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use alertcenter1_beta1::AlertCenter;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AlertCenter::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BatchUndeleteAlertsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.alerts().batch_undelete(req)
+///              .doit();
+/// # }
+/// ```
+pub struct AlertBatchUndeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AlertCenter<C, A>,
+    _request: BatchUndeleteAlertsRequest,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AlertBatchUndeleteCall<'a, C, A> {}
+
+impl<'a, C, A> AlertBatchUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, BatchUndeleteAlertsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "alertcenter.alerts.batchUndelete",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/alerts:batchUndelete";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::AppAlert.as_ref().to_string(), ());
+        }
+
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BatchUndeleteAlertsRequest) -> AlertBatchUndeleteCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AlertBatchUndeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AlertBatchUndeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppAlert`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlertBatchUndeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1679,6 +2166,248 @@ impl<'a, C, A> AlertGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 }
 
 
+/// Performs batch delete operation on alerts.
+///
+/// A builder for the *batchDelete* method supported by a *alert* resource.
+/// It is not used directly, but through a `AlertMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
+/// use alertcenter1_beta1::BatchDeleteAlertsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use alertcenter1_beta1::AlertCenter;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AlertCenter::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BatchDeleteAlertsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.alerts().batch_delete(req)
+///              .doit();
+/// # }
+/// ```
+pub struct AlertBatchDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AlertCenter<C, A>,
+    _request: BatchDeleteAlertsRequest,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AlertBatchDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> AlertBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, BatchDeleteAlertsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "alertcenter.alerts.batchDelete",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/alerts:batchDelete";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::AppAlert.as_ref().to_string(), ());
+        }
+
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BatchDeleteAlertsRequest) -> AlertBatchDeleteCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AlertBatchDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AlertBatchDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppAlert`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlertBatchDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Lists the alerts.
 ///
 /// A builder for the *list* method supported by a *alert* resource.
@@ -1965,6 +2694,265 @@ impl<'a, C, A> AlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
+/// Returns the metadata of an alert. Attempting to get metadata for
+/// a non-existent alert returns `NOT_FOUND` error.
+///
+/// A builder for the *getMetadata* method supported by a *alert* resource.
+/// It is not used directly, but through a `AlertMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use alertcenter1_beta1::AlertCenter;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AlertCenter::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.alerts().get_metadata("alertId")
+///              .customer_id("ipsum")
+///              .doit();
+/// # }
+/// ```
+pub struct AlertGetMetadataCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AlertCenter<C, A>,
+    _alert_id: String,
+    _customer_id: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AlertGetMetadataCall<'a, C, A> {}
+
+impl<'a, C, A> AlertGetMetadataCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, AlertMetadata)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "alertcenter.alerts.getMetadata",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("alertId", self._alert_id.to_string()));
+        if let Some(value) = self._customer_id {
+            params.push(("customerId", value.to_string()));
+        }
+        for &field in ["alt", "alertId", "customerId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/alerts/{alertId}/metadata";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::AppAlert.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{alertId}", "alertId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["alertId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The identifier of the alert this metadata belongs to.
+    ///
+    /// Sets the *alert id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn alert_id(mut self, new_value: &str) -> AlertGetMetadataCall<'a, C, A> {
+        self._alert_id = new_value.to_string();
+        self
+    }
+    /// Optional. The unique identifier of the G Suite organization account of the
+    /// customer the alert metadata is associated with.
+    /// Inferred from the caller identity if not provided.
+    ///
+    /// Sets the *customer id* query property to the given value.
+    pub fn customer_id(mut self, new_value: &str) -> AlertGetMetadataCall<'a, C, A> {
+        self._customer_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AlertGetMetadataCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AlertGetMetadataCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppAlert`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlertGetMetadataCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Lists all the feedback for an alert. Attempting to list feedbacks for
 /// a non-existent alert returns `NOT_FOUND` error.
 ///
@@ -1994,8 +2982,8 @@ impl<'a, C, A> AlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.alerts().feedback_list("alertId")
-///              .filter("ipsum")
-///              .customer_id("Lorem")
+///              .filter("et")
+///              .customer_id("duo")
 ///              .doit();
 /// # }
 /// ```
@@ -2242,7 +3230,9 @@ impl<'a, C, A> AlertFeedbackListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
 /// Creates new feedback for an alert. Attempting to create a feedback for
-/// a non-existent alert returns `NOT_FOUND` error.
+/// a non-existent alert returns `NOT_FOUND` error. Attempting to create a
+/// feedback for an alert that is marked for deletion returns
+/// `FAILED_PRECONDITION' error.
 ///
 /// A builder for the *feedback.create* method supported by a *alert* resource.
 /// It is not used directly, but through a `AlertMethods` instance.
@@ -2276,7 +3266,7 @@ impl<'a, C, A> AlertFeedbackListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.alerts().feedback_create(req, "alertId")
-///              .customer_id("duo")
+///              .customer_id("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -2531,6 +3521,231 @@ impl<'a, C, A> AlertFeedbackCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
+/// Returns customer-level settings.
+///
+/// A builder for the *getSettings* method.
+/// It is not used directly, but through a `MethodMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use alertcenter1_beta1::AlertCenter;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AlertCenter::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.methods().get_settings()
+///              .customer_id("Lorem")
+///              .doit();
+/// # }
+/// ```
+pub struct MethodGetSettingCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AlertCenter<C, A>,
+    _customer_id: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for MethodGetSettingCall<'a, C, A> {}
+
+impl<'a, C, A> MethodGetSettingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Settings)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "alertcenter.getSettings",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        if let Some(value) = self._customer_id {
+            params.push(("customerId", value.to_string()));
+        }
+        for &field in ["alt", "customerId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/settings";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::AppAlert.as_ref().to_string(), ());
+        }
+
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Optional. The unique identifier of the G Suite organization account of the
+    /// customer the alert settings are associated with.
+    /// Inferred from the caller identity if not provided.
+    ///
+    /// Sets the *customer id* query property to the given value.
+    pub fn customer_id(mut self, new_value: &str) -> MethodGetSettingCall<'a, C, A> {
+        self._customer_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> MethodGetSettingCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetSettingCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::AppAlert`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> MethodGetSettingCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Updates the customer-level settings.
 ///
 /// A builder for the *updateSettings* method.
@@ -2565,7 +3780,7 @@ impl<'a, C, A> AlertFeedbackCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.methods().update_settings(req)
-///              .customer_id("aliquyam")
+///              .customer_id("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -2776,231 +3991,6 @@ impl<'a, C, A> MethodUpdateSettingCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> MethodUpdateSettingCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Returns customer-level settings.
-///
-/// A builder for the *getSettings* method.
-/// It is not used directly, but through a `MethodMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use alertcenter1_beta1::AlertCenter;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AlertCenter::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.methods().get_settings()
-///              .customer_id("sea")
-///              .doit();
-/// # }
-/// ```
-pub struct MethodGetSettingCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AlertCenter<C, A>,
-    _customer_id: Option<String>,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for MethodGetSettingCall<'a, C, A> {}
-
-impl<'a, C, A> MethodGetSettingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Settings)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "alertcenter.getSettings",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        if let Some(value) = self._customer_id {
-            params.push(("customerId", value.to_string()));
-        }
-        for &field in ["alt", "customerId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1beta1/settings";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppAlert.as_ref().to_string(), ());
-        }
-
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Optional. The unique identifier of the G Suite organization account of the
-    /// customer the alert settings are associated with.
-    /// Inferred from the caller identity if not provided.
-    ///
-    /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> MethodGetSettingCall<'a, C, A> {
-        self._customer_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> MethodGetSettingCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetSettingCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::AppAlert`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodGetSettingCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Spanner* crate version *1.0.12+20190613*, where *20190613* is the exact revision of the *spanner:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Spanner* crate version *1.0.13+20200403*, where *20200403* is the exact revision of the *spanner:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Spanner* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/spanner/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Spanner.html) ... 
 //! 
 //! * projects
-//!  * [*instance configs get*](struct.ProjectInstanceConfigGetCall.html), [*instance configs list*](struct.ProjectInstanceConfigListCall.html), [*instances create*](struct.ProjectInstanceCreateCall.html), [*instances databases create*](struct.ProjectInstanceDatabaseCreateCall.html), [*instances databases drop database*](struct.ProjectInstanceDatabaseDropDatabaseCall.html), [*instances databases get*](struct.ProjectInstanceDatabaseGetCall.html), [*instances databases get ddl*](struct.ProjectInstanceDatabaseGetDdlCall.html), [*instances databases get iam policy*](struct.ProjectInstanceDatabaseGetIamPolicyCall.html), [*instances databases list*](struct.ProjectInstanceDatabaseListCall.html), [*instances databases operations cancel*](struct.ProjectInstanceDatabaseOperationCancelCall.html), [*instances databases operations delete*](struct.ProjectInstanceDatabaseOperationDeleteCall.html), [*instances databases operations get*](struct.ProjectInstanceDatabaseOperationGetCall.html), [*instances databases operations list*](struct.ProjectInstanceDatabaseOperationListCall.html), [*instances databases sessions begin transaction*](struct.ProjectInstanceDatabaseSessionBeginTransactionCall.html), [*instances databases sessions commit*](struct.ProjectInstanceDatabaseSessionCommitCall.html), [*instances databases sessions create*](struct.ProjectInstanceDatabaseSessionCreateCall.html), [*instances databases sessions delete*](struct.ProjectInstanceDatabaseSessionDeleteCall.html), [*instances databases sessions execute batch dml*](struct.ProjectInstanceDatabaseSessionExecuteBatchDmlCall.html), [*instances databases sessions execute sql*](struct.ProjectInstanceDatabaseSessionExecuteSqlCall.html), [*instances databases sessions execute streaming sql*](struct.ProjectInstanceDatabaseSessionExecuteStreamingSqlCall.html), [*instances databases sessions get*](struct.ProjectInstanceDatabaseSessionGetCall.html), [*instances databases sessions list*](struct.ProjectInstanceDatabaseSessionListCall.html), [*instances databases sessions partition query*](struct.ProjectInstanceDatabaseSessionPartitionQueryCall.html), [*instances databases sessions partition read*](struct.ProjectInstanceDatabaseSessionPartitionReadCall.html), [*instances databases sessions read*](struct.ProjectInstanceDatabaseSessionReadCall.html), [*instances databases sessions rollback*](struct.ProjectInstanceDatabaseSessionRollbackCall.html), [*instances databases sessions streaming read*](struct.ProjectInstanceDatabaseSessionStreamingReadCall.html), [*instances databases set iam policy*](struct.ProjectInstanceDatabaseSetIamPolicyCall.html), [*instances databases test iam permissions*](struct.ProjectInstanceDatabaseTestIamPermissionCall.html), [*instances databases update ddl*](struct.ProjectInstanceDatabaseUpdateDdlCall.html), [*instances delete*](struct.ProjectInstanceDeleteCall.html), [*instances get*](struct.ProjectInstanceGetCall.html), [*instances get iam policy*](struct.ProjectInstanceGetIamPolicyCall.html), [*instances list*](struct.ProjectInstanceListCall.html), [*instances operations cancel*](struct.ProjectInstanceOperationCancelCall.html), [*instances operations delete*](struct.ProjectInstanceOperationDeleteCall.html), [*instances operations get*](struct.ProjectInstanceOperationGetCall.html), [*instances operations list*](struct.ProjectInstanceOperationListCall.html), [*instances patch*](struct.ProjectInstancePatchCall.html), [*instances set iam policy*](struct.ProjectInstanceSetIamPolicyCall.html) and [*instances test iam permissions*](struct.ProjectInstanceTestIamPermissionCall.html)
+//!  * [*instance configs get*](struct.ProjectInstanceConfigGetCall.html), [*instance configs list*](struct.ProjectInstanceConfigListCall.html), [*instances backup operations list*](struct.ProjectInstanceBackupOperationListCall.html), [*instances backups create*](struct.ProjectInstanceBackupCreateCall.html), [*instances backups delete*](struct.ProjectInstanceBackupDeleteCall.html), [*instances backups get*](struct.ProjectInstanceBackupGetCall.html), [*instances backups get iam policy*](struct.ProjectInstanceBackupGetIamPolicyCall.html), [*instances backups list*](struct.ProjectInstanceBackupListCall.html), [*instances backups operations cancel*](struct.ProjectInstanceBackupOperationCancelCall.html), [*instances backups operations delete*](struct.ProjectInstanceBackupOperationDeleteCall.html), [*instances backups operations get*](struct.ProjectInstanceBackupOperationGetCall.html), [*instances backups operations list*](struct.ProjectInstanceBackupOperationListCall.html), [*instances backups patch*](struct.ProjectInstanceBackupPatchCall.html), [*instances backups set iam policy*](struct.ProjectInstanceBackupSetIamPolicyCall.html), [*instances backups test iam permissions*](struct.ProjectInstanceBackupTestIamPermissionCall.html), [*instances create*](struct.ProjectInstanceCreateCall.html), [*instances database operations list*](struct.ProjectInstanceDatabaseOperationListCall.html), [*instances databases create*](struct.ProjectInstanceDatabaseCreateCall.html), [*instances databases drop database*](struct.ProjectInstanceDatabaseDropDatabaseCall.html), [*instances databases get*](struct.ProjectInstanceDatabaseGetCall.html), [*instances databases get ddl*](struct.ProjectInstanceDatabaseGetDdlCall.html), [*instances databases get iam policy*](struct.ProjectInstanceDatabaseGetIamPolicyCall.html), [*instances databases list*](struct.ProjectInstanceDatabaseListCall.html), [*instances databases operations cancel*](struct.ProjectInstanceDatabaseOperationCancelCall.html), [*instances databases operations delete*](struct.ProjectInstanceDatabaseOperationDeleteCall.html), [*instances databases operations get*](struct.ProjectInstanceDatabaseOperationGetCall.html), [*instances databases operations list*](struct.ProjectInstanceDatabaseOperationListCall.html), [*instances databases restore*](struct.ProjectInstanceDatabaseRestoreCall.html), [*instances databases sessions batch create*](struct.ProjectInstanceDatabaseSessionBatchCreateCall.html), [*instances databases sessions begin transaction*](struct.ProjectInstanceDatabaseSessionBeginTransactionCall.html), [*instances databases sessions commit*](struct.ProjectInstanceDatabaseSessionCommitCall.html), [*instances databases sessions create*](struct.ProjectInstanceDatabaseSessionCreateCall.html), [*instances databases sessions delete*](struct.ProjectInstanceDatabaseSessionDeleteCall.html), [*instances databases sessions execute batch dml*](struct.ProjectInstanceDatabaseSessionExecuteBatchDmlCall.html), [*instances databases sessions execute sql*](struct.ProjectInstanceDatabaseSessionExecuteSqlCall.html), [*instances databases sessions execute streaming sql*](struct.ProjectInstanceDatabaseSessionExecuteStreamingSqlCall.html), [*instances databases sessions get*](struct.ProjectInstanceDatabaseSessionGetCall.html), [*instances databases sessions list*](struct.ProjectInstanceDatabaseSessionListCall.html), [*instances databases sessions partition query*](struct.ProjectInstanceDatabaseSessionPartitionQueryCall.html), [*instances databases sessions partition read*](struct.ProjectInstanceDatabaseSessionPartitionReadCall.html), [*instances databases sessions read*](struct.ProjectInstanceDatabaseSessionReadCall.html), [*instances databases sessions rollback*](struct.ProjectInstanceDatabaseSessionRollbackCall.html), [*instances databases sessions streaming read*](struct.ProjectInstanceDatabaseSessionStreamingReadCall.html), [*instances databases set iam policy*](struct.ProjectInstanceDatabaseSetIamPolicyCall.html), [*instances databases test iam permissions*](struct.ProjectInstanceDatabaseTestIamPermissionCall.html), [*instances databases update ddl*](struct.ProjectInstanceDatabaseUpdateDdlCall.html), [*instances delete*](struct.ProjectInstanceDeleteCall.html), [*instances get*](struct.ProjectInstanceGetCall.html), [*instances get iam policy*](struct.ProjectInstanceGetIamPolicyCall.html), [*instances list*](struct.ProjectInstanceListCall.html), [*instances operations cancel*](struct.ProjectInstanceOperationCancelCall.html), [*instances operations delete*](struct.ProjectInstanceOperationDeleteCall.html), [*instances operations get*](struct.ProjectInstanceOperationGetCall.html), [*instances operations list*](struct.ProjectInstanceOperationListCall.html), [*instances patch*](struct.ProjectInstancePatchCall.html), [*instances set iam policy*](struct.ProjectInstanceSetIamPolicyCall.html) and [*instances test iam permissions*](struct.ProjectInstanceTestIamPermissionCall.html)
 //! 
 //! 
 //! 
@@ -48,6 +48,8 @@
 //! 
 //! ```ignore
 //! let r = hub.projects().instances_databases_operations_cancel(...).doit()
+//! let r = hub.projects().instances_backups_operations_delete(...).doit()
+//! let r = hub.projects().instances_backups_operations_cancel(...).doit()
 //! let r = hub.projects().instances_databases_drop_database(...).doit()
 //! let r = hub.projects().instances_operations_delete(...).doit()
 //! let r = hub.projects().instances_databases_operations_delete(...).doit()
@@ -55,6 +57,7 @@
 //! let r = hub.projects().instances_operations_cancel(...).doit()
 //! let r = hub.projects().instances_databases_sessions_rollback(...).doit()
 //! let r = hub.projects().instances_databases_sessions_delete(...).doit()
+//! let r = hub.projects().instances_backups_delete(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -344,7 +347,7 @@ impl<'a, C, A> Spanner<C, A>
         Spanner {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://spanner.googleapis.com/".to_string(),
             _root_url: "https://spanner.googleapis.com/".to_string(),
         }
@@ -355,7 +358,7 @@ impl<'a, C, A> Spanner<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -383,6 +386,48 @@ impl<'a, C, A> Spanner<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// The response for BatchCreateSessions.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases sessions batch create projects](struct.ProjectInstanceDatabaseSessionBatchCreateCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchCreateSessionsResponse {
+    /// The freshly created sessions.
+    pub session: Option<Vec<Session>>,
+}
+
+impl ResponseResult for BatchCreateSessionsResponse {}
+
+
+/// The response for ListBackups.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances backups list projects](struct.ProjectInstanceBackupListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListBackupsResponse {
+    /// `next_page_token` can be sent in a subsequent
+    /// ListBackups call to fetch more
+    /// of the matching backups.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of matching backups. Backups returned are ordered by `create_time`
+    /// in descending order, starting from the most recent `create_time`.
+    pub backups: Option<Vec<Backup>>,
+}
+
+impl ResponseResult for ListBackupsResponse {}
+
+
 /// The response for ListSessions.
 /// 
 /// # Activities
@@ -450,8 +495,12 @@ pub struct Instance {
     /// `projects/<project>/instances/a-z*[a-z0-9]`. The final
     /// segment of the name must be between 2 and 64 characters in length.
     pub name: Option<String>,
-    /// Required. The number of nodes allocated to this instance. This may be zero
-    /// in API responses for instances that are not yet in state `READY`.
+    /// Deprecated. This field is not populated.
+    #[serde(rename="endpointUris")]
+    pub endpoint_uris: Option<Vec<String>>,
+    /// The number of nodes allocated to this instance. This
+    /// may be zero in API responses for instances that are not yet in state
+    /// `READY`.
     /// 
     /// See [the
     /// documentation](https://cloud.google.com/spanner/docs/instances#node_count)
@@ -641,6 +690,10 @@ pub struct Mutation {
     /// Like insert, except that if the row already exists, then
     /// its column values are overwritten with the ones provided. Any
     /// column values not explicitly written are preserved.
+    /// 
+    /// When using insert_or_update, just as when using insert, all `NOT
+    /// NULL` columns in the table must be given a value. This holds true
+    /// even when the row already exists and will therefore actually be updated.
     #[serde(rename="insertOrUpdate")]
     pub insert_or_update: Option<Write>,
     /// Update existing rows in a table. If any of the rows does not
@@ -650,6 +703,11 @@ pub struct Mutation {
     /// deleted, and the column values provided are inserted
     /// instead. Unlike insert_or_update, this means any values not
     /// explicitly written become `NULL`.
+    /// 
+    /// In an interleaved table, if you create the child table with the
+    /// `ON DELETE CASCADE` annotation, then replacing a parent row
+    /// also deletes the child rows. Otherwise, you must delete the
+    /// child rows before you replace the parent row.
     pub replace: Option<Write>,
 }
 
@@ -672,48 +730,24 @@ pub struct Statement {
     /// about SQL types.
     #[serde(rename="paramTypes")]
     pub param_types: Option<HashMap<String, Type>>,
-    /// The DML string can contain parameter placeholders. A parameter
-    /// placeholder consists of `'@'` followed by the parameter
-    /// name. Parameter names consist of any combination of letters,
-    /// numbers, and underscores.
+    /// Parameter names and values that bind to placeholders in the DML string.
+    /// 
+    /// A parameter placeholder consists of the `@` character followed by the
+    /// parameter name (for example, `@firstName`). Parameter names can contain
+    /// letters, numbers, and underscores.
     /// 
     /// Parameters can appear anywhere that a literal value is expected.  The
     /// same parameter name can be used more than once, for example:
-    ///   `"WHERE id > @msg_id AND id < @msg_id + 100"`
     /// 
-    /// It is an error to execute an SQL statement with unbound parameters.
+    /// `"WHERE id > @msg_id AND id < @msg_id + 100"`
     /// 
-    /// Parameter values are specified using `params`, which is a JSON
-    /// object whose keys are parameter names, and whose values are the
-    /// corresponding parameter values.
+    /// It is an error to execute a SQL statement with unbound parameters.
     pub params: Option<HashMap<String, String>>,
     /// Required. The DML string.
     pub sql: Option<String>,
 }
 
 impl Part for Statement {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReplicaInfo {
-    /// If true, this location is designated as the default leader location where
-    /// leader replicas are placed. See the [region types
-    /// documentation](https://cloud.google.com/spanner/docs/instances#region_types)
-    /// for more details.
-    #[serde(rename="defaultLeaderLocation")]
-    pub default_leader_location: Option<bool>,
-    /// The type of replica.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// The location of the serving resources, e.g. "us-central1".
-    pub location: Option<String>,
-}
-
-impl Part for ReplicaInfo {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated
@@ -734,6 +768,8 @@ impl Part for ReplicaInfo {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [instances databases operations cancel projects](struct.ProjectInstanceDatabaseOperationCancelCall.html) (response)
+/// * [instances backups operations delete projects](struct.ProjectInstanceBackupOperationDeleteCall.html) (response)
+/// * [instances backups operations cancel projects](struct.ProjectInstanceBackupOperationCancelCall.html) (response)
 /// * [instances databases drop database projects](struct.ProjectInstanceDatabaseDropDatabaseCall.html) (response)
 /// * [instances operations delete projects](struct.ProjectInstanceOperationDeleteCall.html) (response)
 /// * [instances databases operations delete projects](struct.ProjectInstanceDatabaseOperationDeleteCall.html) (response)
@@ -741,1217 +777,11 @@ impl Part for ReplicaInfo {}
 /// * [instances operations cancel projects](struct.ProjectInstanceOperationCancelCall.html) (response)
 /// * [instances databases sessions rollback projects](struct.ProjectInstanceDatabaseSessionRollbackCall.html) (response)
 /// * [instances databases sessions delete projects](struct.ProjectInstanceDatabaseSessionDeleteCall.html) (response)
+/// * [instances backups delete projects](struct.ProjectInstanceBackupDeleteCall.html) (response)
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
 impl ResponseResult for Empty {}
-
-
-/// The `Status` type defines a logical error model that is suitable for
-/// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
-/// three pieces of data: error code, error message, and error details.
-/// 
-/// You can find out more about this error model and how to work with it in the
-/// [API Design Guide](https://cloud.google.com/apis/design/errors).
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Status {
-    /// A developer-facing error message, which should be in English. Any
-    /// user-facing error message should be localized and sent in the
-    /// google.rpc.Status.details field, or localized by the client.
-    pub message: Option<String>,
-    /// The status code, which should be an enum value of google.rpc.Code.
-    pub code: Option<i32>,
-    /// A list of messages that carry the error details.  There is a common set of
-    /// message types for APIs to use.
-    pub details: Option<Vec<HashMap<String, String>>>,
-}
-
-impl Part for Status {}
-
-
-/// Response message for `TestIamPermissions` method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases test iam permissions projects](struct.ProjectInstanceDatabaseTestIamPermissionCall.html) (response)
-/// * [instances test iam permissions projects](struct.ProjectInstanceTestIamPermissionCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TestIamPermissionsResponse {
-    /// A subset of `TestPermissionsRequest.permissions` that the caller is
-    /// allowed.
-    pub permissions: Option<Vec<String>>,
-}
-
-impl ResponseResult for TestIamPermissionsResponse {}
-
-
-/// The request for CreateInstance.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances create projects](struct.ProjectInstanceCreateCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CreateInstanceRequest {
-    /// Required. The ID of the instance to create.  Valid identifiers are of the
-    /// form `a-z*[a-z0-9]` and must be between 2 and 64 characters in
-    /// length.
-    #[serde(rename="instanceId")]
-    pub instance_id: Option<String>,
-    /// Required. The instance to create.  The name may be omitted, but if
-    /// specified must be `<parent>/instances/<instance_id>`.
-    pub instance: Option<Instance>,
-}
-
-impl RequestValue for CreateInstanceRequest {}
-
-
-/// `StructType` defines the fields of a STRUCT type.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct StructType {
-    /// The list of fields that make up this struct. Order is
-    /// significant, because values of this struct type are represented as
-    /// lists, where the order of field values matches the order of
-    /// fields in the StructType. In turn, the order of fields
-    /// matches the order of columns in a read request, or the order of
-    /// fields in the `SELECT` clause of a query.
-    pub fields: Option<Vec<Field>>,
-}
-
-impl Part for StructType {}
-
-
-/// Request message for `GetIamPolicy` method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances get iam policy projects](struct.ProjectInstanceGetIamPolicyCall.html) (request)
-/// * [instances databases get iam policy projects](struct.ProjectInstanceDatabaseGetIamPolicyCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetIamPolicyRequest { _never_set: Option<bool> }
-
-impl RequestValue for GetIamPolicyRequest {}
-
-
-/// A Cloud Spanner database.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases get projects](struct.ProjectInstanceDatabaseGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Database {
-    /// Output only. The current database state.
-    pub state: Option<String>,
-    /// Required. The name of the database. Values are of the form
-    /// `projects/<project>/instances/<instance>/databases/<database>`,
-    /// where `<database>` is as specified in the `CREATE DATABASE`
-    /// statement. This name can be passed to other API methods to
-    /// identify the database.
-    pub name: Option<String>,
-}
-
-impl ResponseResult for Database {}
-
-
-/// The response for ExecuteBatchDml. Contains a list
-/// of ResultSet, one for each DML statement that has successfully executed.
-/// If a statement fails, the error is returned as part of the response payload.
-/// Clients can determine whether all DML statements have run successfully, or if
-/// a statement failed, using one of the following approaches:
-/// 
-/// 1. Check if `'status'` field is `OkStatus`.
-/// 1. Check if `result_sets_size()` equals the number of statements in
-///    ExecuteBatchDmlRequest.
-/// 
-/// Example 1: A request with 5 DML statements, all executed successfully.
-/// 
-/// Result: A response with 5 ResultSets, one for each statement in the same
-/// order, and an `OkStatus`.
-/// 
-/// Example 2: A request with 5 DML statements. The 3rd statement has a syntax
-/// error.
-/// 
-/// Result: A response with 2 ResultSets, for the first 2 statements that
-/// run successfully, and a syntax error (`INVALID_ARGUMENT`) status. From
-/// `result_set_size()` client can determine that the 3rd statement has failed.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases sessions execute batch dml projects](struct.ProjectInstanceDatabaseSessionExecuteBatchDmlCall.html) (response)
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ExecuteBatchDmlResponse {
-    /// If all DML statements are executed successfully, status will be OK.
-    /// Otherwise, the error status of the first failed statement.
-    pub status: Option<Status>,
-    /// ResultSets, one for each statement in the request that ran successfully, in
-    /// the same order as the statements in the request. Each ResultSet will
-    /// not contain any rows. The ResultSetStats in each ResultSet will
-    /// contain the number of rows modified by the statement.
-    /// 
-    /// Only the first ResultSet in the response contains a valid
-    /// ResultSetMetadata.
-    #[serde(rename="resultSets")]
-    pub result_sets: Option<Vec<ResultSet>>,
-}
-
-impl ResponseResult for ExecuteBatchDmlResponse {}
-
-
-/// The response for GetDatabaseDdl.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases get ddl projects](struct.ProjectInstanceDatabaseGetDdlCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetDatabaseDdlResponse {
-    /// A list of formatted DDL statements defining the schema of the database
-    /// specified in the request.
-    pub statements: Option<Vec<String>>,
-}
-
-impl ResponseResult for GetDatabaseDdlResponse {}
-
-
-/// The response for PartitionQuery
-/// or PartitionRead
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases sessions partition query projects](struct.ProjectInstanceDatabaseSessionPartitionQueryCall.html) (response)
-/// * [instances databases sessions partition read projects](struct.ProjectInstanceDatabaseSessionPartitionReadCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PartitionResponse {
-    /// Transaction created by this request.
-    pub transaction: Option<Transaction>,
-    /// Partitions created by this request.
-    pub partitions: Option<Vec<Partition>>,
-}
-
-impl ResponseResult for PartitionResponse {}
-
-
-/// The request for PartitionRead
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases sessions partition read projects](struct.ProjectInstanceDatabaseSessionPartitionReadCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PartitionReadRequest {
-    /// If non-empty, the name of an index on table. This index is
-    /// used instead of the table primary key when interpreting key_set
-    /// and sorting result rows. See key_set for further information.
-    pub index: Option<String>,
-    /// Read only snapshot transactions are supported, read/write and single use
-    /// transactions are not.
-    pub transaction: Option<TransactionSelector>,
-    /// Required. `key_set` identifies the rows to be yielded. `key_set` names the
-    /// primary keys of the rows in table to be yielded, unless index
-    /// is present. If index is present, then key_set instead names
-    /// index keys in index.
-    /// 
-    /// It is not an error for the `key_set` to name rows that do not
-    /// exist in the database. Read yields nothing for nonexistent rows.
-    #[serde(rename="keySet")]
-    pub key_set: Option<KeySet>,
-    /// Additional options that affect how many partitions are created.
-    #[serde(rename="partitionOptions")]
-    pub partition_options: Option<PartitionOptions>,
-    /// Required. The name of the table in the database to be read.
-    pub table: Option<String>,
-    /// The columns of table to be returned for each row matching
-    /// this request.
-    pub columns: Option<Vec<String>>,
-}
-
-impl RequestValue for PartitionReadRequest {}
-
-
-/// This message is used to select the transaction in which a
-/// Read or
-/// ExecuteSql call runs.
-/// 
-/// See TransactionOptions for more information about transactions.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TransactionSelector {
-    /// Begin a new transaction and execute this read or SQL query in
-    /// it. The transaction ID of the new transaction is returned in
-    /// ResultSetMetadata.transaction, which is a Transaction.
-    pub begin: Option<TransactionOptions>,
-    /// Execute the read or SQL query in a temporary transaction.
-    /// This is the most efficient way to execute a transaction that
-    /// consists of a single SQL query.
-    #[serde(rename="singleUse")]
-    pub single_use: Option<TransactionOptions>,
-    /// Execute the read or SQL query in a previously-started transaction.
-    pub id: Option<String>,
-}
-
-impl Part for TransactionSelector {}
-
-
-/// Message type to initiate a read-write transaction. Currently this
-/// transaction type has no options.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReadWrite { _never_set: Option<bool> }
-
-impl Part for ReadWrite {}
-
-
-/// Associates `members` with a `role`.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Binding {
-    /// Role that is assigned to `members`.
-    /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
-    pub role: Option<String>,
-    /// The condition that is associated with this binding.
-    /// NOTE: An unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
-    pub condition: Option<Expr>,
-    /// Specifies the identities requesting access for a Cloud Platform resource.
-    /// `members` can have the following values:
-    /// 
-    /// * `allUsers`: A special identifier that represents anyone who is
-    ///    on the internet; with or without a Google account.
-    /// 
-    /// * `allAuthenticatedUsers`: A special identifier that represents anyone
-    ///    who is authenticated with a Google account or a service account.
-    /// 
-    /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` .
-    /// 
-    /// 
-    /// * `serviceAccount:{emailid}`: An email address that represents a service
-    ///    account. For example, `my-other-app@appspot.gserviceaccount.com`.
-    /// 
-    /// * `group:{emailid}`: An email address that represents a Google group.
-    ///    For example, `admins@example.com`.
-    /// 
-    /// 
-    /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
-    ///    users of that domain. For example, `google.com` or `example.com`.
-    /// 
-    /// 
-    pub members: Option<Vec<String>>,
-}
-
-impl Part for Binding {}
-
-
-/// Message type to initiate a Partitioned DML transaction.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PartitionedDml { _never_set: Option<bool> }
-
-impl Part for PartitionedDml {}
-
-
-/// The request for CreateDatabase.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases create projects](struct.ProjectInstanceDatabaseCreateCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CreateDatabaseRequest {
-    /// An optional list of DDL statements to run inside the newly created
-    /// database. Statements can create tables, indexes, etc. These
-    /// statements execute atomically with the creation of the database:
-    /// if there is an error in any statement, the database is not created.
-    #[serde(rename="extraStatements")]
-    pub extra_statements: Option<Vec<String>>,
-    /// Required. A `CREATE DATABASE` statement, which specifies the ID of the
-    /// new database.  The database ID must conform to the regular expression
-    /// `a-z*[a-z0-9]` and be between 2 and 30 characters in length.
-    /// If the database ID is a reserved word or if it contains a hyphen, the
-    /// database ID must be enclosed in backticks (`` ` ``).
-    #[serde(rename="createStatement")]
-    pub create_statement: Option<String>,
-}
-
-impl RequestValue for CreateDatabaseRequest {}
-
-
-/// The request for Rollback.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases sessions rollback projects](struct.ProjectInstanceDatabaseSessionRollbackCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RollbackRequest {
-    /// Required. The transaction to roll back.
-    #[serde(rename="transactionId")]
-    pub transaction_id: Option<String>,
-}
-
-impl RequestValue for RollbackRequest {}
-
-
-/// `KeySet` defines a collection of Cloud Spanner keys and/or key ranges. All
-/// the keys are expected to be in the same table or index. The keys need
-/// not be sorted in any particular way.
-/// 
-/// If the same key is specified multiple times in the set (for example
-/// if two ranges, two keys, or a key and a range overlap), Cloud Spanner
-/// behaves as if the key were only specified once.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct KeySet {
-    /// A list of specific keys. Entries in `keys` should have exactly as
-    /// many elements as there are columns in the primary or index key
-    /// with which this `KeySet` is used.  Individual key values are
-    /// encoded as described here.
-    pub keys: Option<Vec<Vec<String>>>,
-    /// A list of key ranges. See KeyRange for more information about
-    /// key range specifications.
-    pub ranges: Option<Vec<KeyRange>>,
-    /// For convenience `all` can be set to `true` to indicate that this
-    /// `KeySet` matches all keys in the table or index. Note that any keys
-    /// specified in `keys` or `ranges` are only yielded once.
-    pub all: Option<bool>,
-}
-
-impl Part for KeySet {}
-
-
-/// Message type to initiate a read-only transaction.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReadOnly {
-    /// Executes all reads at a timestamp >= `min_read_timestamp`.
-    /// 
-    /// This is useful for requesting fresher data than some previous
-    /// read, or data that is fresh enough to observe the effects of some
-    /// previously committed transaction whose timestamp is known.
-    /// 
-    /// Note that this option can only be used in single-use transactions.
-    /// 
-    /// A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds.
-    /// Example: `"2014-10-02T15:01:23.045123456Z"`.
-    #[serde(rename="minReadTimestamp")]
-    pub min_read_timestamp: Option<String>,
-    /// If true, the Cloud Spanner-selected read timestamp is included in
-    /// the Transaction message that describes the transaction.
-    #[serde(rename="returnReadTimestamp")]
-    pub return_read_timestamp: Option<bool>,
-    /// Read at a timestamp where all previously committed transactions
-    /// are visible.
-    pub strong: Option<bool>,
-    /// Executes all reads at the given timestamp. Unlike other modes,
-    /// reads at a specific timestamp are repeatable; the same read at
-    /// the same timestamp always returns the same data. If the
-    /// timestamp is in the future, the read will block until the
-    /// specified timestamp, modulo the read's deadline.
-    /// 
-    /// Useful for large scale consistent reads such as mapreduces, or
-    /// for coordinating many reads against a consistent snapshot of the
-    /// data.
-    /// 
-    /// A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds.
-    /// Example: `"2014-10-02T15:01:23.045123456Z"`.
-    #[serde(rename="readTimestamp")]
-    pub read_timestamp: Option<String>,
-    /// Read data at a timestamp >= `NOW - max_staleness`
-    /// seconds. Guarantees that all writes that have committed more
-    /// than the specified number of seconds ago are visible. Because
-    /// Cloud Spanner chooses the exact timestamp, this mode works even if
-    /// the client's local clock is substantially skewed from Cloud Spanner
-    /// commit timestamps.
-    /// 
-    /// Useful for reading the freshest data available at a nearby
-    /// replica, while bounding the possible staleness if the local
-    /// replica has fallen behind.
-    /// 
-    /// Note that this option can only be used in single-use
-    /// transactions.
-    #[serde(rename="maxStaleness")]
-    pub max_staleness: Option<String>,
-    /// Executes all reads at a timestamp that is `exact_staleness`
-    /// old. The timestamp is chosen soon after the read is started.
-    /// 
-    /// Guarantees that all writes that have committed more than the
-    /// specified number of seconds ago are visible. Because Cloud Spanner
-    /// chooses the exact timestamp, this mode works even if the client's
-    /// local clock is substantially skewed from Cloud Spanner commit
-    /// timestamps.
-    /// 
-    /// Useful for reading at nearby replicas without the distributed
-    /// timestamp negotiation overhead of `max_staleness`.
-    #[serde(rename="exactStaleness")]
-    pub exact_staleness: Option<String>,
-}
-
-impl Part for ReadOnly {}
-
-
-/// Metadata associated with a parent-child relationship appearing in a
-/// PlanNode.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ChildLink {
-    /// Only present if the child node is SCALAR and corresponds
-    /// to an output variable of the parent node. The field carries the name of
-    /// the output variable.
-    /// For example, a `TableScan` operator that reads rows from a table will
-    /// have child links to the `SCALAR` nodes representing the output variables
-    /// created for each column that is read by the operator. The corresponding
-    /// `variable` fields will be set to the variable names assigned to the
-    /// columns.
-    pub variable: Option<String>,
-    /// The node to which the link points.
-    #[serde(rename="childIndex")]
-    pub child_index: Option<i32>,
-    /// The type of the link. For example, in Hash Joins this could be used to
-    /// distinguish between the build child and the probe child, or in the case
-    /// of the child being an output variable, to represent the tag associated
-    /// with the output variable.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-}
-
-impl Part for ChildLink {}
-
-
-/// The request for Read and
-/// StreamingRead.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases sessions streaming read projects](struct.ProjectInstanceDatabaseSessionStreamingReadCall.html) (request)
-/// * [instances databases sessions read projects](struct.ProjectInstanceDatabaseSessionReadCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReadRequest {
-    /// If non-empty, the name of an index on table. This index is
-    /// used instead of the table primary key when interpreting key_set
-    /// and sorting result rows. See key_set for further information.
-    pub index: Option<String>,
-    /// The transaction to use. If none is provided, the default is a
-    /// temporary read-only transaction with strong concurrency.
-    pub transaction: Option<TransactionSelector>,
-    /// If this request is resuming a previously interrupted read,
-    /// `resume_token` should be copied from the last
-    /// PartialResultSet yielded before the interruption. Doing this
-    /// enables the new read to resume where the last read left off. The
-    /// rest of the request parameters must exactly match the request
-    /// that yielded this token.
-    #[serde(rename="resumeToken")]
-    pub resume_token: Option<String>,
-    /// If present, results will be restricted to the specified partition
-    /// previously created using PartitionRead().    There must be an exact
-    /// match for the values of fields common to this message and the
-    /// PartitionReadRequest message used to create this partition_token.
-    #[serde(rename="partitionToken")]
-    pub partition_token: Option<String>,
-    /// Required. `key_set` identifies the rows to be yielded. `key_set` names the
-    /// primary keys of the rows in table to be yielded, unless index
-    /// is present. If index is present, then key_set instead names
-    /// index keys in index.
-    /// 
-    /// If the partition_token field is empty, rows are yielded
-    /// in table primary key order (if index is empty) or index key order
-    /// (if index is non-empty).  If the partition_token field is not
-    /// empty, rows will be yielded in an unspecified order.
-    /// 
-    /// It is not an error for the `key_set` to name rows that do not
-    /// exist in the database. Read yields nothing for nonexistent rows.
-    #[serde(rename="keySet")]
-    pub key_set: Option<KeySet>,
-    /// If greater than zero, only the first `limit` rows are yielded. If `limit`
-    /// is zero, the default is no limit. A limit cannot be specified if
-    /// `partition_token` is set.
-    pub limit: Option<String>,
-    /// Required. The name of the table in the database to be read.
-    pub table: Option<String>,
-    /// The columns of table to be returned for each row matching
-    /// this request.
-    pub columns: Option<Vec<String>>,
-}
-
-impl RequestValue for ReadRequest {}
-
-
-/// Options for a PartitionQueryRequest and
-/// PartitionReadRequest.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PartitionOptions {
-    /// **Note:** This hint is currently ignored by PartitionQuery and
-    /// PartitionRead requests.
-    /// 
-    /// The desired maximum number of partitions to return.  For example, this may
-    /// be set to the number of workers available.  The default for this option
-    /// is currently 10,000. The maximum value is currently 200,000.  This is only
-    /// a hint.  The actual number of partitions returned may be smaller or larger
-    /// than this maximum count request.
-    #[serde(rename="maxPartitions")]
-    pub max_partitions: Option<String>,
-    /// **Note:** This hint is currently ignored by PartitionQuery and
-    /// PartitionRead requests.
-    /// 
-    /// The desired data size for each partition generated.  The default for this
-    /// option is currently 1 GiB.  This is only a hint. The actual size of each
-    /// partition may be smaller or larger than this size request.
-    #[serde(rename="partitionSizeBytes")]
-    pub partition_size_bytes: Option<String>,
-}
-
-impl Part for PartitionOptions {}
-
-
-/// This resource represents a long-running operation that is the result of a
-/// network API call.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases operations get projects](struct.ProjectInstanceDatabaseOperationGetCall.html) (response)
-/// * [instances operations get projects](struct.ProjectInstanceOperationGetCall.html) (response)
-/// * [instances databases create projects](struct.ProjectInstanceDatabaseCreateCall.html) (response)
-/// * [instances create projects](struct.ProjectInstanceCreateCall.html) (response)
-/// * [instances databases update ddl projects](struct.ProjectInstanceDatabaseUpdateDdlCall.html) (response)
-/// * [instances patch projects](struct.ProjectInstancePatchCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Operation {
-    /// The error result of the operation in case of failure or cancellation.
-    pub error: Option<Status>,
-    /// If the value is `false`, it means the operation is still in progress.
-    /// If `true`, the operation is completed, and either `error` or `response` is
-    /// available.
-    pub done: Option<bool>,
-    /// The normal response of the operation in case of success.  If the original
-    /// method returns no data on success, such as `Delete`, the response is
-    /// `google.protobuf.Empty`.  If the original method is standard
-    /// `Get`/`Create`/`Update`, the response should be the resource.  For other
-    /// methods, the response should have the type `XxxResponse`, where `Xxx`
-    /// is the original method name.  For example, if the original method name
-    /// is `TakeSnapshot()`, the inferred response type is
-    /// `TakeSnapshotResponse`.
-    pub response: Option<HashMap<String, String>>,
-    /// The server-assigned name, which is only unique within the same service that
-    /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should be a resource name ending with `operations/{unique_id}`.
-    pub name: Option<String>,
-    /// Service-specific metadata associated with the operation.  It typically
-    /// contains progress information and common metadata such as create time.
-    /// Some services might not provide such metadata.  Any method that returns a
-    /// long-running operation should document the metadata type, if any.
-    pub metadata: Option<HashMap<String, String>>,
-}
-
-impl ResponseResult for Operation {}
-
-
-/// The response for ListInstances.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances list projects](struct.ProjectInstanceListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListInstancesResponse {
-    /// `next_page_token` can be sent in a subsequent
-    /// ListInstances call to fetch more
-    /// of the matching instances.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of requested instances.
-    pub instances: Option<Vec<Instance>>,
-}
-
-impl ResponseResult for ListInstancesResponse {}
-
-
-/// Contains an ordered list of nodes appearing in the query plan.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct QueryPlan {
-    /// The nodes in the query plan. Plan nodes are returned in pre-order starting
-    /// with the plan root. Each PlanNode's `id` corresponds to its index in
-    /// `plan_nodes`.
-    #[serde(rename="planNodes")]
-    pub plan_nodes: Option<Vec<PlanNode>>,
-}
-
-impl Part for QueryPlan {}
-
-
-/// Request message for `SetIamPolicy` method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases set iam policy projects](struct.ProjectInstanceDatabaseSetIamPolicyCall.html) (request)
-/// * [instances set iam policy projects](struct.ProjectInstanceSetIamPolicyCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SetIamPolicyRequest {
-    /// REQUIRED: The complete policy to be applied to the `resource`. The size of
-    /// the policy is limited to a few 10s of KB. An empty policy is a
-    /// valid policy but certain Cloud Platform services (such as Projects)
-    /// might reject them.
-    pub policy: Option<Policy>,
-}
-
-impl RequestValue for SetIamPolicyRequest {}
-
-
-/// The request for PartitionQuery
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases sessions partition query projects](struct.ProjectInstanceDatabaseSessionPartitionQueryCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PartitionQueryRequest {
-    /// It is not always possible for Cloud Spanner to infer the right SQL type
-    /// from a JSON value.  For example, values of type `BYTES` and values
-    /// of type `STRING` both appear in params as JSON strings.
-    /// 
-    /// In these cases, `param_types` can be used to specify the exact
-    /// SQL type for some or all of the SQL query parameters. See the
-    /// definition of Type for more information
-    /// about SQL types.
-    #[serde(rename="paramTypes")]
-    pub param_types: Option<HashMap<String, Type>>,
-    /// Additional options that affect how many partitions are created.
-    #[serde(rename="partitionOptions")]
-    pub partition_options: Option<PartitionOptions>,
-    /// Read only snapshot transactions are supported, read/write and single use
-    /// transactions are not.
-    pub transaction: Option<TransactionSelector>,
-    /// The SQL query string can contain parameter placeholders. A parameter
-    /// placeholder consists of `'@'` followed by the parameter
-    /// name. Parameter names consist of any combination of letters,
-    /// numbers, and underscores.
-    /// 
-    /// Parameters can appear anywhere that a literal value is expected.  The same
-    /// parameter name can be used more than once, for example:
-    ///   `"WHERE id > @msg_id AND id < @msg_id + 100"`
-    /// 
-    /// It is an error to execute an SQL query with unbound parameters.
-    /// 
-    /// Parameter values are specified using `params`, which is a JSON
-    /// object whose keys are parameter names, and whose values are the
-    /// corresponding parameter values.
-    pub params: Option<HashMap<String, String>>,
-    /// The query request to generate partitions for. The request will fail if
-    /// the query is not root partitionable. The query plan of a root
-    /// partitionable query has a single distributed union operator. A distributed
-    /// union operator conceptually divides one or more tables into multiple
-    /// splits, remotely evaluates a subquery independently on each split, and
-    /// then unions all results.
-    /// 
-    /// This must not contain DML commands, such as INSERT, UPDATE, or
-    /// DELETE. Use ExecuteStreamingSql with a
-    /// PartitionedDml transaction for large, partition-friendly DML operations.
-    pub sql: Option<String>,
-}
-
-impl RequestValue for PartitionQueryRequest {}
-
-
-/// Results from Read or
-/// ExecuteSql.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases sessions execute sql projects](struct.ProjectInstanceDatabaseSessionExecuteSqlCall.html) (response)
-/// * [instances databases sessions read projects](struct.ProjectInstanceDatabaseSessionReadCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ResultSet {
-    /// Each element in `rows` is a row whose format is defined by
-    /// metadata.row_type. The ith element
-    /// in each row matches the ith field in
-    /// metadata.row_type. Elements are
-    /// encoded based on type as described
-    /// here.
-    pub rows: Option<Vec<Vec<String>>>,
-    /// Query plan and execution statistics for the SQL statement that
-    /// produced this result set. These can be requested by setting
-    /// ExecuteSqlRequest.query_mode.
-    /// DML statements always produce stats containing the number of rows
-    /// modified, unless executed using the
-    /// ExecuteSqlRequest.QueryMode.PLAN ExecuteSqlRequest.query_mode.
-    /// Other fields may or may not be populated, based on the
-    /// ExecuteSqlRequest.query_mode.
-    pub stats: Option<ResultSetStats>,
-    /// Metadata about the result set, such as row type information.
-    pub metadata: Option<ResultSetMetadata>,
-}
-
-impl ResponseResult for ResultSet {}
-
-
-/// Arguments to insert, update, insert_or_update, and
-/// replace operations.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Write {
-    /// Required. The table whose rows will be written.
-    pub table: Option<String>,
-    /// The values to be written. `values` can contain more than one
-    /// list of values. If it does, then multiple rows are written, one
-    /// for each entry in `values`. Each list in `values` must have
-    /// exactly as many entries as there are entries in columns
-    /// above. Sending multiple lists is equivalent to sending multiple
-    /// `Mutation`s, each containing one `values` entry and repeating
-    /// table and columns. Individual values in each list are
-    /// encoded as described here.
-    pub values: Option<Vec<Vec<String>>>,
-    /// The names of the columns in table to be written.
-    /// 
-    /// The list of columns must contain enough columns to allow
-    /// Cloud Spanner to derive values for all primary key columns in the
-    /// row(s) to be modified.
-    pub columns: Option<Vec<String>>,
-}
-
-impl Part for Write {}
-
-
-/// Message representing a single field of a struct.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Field {
-    /// The type of the field.
-    #[serde(rename="type")]
-    pub type_: Option<Type>,
-    /// The name of the field. For reads, this is the column name. For
-    /// SQL queries, it is the column alias (e.g., `"Word"` in the
-    /// query `"SELECT 'hello' AS Word"`), or the column name (e.g.,
-    /// `"ColName"` in the query `"SELECT ColName FROM Table"`). Some
-    /// columns might have an empty name (e.g., !"SELECT
-    /// UPPER(ColName)"`). Note that a query result can contain
-    /// multiple fields with the same name.
-    pub name: Option<String>,
-}
-
-impl Part for Field {}
-
-
-/// The response for ListDatabases.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases list projects](struct.ProjectInstanceDatabaseListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListDatabasesResponse {
-    /// `next_page_token` can be sent in a subsequent
-    /// ListDatabases call to fetch more
-    /// of the matching databases.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// Databases that matched the request.
-    pub databases: Option<Vec<Database>>,
-}
-
-impl ResponseResult for ListDatabasesResponse {}
-
-
-/// Additional statistics about a ResultSet or PartialResultSet.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ResultSetStats {
-    /// Partitioned DML does not offer exactly-once semantics, so it
-    /// returns a lower bound of the rows modified.
-    #[serde(rename="rowCountLowerBound")]
-    pub row_count_lower_bound: Option<String>,
-    /// Standard DML returns an exact count of rows that were modified.
-    #[serde(rename="rowCountExact")]
-    pub row_count_exact: Option<String>,
-    /// QueryPlan for the query associated with this result.
-    #[serde(rename="queryPlan")]
-    pub query_plan: Option<QueryPlan>,
-    /// Aggregated statistics from the execution of the query. Only present when
-    /// the query is profiled. For example, a query could return the statistics as
-    /// follows:
-    /// 
-    /// ````text
-    /// {
-    ///   "rows_returned": "3",
-    ///   "elapsed_time": "1.22 secs",
-    ///   "cpu_time": "1.19 secs"
-    /// }````
-    #[serde(rename="queryStats")]
-    pub query_stats: Option<HashMap<String, String>>,
-}
-
-impl Part for ResultSetStats {}
-
-
-/// The response for Commit.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases sessions commit projects](struct.ProjectInstanceDatabaseSessionCommitCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CommitResponse {
-    /// The Cloud Spanner timestamp at which the transaction committed.
-    #[serde(rename="commitTimestamp")]
-    pub commit_timestamp: Option<String>,
-}
-
-impl ResponseResult for CommitResponse {}
-
-
-/// Defines an Identity and Access Management (IAM) policy. It is used to
-/// specify access control policies for Cloud Platform resources.
-/// 
-/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
-/// `members` to a `role`, where the members can be user accounts, Google groups,
-/// Google domains, and service accounts. A `role` is a named list of permissions
-/// defined by IAM.
-/// 
-/// **JSON Example**
-/// 
-/// ````text
-/// {
-///   "bindings": [
-///     {
-///       "role": "roles/owner",
-///       "members": [
-///         "user:mike@example.com",
-///         "group:admins@example.com",
-///         "domain:google.com",
-///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
-///       ]
-///     },
-///     {
-///       "role": "roles/viewer",
-///       "members": ["user:sean@example.com"]
-///     }
-///   ]
-/// }
-/// ````
-/// 
-/// **YAML Example**
-/// 
-/// ````text
-/// bindings:
-/// - members:
-///   - user:mike@example.com
-///   - group:admins@example.com
-///   - domain:google.com
-///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///   role: roles/owner
-/// - members:
-///   - user:sean@example.com
-///   role: roles/viewer
-/// ````
-/// 
-/// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam/docs).
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances get iam policy projects](struct.ProjectInstanceGetIamPolicyCall.html) (response)
-/// * [instances databases set iam policy projects](struct.ProjectInstanceDatabaseSetIamPolicyCall.html) (response)
-/// * [instances set iam policy projects](struct.ProjectInstanceSetIamPolicyCall.html) (response)
-/// * [instances databases get iam policy projects](struct.ProjectInstanceDatabaseGetIamPolicyCall.html) (response)
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Policy {
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
-    pub bindings: Option<Vec<Binding>>,
-    /// `etag` is used for optimistic concurrency control as a way to help
-    /// prevent simultaneous updates of a policy from overwriting each other.
-    /// It is strongly suggested that systems make use of the `etag` in the
-    /// read-modify-write cycle to perform policy updates in order to avoid race
-    /// conditions: An `etag` is returned in the response to `getIamPolicy`, and
-    /// systems are expected to put that etag in the request to `setIamPolicy` to
-    /// ensure that their change will be applied to the same version of the policy.
-    /// 
-    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
-    /// policy is overwritten blindly.
-    pub etag: Option<String>,
-    /// Deprecated.
-    pub version: Option<i32>,
-}
-
-impl ResponseResult for Policy {}
-
-
-/// Enqueues the given DDL statements to be applied, in order but not
-/// necessarily all at once, to the database schema at some point (or
-/// points) in the future. The server checks that the statements
-/// are executable (syntactically valid, name tables that exist, etc.)
-/// before enqueueing them, but they may still fail upon
-/// later execution (e.g., if a statement from another batch of
-/// statements is applied first and it conflicts in some way, or if
-/// there is some data-related problem like a `NULL` value in a column to
-/// which `NOT NULL` would be added). If a statement fails, all
-/// subsequent statements in the batch are automatically cancelled.
-/// 
-/// Each batch of statements is assigned a name which can be used with
-/// the Operations API to monitor
-/// progress. See the
-/// operation_id field for more
-/// details.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases update ddl projects](struct.ProjectInstanceDatabaseUpdateDdlCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UpdateDatabaseDdlRequest {
-    /// DDL statements to be applied to the database.
-    pub statements: Option<Vec<String>>,
-    /// If empty, the new update request is assigned an
-    /// automatically-generated operation ID. Otherwise, `operation_id`
-    /// is used to construct the name of the resulting
-    /// Operation.
-    /// 
-    /// Specifying an explicit operation ID simplifies determining
-    /// whether the statements were executed in the event that the
-    /// UpdateDatabaseDdl call is replayed,
-    /// or the return value is otherwise lost: the database and
-    /// `operation_id` fields can be combined to form the
-    /// name of the resulting
-    /// longrunning.Operation: `<database>/operations/<operation_id>`.
-    /// 
-    /// `operation_id` should be unique within the database, and must be
-    /// a valid identifier: `a-z*`. Note that
-    /// automatically-generated operation IDs always begin with an
-    /// underscore. If the named operation already exists,
-    /// UpdateDatabaseDdl returns
-    /// `ALREADY_EXISTS`.
-    #[serde(rename="operationId")]
-    pub operation_id: Option<String>,
-}
-
-impl RequestValue for UpdateDatabaseDdlRequest {}
-
-
-/// `Type` indicates the type of a Cloud Spanner value, as might be stored in a
-/// table cell or returned from an SQL query.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Type {
-    /// If code == STRUCT, then `struct_type`
-    /// provides type information for the struct's fields.
-    #[serde(rename="structType")]
-    pub struct_type: Option<StructType>,
-    /// Required. The TypeCode for this type.
-    pub code: Option<String>,
-    /// If code == ARRAY, then `array_element_type`
-    /// is the type of the array elements.
-    #[serde(rename="arrayElementType")]
-    pub array_element_type: Option<Option<Box<Type>>>,
-}
-
-impl Part for Type {}
-
-
-/// A session in the Cloud Spanner API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases sessions get projects](struct.ProjectInstanceDatabaseSessionGetCall.html) (response)
-/// * [instances databases sessions create projects](struct.ProjectInstanceDatabaseSessionCreateCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Session {
-    /// The labels for the session.
-    /// 
-    ///  * Label keys must be between 1 and 63 characters long and must conform to
-    ///    the following regular expression: `[a-z]([-a-z0-9]*[a-z0-9])?`.
-    ///  * Label values must be between 0 and 63 characters long and must conform
-    ///    to the regular expression `([a-z]([-a-z0-9]*[a-z0-9])?)?`.
-    ///  * No more than 64 labels can be associated with a given session.
-    /// 
-    /// See https://goo.gl/xmQnxf for more information on and examples of labels.
-    pub labels: Option<HashMap<String, String>>,
-    /// Output only. The timestamp when the session is created.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
-    /// Output only. The approximate timestamp when the session is last used. It is
-    /// typically earlier than the actual last use time.
-    #[serde(rename="approximateLastUseTime")]
-    pub approximate_last_use_time: Option<String>,
-    /// The name of the session. This is always system-assigned; values provided
-    /// when creating a session are ignored.
-    pub name: Option<String>,
-}
-
-impl ResponseResult for Session {}
-
-
-/// The request for UpdateInstance.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances patch projects](struct.ProjectInstancePatchCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UpdateInstanceRequest {
-    /// Required. The instance to update, which must always include the instance
-    /// name.  Otherwise, only fields mentioned in [][google.spanner.admin.instance.v1.UpdateInstanceRequest.field_mask] need be included.
-    pub instance: Option<Instance>,
-    /// Required. A mask specifying which fields in [][google.spanner.admin.instance.v1.UpdateInstanceRequest.instance] should be updated.
-    /// The field mask must always be specified; this prevents any future fields in
-    /// [][google.spanner.admin.instance.v1.Instance] from being erased accidentally by clients that do not know
-    /// about them.
-    #[serde(rename="fieldMask")]
-    pub field_mask: Option<String>,
-}
-
-impl RequestValue for UpdateInstanceRequest {}
-
-
-/// Node information for nodes appearing in a QueryPlan.plan_nodes.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PlanNode {
-    /// The `PlanNode`'s index in node list.
-    pub index: Option<i32>,
-    /// Used to determine the type of node. May be needed for visualizing
-    /// different kinds of nodes differently. For example, If the node is a
-    /// SCALAR node, it will have a condensed representation
-    /// which can be used to directly embed a description of the node in its
-    /// parent.
-    pub kind: Option<String>,
-    /// The display name for the node.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The execution statistics associated with the node, contained in a group of
-    /// key-value pairs. Only present if the plan was returned as a result of a
-    /// profile query. For example, number of executions, number of rows/time per
-    /// execution etc.
-    #[serde(rename="executionStats")]
-    pub execution_stats: Option<HashMap<String, String>>,
-    /// List of child node `index`es and their relationship to this parent.
-    #[serde(rename="childLinks")]
-    pub child_links: Option<Vec<ChildLink>>,
-    /// Condensed representation for SCALAR nodes.
-    #[serde(rename="shortRepresentation")]
-    pub short_representation: Option<ShortRepresentation>,
-    /// Attributes relevant to the node contained in a group of key-value pairs.
-    /// For example, a Parameter Reference node could have the following
-    /// information in its metadata:
-    /// 
-    /// ````text
-    /// {
-    ///   "parameter_reference": "param1",
-    ///   "parameter_type": "array"
-    /// }````
-    pub metadata: Option<HashMap<String, String>>,
-}
-
-impl Part for PlanNode {}
 
 
 /// # Transactions
@@ -2260,6 +1090,1481 @@ pub struct TransactionOptions {
 impl Part for TransactionOptions {}
 
 
+/// Response message for `TestIamPermissions` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases test iam permissions projects](struct.ProjectInstanceDatabaseTestIamPermissionCall.html) (response)
+/// * [instances test iam permissions projects](struct.ProjectInstanceTestIamPermissionCall.html) (response)
+/// * [instances backups test iam permissions projects](struct.ProjectInstanceBackupTestIamPermissionCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TestIamPermissionsResponse {
+    /// A subset of `TestPermissionsRequest.permissions` that the caller is
+    /// allowed.
+    pub permissions: Option<Vec<String>>,
+}
+
+impl ResponseResult for TestIamPermissionsResponse {}
+
+
+/// A backup of a Cloud Spanner database.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances backups patch projects](struct.ProjectInstanceBackupPatchCall.html) (request|response)
+/// * [instances backups create projects](struct.ProjectInstanceBackupCreateCall.html) (request)
+/// * [instances backups get projects](struct.ProjectInstanceBackupGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Backup {
+    /// Required for the CreateBackup
+    /// operation. The expiration time of the backup, with microseconds
+    /// granularity that must be at least 6 hours and at most 366 days
+    /// from the time the CreateBackup request is processed. Once the `expire_time`
+    /// has passed, the backup is eligible to be automatically deleted by Cloud
+    /// Spanner to free the resources used by the backup.
+    #[serde(rename="expireTime")]
+    pub expire_time: Option<String>,
+    /// Output only. Size of the backup in bytes.
+    #[serde(rename="sizeBytes")]
+    pub size_bytes: Option<String>,
+    /// Output only. The current state of the backup.
+    pub state: Option<String>,
+    /// Output only for the CreateBackup operation.
+    /// Required for the UpdateBackup operation.
+    /// 
+    /// A globally unique identifier for the backup which cannot be
+    /// changed. Values are of the form
+    /// `projects/<project>/instances/<instance>/backups/a-z*[a-z0-9]`
+    /// The final segment of the name must be between 2 and 60 characters
+    /// in length.
+    /// 
+    /// The backup is stored in the location(s) specified in the instance
+    /// configuration of the instance containing the backup, identified
+    /// by the prefix of the backup name of the form
+    /// `projects/<project>/instances/<instance>`.
+    pub name: Option<String>,
+    /// Required for the CreateBackup operation.
+    /// Name of the database from which this backup was
+    /// created. This needs to be in the same instance as the backup.
+    /// Values are of the form
+    /// `projects/<project>/instances/<instance>/databases/<database>`.
+    pub database: Option<String>,
+    /// Output only. The names of the restored databases that reference the backup.
+    /// The database names are of
+    /// the form `projects/<project>/instances/<instance>/databases/<database>`.
+    /// Referencing databases may exist in different instances. The existence of
+    /// any referencing database prevents the backup from being deleted. When a
+    /// restored database from the backup enters the `READY` state, the reference
+    /// to the backup is removed.
+    #[serde(rename="referencingDatabases")]
+    pub referencing_databases: Option<Vec<String>>,
+    /// Output only. The backup will contain an externally consistent
+    /// copy of the database at the timestamp specified by
+    /// `create_time`. `create_time` is approximately the time the
+    /// CreateBackup request is received.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+}
+
+impl RequestValue for Backup {}
+impl ResponseResult for Backup {}
+
+
+/// The request for CreateInstance.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances create projects](struct.ProjectInstanceCreateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateInstanceRequest {
+    /// Required. The ID of the instance to create.  Valid identifiers are of the
+    /// form `a-z*[a-z0-9]` and must be between 2 and 64 characters in
+    /// length.
+    #[serde(rename="instanceId")]
+    pub instance_id: Option<String>,
+    /// Required. The instance to create.  The name may be omitted, but if
+    /// specified must be `<parent>/instances/<instance_id>`.
+    pub instance: Option<Instance>,
+}
+
+impl RequestValue for CreateInstanceRequest {}
+
+
+/// The response for
+/// ListBackupOperations.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances backup operations list projects](struct.ProjectInstanceBackupOperationListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListBackupOperationsResponse {
+    /// `next_page_token` can be sent in a subsequent
+    /// ListBackupOperations
+    /// call to fetch more of the matching metadata.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of matching backup long-running
+    /// operations. Each operation's name will be
+    /// prefixed by the backup's name and the operation's
+    /// metadata will be of type
+    /// CreateBackupMetadata. Operations returned include those that are
+    /// pending or have completed/failed/canceled within the last 7 days.
+    /// Operations returned are ordered by
+    /// `operation.metadata.value.progress.start_time` in descending order starting
+    /// from the most recently started operation.
+    pub operations: Option<Vec<Operation>>,
+}
+
+impl ResponseResult for ListBackupOperationsResponse {}
+
+
+/// Request message for `GetIamPolicy` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances backups get iam policy projects](struct.ProjectInstanceBackupGetIamPolicyCall.html) (request)
+/// * [instances get iam policy projects](struct.ProjectInstanceGetIamPolicyCall.html) (request)
+/// * [instances databases get iam policy projects](struct.ProjectInstanceDatabaseGetIamPolicyCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetIamPolicyRequest {
+    /// OPTIONAL: A `GetPolicyOptions` object for specifying options to
+    /// `GetIamPolicy`. This field is only used by Cloud IAM.
+    pub options: Option<GetPolicyOptions>,
+}
+
+impl RequestValue for GetIamPolicyRequest {}
+
+
+/// A Cloud Spanner database.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases get projects](struct.ProjectInstanceDatabaseGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Database {
+    /// Output only. The current database state.
+    pub state: Option<String>,
+    /// Output only. If exists, the time at which the database creation started.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+    /// Required. The name of the database. Values are of the form
+    /// `projects/<project>/instances/<instance>/databases/<database>`,
+    /// where `<database>` is as specified in the `CREATE DATABASE`
+    /// statement. This name can be passed to other API methods to
+    /// identify the database.
+    pub name: Option<String>,
+    /// Output only. Applicable only for restored databases. Contains information
+    /// about the restore source.
+    #[serde(rename="restoreInfo")]
+    pub restore_info: Option<RestoreInfo>,
+}
+
+impl ResponseResult for Database {}
+
+
+/// The request for BatchCreateSessions.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases sessions batch create projects](struct.ProjectInstanceDatabaseSessionBatchCreateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchCreateSessionsRequest {
+    /// Required. The number of sessions to be created in this batch call.
+    /// The API may return fewer than the requested number of sessions. If a
+    /// specific number of sessions are desired, the client can make additional
+    /// calls to BatchCreateSessions (adjusting
+    /// session_count as necessary).
+    #[serde(rename="sessionCount")]
+    pub session_count: Option<i32>,
+    /// Parameters to be applied to each created session.
+    #[serde(rename="sessionTemplate")]
+    pub session_template: Option<Session>,
+}
+
+impl RequestValue for BatchCreateSessionsRequest {}
+
+
+/// The response for ExecuteBatchDml. Contains a list
+/// of ResultSet messages, one for each DML statement that has successfully
+/// executed, in the same order as the statements in the request. If a statement
+/// fails, the status in the response body identifies the cause of the failure.
+/// 
+/// To check for DML statements that failed, use the following approach:
+/// 
+/// 1. Check the status in the response message. The google.rpc.Code enum
+///    value `OK` indicates that all statements were executed successfully.
+/// 2. If the status was not `OK`, check the number of result sets in the
+///    response. If the response contains `N` ResultSet messages, then
+///    statement `N+1` in the request failed.
+/// 
+/// Example 1:
+/// 
+/// * Request: 5 DML statements, all executed successfully.
+/// * Response: 5 ResultSet messages, with the status `OK`.
+/// 
+/// Example 2:
+/// 
+/// * Request: 5 DML statements. The third statement has a syntax error.
+/// * Response: 2 ResultSet messages, and a syntax error (`INVALID_ARGUMENT`)
+///   status. The number of ResultSet messages indicates that the third
+///   statement failed, and the fourth and fifth statements were not executed.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases sessions execute batch dml projects](struct.ProjectInstanceDatabaseSessionExecuteBatchDmlCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ExecuteBatchDmlResponse {
+    /// If all DML statements are executed successfully, the status is `OK`.
+    /// Otherwise, the error status of the first failed statement.
+    pub status: Option<Status>,
+    /// One ResultSet for each statement in the request that ran successfully,
+    /// in the same order as the statements in the request. Each ResultSet does
+    /// not contain any rows. The ResultSetStats in each ResultSet contain
+    /// the number of rows modified by the statement.
+    /// 
+    /// Only the first ResultSet in the response contains valid
+    /// ResultSetMetadata.
+    #[serde(rename="resultSets")]
+    pub result_sets: Option<Vec<ResultSet>>,
+}
+
+impl ResponseResult for ExecuteBatchDmlResponse {}
+
+
+/// The response for GetDatabaseDdl.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases get ddl projects](struct.ProjectInstanceDatabaseGetDdlCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetDatabaseDdlResponse {
+    /// A list of formatted DDL statements defining the schema of the database
+    /// specified in the request.
+    pub statements: Option<Vec<String>>,
+}
+
+impl ResponseResult for GetDatabaseDdlResponse {}
+
+
+/// The response for PartitionQuery
+/// or PartitionRead
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases sessions partition query projects](struct.ProjectInstanceDatabaseSessionPartitionQueryCall.html) (response)
+/// * [instances databases sessions partition read projects](struct.ProjectInstanceDatabaseSessionPartitionReadCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PartitionResponse {
+    /// Transaction created by this request.
+    pub transaction: Option<Transaction>,
+    /// Partitions created by this request.
+    pub partitions: Option<Vec<Partition>>,
+}
+
+impl ResponseResult for PartitionResponse {}
+
+
+/// The request for PartitionRead
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases sessions partition read projects](struct.ProjectInstanceDatabaseSessionPartitionReadCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PartitionReadRequest {
+    /// If non-empty, the name of an index on table. This index is
+    /// used instead of the table primary key when interpreting key_set
+    /// and sorting result rows. See key_set for further information.
+    pub index: Option<String>,
+    /// Read only snapshot transactions are supported, read/write and single use
+    /// transactions are not.
+    pub transaction: Option<TransactionSelector>,
+    /// Required. `key_set` identifies the rows to be yielded. `key_set` names the
+    /// primary keys of the rows in table to be yielded, unless index
+    /// is present. If index is present, then key_set instead names
+    /// index keys in index.
+    /// 
+    /// It is not an error for the `key_set` to name rows that do not
+    /// exist in the database. Read yields nothing for nonexistent rows.
+    #[serde(rename="keySet")]
+    pub key_set: Option<KeySet>,
+    /// Additional options that affect how many partitions are created.
+    #[serde(rename="partitionOptions")]
+    pub partition_options: Option<PartitionOptions>,
+    /// Required. The name of the table in the database to be read.
+    pub table: Option<String>,
+    /// The columns of table to be returned for each row matching
+    /// this request.
+    pub columns: Option<Vec<String>>,
+}
+
+impl RequestValue for PartitionReadRequest {}
+
+
+/// This message is used to select the transaction in which a
+/// Read or
+/// ExecuteSql call runs.
+/// 
+/// See TransactionOptions for more information about transactions.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TransactionSelector {
+    /// Begin a new transaction and execute this read or SQL query in
+    /// it. The transaction ID of the new transaction is returned in
+    /// ResultSetMetadata.transaction, which is a Transaction.
+    pub begin: Option<TransactionOptions>,
+    /// Execute the read or SQL query in a temporary transaction.
+    /// This is the most efficient way to execute a transaction that
+    /// consists of a single SQL query.
+    #[serde(rename="singleUse")]
+    pub single_use: Option<TransactionOptions>,
+    /// Execute the read or SQL query in a previously-started transaction.
+    pub id: Option<String>,
+}
+
+impl Part for TransactionSelector {}
+
+
+/// Message type to initiate a read-write transaction. Currently this
+/// transaction type has no options.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReadWrite { _never_set: Option<bool> }
+
+impl Part for ReadWrite {}
+
+
+/// The response for
+/// ListDatabaseOperations.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances database operations list projects](struct.ProjectInstanceDatabaseOperationListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListDatabaseOperationsResponse {
+    /// `next_page_token` can be sent in a subsequent
+    /// ListDatabaseOperations
+    /// call to fetch more of the matching metadata.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of matching database long-running
+    /// operations. Each operation's name will be
+    /// prefixed by the database's name. The operation's
+    /// metadata field type
+    /// `metadata.type_url` describes the type of the metadata.
+    pub operations: Option<Vec<Operation>>,
+}
+
+impl ResponseResult for ListDatabaseOperationsResponse {}
+
+
+/// Associates `members` with a `role`.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Binding {
+    /// Role that is assigned to `members`.
+    /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
+    pub role: Option<String>,
+    /// The condition that is associated with this binding.
+    /// NOTE: An unsatisfied condition will not allow user access via current
+    /// binding. Different bindings, including their conditions, are examined
+    /// independently.
+    pub condition: Option<Expr>,
+    /// Specifies the identities requesting access for a Cloud Platform resource.
+    /// `members` can have the following values:
+    /// 
+    /// * `allUsers`: A special identifier that represents anyone who is
+    ///    on the internet; with or without a Google account.
+    /// 
+    /// * `allAuthenticatedUsers`: A special identifier that represents anyone
+    ///    who is authenticated with a Google account or a service account.
+    /// 
+    /// * `user:{emailid}`: An email address that represents a specific Google
+    ///    account. For example, `alice@example.com` .
+    /// 
+    /// 
+    /// * `serviceAccount:{emailid}`: An email address that represents a service
+    ///    account. For example, `my-other-app@appspot.gserviceaccount.com`.
+    /// 
+    /// * `group:{emailid}`: An email address that represents a Google group.
+    ///    For example, `admins@example.com`.
+    /// 
+    /// * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a user that has been recently deleted. For
+    ///    example, `alice@example.com?uid=123456789012345678901`. If the user is
+    ///    recovered, this value reverts to `user:{emailid}` and the recovered user
+    ///    retains the role in the binding.
+    /// 
+    /// * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus
+    ///    unique identifier) representing a service account that has been recently
+    ///    deleted. For example,
+    ///    `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.
+    ///    If the service account is undeleted, this value reverts to
+    ///    `serviceAccount:{emailid}` and the undeleted service account retains the
+    ///    role in the binding.
+    /// 
+    /// * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a Google group that has been recently
+    ///    deleted. For example, `admins@example.com?uid=123456789012345678901`. If
+    ///    the group is recovered, this value reverts to `group:{emailid}` and the
+    ///    recovered group retains the role in the binding.
+    /// 
+    /// 
+    /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
+    ///    users of that domain. For example, `google.com` or `example.com`.
+    /// 
+    /// 
+    pub members: Option<Vec<String>>,
+}
+
+impl Part for Binding {}
+
+
+/// Message type to initiate a Partitioned DML transaction.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PartitionedDml { _never_set: Option<bool> }
+
+impl Part for PartitionedDml {}
+
+
+/// The request for CreateDatabase.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases create projects](struct.ProjectInstanceDatabaseCreateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateDatabaseRequest {
+    /// Optional. A list of DDL statements to run inside the newly created
+    /// database. Statements can create tables, indexes, etc. These
+    /// statements execute atomically with the creation of the database:
+    /// if there is an error in any statement, the database is not created.
+    #[serde(rename="extraStatements")]
+    pub extra_statements: Option<Vec<String>>,
+    /// Required. A `CREATE DATABASE` statement, which specifies the ID of the
+    /// new database.  The database ID must conform to the regular expression
+    /// `a-z*[a-z0-9]` and be between 2 and 30 characters in length.
+    /// If the database ID is a reserved word or if it contains a hyphen, the
+    /// database ID must be enclosed in backticks (`` ` ``).
+    #[serde(rename="createStatement")]
+    pub create_statement: Option<String>,
+}
+
+impl RequestValue for CreateDatabaseRequest {}
+
+
+/// The request for Rollback.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases sessions rollback projects](struct.ProjectInstanceDatabaseSessionRollbackCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RollbackRequest {
+    /// Required. The transaction to roll back.
+    #[serde(rename="transactionId")]
+    pub transaction_id: Option<String>,
+}
+
+impl RequestValue for RollbackRequest {}
+
+
+/// `KeySet` defines a collection of Cloud Spanner keys and/or key ranges. All
+/// the keys are expected to be in the same table or index. The keys need
+/// not be sorted in any particular way.
+/// 
+/// If the same key is specified multiple times in the set (for example
+/// if two ranges, two keys, or a key and a range overlap), Cloud Spanner
+/// behaves as if the key were only specified once.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct KeySet {
+    /// A list of specific keys. Entries in `keys` should have exactly as
+    /// many elements as there are columns in the primary or index key
+    /// with which this `KeySet` is used.  Individual key values are
+    /// encoded as described here.
+    pub keys: Option<Vec<Vec<String>>>,
+    /// A list of key ranges. See KeyRange for more information about
+    /// key range specifications.
+    pub ranges: Option<Vec<KeyRange>>,
+    /// For convenience `all` can be set to `true` to indicate that this
+    /// `KeySet` matches all keys in the table or index. Note that any keys
+    /// specified in `keys` or `ranges` are only yielded once.
+    pub all: Option<bool>,
+}
+
+impl Part for KeySet {}
+
+
+/// Metadata associated with a parent-child relationship appearing in a
+/// PlanNode.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ChildLink {
+    /// Only present if the child node is SCALAR and corresponds
+    /// to an output variable of the parent node. The field carries the name of
+    /// the output variable.
+    /// For example, a `TableScan` operator that reads rows from a table will
+    /// have child links to the `SCALAR` nodes representing the output variables
+    /// created for each column that is read by the operator. The corresponding
+    /// `variable` fields will be set to the variable names assigned to the
+    /// columns.
+    pub variable: Option<String>,
+    /// The node to which the link points.
+    #[serde(rename="childIndex")]
+    pub child_index: Option<i32>,
+    /// The type of the link. For example, in Hash Joins this could be used to
+    /// distinguish between the build child and the probe child, or in the case
+    /// of the child being an output variable, to represent the tag associated
+    /// with the output variable.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+}
+
+impl Part for ChildLink {}
+
+
+/// The request for Read and
+/// StreamingRead.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases sessions streaming read projects](struct.ProjectInstanceDatabaseSessionStreamingReadCall.html) (request)
+/// * [instances databases sessions read projects](struct.ProjectInstanceDatabaseSessionReadCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReadRequest {
+    /// If non-empty, the name of an index on table. This index is
+    /// used instead of the table primary key when interpreting key_set
+    /// and sorting result rows. See key_set for further information.
+    pub index: Option<String>,
+    /// The transaction to use. If none is provided, the default is a
+    /// temporary read-only transaction with strong concurrency.
+    pub transaction: Option<TransactionSelector>,
+    /// If this request is resuming a previously interrupted read,
+    /// `resume_token` should be copied from the last
+    /// PartialResultSet yielded before the interruption. Doing this
+    /// enables the new read to resume where the last read left off. The
+    /// rest of the request parameters must exactly match the request
+    /// that yielded this token.
+    #[serde(rename="resumeToken")]
+    pub resume_token: Option<String>,
+    /// If present, results will be restricted to the specified partition
+    /// previously created using PartitionRead().    There must be an exact
+    /// match for the values of fields common to this message and the
+    /// PartitionReadRequest message used to create this partition_token.
+    #[serde(rename="partitionToken")]
+    pub partition_token: Option<String>,
+    /// Required. `key_set` identifies the rows to be yielded. `key_set` names the
+    /// primary keys of the rows in table to be yielded, unless index
+    /// is present. If index is present, then key_set instead names
+    /// index keys in index.
+    /// 
+    /// If the partition_token field is empty, rows are yielded
+    /// in table primary key order (if index is empty) or index key order
+    /// (if index is non-empty).  If the partition_token field is not
+    /// empty, rows will be yielded in an unspecified order.
+    /// 
+    /// It is not an error for the `key_set` to name rows that do not
+    /// exist in the database. Read yields nothing for nonexistent rows.
+    #[serde(rename="keySet")]
+    pub key_set: Option<KeySet>,
+    /// If greater than zero, only the first `limit` rows are yielded. If `limit`
+    /// is zero, the default is no limit. A limit cannot be specified if
+    /// `partition_token` is set.
+    pub limit: Option<String>,
+    /// Required. The name of the table in the database to be read.
+    pub table: Option<String>,
+    /// Required. The columns of table to be returned for each row matching
+    /// this request.
+    pub columns: Option<Vec<String>>,
+}
+
+impl RequestValue for ReadRequest {}
+
+
+/// Options for a PartitionQueryRequest and
+/// PartitionReadRequest.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PartitionOptions {
+    /// **Note:** This hint is currently ignored by PartitionQuery and
+    /// PartitionRead requests.
+    /// 
+    /// The desired maximum number of partitions to return.  For example, this may
+    /// be set to the number of workers available.  The default for this option
+    /// is currently 10,000. The maximum value is currently 200,000.  This is only
+    /// a hint.  The actual number of partitions returned may be smaller or larger
+    /// than this maximum count request.
+    #[serde(rename="maxPartitions")]
+    pub max_partitions: Option<String>,
+    /// **Note:** This hint is currently ignored by PartitionQuery and
+    /// PartitionRead requests.
+    /// 
+    /// The desired data size for each partition generated.  The default for this
+    /// option is currently 1 GiB.  This is only a hint. The actual size of each
+    /// partition may be smaller or larger than this size request.
+    #[serde(rename="partitionSizeBytes")]
+    pub partition_size_bytes: Option<String>,
+}
+
+impl Part for PartitionOptions {}
+
+
+/// This resource represents a long-running operation that is the result of a
+/// network API call.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases operations get projects](struct.ProjectInstanceDatabaseOperationGetCall.html) (response)
+/// * [instances operations get projects](struct.ProjectInstanceOperationGetCall.html) (response)
+/// * [instances backups create projects](struct.ProjectInstanceBackupCreateCall.html) (response)
+/// * [instances databases create projects](struct.ProjectInstanceDatabaseCreateCall.html) (response)
+/// * [instances create projects](struct.ProjectInstanceCreateCall.html) (response)
+/// * [instances backups operations get projects](struct.ProjectInstanceBackupOperationGetCall.html) (response)
+/// * [instances databases update ddl projects](struct.ProjectInstanceDatabaseUpdateDdlCall.html) (response)
+/// * [instances databases restore projects](struct.ProjectInstanceDatabaseRestoreCall.html) (response)
+/// * [instances patch projects](struct.ProjectInstancePatchCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Operation {
+    /// The error result of the operation in case of failure or cancellation.
+    pub error: Option<Status>,
+    /// If the value is `false`, it means the operation is still in progress.
+    /// If `true`, the operation is completed, and either `error` or `response` is
+    /// available.
+    pub done: Option<bool>,
+    /// The normal response of the operation in case of success.  If the original
+    /// method returns no data on success, such as `Delete`, the response is
+    /// `google.protobuf.Empty`.  If the original method is standard
+    /// `Get`/`Create`/`Update`, the response should be the resource.  For other
+    /// methods, the response should have the type `XxxResponse`, where `Xxx`
+    /// is the original method name.  For example, if the original method name
+    /// is `TakeSnapshot()`, the inferred response type is
+    /// `TakeSnapshotResponse`.
+    pub response: Option<HashMap<String, String>>,
+    /// The server-assigned name, which is only unique within the same service that
+    /// originally returns it. If you use the default HTTP mapping, the
+    /// `name` should be a resource name ending with `operations/{unique_id}`.
+    pub name: Option<String>,
+    /// Service-specific metadata associated with the operation.  It typically
+    /// contains progress information and common metadata such as create time.
+    /// Some services might not provide such metadata.  Any method that returns a
+    /// long-running operation should document the metadata type, if any.
+    pub metadata: Option<HashMap<String, String>>,
+}
+
+impl ResponseResult for Operation {}
+
+
+/// `StructType` defines the fields of a STRUCT type.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StructType {
+    /// The list of fields that make up this struct. Order is
+    /// significant, because values of this struct type are represented as
+    /// lists, where the order of field values matches the order of
+    /// fields in the StructType. In turn, the order of fields
+    /// matches the order of columns in a read request, or the order of
+    /// fields in the `SELECT` clause of a query.
+    pub fields: Option<Vec<Field>>,
+}
+
+impl Part for StructType {}
+
+
+/// The response for ListInstances.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances list projects](struct.ProjectInstanceListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListInstancesResponse {
+    /// `next_page_token` can be sent in a subsequent
+    /// ListInstances call to fetch more
+    /// of the matching instances.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of requested instances.
+    pub instances: Option<Vec<Instance>>,
+}
+
+impl ResponseResult for ListInstancesResponse {}
+
+
+/// Contains an ordered list of nodes appearing in the query plan.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct QueryPlan {
+    /// The nodes in the query plan. Plan nodes are returned in pre-order starting
+    /// with the plan root. Each PlanNode's `id` corresponds to its index in
+    /// `plan_nodes`.
+    #[serde(rename="planNodes")]
+    pub plan_nodes: Option<Vec<PlanNode>>,
+}
+
+impl Part for QueryPlan {}
+
+
+/// The request for
+/// RestoreDatabase.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases restore projects](struct.ProjectInstanceDatabaseRestoreCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RestoreDatabaseRequest {
+    /// Required. The id of the database to create and restore to. This
+    /// database must not already exist. The `database_id` appended to
+    /// `parent` forms the full database name of the form
+    /// `projects/<project>/instances/<instance>/databases/<database_id>`.
+    #[serde(rename="databaseId")]
+    pub database_id: Option<String>,
+    /// Name of the backup from which to restore.  Values are of the form
+    /// `projects/<project>/instances/<instance>/backups/<backup>`.
+    pub backup: Option<String>,
+}
+
+impl RequestValue for RestoreDatabaseRequest {}
+
+
+/// Request message for `SetIamPolicy` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases set iam policy projects](struct.ProjectInstanceDatabaseSetIamPolicyCall.html) (request)
+/// * [instances backups set iam policy projects](struct.ProjectInstanceBackupSetIamPolicyCall.html) (request)
+/// * [instances set iam policy projects](struct.ProjectInstanceSetIamPolicyCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SetIamPolicyRequest {
+    /// REQUIRED: The complete policy to be applied to the `resource`. The size of
+    /// the policy is limited to a few 10s of KB. An empty policy is a
+    /// valid policy but certain Cloud Platform services (such as Projects)
+    /// might reject them.
+    pub policy: Option<Policy>,
+}
+
+impl RequestValue for SetIamPolicyRequest {}
+
+
+/// The request for PartitionQuery
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases sessions partition query projects](struct.ProjectInstanceDatabaseSessionPartitionQueryCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PartitionQueryRequest {
+    /// It is not always possible for Cloud Spanner to infer the right SQL type
+    /// from a JSON value.  For example, values of type `BYTES` and values
+    /// of type `STRING` both appear in params as JSON strings.
+    /// 
+    /// In these cases, `param_types` can be used to specify the exact
+    /// SQL type for some or all of the SQL query parameters. See the
+    /// definition of Type for more information
+    /// about SQL types.
+    #[serde(rename="paramTypes")]
+    pub param_types: Option<HashMap<String, Type>>,
+    /// Additional options that affect how many partitions are created.
+    #[serde(rename="partitionOptions")]
+    pub partition_options: Option<PartitionOptions>,
+    /// Read only snapshot transactions are supported, read/write and single use
+    /// transactions are not.
+    pub transaction: Option<TransactionSelector>,
+    /// Parameter names and values that bind to placeholders in the SQL string.
+    /// 
+    /// A parameter placeholder consists of the `@` character followed by the
+    /// parameter name (for example, `@firstName`). Parameter names can contain
+    /// letters, numbers, and underscores.
+    /// 
+    /// Parameters can appear anywhere that a literal value is expected.  The same
+    /// parameter name can be used more than once, for example:
+    /// 
+    /// `"WHERE id > @msg_id AND id < @msg_id + 100"`
+    /// 
+    /// It is an error to execute a SQL statement with unbound parameters.
+    pub params: Option<HashMap<String, String>>,
+    /// Required. The query request to generate partitions for. The request will fail if
+    /// the query is not root partitionable. The query plan of a root
+    /// partitionable query has a single distributed union operator. A distributed
+    /// union operator conceptually divides one or more tables into multiple
+    /// splits, remotely evaluates a subquery independently on each split, and
+    /// then unions all results.
+    /// 
+    /// This must not contain DML commands, such as INSERT, UPDATE, or
+    /// DELETE. Use ExecuteStreamingSql with a
+    /// PartitionedDml transaction for large, partition-friendly DML operations.
+    pub sql: Option<String>,
+}
+
+impl RequestValue for PartitionQueryRequest {}
+
+
+/// Results from Read or
+/// ExecuteSql.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases sessions execute sql projects](struct.ProjectInstanceDatabaseSessionExecuteSqlCall.html) (response)
+/// * [instances databases sessions read projects](struct.ProjectInstanceDatabaseSessionReadCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ResultSet {
+    /// Each element in `rows` is a row whose format is defined by
+    /// metadata.row_type. The ith element
+    /// in each row matches the ith field in
+    /// metadata.row_type. Elements are
+    /// encoded based on type as described
+    /// here.
+    pub rows: Option<Vec<Vec<String>>>,
+    /// Query plan and execution statistics for the SQL statement that
+    /// produced this result set. These can be requested by setting
+    /// ExecuteSqlRequest.query_mode.
+    /// DML statements always produce stats containing the number of rows
+    /// modified, unless executed using the
+    /// ExecuteSqlRequest.QueryMode.PLAN ExecuteSqlRequest.query_mode.
+    /// Other fields may or may not be populated, based on the
+    /// ExecuteSqlRequest.query_mode.
+    pub stats: Option<ResultSetStats>,
+    /// Metadata about the result set, such as row type information.
+    pub metadata: Option<ResultSetMetadata>,
+}
+
+impl ResponseResult for ResultSet {}
+
+
+/// Arguments to insert, update, insert_or_update, and
+/// replace operations.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Write {
+    /// Required. The table whose rows will be written.
+    pub table: Option<String>,
+    /// The values to be written. `values` can contain more than one
+    /// list of values. If it does, then multiple rows are written, one
+    /// for each entry in `values`. Each list in `values` must have
+    /// exactly as many entries as there are entries in columns
+    /// above. Sending multiple lists is equivalent to sending multiple
+    /// `Mutation`s, each containing one `values` entry and repeating
+    /// table and columns. Individual values in each list are
+    /// encoded as described here.
+    pub values: Option<Vec<Vec<String>>>,
+    /// The names of the columns in table to be written.
+    /// 
+    /// The list of columns must contain enough columns to allow
+    /// Cloud Spanner to derive values for all primary key columns in the
+    /// row(s) to be modified.
+    pub columns: Option<Vec<String>>,
+}
+
+impl Part for Write {}
+
+
+/// Message representing a single field of a struct.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Field {
+    /// The type of the field.
+    #[serde(rename="type")]
+    pub type_: Option<Type>,
+    /// The name of the field. For reads, this is the column name. For
+    /// SQL queries, it is the column alias (e.g., `"Word"` in the
+    /// query `"SELECT 'hello' AS Word"`), or the column name (e.g.,
+    /// `"ColName"` in the query `"SELECT ColName FROM Table"`). Some
+    /// columns might have an empty name (e.g., !"SELECT
+    /// UPPER(ColName)"`). Note that a query result can contain
+    /// multiple fields with the same name.
+    pub name: Option<String>,
+}
+
+impl Part for Field {}
+
+
+/// The response for ListDatabases.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases list projects](struct.ProjectInstanceDatabaseListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListDatabasesResponse {
+    /// `next_page_token` can be sent in a subsequent
+    /// ListDatabases call to fetch more
+    /// of the matching databases.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Databases that matched the request.
+    pub databases: Option<Vec<Database>>,
+}
+
+impl ResponseResult for ListDatabasesResponse {}
+
+
+/// Information about the database restore.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RestoreInfo {
+    /// Information about the backup used to restore the database. The backup
+    /// may no longer exist.
+    #[serde(rename="backupInfo")]
+    pub backup_info: Option<BackupInfo>,
+    /// The type of the restore source.
+    #[serde(rename="sourceType")]
+    pub source_type: Option<String>,
+}
+
+impl Part for RestoreInfo {}
+
+
+/// Additional statistics about a ResultSet or PartialResultSet.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ResultSetStats {
+    /// Partitioned DML does not offer exactly-once semantics, so it
+    /// returns a lower bound of the rows modified.
+    #[serde(rename="rowCountLowerBound")]
+    pub row_count_lower_bound: Option<String>,
+    /// Standard DML returns an exact count of rows that were modified.
+    #[serde(rename="rowCountExact")]
+    pub row_count_exact: Option<String>,
+    /// QueryPlan for the query associated with this result.
+    #[serde(rename="queryPlan")]
+    pub query_plan: Option<QueryPlan>,
+    /// Aggregated statistics from the execution of the query. Only present when
+    /// the query is profiled. For example, a query could return the statistics as
+    /// follows:
+    /// 
+    /// ````text
+    /// {
+    ///   "rows_returned": "3",
+    ///   "elapsed_time": "1.22 secs",
+    ///   "cpu_time": "1.19 secs"
+    /// }````
+    #[serde(rename="queryStats")]
+    pub query_stats: Option<HashMap<String, String>>,
+}
+
+impl Part for ResultSetStats {}
+
+
+/// The response for Commit.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases sessions commit projects](struct.ProjectInstanceDatabaseSessionCommitCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CommitResponse {
+    /// The Cloud Spanner timestamp at which the transaction committed.
+    #[serde(rename="commitTimestamp")]
+    pub commit_timestamp: Option<String>,
+}
+
+impl ResponseResult for CommitResponse {}
+
+
+/// Information about a backup.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BackupInfo {
+    /// Name of the backup.
+    pub backup: Option<String>,
+    /// The backup contains an externally consistent copy of `source_database` at
+    /// the timestamp specified by `create_time`.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+    /// Name of the database the backup was created from.
+    #[serde(rename="sourceDatabase")]
+    pub source_database: Option<String>,
+}
+
+impl Part for BackupInfo {}
+
+
+/// An Identity and Access Management (IAM) policy, which specifies access
+/// controls for Google Cloud resources.
+/// 
+/// A `Policy` is a collection of `bindings`. A `binding` binds one or more
+/// `members` to a single `role`. Members can be user accounts, service accounts,
+/// Google groups, and domains (such as G Suite). A `role` is a named list of
+/// permissions; each `role` can be an IAM predefined role or a user-created
+/// custom role.
+/// 
+/// Optionally, a `binding` can specify a `condition`, which is a logical
+/// expression that allows access to a resource only if the expression evaluates
+/// to `true`. A condition can add constraints based on attributes of the
+/// request, the resource, or both.
+/// 
+/// **JSON example:**
+/// 
+/// ````text
+/// {
+///   "bindings": [
+///     {
+///       "role": "roles/resourcemanager.organizationAdmin",
+///       "members": [
+///         "user:mike@example.com",
+///         "group:admins@example.com",
+///         "domain:google.com",
+///         "serviceAccount:my-project-id@appspot.gserviceaccount.com"
+///       ]
+///     },
+///     {
+///       "role": "roles/resourcemanager.organizationViewer",
+///       "members": ["user:eve@example.com"],
+///       "condition": {
+///         "title": "expirable access",
+///         "description": "Does not grant access after Sep 2020",
+///         "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')",
+///       }
+///     }
+///   ],
+///   "etag": "BwWWja0YfJA=",
+///   "version": 3
+/// }
+/// ````
+/// 
+/// **YAML example:**
+/// 
+/// ````text
+/// bindings:
+/// - members:
+///   - user:mike@example.com
+///   - group:admins@example.com
+///   - domain:google.com
+///   - serviceAccount:my-project-id@appspot.gserviceaccount.com
+///   role: roles/resourcemanager.organizationAdmin
+/// - members:
+///   - user:eve@example.com
+///   role: roles/resourcemanager.organizationViewer
+///   condition:
+///     title: expirable access
+///     description: Does not grant access after Sep 2020
+///     expression: request.time < timestamp('2020-10-01T00:00:00.000Z')
+/// - etag: BwWWja0YfJA=
+/// - version: 3
+/// ````
+/// 
+/// For a description of IAM and its features, see the
+/// [IAM documentation](https://cloud.google.com/iam/docs/).
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances get iam policy projects](struct.ProjectInstanceGetIamPolicyCall.html) (response)
+/// * [instances set iam policy projects](struct.ProjectInstanceSetIamPolicyCall.html) (response)
+/// * [instances backups get iam policy projects](struct.ProjectInstanceBackupGetIamPolicyCall.html) (response)
+/// * [instances databases set iam policy projects](struct.ProjectInstanceDatabaseSetIamPolicyCall.html) (response)
+/// * [instances backups set iam policy projects](struct.ProjectInstanceBackupSetIamPolicyCall.html) (response)
+/// * [instances databases get iam policy projects](struct.ProjectInstanceDatabaseGetIamPolicyCall.html) (response)
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Policy {
+    /// Associates a list of `members` to a `role`. Optionally, may specify a
+    /// `condition` that determines how and when the `bindings` are applied. Each
+    /// of the `bindings` must contain at least one member.
+    pub bindings: Option<Vec<Binding>>,
+    /// `etag` is used for optimistic concurrency control as a way to help
+    /// prevent simultaneous updates of a policy from overwriting each other.
+    /// It is strongly suggested that systems make use of the `etag` in the
+    /// read-modify-write cycle to perform policy updates in order to avoid race
+    /// conditions: An `etag` is returned in the response to `getIamPolicy`, and
+    /// systems are expected to put that etag in the request to `setIamPolicy` to
+    /// ensure that their change will be applied to the same version of the policy.
+    /// 
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
+    pub etag: Option<String>,
+    /// Specifies the format of the policy.
+    /// 
+    /// Valid values are `0`, `1`, and `3`. Requests that specify an invalid value
+    /// are rejected.
+    /// 
+    /// Any operation that affects conditional role bindings must specify version
+    /// `3`. This requirement applies to the following operations:
+    /// 
+    /// * Getting a policy that includes a conditional role binding
+    /// * Adding a conditional role binding to a policy
+    /// * Changing a conditional role binding in a policy
+    /// * Removing any role binding, with or without a condition, from a policy
+    ///   that includes conditions
+    /// 
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
+    /// 
+    /// If a policy does not include any conditions, operations on that policy may
+    /// specify any valid version or leave the field unset.
+    pub version: Option<i32>,
+}
+
+impl ResponseResult for Policy {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReplicaInfo {
+    /// If true, this location is designated as the default leader location where
+    /// leader replicas are placed. See the [region types
+    /// documentation](https://cloud.google.com/spanner/docs/instances#region_types)
+    /// for more details.
+    #[serde(rename="defaultLeaderLocation")]
+    pub default_leader_location: Option<bool>,
+    /// The type of replica.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The location of the serving resources, e.g. "us-central1".
+    pub location: Option<String>,
+}
+
+impl Part for ReplicaInfo {}
+
+
+/// `Type` indicates the type of a Cloud Spanner value, as might be stored in a
+/// table cell or returned from an SQL query.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Type {
+    /// If code == STRUCT, then `struct_type`
+    /// provides type information for the struct's fields.
+    #[serde(rename="structType")]
+    pub struct_type: Option<StructType>,
+    /// Required. The TypeCode for this type.
+    pub code: Option<String>,
+    /// If code == ARRAY, then `array_element_type`
+    /// is the type of the array elements.
+    #[serde(rename="arrayElementType")]
+    pub array_element_type: Option<Option<Box<Type>>>,
+}
+
+impl Part for Type {}
+
+
+/// Message type to initiate a read-only transaction.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReadOnly {
+    /// Executes all reads at a timestamp >= `min_read_timestamp`.
+    /// 
+    /// This is useful for requesting fresher data than some previous
+    /// read, or data that is fresh enough to observe the effects of some
+    /// previously committed transaction whose timestamp is known.
+    /// 
+    /// Note that this option can only be used in single-use transactions.
+    /// 
+    /// A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds.
+    /// Example: `"2014-10-02T15:01:23.045123456Z"`.
+    #[serde(rename="minReadTimestamp")]
+    pub min_read_timestamp: Option<String>,
+    /// If true, the Cloud Spanner-selected read timestamp is included in
+    /// the Transaction message that describes the transaction.
+    #[serde(rename="returnReadTimestamp")]
+    pub return_read_timestamp: Option<bool>,
+    /// Read at a timestamp where all previously committed transactions
+    /// are visible.
+    pub strong: Option<bool>,
+    /// Executes all reads at the given timestamp. Unlike other modes,
+    /// reads at a specific timestamp are repeatable; the same read at
+    /// the same timestamp always returns the same data. If the
+    /// timestamp is in the future, the read will block until the
+    /// specified timestamp, modulo the read's deadline.
+    /// 
+    /// Useful for large scale consistent reads such as mapreduces, or
+    /// for coordinating many reads against a consistent snapshot of the
+    /// data.
+    /// 
+    /// A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds.
+    /// Example: `"2014-10-02T15:01:23.045123456Z"`.
+    #[serde(rename="readTimestamp")]
+    pub read_timestamp: Option<String>,
+    /// Read data at a timestamp >= `NOW - max_staleness`
+    /// seconds. Guarantees that all writes that have committed more
+    /// than the specified number of seconds ago are visible. Because
+    /// Cloud Spanner chooses the exact timestamp, this mode works even if
+    /// the client's local clock is substantially skewed from Cloud Spanner
+    /// commit timestamps.
+    /// 
+    /// Useful for reading the freshest data available at a nearby
+    /// replica, while bounding the possible staleness if the local
+    /// replica has fallen behind.
+    /// 
+    /// Note that this option can only be used in single-use
+    /// transactions.
+    #[serde(rename="maxStaleness")]
+    pub max_staleness: Option<String>,
+    /// Executes all reads at a timestamp that is `exact_staleness`
+    /// old. The timestamp is chosen soon after the read is started.
+    /// 
+    /// Guarantees that all writes that have committed more than the
+    /// specified number of seconds ago are visible. Because Cloud Spanner
+    /// chooses the exact timestamp, this mode works even if the client's
+    /// local clock is substantially skewed from Cloud Spanner commit
+    /// timestamps.
+    /// 
+    /// Useful for reading at nearby replicas without the distributed
+    /// timestamp negotiation overhead of `max_staleness`.
+    #[serde(rename="exactStaleness")]
+    pub exact_staleness: Option<String>,
+}
+
+impl Part for ReadOnly {}
+
+
+/// A session in the Cloud Spanner API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases sessions get projects](struct.ProjectInstanceDatabaseSessionGetCall.html) (response)
+/// * [instances databases sessions create projects](struct.ProjectInstanceDatabaseSessionCreateCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Session {
+    /// The labels for the session.
+    /// 
+    ///  * Label keys must be between 1 and 63 characters long and must conform to
+    ///    the following regular expression: `[a-z]([-a-z0-9]*[a-z0-9])?`.
+    ///  * Label values must be between 0 and 63 characters long and must conform
+    ///    to the regular expression `([a-z]([-a-z0-9]*[a-z0-9])?)?`.
+    ///  * No more than 64 labels can be associated with a given session.
+    /// 
+    /// See https://goo.gl/xmQnxf for more information on and examples of labels.
+    pub labels: Option<HashMap<String, String>>,
+    /// Output only. The timestamp when the session is created.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+    /// Output only. The approximate timestamp when the session is last used. It is
+    /// typically earlier than the actual last use time.
+    #[serde(rename="approximateLastUseTime")]
+    pub approximate_last_use_time: Option<String>,
+    /// The name of the session. This is always system-assigned; values provided
+    /// when creating a session are ignored.
+    pub name: Option<String>,
+}
+
+impl ResponseResult for Session {}
+
+
+/// The request for UpdateInstance.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances patch projects](struct.ProjectInstancePatchCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateInstanceRequest {
+    /// Required. The instance to update, which must always include the instance
+    /// name.  Otherwise, only fields mentioned in field_mask need be included.
+    pub instance: Option<Instance>,
+    /// Required. A mask specifying which fields in Instance should be updated.
+    /// The field mask must always be specified; this prevents any future fields in
+    /// Instance from being erased accidentally by clients that do not know
+    /// about them.
+    #[serde(rename="fieldMask")]
+    pub field_mask: Option<String>,
+}
+
+impl RequestValue for UpdateInstanceRequest {}
+
+
+/// Node information for nodes appearing in a QueryPlan.plan_nodes.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PlanNode {
+    /// The `PlanNode`'s index in node list.
+    pub index: Option<i32>,
+    /// Used to determine the type of node. May be needed for visualizing
+    /// different kinds of nodes differently. For example, If the node is a
+    /// SCALAR node, it will have a condensed representation
+    /// which can be used to directly embed a description of the node in its
+    /// parent.
+    pub kind: Option<String>,
+    /// The display name for the node.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The execution statistics associated with the node, contained in a group of
+    /// key-value pairs. Only present if the plan was returned as a result of a
+    /// profile query. For example, number of executions, number of rows/time per
+    /// execution etc.
+    #[serde(rename="executionStats")]
+    pub execution_stats: Option<HashMap<String, String>>,
+    /// List of child node `index`es and their relationship to this parent.
+    #[serde(rename="childLinks")]
+    pub child_links: Option<Vec<ChildLink>>,
+    /// Condensed representation for SCALAR nodes.
+    #[serde(rename="shortRepresentation")]
+    pub short_representation: Option<ShortRepresentation>,
+    /// Attributes relevant to the node contained in a group of key-value pairs.
+    /// For example, a Parameter Reference node could have the following
+    /// information in its metadata:
+    /// 
+    /// ````text
+    /// {
+    ///   "parameter_reference": "param1",
+    ///   "parameter_type": "array"
+    /// }````
+    pub metadata: Option<HashMap<String, String>>,
+}
+
+impl Part for PlanNode {}
+
+
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
+/// 
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Status {
+    /// A developer-facing error message, which should be in English. Any
+    /// user-facing error message should be localized and sent in the
+    /// google.rpc.Status.details field, or localized by the client.
+    pub message: Option<String>,
+    /// The status code, which should be an enum value of google.rpc.Code.
+    pub code: Option<i32>,
+    /// A list of messages that carry the error details.  There is a common set of
+    /// message types for APIs to use.
+    pub details: Option<Vec<HashMap<String, String>>>,
+}
+
+impl Part for Status {}
+
+
 /// A transaction.
 /// 
 /// # Activities
@@ -2302,6 +2607,7 @@ impl ResponseResult for Transaction {}
 /// 
 /// * [instances databases test iam permissions projects](struct.ProjectInstanceDatabaseTestIamPermissionCall.html) (request)
 /// * [instances test iam permissions projects](struct.ProjectInstanceTestIamPermissionCall.html) (request)
+/// * [instances backups test iam permissions projects](struct.ProjectInstanceBackupTestIamPermissionCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestIamPermissionsRequest {
@@ -2313,30 +2619,59 @@ pub struct TestIamPermissionsRequest {
 impl RequestValue for TestIamPermissionsRequest {}
 
 
-/// Represents an expression text. Example:
+/// Represents a textual expression in the Common Expression Language (CEL)
+/// syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+/// are documented at https://github.com/google/cel-spec.
+/// 
+/// Example (Comparison):
 /// 
 /// ````text
-/// title: "User account presence"
-/// description: "Determines whether the request has a user account"
-/// expression: "size(request.user) > 0"
+/// title: "Summary size limit"
+/// description: "Determines if a summary is less than 100 chars"
+/// expression: "document.summary.size() < 100"
 /// ````
+/// 
+/// Example (Equality):
+/// 
+/// ````text
+/// title: "Requestor is owner"
+/// description: "Determines if requestor is the document owner"
+/// expression: "document.owner == request.auth.claims.email"
+/// ````
+/// 
+/// Example (Logic):
+/// 
+/// ````text
+/// title: "Public documents"
+/// description: "Determine whether the document should be publicly visible"
+/// expression: "document.type != 'private' && document.type != 'internal'"
+/// ````
+/// 
+/// Example (Data Manipulation):
+/// 
+/// ````text
+/// title: "Notification string"
+/// description: "Create a notification string with a timestamp."
+/// expression: "'New message received at ' + string(document.create_time)"
+/// ````
+/// 
+/// The exact variables and functions that may be referenced within an expression
+/// are determined by the service that evaluates it. See the service
+/// documentation for additional information.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
-    /// An optional description of the expression. This is a longer text which
+    /// Optional. Description of the expression. This is a longer text which
     /// describes the expression, e.g. when hovered over it in a UI.
     pub description: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
+    /// Textual representation of an expression in Common Expression Language
+    /// syntax.
     pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error
+    /// Optional. String indicating the location of the expression for error
     /// reporting, e.g. a file name and a position in the file.
     pub location: Option<String>,
-    /// An optional title for the expression, i.e. a short string describing
+    /// Optional. Title for the expression, i.e. a short string describing
     /// its purpose. This can be used e.g. in UIs which allow to enter the
     /// expression.
     pub title: Option<String>,
@@ -2481,7 +2816,36 @@ pub struct PartialResultSet {
 impl ResponseResult for PartialResultSet {}
 
 
-/// The request for ExecuteBatchDml
+/// Query optimizer configuration.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct QueryOptions {
+    /// An option to control the selection of optimizer version.
+    /// 
+    /// This parameter allows individual queries to pick different query
+    /// optimizer versions.
+    /// 
+    /// Specifying "latest" as a value instructs Cloud Spanner to use the
+    /// latest supported query optimizer version. If not specified, Cloud Spanner
+    /// uses optimizer version set at the database level options. Any other
+    /// positive integer (from the list of supported optimizer versions)
+    /// overrides the default optimizer version for query execution.
+    /// The list of supported optimizer versions can be queried from
+    /// SPANNER_SYS.SUPPORTED_OPTIMIZER_VERSIONS. Executing a SQL statement
+    /// with an invalid optimizer version will fail with a syntax error
+    /// (`INVALID_ARGUMENT`) status.
+    /// 
+    /// The `optimizer_version` statement hint has precedence over this setting.
+    #[serde(rename="optimizerVersion")]
+    pub optimizer_version: Option<String>,
+}
+
+impl Part for QueryOptions {}
+
+
+/// The request for ExecuteBatchDml.
 /// 
 /// # Activities
 /// 
@@ -2492,25 +2856,85 @@ impl ResponseResult for PartialResultSet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExecuteBatchDmlRequest {
-    /// A per-transaction sequence number used to identify this request. This is
-    /// used in the same space as the seqno in
-    /// ExecuteSqlRequest. See more details
-    /// in ExecuteSqlRequest.
-    pub seqno: Option<String>,
-    /// The transaction to use. A ReadWrite transaction is required. Single-use
-    /// transactions are not supported (to avoid replay).  The caller must either
-    /// supply an existing transaction ID or begin a new transaction.
-    pub transaction: Option<TransactionSelector>,
-    /// The list of statements to execute in this batch. Statements are executed
-    /// serially, such that the effects of statement i are visible to statement
-    /// i+1. Each statement must be a DML statement. Execution will stop at the
-    /// first failed statement; the remaining statements will not run.
+    /// Required. A per-transaction sequence number used to identify this request. This field
+    /// makes each request idempotent such that if the request is received multiple
+    /// times, at most one will succeed.
     /// 
-    /// REQUIRES: `statements_size()` > 0.
+    /// The sequence number must be monotonically increasing within the
+    /// transaction. If a request arrives for the first time with an out-of-order
+    /// sequence number, the transaction may be aborted. Replays of previously
+    /// handled requests will yield the same response as the first execution.
+    pub seqno: Option<String>,
+    /// Required. The transaction to use. Must be a read-write transaction.
+    /// 
+    /// To protect against replays, single-use transactions are not supported. The
+    /// caller must either supply an existing transaction ID or begin a new
+    /// transaction.
+    pub transaction: Option<TransactionSelector>,
+    /// Required. The list of statements to execute in this batch. Statements are executed
+    /// serially, such that the effects of statement `i` are visible to statement
+    /// `i+1`. Each statement must be a DML statement. Execution stops at the
+    /// first failed statement; the remaining statements are not executed.
+    /// 
+    /// Callers must provide at least one statement.
     pub statements: Option<Vec<Statement>>,
 }
 
 impl RequestValue for ExecuteBatchDmlRequest {}
+
+
+/// Enqueues the given DDL statements to be applied, in order but not
+/// necessarily all at once, to the database schema at some point (or
+/// points) in the future. The server checks that the statements
+/// are executable (syntactically valid, name tables that exist, etc.)
+/// before enqueueing them, but they may still fail upon
+/// later execution (e.g., if a statement from another batch of
+/// statements is applied first and it conflicts in some way, or if
+/// there is some data-related problem like a `NULL` value in a column to
+/// which `NOT NULL` would be added). If a statement fails, all
+/// subsequent statements in the batch are automatically cancelled.
+/// 
+/// Each batch of statements is assigned a name which can be used with
+/// the Operations API to monitor
+/// progress. See the
+/// operation_id field for more
+/// details.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases update ddl projects](struct.ProjectInstanceDatabaseUpdateDdlCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateDatabaseDdlRequest {
+    /// Required. DDL statements to be applied to the database.
+    pub statements: Option<Vec<String>>,
+    /// If empty, the new update request is assigned an
+    /// automatically-generated operation ID. Otherwise, `operation_id`
+    /// is used to construct the name of the resulting
+    /// Operation.
+    /// 
+    /// Specifying an explicit operation ID simplifies determining
+    /// whether the statements were executed in the event that the
+    /// UpdateDatabaseDdl call is replayed,
+    /// or the return value is otherwise lost: the database and
+    /// `operation_id` fields can be combined to form the
+    /// name of the resulting
+    /// longrunning.Operation: `<database>/operations/<operation_id>`.
+    /// 
+    /// `operation_id` should be unique within the database, and must be
+    /// a valid identifier: `a-z*`. Note that
+    /// automatically-generated operation IDs always begin with an
+    /// underscore. If the named operation already exists,
+    /// UpdateDatabaseDdl returns
+    /// `ALREADY_EXISTS`.
+    #[serde(rename="operationId")]
+    pub operation_id: Option<String>,
+}
+
+impl RequestValue for UpdateDatabaseDdlRequest {}
 
 
 /// The request for ExecuteSql and
@@ -2526,21 +2950,18 @@ impl RequestValue for ExecuteBatchDmlRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExecuteSqlRequest {
-    /// The transaction to use. If none is provided, the default is a
-    /// temporary read-only transaction with strong concurrency.
-    /// 
     /// The transaction to use.
     /// 
     /// For queries, if none is provided, the default is a temporary read-only
     /// transaction with strong concurrency.
     /// 
-    /// Standard DML statements require a ReadWrite transaction. Single-use
-    /// transactions are not supported (to avoid replay).  The caller must
-    /// either supply an existing transaction ID or begin a new transaction.
+    /// Standard DML statements require a read-write transaction. To protect
+    /// against replays, single-use transactions are not supported.  The caller
+    /// must either supply an existing transaction ID or begin a new transaction.
     /// 
-    /// Partitioned DML requires an existing PartitionedDml transaction ID.
+    /// Partitioned DML requires an existing Partitioned DML transaction ID.
     pub transaction: Option<TransactionSelector>,
-    /// A per-transaction sequence number used to identify this request. This
+    /// A per-transaction sequence number used to identify this request. This field
     /// makes each request idempotent such that if the request is received multiple
     /// times, at most one will succeed.
     /// 
@@ -2575,6 +2996,9 @@ pub struct ExecuteSqlRequest {
     /// about SQL types.
     #[serde(rename="paramTypes")]
     pub param_types: Option<HashMap<String, Type>>,
+    /// Query optimizer configuration to use for the given query.
+    #[serde(rename="queryOptions")]
+    pub query_options: Option<QueryOptions>,
     /// Used to control the amount of debugging information returned in
     /// ResultSetStats. If partition_token is set, query_mode can only
     /// be set to QueryMode.NORMAL.
@@ -2582,20 +3006,18 @@ pub struct ExecuteSqlRequest {
     pub query_mode: Option<String>,
     /// Required. The SQL string.
     pub sql: Option<String>,
-    /// The SQL string can contain parameter placeholders. A parameter
-    /// placeholder consists of `'@'` followed by the parameter
-    /// name. Parameter names consist of any combination of letters,
-    /// numbers, and underscores.
+    /// Parameter names and values that bind to placeholders in the SQL string.
+    /// 
+    /// A parameter placeholder consists of the `@` character followed by the
+    /// parameter name (for example, `@firstName`). Parameter names can contain
+    /// letters, numbers, and underscores.
     /// 
     /// Parameters can appear anywhere that a literal value is expected.  The same
     /// parameter name can be used more than once, for example:
-    ///   `"WHERE id > @msg_id AND id < @msg_id + 100"`
     /// 
-    /// It is an error to execute an SQL statement with unbound parameters.
+    /// `"WHERE id > @msg_id AND id < @msg_id + 100"`
     /// 
-    /// Parameter values are specified using `params`, which is a JSON
-    /// object whose keys are parameter names, and whose values are the
-    /// corresponding parameter values.
+    /// It is an error to execute a SQL statement with unbound parameters.
     pub params: Option<HashMap<String, String>>,
 }
 
@@ -2635,7 +3057,10 @@ impl ResponseResult for InstanceConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Delete {
-    /// Required. The primary keys of the rows within table to delete.
+    /// Required. The primary keys of the rows within table to delete.  The
+    /// primary keys must be specified in the order in which they appear in the
+    /// `PRIMARY KEY()` clause of the table's equivalent DDL statement (the DDL
+    /// statement used to create the table).
     /// Delete is idempotent. The transaction will succeed even if some or all
     /// rows do not exist.
     #[serde(rename="keySet")]
@@ -2689,6 +3114,7 @@ impl RequestValue for CommitRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [instances databases operations list projects](struct.ProjectInstanceDatabaseOperationListCall.html) (response)
+/// * [instances backups operations list projects](struct.ProjectInstanceBackupOperationListCall.html) (response)
 /// * [instances operations list projects](struct.ProjectInstanceOperationListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -2701,6 +3127,27 @@ pub struct ListOperationsResponse {
 }
 
 impl ResponseResult for ListOperationsResponse {}
+
+
+/// Encapsulates settings provided to GetIamPolicy.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetPolicyOptions {
+    /// Optional. The policy format version to be returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
+    #[serde(rename="requestedPolicyVersion")]
+    pub requested_policy_version: Option<i32>,
+}
+
+impl Part for GetPolicyOptions {}
 
 
 /// The request for BeginTransaction.
@@ -2818,7 +3265,7 @@ impl Part for ShortRepresentation {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `instance_configs_get(...)`, `instance_configs_list(...)`, `instances_create(...)`, `instances_databases_create(...)`, `instances_databases_drop_database(...)`, `instances_databases_get(...)`, `instances_databases_get_ddl(...)`, `instances_databases_get_iam_policy(...)`, `instances_databases_list(...)`, `instances_databases_operations_cancel(...)`, `instances_databases_operations_delete(...)`, `instances_databases_operations_get(...)`, `instances_databases_operations_list(...)`, `instances_databases_sessions_begin_transaction(...)`, `instances_databases_sessions_commit(...)`, `instances_databases_sessions_create(...)`, `instances_databases_sessions_delete(...)`, `instances_databases_sessions_execute_batch_dml(...)`, `instances_databases_sessions_execute_sql(...)`, `instances_databases_sessions_execute_streaming_sql(...)`, `instances_databases_sessions_get(...)`, `instances_databases_sessions_list(...)`, `instances_databases_sessions_partition_query(...)`, `instances_databases_sessions_partition_read(...)`, `instances_databases_sessions_read(...)`, `instances_databases_sessions_rollback(...)`, `instances_databases_sessions_streaming_read(...)`, `instances_databases_set_iam_policy(...)`, `instances_databases_test_iam_permissions(...)`, `instances_databases_update_ddl(...)`, `instances_delete(...)`, `instances_get(...)`, `instances_get_iam_policy(...)`, `instances_list(...)`, `instances_operations_cancel(...)`, `instances_operations_delete(...)`, `instances_operations_get(...)`, `instances_operations_list(...)`, `instances_patch(...)`, `instances_set_iam_policy(...)` and `instances_test_iam_permissions(...)`
+/// // like `instance_configs_get(...)`, `instance_configs_list(...)`, `instances_backup_operations_list(...)`, `instances_backups_create(...)`, `instances_backups_delete(...)`, `instances_backups_get(...)`, `instances_backups_get_iam_policy(...)`, `instances_backups_list(...)`, `instances_backups_operations_cancel(...)`, `instances_backups_operations_delete(...)`, `instances_backups_operations_get(...)`, `instances_backups_operations_list(...)`, `instances_backups_patch(...)`, `instances_backups_set_iam_policy(...)`, `instances_backups_test_iam_permissions(...)`, `instances_create(...)`, `instances_database_operations_list(...)`, `instances_databases_create(...)`, `instances_databases_drop_database(...)`, `instances_databases_get(...)`, `instances_databases_get_ddl(...)`, `instances_databases_get_iam_policy(...)`, `instances_databases_list(...)`, `instances_databases_operations_cancel(...)`, `instances_databases_operations_delete(...)`, `instances_databases_operations_get(...)`, `instances_databases_operations_list(...)`, `instances_databases_restore(...)`, `instances_databases_sessions_batch_create(...)`, `instances_databases_sessions_begin_transaction(...)`, `instances_databases_sessions_commit(...)`, `instances_databases_sessions_create(...)`, `instances_databases_sessions_delete(...)`, `instances_databases_sessions_execute_batch_dml(...)`, `instances_databases_sessions_execute_sql(...)`, `instances_databases_sessions_execute_streaming_sql(...)`, `instances_databases_sessions_get(...)`, `instances_databases_sessions_list(...)`, `instances_databases_sessions_partition_query(...)`, `instances_databases_sessions_partition_read(...)`, `instances_databases_sessions_read(...)`, `instances_databases_sessions_rollback(...)`, `instances_databases_sessions_streaming_read(...)`, `instances_databases_set_iam_policy(...)`, `instances_databases_test_iam_permissions(...)`, `instances_databases_update_ddl(...)`, `instances_delete(...)`, `instances_get(...)`, `instances_get_iam_policy(...)`, `instances_list(...)`, `instances_operations_cancel(...)`, `instances_operations_delete(...)`, `instances_operations_get(...)`, `instances_operations_list(...)`, `instances_patch(...)`, `instances_set_iam_policy(...)` and `instances_test_iam_permissions(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2931,22 +3378,28 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the access control policy for a database resource.
-    /// Returns an empty policy if a database exists but does
-    /// not have a policy set.
-    /// 
-    /// Authorization requires `spanner.databases.getIamPolicy` permission on
-    /// resource.
+    /// Lists the backup long-running operations in
+    /// the given instance. A backup operation has a name of the form
+    /// `projects/<project>/instances/<instance>/backups/<backup>/operations/<operation>`.
+    /// The long-running operation
+    /// metadata field type
+    /// `metadata.type_url` describes the type of the metadata. Operations returned
+    /// include those that have completed/failed/canceled within the last 7 days,
+    /// and pending operations. Operations returned are ordered by
+    /// `operation.metadata.value.progress.start_time` in descending order starting
+    /// from the most recently started operation.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The Cloud Spanner resource for which the policy is being retrieved. The format is `projects/<project ID>/instances/<instance ID>` for instance resources and `projects/<project ID>/instances/<instance ID>/databases/<database ID>` for database resources.
-    pub fn instances_databases_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {
-        ProjectInstanceDatabaseGetIamPolicyCall {
+    /// * `parent` - Required. The instance of the backup operations. Values are of
+    ///              the form `projects/<project>/instances/<instance>`.
+    pub fn instances_backup_operations_list(&self, parent: &str) -> ProjectInstanceBackupOperationListCall<'a, C, A> {
+        ProjectInstanceBackupOperationListCall {
             hub: self.hub,
-            _request: request,
-            _resource: resource.to_string(),
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2990,21 +3443,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// to be run with lower latency than submitting them sequentially with
     /// ExecuteSql.
     /// 
-    /// Statements are executed in order, sequentially.
-    /// ExecuteBatchDmlResponse will contain a
-    /// ResultSet for each DML statement that has successfully executed. If a
-    /// statement fails, its error status will be returned as part of the
-    /// ExecuteBatchDmlResponse. Execution will
-    /// stop at the first failed statement; the remaining statements will not run.
+    /// Statements are executed in sequential order. A request can succeed even if
+    /// a statement fails. The ExecuteBatchDmlResponse.status field in the
+    /// response provides information about the statement that failed. Clients must
+    /// inspect this field to determine whether an error occurred.
     /// 
-    /// ExecuteBatchDml is expected to return an OK status with a response even if
-    /// there was an error while processing one of the DML statements. Clients must
-    /// inspect response.status to determine if there were any errors while
-    /// processing the request.
-    /// 
-    /// See more details in
-    /// ExecuteBatchDmlRequest and
-    /// ExecuteBatchDmlResponse.
+    /// Execution stops after the first failed statement; the remaining statements
+    /// are not executed.
     /// 
     /// # Arguments
     ///
@@ -3046,19 +3491,48 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns permissions that the caller has on the specified database resource.
+    /// Deletes an instance.
     /// 
-    /// Attempting this RPC on a non-existent Cloud Spanner database will
-    /// result in a NOT_FOUND error if the user has
-    /// `spanner.databases.list` permission on the containing Cloud
-    /// Spanner instance. Otherwise returns an empty set of permissions.
+    /// Immediately upon completion of the request:
+    /// 
+    /// * Billing ceases for all of the instance's reserved resources.
+    /// 
+    /// Soon afterward:
+    /// 
+    /// * The instance and *all of its databases* immediately and
+    ///   irrevocably disappear from the API. All data in the databases
+    ///   is permanently deleted.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the instance to be deleted. Values are of the form
+    ///            `projects/<project>/instances/<instance>`
+    pub fn instances_delete(&self, name: &str) -> ProjectInstanceDeleteCall<'a, C, A> {
+        ProjectInstanceDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Sets the access control policy on a database or backup resource.
+    /// Replaces any existing policy.
+    /// 
+    /// Authorization requires `spanner.databases.setIamPolicy`
+    /// permission on resource.
+    /// For backups, authorization requires `spanner.backups.setIamPolicy`
+    /// permission on resource.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The Cloud Spanner resource for which permissions are being tested. The format is `projects/<project ID>/instances/<instance ID>` for instance resources and `projects/<project ID>/instances/<instance ID>/databases/<database ID>` for database resources.
-    pub fn instances_databases_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> {
-        ProjectInstanceDatabaseTestIamPermissionCall {
+    /// * `resource` - REQUIRED: The Cloud Spanner resource for which the policy is being set. The format is `projects/<project ID>/instances/<instance ID>` for instance resources and `projects/<project ID>/instances/<instance ID>/databases/<database ID>` for databases resources.
+    pub fn instances_backups_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectInstanceBackupSetIamPolicyCall<'a, C, A> {
+        ProjectInstanceBackupSetIamPolicyCall {
             hub: self.hub,
             _request: request,
             _resource: resource.to_string(),
@@ -3126,6 +3600,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectInstanceGetCall {
             hub: self.hub,
             _name: name.to_string(),
+            _field_mask: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3176,19 +3651,34 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all instances in the given project.
+    /// Starts creating a new Cloud Spanner Backup.
+    /// The returned backup long-running operation
+    /// will have a name of the format
+    /// `projects/<project>/instances/<instance>/backups/<backup>/operations/<operation_id>`
+    /// and can be used to track creation of the backup. The
+    /// metadata field type is
+    /// CreateBackupMetadata. The
+    /// response field type is
+    /// Backup, if successful. Cancelling the returned operation will stop the
+    /// creation and delete the backup.
+    /// There can be only one pending backup creation per database. Backup creation
+    /// of different databases can run concurrently.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The name of the project for which a list of instances is
-    ///              requested. Values are of the form `projects/<project>`.
-    pub fn instances_list(&self, parent: &str) -> ProjectInstanceListCall<'a, C, A> {
-        ProjectInstanceListCall {
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The name of the instance in which the backup will be
+    ///              created. This must be the same instance that contains the database the
+    ///              backup will be created from. The backup will be stored in the
+    ///              location(s) specified in the instance configuration of this
+    ///              instance. Values are of the form
+    ///              `projects/<project>/instances/<instance>`.
+    pub fn instances_backups_create(&self, request: Backup, parent: &str) -> ProjectInstanceBackupCreateCall<'a, C, A> {
+        ProjectInstanceBackupCreateCall {
             hub: self.hub,
+            _request: request,
             _parent: parent.to_string(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
-            _filter: Default::default(),
+            _backup_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3208,9 +3698,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// transaction internally, and count toward the one transaction
     /// limit.
     /// 
-    /// Cloud Spanner limits the number of sessions that can exist at any given
-    /// time; thus, it is a good idea to delete idle and/or unneeded sessions.
-    /// Aside from explicit deletes, Cloud Spanner can delete sessions for which no
+    /// Active sessions use additional server resources, so it is a good idea to
+    /// delete idle and unneeded sessions.
+    /// Aside from explicit deletes, Cloud Spanner may delete sessions for which no
     /// operations are sent for more than an hour. If a session is deleted,
     /// requests to it return `NOT_FOUND`.
     /// 
@@ -3261,6 +3751,35 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Lists operations that match the specified filter in the request. If the
+    /// server doesn't support this method, it returns `UNIMPLEMENTED`.
+    /// 
+    /// NOTE: the `name` binding allows API services to override the binding
+    /// to use different resource name schemes, such as `users/*/operations`. To
+    /// override the binding, API services can add a binding such as
+    /// `"/v1/{name=users/*}/operations"` to their service configuration.
+    /// For backwards compatibility, the default name includes the operations
+    /// collection id, however overriding users must ensure the name binding
+    /// is the parent resource, without the operations collection id.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The name of the operation's parent resource.
+    pub fn instances_backups_operations_list(&self, name: &str) -> ProjectInstanceBackupOperationListCall<'a, C, A> {
+        ProjectInstanceBackupOperationListCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Updates the schema of a Cloud Spanner database by
     /// creating/altering/dropping tables, columns, indexes, etc. The returned
     /// long-running operation will have a name of
@@ -3286,10 +3805,33 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on a database resource.
+    /// Lists all instances in the given project.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The name of the project for which a list of instances is
+    ///              requested. Values are of the form `projects/<project>`.
+    pub fn instances_list(&self, parent: &str) -> ProjectInstanceListCall<'a, C, A> {
+        ProjectInstanceListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Sets the access control policy on a database or backup resource.
     /// Replaces any existing policy.
     /// 
     /// Authorization requires `spanner.databases.setIamPolicy`
+    /// permission on resource.
+    /// For backups, authorization requires `spanner.backups.setIamPolicy`
     /// permission on resource.
     /// 
     /// # Arguments
@@ -3309,59 +3851,97 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an instance, and begins allocating or releasing resources
-    /// as requested. The returned long-running
-    /// operation can be used to track the
-    /// progress of updating the instance. If the named instance does not
-    /// exist, returns `NOT_FOUND`.
+    /// Gets metadata on a pending or completed Backup.
     /// 
-    /// Immediately upon completion of this request:
+    /// # Arguments
+    ///
+    /// * `name` - Required. Name of the backup.
+    ///            Values are of the form
+    ///            `projects/<project>/instances/<instance>/backups/<backup>`.
+    pub fn instances_backups_get(&self, name: &str) -> ProjectInstanceBackupGetCall<'a, C, A> {
+        ProjectInstanceBackupGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists database longrunning-operations.
+    /// A database operation has a name of the form
+    /// `projects/<project>/instances/<instance>/databases/<database>/operations/<operation>`.
+    /// The long-running operation
+    /// metadata field type
+    /// `metadata.type_url` describes the type of the metadata. Operations returned
+    /// include those that have completed/failed/canceled within the last 7 days,
+    /// and pending operations.
     /// 
-    /// * For resource types for which a decrease in the instance's allocation
-    ///   has been requested, billing is based on the newly-requested level.
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The instance of the database operations.
+    ///              Values are of the form `projects/<project>/instances/<instance>`.
+    pub fn instances_database_operations_list(&self, parent: &str) -> ProjectInstanceDatabaseOperationListCall<'a, C, A> {
+        ProjectInstanceDatabaseOperationListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates multiple new sessions.
     /// 
-    /// Until completion of the returned operation:
-    /// 
-    /// * Cancelling the operation sets its metadata's
-    ///   cancel_time, and begins
-    ///   restoring resources to their pre-request values. The operation
-    ///   is guaranteed to succeed at undoing all resource changes,
-    ///   after which point it terminates with a `CANCELLED` status.
-    /// * All other attempts to modify the instance are rejected.
-    /// * Reading the instance via the API continues to give the pre-request
-    ///   resource levels.
-    /// 
-    /// Upon completion of the returned operation:
-    /// 
-    /// * Billing begins for all successfully-allocated resources (some types
-    ///   may have lower than the requested levels).
-    /// * All newly-reserved resources are available for serving the instance's
-    ///   tables.
-    /// * The instance's new resource levels are readable via the API.
-    /// 
-    /// The returned long-running operation will
-    /// have a name of the format `<instance_name>/operations/<operation_id>` and
-    /// can be used to track the instance modification.  The
-    /// metadata field type is
-    /// UpdateInstanceMetadata.
-    /// The response field type is
-    /// Instance, if successful.
-    /// 
-    /// Authorization requires `spanner.instances.update` permission on
-    /// resource name.
+    /// This API can be used to initialize a session cache on the clients.
+    /// See https://goo.gl/TgSFN2 for best practices on session cache management.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. A unique identifier for the instance, which cannot be changed
-    ///            after the instance is created. Values are of the form
-    ///            `projects/<project>/instances/a-z*[a-z0-9]`. The final
-    ///            segment of the name must be between 2 and 64 characters in length.
-    pub fn instances_patch(&self, request: UpdateInstanceRequest, name: &str) -> ProjectInstancePatchCall<'a, C, A> {
-        ProjectInstancePatchCall {
+    /// * `database` - Required. The database in which the new sessions are created.
+    pub fn instances_databases_sessions_batch_create(&self, request: BatchCreateSessionsRequest, database: &str) -> ProjectInstanceDatabaseSessionBatchCreateCall<'a, C, A> {
+        ProjectInstanceDatabaseSessionBatchCreateCall {
+            hub: self.hub,
+            _request: request,
+            _database: database.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a pending or completed Backup.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Output only for the CreateBackup operation.
+    ///            Required for the UpdateBackup operation.
+    ///            A globally unique identifier for the backup which cannot be
+    ///            changed. Values are of the form
+    ///            `projects/<project>/instances/<instance>/backups/a-z*[a-z0-9]`
+    ///            The final segment of the name must be between 2 and 60 characters
+    ///            in length.
+    ///            The backup is stored in the location(s) specified in the instance
+    ///            configuration of the instance containing the backup, identified
+    ///            by the prefix of the backup name of the form
+    ///            `projects/<project>/instances/<instance>`.
+    pub fn instances_backups_patch(&self, request: Backup, name: &str) -> ProjectInstanceBackupPatchCall<'a, C, A> {
+        ProjectInstanceBackupPatchCall {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
+            _update_mask: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3460,6 +4040,26 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Deletes a long-running operation. This method indicates that the client is
+    /// no longer interested in the operation result. It does not cancel the
+    /// operation. If the server doesn't support this method, it returns
+    /// `google.rpc.Code.UNIMPLEMENTED`.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The name of the operation resource to be deleted.
+    pub fn instances_backups_operations_delete(&self, name: &str) -> ProjectInstanceBackupOperationDeleteCall<'a, C, A> {
+        ProjectInstanceBackupOperationDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Returns the schema of a Cloud Spanner database as a list of formatted
     /// DDL statements. This method does not show pending schema updates, those may
     /// be queried using the Operations API.
@@ -3471,6 +4071,67 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectInstanceDatabaseGetDdlCall {
             hub: self.hub,
             _database: database.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates an instance, and begins allocating or releasing resources
+    /// as requested. The returned long-running
+    /// operation can be used to track the
+    /// progress of updating the instance. If the named instance does not
+    /// exist, returns `NOT_FOUND`.
+    /// 
+    /// Immediately upon completion of this request:
+    /// 
+    /// * For resource types for which a decrease in the instance's allocation
+    ///   has been requested, billing is based on the newly-requested level.
+    /// 
+    /// Until completion of the returned operation:
+    /// 
+    /// * Cancelling the operation sets its metadata's
+    ///   cancel_time, and begins
+    ///   restoring resources to their pre-request values. The operation
+    ///   is guaranteed to succeed at undoing all resource changes,
+    ///   after which point it terminates with a `CANCELLED` status.
+    /// * All other attempts to modify the instance are rejected.
+    /// * Reading the instance via the API continues to give the pre-request
+    ///   resource levels.
+    /// 
+    /// Upon completion of the returned operation:
+    /// 
+    /// * Billing begins for all successfully-allocated resources (some types
+    ///   may have lower than the requested levels).
+    /// * All newly-reserved resources are available for serving the instance's
+    ///   tables.
+    /// * The instance's new resource levels are readable via the API.
+    /// 
+    /// The returned long-running operation will
+    /// have a name of the format `<instance_name>/operations/<operation_id>` and
+    /// can be used to track the instance modification.  The
+    /// metadata field type is
+    /// UpdateInstanceMetadata.
+    /// The response field type is
+    /// Instance, if successful.
+    /// 
+    /// Authorization requires `spanner.instances.update` permission on
+    /// resource name.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. A unique identifier for the instance, which cannot be changed
+    ///            after the instance is created. Values are of the form
+    ///            `projects/<project>/instances/a-z*[a-z0-9]`. The final
+    ///            segment of the name must be between 2 and 64 characters in length.
+    pub fn instances_patch(&self, request: UpdateInstanceRequest, name: &str) -> ProjectInstancePatchCall<'a, C, A> {
+        ProjectInstancePatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3530,19 +4191,63 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the supported instance configurations for a given project.
+    /// Gets the access control policy for a database or backup resource.
+    /// Returns an empty policy if a database or backup exists but does not have a
+    /// policy set.
+    /// 
+    /// Authorization requires `spanner.databases.getIamPolicy` permission on
+    /// resource.
+    /// For backups, authorization requires `spanner.backups.getIamPolicy`
+    /// permission on resource.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The name of the project for which a list of supported instance
-    ///              configurations is requested. Values are of the form
-    ///              `projects/<project>`.
-    pub fn instance_configs_list(&self, parent: &str) -> ProjectInstanceConfigListCall<'a, C, A> {
-        ProjectInstanceConfigListCall {
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The Cloud Spanner resource for which the policy is being retrieved. The format is `projects/<project ID>/instances/<instance ID>` for instance resources and `projects/<project ID>/instances/<instance ID>/databases/<database ID>` for database resources.
+    pub fn instances_backups_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectInstanceBackupGetIamPolicyCall<'a, C, A> {
+        ProjectInstanceBackupGetIamPolicyCall {
             hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Create a new database by restoring from a completed backup. The new
+    /// database must be in the same project and in an instance with the same
+    /// instance configuration as the instance containing
+    /// the backup. The returned database long-running
+    /// operation has a name of the format
+    /// `projects/<project>/instances/<instance>/databases/<database>/operations/<operation_id>`,
+    /// and can be used to track the progress of the operation, and to cancel it.
+    /// The metadata field type is
+    /// RestoreDatabaseMetadata.
+    /// The response type
+    /// is Database, if
+    /// successful. Cancelling the returned operation will stop the restore and
+    /// delete the database.
+    /// There can be only one database being restored into an instance at a time.
+    /// Once the restore operation completes, a new restore operation can be
+    /// initiated, without waiting for the optimize operation associated with the
+    /// first restore to complete.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The name of the instance in which to create the
+    ///              restored database. This instance must be in the same project and
+    ///              have the same instance configuration as the instance containing
+    ///              the source backup. Values are of the form
+    ///              `projects/<project>/instances/<instance>`.
+    pub fn instances_databases_restore(&self, request: RestoreDatabaseRequest, parent: &str) -> ProjectInstanceDatabaseRestoreCall<'a, C, A> {
+        ProjectInstanceDatabaseRestoreCall {
+            hub: self.hub,
+            _request: request,
             _parent: parent.to_string(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3582,6 +4287,34 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Returns permissions that the caller has on the specified database or backup
+    /// resource.
+    /// 
+    /// Attempting this RPC on a non-existent Cloud Spanner database will
+    /// result in a NOT_FOUND error if the user has
+    /// `spanner.databases.list` permission on the containing Cloud
+    /// Spanner instance. Otherwise returns an empty set of permissions.
+    /// Calling this method on a backup that does not exist will
+    /// result in a NOT_FOUND error if the user has
+    /// `spanner.backups.list` permission on the containing instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The Cloud Spanner resource for which permissions are being tested. The format is `projects/<project ID>/instances/<instance ID>` for instance resources and `projects/<project ID>/instances/<instance ID>/databases/<database ID>` for database resources.
+    pub fn instances_databases_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> {
+        ProjectInstanceDatabaseTestIamPermissionCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Like ExecuteSql, except returns the result
     /// set as a stream. Unlike ExecuteSql, there
     /// is no limit on the size of the returned result set. However, no
@@ -3597,6 +4330,27 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _session: session.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists the supported instance configurations for a given project.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The name of the project for which a list of supported instance
+    ///              configurations is requested. Values are of the form
+    ///              `projects/<project>`.
+    pub fn instance_configs_list(&self, parent: &str) -> ProjectInstanceConfigListCall<'a, C, A> {
+        ProjectInstanceConfigListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3650,18 +4404,24 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all sessions in a given database.
+    /// Starts asynchronous cancellation on a long-running operation.  The server
+    /// makes a best effort to cancel the operation, but success is not
+    /// guaranteed.  If the server doesn't support this method, it returns
+    /// `google.rpc.Code.UNIMPLEMENTED`.  Clients can use
+    /// Operations.GetOperation or
+    /// other methods to check whether the cancellation succeeded or whether the
+    /// operation completed despite cancellation. On successful cancellation,
+    /// the operation is not deleted; instead, it becomes an operation with
+    /// an Operation.error value with a google.rpc.Status.code of 1,
+    /// corresponding to `Code.CANCELLED`.
     /// 
     /// # Arguments
     ///
-    /// * `database` - Required. The database in which to list sessions.
-    pub fn instances_databases_sessions_list(&self, database: &str) -> ProjectInstanceDatabaseSessionListCall<'a, C, A> {
-        ProjectInstanceDatabaseSessionListCall {
+    /// * `name` - The name of the operation resource to be cancelled.
+    pub fn instances_backups_operations_cancel(&self, name: &str) -> ProjectInstanceBackupOperationCancelCall<'a, C, A> {
+        ProjectInstanceBackupOperationCancelCall {
             hub: self.hub,
-            _database: database.to_string(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
-            _filter: Default::default(),
+            _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3753,6 +4513,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Drops (aka deletes) a Cloud Spanner database.
+    /// Completed backups for the database will be retained according to their
+    /// `expire_time`.
     /// 
     /// # Arguments
     ///
@@ -3761,6 +4523,25 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectInstanceDatabaseDropDatabaseCall {
             hub: self.hub,
             _database: database.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the latest state of a long-running operation.  Clients can use this
+    /// method to poll the operation result at intervals as recommended by the API
+    /// service.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The name of the operation resource.
+    pub fn instances_backups_operations_get(&self, name: &str) -> ProjectInstanceBackupOperationGetCall<'a, C, A> {
+        ProjectInstanceBackupOperationGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3789,6 +4570,26 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Lists all sessions in a given database.
+    /// 
+    /// # Arguments
+    ///
+    /// * `database` - Required. The database in which to list sessions.
+    pub fn instances_databases_sessions_list(&self, database: &str) -> ProjectInstanceDatabaseSessionListCall<'a, C, A> {
+        ProjectInstanceDatabaseSessionListCall {
+            hub: self.hub,
+            _database: database.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Deletes a long-running operation. This method indicates that the client is
     /// no longer interested in the operation result. It does not cancel the
     /// operation. If the server doesn't support this method, it returns
@@ -3809,26 +4610,75 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an instance.
+    /// Gets the access control policy for a database or backup resource.
+    /// Returns an empty policy if a database or backup exists but does not have a
+    /// policy set.
     /// 
-    /// Immediately upon completion of the request:
-    /// 
-    /// * Billing ceases for all of the instance's reserved resources.
-    /// 
-    /// Soon afterward:
-    /// 
-    /// * The instance and *all of its databases* immediately and
-    ///   irrevocably disappear from the API. All data in the databases
-    ///   is permanently deleted.
+    /// Authorization requires `spanner.databases.getIamPolicy` permission on
+    /// resource.
+    /// For backups, authorization requires `spanner.backups.getIamPolicy`
+    /// permission on resource.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The name of the instance to be deleted. Values are of the form
-    ///            `projects/<project>/instances/<instance>`
-    pub fn instances_delete(&self, name: &str) -> ProjectInstanceDeleteCall<'a, C, A> {
-        ProjectInstanceDeleteCall {
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The Cloud Spanner resource for which the policy is being retrieved. The format is `projects/<project ID>/instances/<instance ID>` for instance resources and `projects/<project ID>/instances/<instance ID>/databases/<database ID>` for database resources.
+    pub fn instances_databases_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {
+        ProjectInstanceDatabaseGetIamPolicyCall {
             hub: self.hub,
-            _name: name.to_string(),
+            _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists completed and pending backups.
+    /// Backups returned are ordered by `create_time` in descending order,
+    /// starting from the most recent `create_time`.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The instance to list backups from.  Values are of the
+    ///              form `projects/<project>/instances/<instance>`.
+    pub fn instances_backups_list(&self, parent: &str) -> ProjectInstanceBackupListCall<'a, C, A> {
+        ProjectInstanceBackupListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns permissions that the caller has on the specified database or backup
+    /// resource.
+    /// 
+    /// Attempting this RPC on a non-existent Cloud Spanner database will
+    /// result in a NOT_FOUND error if the user has
+    /// `spanner.databases.list` permission on the containing Cloud
+    /// Spanner instance. Otherwise returns an empty set of permissions.
+    /// Calling this method on a backup that does not exist will
+    /// result in a NOT_FOUND error if the user has
+    /// `spanner.backups.list` permission on the containing instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The Cloud Spanner resource for which permissions are being tested. The format is `projects/<project ID>/instances/<instance ID>` for instance resources and `projects/<project ID>/instances/<instance ID>/databases/<database ID>` for database resources.
+    pub fn instances_backups_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectInstanceBackupTestIamPermissionCall<'a, C, A> {
+        ProjectInstanceBackupTestIamPermissionCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3872,6 +4722,25 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `name` - Required. The name of the session to retrieve.
     pub fn instances_databases_sessions_get(&self, name: &str) -> ProjectInstanceDatabaseSessionGetCall<'a, C, A> {
         ProjectInstanceDatabaseSessionGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a pending or completed Backup.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. Name of the backup to delete.
+    ///            Values are of the form
+    ///            `projects/<project>/instances/<instance>/backups/<backup>`.
+    pub fn instances_backups_delete(&self, name: &str) -> ProjectInstanceBackupDeleteCall<'a, C, A> {
+        ProjectInstanceBackupDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
             _delegate: Default::default(),
@@ -4996,14 +5865,18 @@ impl<'a, C, A> ProjectInstanceGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
-/// Gets the access control policy for a database resource.
-/// Returns an empty policy if a database exists but does
-/// not have a policy set.
-/// 
-/// Authorization requires `spanner.databases.getIamPolicy` permission on
-/// resource.
+/// Lists the backup long-running operations in
+/// the given instance. A backup operation has a name of the form
+/// `projects/<project>/instances/<instance>/backups/<backup>/operations/<operation>`.
+/// The long-running operation
+/// metadata field type
+/// `metadata.type_url` describes the type of the metadata. Operations returned
+/// include those that have completed/failed/canceled within the last 7 days,
+/// and pending operations. Operations returned are ordered by
+/// `operation.metadata.value.progress.start_time` in descending order starting
+/// from the most recently started operation.
 ///
-/// A builder for the *instances.databases.getIamPolicy* method supported by a *project* resource.
+/// A builder for the *instances.backupOperations.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -5015,7 +5888,6 @@ impl<'a, C, A> ProjectInstanceGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_spanner1 as spanner1;
-/// use spanner1::GetIamPolicyRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5026,36 +5898,36 @@ impl<'a, C, A> ProjectInstanceGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = GetIamPolicyRequest::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().instances_databases_get_iam_policy(req, "resource")
+/// let result = hub.projects().instances_backup_operations_list("parent")
+///              .page_token("takimata")
+///              .page_size(-70)
+///              .filter("amet.")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A>
+pub struct ProjectInstanceBackupOperationListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Spanner<C, A>,
-    _request: GetIamPolicyRequest,
-    _resource: String,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _filter: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectInstanceBackupOperationListCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectInstanceBackupOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListBackupOperationsResponse)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -5064,11 +5936,20 @@ impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: Borrow
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.getIamPolicy",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.backupOperations.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5080,12 +5961,12 @@ impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/backupOperations";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -5100,7 +5981,7 @@ impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: Borrow
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["resource"].iter() {
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -5112,17 +5993,6 @@ impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: Borrow
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -5139,15 +6009,11 @@ impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: Borrow
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -5198,23 +6064,77 @@ impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: Borrow
     }
 
 
+    /// Required. The instance of the backup operations. Values are of
+    /// the form `projects/<project>/instances/<instance>`.
     ///
-    /// Sets the *request* property to the given value.
+    /// Sets the *parent* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {
-        self._request = new_value;
+    pub fn parent(mut self, new_value: &str) -> ProjectInstanceBackupOperationListCall<'a, C, A> {
+        self._parent = new_value.to_string();
         self
     }
-    /// REQUIRED: The Cloud Spanner resource for which the policy is being retrieved. The format is `projects/<project ID>/instances/<instance ID>` for instance resources and `projects/<project ID>/instances/<instance ID>/databases/<database ID>` for database resources.
+    /// If non-empty, `page_token` should contain a
+    /// next_page_token
+    /// from a previous ListBackupOperationsResponse to the
+    /// same `parent` and with the same `filter`.
     ///
-    /// Sets the *resource* path property to the given value.
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectInstanceBackupOperationListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Number of operations to be returned in the response. If 0 or
+    /// less, defaults to the server's maximum allowed page size.
     ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {
-        self._resource = new_value.to_string();
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectInstanceBackupOperationListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// An expression that filters the list of returned backup operations.
+    /// 
+    /// A filter expression consists of a field name, a
+    /// comparison operator, and a value for filtering.
+    /// The value must be a string, a number, or a boolean. The comparison operator
+    /// must be one of: `<`, `>`, `<=`, `>=`, `!=`, `=`, or `:`.
+    /// Colon `:` is the contains operator. Filter rules are not case sensitive.
+    /// 
+    /// The following fields in the operation
+    /// are eligible for filtering:
+    /// 
+    /// * `name` - The name of the long-running operation
+    /// * `done` - False if the operation is in progress, else true.
+    /// * `metadata.@type` - the type of metadata. For example, the type string
+    ///   for CreateBackupMetadata is
+    ///   `type.googleapis.com/google.spanner.admin.database.v1.CreateBackupMetadata`.
+    /// * `metadata.<field_name>` - any field in metadata.value.
+    /// * `error` - Error associated with the long-running operation.
+    /// * `response.@type` - the type of response.
+    /// * `response.<field_name>` - any field in response.value.
+    /// 
+    /// You can combine multiple expressions by enclosing each expression in
+    /// parentheses. By default, expressions are combined with AND logic, but
+    /// you can specify AND, OR, and NOT logic explicitly.
+    /// 
+    /// Here are a few examples:
+    /// 
+    /// * `done:true` - The operation is complete.
+    /// * `metadata.database:prod` - The database the backup was taken from has
+    ///   a name containing the string "prod".
+    /// * `(metadata.@type=type.googleapis.com/google.spanner.admin.database.v1.CreateBackupMetadata) AND` <br/>
+    ///   `(metadata.name:howl) AND` <br/>
+    ///   `(metadata.progress.start_time < \"2018-03-28T14:50:00Z\") AND` <br/>
+    ///   `(error:*)` - Returns operations where:
+    ///   * The operation's metadata type is CreateBackupMetadata.
+    ///   * The backup name contains the string "howl".
+    ///   * The operation started before 2018-03-28T14:50:00Z.
+    ///   * The operation resulted in an error.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectInstanceBackupOperationListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5223,7 +6143,7 @@ impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceBackupOperationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5248,7 +6168,7 @@ impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: Borrow
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceBackupOperationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5268,7 +6188,7 @@ impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: Borrow
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceBackupOperationListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5575,21 +6495,13 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionReadCall<'a, C, A> where C: BorrowM
 /// to be run with lower latency than submitting them sequentially with
 /// ExecuteSql.
 /// 
-/// Statements are executed in order, sequentially.
-/// ExecuteBatchDmlResponse will contain a
-/// ResultSet for each DML statement that has successfully executed. If a
-/// statement fails, its error status will be returned as part of the
-/// ExecuteBatchDmlResponse. Execution will
-/// stop at the first failed statement; the remaining statements will not run.
+/// Statements are executed in sequential order. A request can succeed even if
+/// a statement fails. The ExecuteBatchDmlResponse.status field in the
+/// response provides information about the statement that failed. Clients must
+/// inspect this field to determine whether an error occurred.
 /// 
-/// ExecuteBatchDml is expected to return an OK status with a response even if
-/// there was an error while processing one of the DML statements. Clients must
-/// inspect response.status to determine if there were any errors while
-/// processing the request.
-/// 
-/// See more details in
-/// ExecuteBatchDmlRequest and
-/// ExecuteBatchDmlResponse.
+/// Execution stops after the first failed statement; the remaining statements
+/// are not executed.
 ///
 /// A builder for the *instances.databases.sessions.executeBatchDml* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6151,14 +7063,19 @@ impl<'a, C, A> ProjectInstanceSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
-/// Returns permissions that the caller has on the specified database resource.
+/// Deletes an instance.
 /// 
-/// Attempting this RPC on a non-existent Cloud Spanner database will
-/// result in a NOT_FOUND error if the user has
-/// `spanner.databases.list` permission on the containing Cloud
-/// Spanner instance. Otherwise returns an empty set of permissions.
+/// Immediately upon completion of the request:
+/// 
+/// * Billing ceases for all of the instance's reserved resources.
+/// 
+/// Soon afterward:
+/// 
+/// * The instance and *all of its databases* immediately and
+///   irrevocably disappear from the API. All data in the databases
+///   is permanently deleted.
 ///
-/// A builder for the *instances.databases.testIamPermissions* method supported by a *project* resource.
+/// A builder for the *instances.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -6170,7 +7087,262 @@ impl<'a, C, A> ProjectInstanceSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_spanner1 as spanner1;
-/// use spanner1::TestIamPermissionsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use spanner1::Spanner;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_delete("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Spanner<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the instance to be deleted. Values are of the form
+    /// `projects/<project>/instances/<instance>`
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectInstanceDeleteCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Sets the access control policy on a database or backup resource.
+/// Replaces any existing policy.
+/// 
+/// Authorization requires `spanner.databases.setIamPolicy`
+/// permission on resource.
+/// For backups, authorization requires `spanner.backups.setIamPolicy`
+/// permission on resource.
+///
+/// A builder for the *instances.backups.setIamPolicy* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_spanner1 as spanner1;
+/// use spanner1::SetIamPolicyRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6184,33 +7356,33 @@ impl<'a, C, A> ProjectInstanceSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = TestIamPermissionsRequest::default();
+/// let mut req = SetIamPolicyRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().instances_databases_test_iam_permissions(req, "resource")
+/// let result = hub.projects().instances_backups_set_iam_policy(req, "resource")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A>
+pub struct ProjectInstanceBackupSetIamPolicyCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Spanner<C, A>,
-    _request: TestIamPermissionsRequest,
+    _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectInstanceBackupSetIamPolicyCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectInstanceBackupSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, TestIamPermissionsResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -6219,7 +7391,7 @@ impl<'a, C, A> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> where C: B
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.testIamPermissions",
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.backups.setIamPolicy",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
@@ -6235,7 +7407,7 @@ impl<'a, C, A> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> where C: B
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:testIamPermissions";
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:setIamPolicy";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -6358,17 +7530,17 @@ impl<'a, C, A> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> where C: B
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectInstanceBackupSetIamPolicyCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// REQUIRED: The Cloud Spanner resource for which permissions are being tested. The format is `projects/<project ID>/instances/<instance ID>` for instance resources and `projects/<project ID>/instances/<instance ID>/databases/<database ID>` for database resources.
+    /// REQUIRED: The Cloud Spanner resource for which the policy is being set. The format is `projects/<project ID>/instances/<instance ID>` for instance resources and `projects/<project ID>/instances/<instance ID>/databases/<database ID>` for databases resources.
     ///
     /// Sets the *resource* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> {
+    pub fn resource(mut self, new_value: &str) -> ProjectInstanceBackupSetIamPolicyCall<'a, C, A> {
         self._resource = new_value.to_string();
         self
     }
@@ -6378,7 +7550,7 @@ impl<'a, C, A> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> where C: B
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceBackupSetIamPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6403,7 +7575,7 @@ impl<'a, C, A> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> where C: B
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceBackupSetIamPolicyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6423,7 +7595,7 @@ impl<'a, C, A> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> where C: B
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceBackupSetIamPolicyCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6463,8 +7635,8 @@ impl<'a, C, A> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> where C: B
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().instances_databases_list("parent")
-///              .page_token("sea")
-///              .page_size(-90)
+///              .page_token("sadipscing")
+///              .page_size(-31)
 ///              .doit();
 /// # }
 /// ```
@@ -7025,6 +8197,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionRollbackCall<'a, C, A> where C: Bor
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().instances_get("name")
+///              .field_mask("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -7033,6 +8206,7 @@ pub struct ProjectInstanceGetCall<'a, C, A>
 
     hub: &'a Spanner<C, A>,
     _name: String,
+    _field_mask: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -7055,9 +8229,12 @@ impl<'a, C, A> ProjectInstanceGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
+        if let Some(value) = self._field_mask {
+            params.push(("fieldMask", value.to_string()));
+        }
+        for &field in ["alt", "name", "fieldMask"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7181,6 +8358,15 @@ impl<'a, C, A> ProjectInstanceGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// we provide this method for API completeness.
     pub fn name(mut self, new_value: &str) -> ProjectInstanceGetCall<'a, C, A> {
         self._name = new_value.to_string();
+        self
+    }
+    /// If field_mask is present, specifies the subset of Instance fields that
+    /// should be returned.
+    /// If absent, all Instance fields are returned.
+    ///
+    /// Sets the *field mask* query property to the given value.
+    pub fn field_mask(mut self, new_value: &str) -> ProjectInstanceGetCall<'a, C, A> {
+        self._field_mask = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -7779,9 +8965,20 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionStreamingReadCall<'a, C, A> where C
 }
 
 
-/// Lists all instances in the given project.
+/// Starts creating a new Cloud Spanner Backup.
+/// The returned backup long-running operation
+/// will have a name of the format
+/// `projects/<project>/instances/<instance>/backups/<backup>/operations/<operation_id>`
+/// and can be used to track creation of the backup. The
+/// metadata field type is
+/// CreateBackupMetadata. The
+/// response field type is
+/// Backup, if successful. Cancelling the returned operation will stop the
+/// creation and delete the backup.
+/// There can be only one pending backup creation per database. Backup creation
+/// of different databases can run concurrently.
 ///
-/// A builder for the *instances.list* method supported by a *project* resource.
+/// A builder for the *instances.backups.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -7793,6 +8990,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionStreamingReadCall<'a, C, A> where C
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_spanner1 as spanner1;
+/// use spanner1::Backup;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7803,36 +9001,38 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionStreamingReadCall<'a, C, A> where C
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Backup::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().instances_list("parent")
-///              .page_token("no")
-///              .page_size(-21)
-///              .filter("justo")
+/// let result = hub.projects().instances_backups_create(req, "parent")
+///              .backup_id("diam")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectInstanceListCall<'a, C, A>
+pub struct ProjectInstanceBackupCreateCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Spanner<C, A>,
+    _request: Backup,
     _parent: String,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
-    _filter: Option<String>,
+    _backup_id: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectInstanceListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectInstanceBackupCreateCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectInstanceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectInstanceBackupCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListInstancesResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -7841,20 +9041,14 @@ impl<'a, C, A> ProjectInstanceListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "spanner.projects.instances.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.backups.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
+        if let Some(value) = self._backup_id {
+            params.push(("backupId", value.to_string()));
         }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._filter {
-            params.push(("filter", value.to_string()));
-        }
-        for &field in ["alt", "parent", "pageToken", "pageSize", "filter"].iter() {
+        for &field in ["alt", "parent", "backupId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7866,7 +9060,7 @@ impl<'a, C, A> ProjectInstanceListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+parent}/instances";
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/backups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7898,6 +9092,17 @@ impl<'a, C, A> ProjectInstanceListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -7914,11 +9119,15 @@ impl<'a, C, A> ProjectInstanceListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -7969,57 +9178,37 @@ impl<'a, C, A> ProjectInstanceListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// Required. The name of the project for which a list of instances is
-    /// requested. Values are of the form `projects/<project>`.
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Backup) -> ProjectInstanceBackupCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the instance in which the backup will be
+    /// created. This must be the same instance that contains the database the
+    /// backup will be created from. The backup will be stored in the
+    /// location(s) specified in the instance configuration of this
+    /// instance. Values are of the form
+    /// `projects/<project>/instances/<instance>`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectInstanceListCall<'a, C, A> {
+    pub fn parent(mut self, new_value: &str) -> ProjectInstanceBackupCreateCall<'a, C, A> {
         self._parent = new_value.to_string();
         self
     }
-    /// If non-empty, `page_token` should contain a
-    /// next_page_token from a
-    /// previous ListInstancesResponse.
+    /// Required. The id of the backup to be created. The `backup_id` appended to
+    /// `parent` forms the full backup name of the form
+    /// `projects/<project>/instances/<instance>/backups/<backup_id>`.
     ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectInstanceListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Number of instances to be returned in the response. If 0 or less, defaults
-    /// to the server's maximum allowed page size.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectInstanceListCall<'a, C, A> {
-        self._page_size = Some(new_value);
-        self
-    }
-    /// An expression for filtering the results of the request. Filter rules are
-    /// case insensitive. The fields eligible for filtering are:
-    /// 
-    /// * `name`
-    /// * `display_name`
-    /// * `labels.key` where key is the name of a label
-    /// 
-    /// Some examples of using filters are:
-    /// 
-    /// * `name:*` --> The instance has a name.
-    /// * `name:Howl` --> The instance's name contains the string "howl".
-    /// * `name:HOWL` --> Equivalent to above.
-    /// * `NAME:howl` --> Equivalent to above.
-    /// * `labels.env:*` --> The instance has the label "env".
-    /// * `labels.env:dev` --> The instance has the label "env" and the value of
-    ///   the label contains the string "dev".
-    /// * `name:howl labels.env:dev` --> The instance's name contains "howl" and
-    ///   it has the label "env" with its value
-    ///   containing "dev".
-    ///
-    /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectInstanceListCall<'a, C, A> {
-        self._filter = Some(new_value.to_string());
+    /// Sets the *backup id* query property to the given value.
+    pub fn backup_id(mut self, new_value: &str) -> ProjectInstanceBackupCreateCall<'a, C, A> {
+        self._backup_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -8028,7 +9217,7 @@ impl<'a, C, A> ProjectInstanceListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceBackupCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8053,7 +9242,7 @@ impl<'a, C, A> ProjectInstanceListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceBackupCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8073,7 +9262,7 @@ impl<'a, C, A> ProjectInstanceListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceListCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceBackupCreateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8096,9 +9285,9 @@ impl<'a, C, A> ProjectInstanceListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// transaction internally, and count toward the one transaction
 /// limit.
 /// 
-/// Cloud Spanner limits the number of sessions that can exist at any given
-/// time; thus, it is a good idea to delete idle and/or unneeded sessions.
-/// Aside from explicit deletes, Cloud Spanner can delete sessions for which no
+/// Active sessions use additional server resources, so it is a good idea to
+/// delete idle and unneeded sessions.
+/// Aside from explicit deletes, Cloud Spanner may delete sessions for which no
 /// operations are sent for more than an hour. If a session is deleted,
 /// requests to it return `NOT_FOUND`.
 /// 
@@ -8669,6 +9858,299 @@ impl<'a, C, A> ProjectInstanceDatabaseCreateCall<'a, C, A> where C: BorrowMut<hy
 }
 
 
+/// Lists operations that match the specified filter in the request. If the
+/// server doesn't support this method, it returns `UNIMPLEMENTED`.
+/// 
+/// NOTE: the `name` binding allows API services to override the binding
+/// to use different resource name schemes, such as `users/*/operations`. To
+/// override the binding, API services can add a binding such as
+/// `"/v1/{name=users/*}/operations"` to their service configuration.
+/// For backwards compatibility, the default name includes the operations
+/// collection id, however overriding users must ensure the name binding
+/// is the parent resource, without the operations collection id.
+///
+/// A builder for the *instances.backups.operations.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_spanner1 as spanner1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use spanner1::Spanner;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_backups_operations_list("name")
+///              .page_token("duo")
+///              .page_size(-32)
+///              .filter("sea")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceBackupOperationListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Spanner<C, A>,
+    _name: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceBackupOperationListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceBackupOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListOperationsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.backups.operations.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the operation's parent resource.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectInstanceBackupOperationListCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The standard list page token.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectInstanceBackupOperationListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The standard list page size.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectInstanceBackupOperationListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The standard list filter.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectInstanceBackupOperationListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceBackupOperationListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceBackupOperationListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceBackupOperationListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Updates the schema of a Cloud Spanner database by
 /// creating/altering/dropping tables, columns, indexes, etc. The returned
 /// long-running operation will have a name of
@@ -8954,10 +10436,318 @@ impl<'a, C, A> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> where C: BorrowMut
 }
 
 
-/// Sets the access control policy on a database resource.
+/// Lists all instances in the given project.
+///
+/// A builder for the *instances.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_spanner1 as spanner1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use spanner1::Spanner;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_list("parent")
+///              .page_token("erat")
+///              .page_size(-95)
+///              .filter("dolor")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Spanner<C, A>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListInstancesResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "filter"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/instances";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the project for which a list of instances is
+    /// requested. Values are of the form `projects/<project>`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectInstanceListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// If non-empty, `page_token` should contain a
+    /// next_page_token from a
+    /// previous ListInstancesResponse.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectInstanceListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Number of instances to be returned in the response. If 0 or less, defaults
+    /// to the server's maximum allowed page size.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectInstanceListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// An expression for filtering the results of the request. Filter rules are
+    /// case insensitive. The fields eligible for filtering are:
+    /// 
+    /// * `name`
+    /// * `display_name`
+    /// * `labels.key` where key is the name of a label
+    /// 
+    /// Some examples of using filters are:
+    /// 
+    /// * `name:*` --> The instance has a name.
+    /// * `name:Howl` --> The instance's name contains the string "howl".
+    /// * `name:HOWL` --> Equivalent to above.
+    /// * `NAME:howl` --> Equivalent to above.
+    /// * `labels.env:*` --> The instance has the label "env".
+    /// * `labels.env:dev` --> The instance has the label "env" and the value of
+    ///   the label contains the string "dev".
+    /// * `name:howl labels.env:dev` --> The instance's name contains "howl" and
+    ///   it has the label "env" with its value
+    ///   containing "dev".
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectInstanceListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Sets the access control policy on a database or backup resource.
 /// Replaces any existing policy.
 /// 
 /// Authorization requires `spanner.databases.setIamPolicy`
+/// permission on resource.
+/// For backups, authorization requires `spanner.backups.setIamPolicy`
 /// permission on resource.
 ///
 /// A builder for the *instances.databases.setIamPolicy* method supported by a *project* resource.
@@ -9237,48 +11027,9 @@ impl<'a, C, A> ProjectInstanceDatabaseSetIamPolicyCall<'a, C, A> where C: Borrow
 }
 
 
-/// Updates an instance, and begins allocating or releasing resources
-/// as requested. The returned long-running
-/// operation can be used to track the
-/// progress of updating the instance. If the named instance does not
-/// exist, returns `NOT_FOUND`.
-/// 
-/// Immediately upon completion of this request:
-/// 
-/// * For resource types for which a decrease in the instance's allocation
-///   has been requested, billing is based on the newly-requested level.
-/// 
-/// Until completion of the returned operation:
-/// 
-/// * Cancelling the operation sets its metadata's
-///   cancel_time, and begins
-///   restoring resources to their pre-request values. The operation
-///   is guaranteed to succeed at undoing all resource changes,
-///   after which point it terminates with a `CANCELLED` status.
-/// * All other attempts to modify the instance are rejected.
-/// * Reading the instance via the API continues to give the pre-request
-///   resource levels.
-/// 
-/// Upon completion of the returned operation:
-/// 
-/// * Billing begins for all successfully-allocated resources (some types
-///   may have lower than the requested levels).
-/// * All newly-reserved resources are available for serving the instance's
-///   tables.
-/// * The instance's new resource levels are readable via the API.
-/// 
-/// The returned long-running operation will
-/// have a name of the format `<instance_name>/operations/<operation_id>` and
-/// can be used to track the instance modification.  The
-/// metadata field type is
-/// UpdateInstanceMetadata.
-/// The response field type is
-/// Instance, if successful.
-/// 
-/// Authorization requires `spanner.instances.update` permission on
-/// resource name.
+/// Gets metadata on a pending or completed Backup.
 ///
-/// A builder for the *instances.patch* method supported by a *project* resource.
+/// A builder for the *instances.backups.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -9290,7 +11041,595 @@ impl<'a, C, A> ProjectInstanceDatabaseSetIamPolicyCall<'a, C, A> where C: Borrow
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_spanner1 as spanner1;
-/// use spanner1::UpdateInstanceRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use spanner1::Spanner;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_backups_get("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceBackupGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Spanner<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceBackupGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceBackupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Backup)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.backups.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Name of the backup.
+    /// Values are of the form
+    /// `projects/<project>/instances/<instance>/backups/<backup>`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectInstanceBackupGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceBackupGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceBackupGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceBackupGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists database longrunning-operations.
+/// A database operation has a name of the form
+/// `projects/<project>/instances/<instance>/databases/<database>/operations/<operation>`.
+/// The long-running operation
+/// metadata field type
+/// `metadata.type_url` describes the type of the metadata. Operations returned
+/// include those that have completed/failed/canceled within the last 7 days,
+/// and pending operations.
+///
+/// A builder for the *instances.databaseOperations.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_spanner1 as spanner1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use spanner1::Spanner;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_database_operations_list("parent")
+///              .page_token("no")
+///              .page_size(-36)
+///              .filter("eirmod")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceDatabaseOperationListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Spanner<C, A>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceDatabaseOperationListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceDatabaseOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListDatabaseOperationsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.databaseOperations.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "filter"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/databaseOperations";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The instance of the database operations.
+    /// Values are of the form `projects/<project>/instances/<instance>`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectInstanceDatabaseOperationListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// If non-empty, `page_token` should contain a
+    /// next_page_token
+    /// from a previous ListDatabaseOperationsResponse to the
+    /// same `parent` and with the same `filter`.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectInstanceDatabaseOperationListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Number of operations to be returned in the response. If 0 or
+    /// less, defaults to the server's maximum allowed page size.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectInstanceDatabaseOperationListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// An expression that filters the list of returned operations.
+    /// 
+    /// A filter expression consists of a field name, a
+    /// comparison operator, and a value for filtering.
+    /// The value must be a string, a number, or a boolean. The comparison operator
+    /// must be one of: `<`, `>`, `<=`, `>=`, `!=`, `=`, or `:`.
+    /// Colon `:` is the contains operator. Filter rules are not case sensitive.
+    /// 
+    /// The following fields in the Operation
+    /// are eligible for filtering:
+    /// 
+    /// * `name` - The name of the long-running operation
+    /// * `done` - False if the operation is in progress, else true.
+    /// * `metadata.@type` - the type of metadata. For example, the type string
+    ///   for RestoreDatabaseMetadata is
+    ///   `type.googleapis.com/google.spanner.admin.database.v1.RestoreDatabaseMetadata`.
+    /// * `metadata.<field_name>` - any field in metadata.value.
+    /// * `error` - Error associated with the long-running operation.
+    /// * `response.@type` - the type of response.
+    /// * `response.<field_name>` - any field in response.value.
+    /// 
+    /// You can combine multiple expressions by enclosing each expression in
+    /// parentheses. By default, expressions are combined with AND logic. However,
+    /// you can specify AND, OR, and NOT logic explicitly.
+    /// 
+    /// Here are a few examples:
+    /// 
+    /// * `done:true` - The operation is complete.
+    /// * `(metadata.@type=type.googleapis.com/google.spanner.admin.database.v1.RestoreDatabaseMetadata) AND` <br/>
+    ///   `(metadata.source_type:BACKUP) AND` <br/>
+    ///   `(metadata.backup_info.backup:backup_howl) AND` <br/>
+    ///   `(metadata.name:restored_howl) AND` <br/>
+    ///   `(metadata.progress.start_time < \"2018-03-28T14:50:00Z\") AND` <br/>
+    ///   `(error:*)` - Return operations where:
+    ///   * The operation's metadata type is RestoreDatabaseMetadata.
+    ///   * The database is restored from a backup.
+    ///   * The backup name contains "backup_howl".
+    ///   * The restored database's name contains "restored_howl".
+    ///   * The operation started before 2018-03-28T14:50:00Z.
+    ///   * The operation resulted in an error.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectInstanceDatabaseOperationListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceDatabaseOperationListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseOperationListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseOperationListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Creates multiple new sessions.
+/// 
+/// This API can be used to initialize a session cache on the clients.
+/// See https://goo.gl/TgSFN2 for best practices on session cache management.
+///
+/// A builder for the *instances.databases.sessions.batchCreate* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_spanner1 as spanner1;
+/// use spanner1::BatchCreateSessionsRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9304,33 +11643,33 @@ impl<'a, C, A> ProjectInstanceDatabaseSetIamPolicyCall<'a, C, A> where C: Borrow
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = UpdateInstanceRequest::default();
+/// let mut req = BatchCreateSessionsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().instances_patch(req, "name")
+/// let result = hub.projects().instances_databases_sessions_batch_create(req, "database")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectInstancePatchCall<'a, C, A>
+pub struct ProjectInstanceDatabaseSessionBatchCreateCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Spanner<C, A>,
-    _request: UpdateInstanceRequest,
-    _name: String,
+    _request: BatchCreateSessionsRequest,
+    _database: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectInstancePatchCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectInstanceDatabaseSessionBatchCreateCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectInstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectInstanceDatabaseSessionBatchCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, BatchCreateSessionsResponse)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -9339,11 +11678,295 @@ impl<'a, C, A> ProjectInstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "spanner.projects.instances.patch",
-                               http_method: hyper::method::Method::Patch });
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.sessions.batchCreate",
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("database", self._database.to_string()));
+        for &field in ["alt", "database"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+database}/sessions:batchCreate";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+database}", "database")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["database"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BatchCreateSessionsRequest) -> ProjectInstanceDatabaseSessionBatchCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The database in which the new sessions are created.
+    ///
+    /// Sets the *database* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn database(mut self, new_value: &str) -> ProjectInstanceDatabaseSessionBatchCreateCall<'a, C, A> {
+        self._database = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceDatabaseSessionBatchCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionBatchCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseSessionBatchCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Updates a pending or completed Backup.
+///
+/// A builder for the *instances.backups.patch* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_spanner1 as spanner1;
+/// use spanner1::Backup;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use spanner1::Spanner;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Backup::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_backups_patch(req, "name")
+///              .update_mask("aliquyam")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceBackupPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Spanner<C, A>,
+    _request: Backup,
+    _name: String,
+    _update_mask: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceBackupPatchCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceBackupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Backup)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.backups.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "name", "updateMask"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9478,21 +12101,41 @@ impl<'a, C, A> ProjectInstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateInstanceRequest) -> ProjectInstancePatchCall<'a, C, A> {
+    pub fn request(mut self, new_value: Backup) -> ProjectInstanceBackupPatchCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// Required. A unique identifier for the instance, which cannot be changed
-    /// after the instance is created. Values are of the form
-    /// `projects/<project>/instances/a-z*[a-z0-9]`. The final
-    /// segment of the name must be between 2 and 64 characters in length.
+    /// Output only for the CreateBackup operation.
+    /// Required for the UpdateBackup operation.
+    /// 
+    /// A globally unique identifier for the backup which cannot be
+    /// changed. Values are of the form
+    /// `projects/<project>/instances/<instance>/backups/a-z*[a-z0-9]`
+    /// The final segment of the name must be between 2 and 60 characters
+    /// in length.
+    /// 
+    /// The backup is stored in the location(s) specified in the instance
+    /// configuration of the instance containing the backup, identified
+    /// by the prefix of the backup name of the form
+    /// `projects/<project>/instances/<instance>`.
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectInstancePatchCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectInstanceBackupPatchCall<'a, C, A> {
         self._name = new_value.to_string();
+        self
+    }
+    /// Required. A mask specifying which fields (e.g. `expire_time`) in the
+    /// Backup resource should be updated. This mask is relative to the Backup
+    /// resource, not to the request message. The field mask must always be
+    /// specified; this prevents any future fields from being erased accidentally
+    /// by clients that do not know about them.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> ProjectInstanceBackupPatchCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -9501,7 +12144,7 @@ impl<'a, C, A> ProjectInstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstancePatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceBackupPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9526,7 +12169,7 @@ impl<'a, C, A> ProjectInstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstancePatchCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceBackupPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9546,7 +12189,7 @@ impl<'a, C, A> ProjectInstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstancePatchCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceBackupPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10630,6 +13273,257 @@ impl<'a, C, A> ProjectInstanceTestIamPermissionCall<'a, C, A> where C: BorrowMut
 }
 
 
+/// Deletes a long-running operation. This method indicates that the client is
+/// no longer interested in the operation result. It does not cancel the
+/// operation. If the server doesn't support this method, it returns
+/// `google.rpc.Code.UNIMPLEMENTED`.
+///
+/// A builder for the *instances.backups.operations.delete* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_spanner1 as spanner1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use spanner1::Spanner;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_backups_operations_delete("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceBackupOperationDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Spanner<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceBackupOperationDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceBackupOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.backups.operations.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the operation resource to be deleted.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectInstanceBackupOperationDeleteCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceBackupOperationDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceBackupOperationDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceBackupOperationDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Returns the schema of a Cloud Spanner database as a list of formatted
 /// DDL statements. This method does not show pending schema updates, those may
 /// be queried using the Operations API.
@@ -10869,6 +13763,327 @@ impl<'a, C, A> ProjectInstanceDatabaseGetDdlCall<'a, C, A> where C: BorrowMut<hy
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseGetDdlCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Updates an instance, and begins allocating or releasing resources
+/// as requested. The returned long-running
+/// operation can be used to track the
+/// progress of updating the instance. If the named instance does not
+/// exist, returns `NOT_FOUND`.
+/// 
+/// Immediately upon completion of this request:
+/// 
+/// * For resource types for which a decrease in the instance's allocation
+///   has been requested, billing is based on the newly-requested level.
+/// 
+/// Until completion of the returned operation:
+/// 
+/// * Cancelling the operation sets its metadata's
+///   cancel_time, and begins
+///   restoring resources to their pre-request values. The operation
+///   is guaranteed to succeed at undoing all resource changes,
+///   after which point it terminates with a `CANCELLED` status.
+/// * All other attempts to modify the instance are rejected.
+/// * Reading the instance via the API continues to give the pre-request
+///   resource levels.
+/// 
+/// Upon completion of the returned operation:
+/// 
+/// * Billing begins for all successfully-allocated resources (some types
+///   may have lower than the requested levels).
+/// * All newly-reserved resources are available for serving the instance's
+///   tables.
+/// * The instance's new resource levels are readable via the API.
+/// 
+/// The returned long-running operation will
+/// have a name of the format `<instance_name>/operations/<operation_id>` and
+/// can be used to track the instance modification.  The
+/// metadata field type is
+/// UpdateInstanceMetadata.
+/// The response field type is
+/// Instance, if successful.
+/// 
+/// Authorization requires `spanner.instances.update` permission on
+/// resource name.
+///
+/// A builder for the *instances.patch* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_spanner1 as spanner1;
+/// use spanner1::UpdateInstanceRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use spanner1::Spanner;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = UpdateInstanceRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_patch(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstancePatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Spanner<C, A>,
+    _request: UpdateInstanceRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstancePatchCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: UpdateInstanceRequest) -> ProjectInstancePatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. A unique identifier for the instance, which cannot be changed
+    /// after the instance is created. Values are of the form
+    /// `projects/<project>/instances/a-z*[a-z0-9]`. The final
+    /// segment of the name must be between 2 and 64 characters in length.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectInstancePatchCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstancePatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstancePatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstancePatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11199,9 +14414,9 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionBeginTransactionCall<'a, C, A> wher
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().instances_operations_list("name")
-///              .page_token("sadipscing")
-///              .page_size(-48)
-///              .filter("eirmod")
+///              .page_token("amet")
+///              .page_size(-23)
+///              .filter("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -11455,9 +14670,16 @@ impl<'a, C, A> ProjectInstanceOperationListCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Lists the supported instance configurations for a given project.
+/// Gets the access control policy for a database or backup resource.
+/// Returns an empty policy if a database or backup exists but does not have a
+/// policy set.
+/// 
+/// Authorization requires `spanner.databases.getIamPolicy` permission on
+/// resource.
+/// For backups, authorization requires `spanner.backups.getIamPolicy`
+/// permission on resource.
 ///
-/// A builder for the *instanceConfigs.list* method supported by a *project* resource.
+/// A builder for the *instances.backups.getIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -11469,6 +14691,7 @@ impl<'a, C, A> ProjectInstanceOperationListCall<'a, C, A> where C: BorrowMut<hyp
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_spanner1 as spanner1;
+/// use spanner1::GetIamPolicyRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -11479,34 +14702,36 @@ impl<'a, C, A> ProjectInstanceOperationListCall<'a, C, A> where C: BorrowMut<hyp
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GetIamPolicyRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().instance_configs_list("parent")
-///              .page_token("amet")
-///              .page_size(-60)
+/// let result = hub.projects().instances_backups_get_iam_policy(req, "resource")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectInstanceConfigListCall<'a, C, A>
+pub struct ProjectInstanceBackupGetIamPolicyCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Spanner<C, A>,
-    _parent: String,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
+    _request: GetIamPolicyRequest,
+    _resource: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectInstanceConfigListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectInstanceBackupGetIamPolicyCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectInstanceConfigListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectInstanceBackupGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListInstanceConfigsResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -11515,17 +14740,11 @@ impl<'a, C, A> ProjectInstanceConfigListCall<'a, C, A> where C: BorrowMut<hyper:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "spanner.projects.instanceConfigs.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.backups.getIamPolicy",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11537,12 +14756,12 @@ impl<'a, C, A> ProjectInstanceConfigListCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+parent}/instanceConfigs";
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -11557,7 +14776,7 @@ impl<'a, C, A> ProjectInstanceConfigListCall<'a, C, A> where C: BorrowMut<hyper:
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["parent"].iter() {
+            for param_name in ["resource"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -11569,6 +14788,17 @@ impl<'a, C, A> ProjectInstanceConfigListCall<'a, C, A> where C: BorrowMut<hyper:
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -11585,11 +14815,15 @@ impl<'a, C, A> ProjectInstanceConfigListCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -11640,33 +14874,23 @@ impl<'a, C, A> ProjectInstanceConfigListCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// Required. The name of the project for which a list of supported instance
-    /// configurations is requested. Values are of the form
-    /// `projects/<project>`.
     ///
-    /// Sets the *parent* path property to the given value.
+    /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectInstanceConfigListCall<'a, C, A> {
-        self._parent = new_value.to_string();
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectInstanceBackupGetIamPolicyCall<'a, C, A> {
+        self._request = new_value;
         self
     }
-    /// If non-empty, `page_token` should contain a
-    /// next_page_token
-    /// from a previous ListInstanceConfigsResponse.
+    /// REQUIRED: The Cloud Spanner resource for which the policy is being retrieved. The format is `projects/<project ID>/instances/<instance ID>` for instance resources and `projects/<project ID>/instances/<instance ID>/databases/<database ID>` for database resources.
     ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectInstanceConfigListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Number of instance configurations to be returned in the response. If 0 or
-    /// less, defaults to the server's maximum allowed page size.
+    /// Sets the *resource* path property to the given value.
     ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectInstanceConfigListCall<'a, C, A> {
-        self._page_size = Some(new_value);
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectInstanceBackupGetIamPolicyCall<'a, C, A> {
+        self._resource = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -11675,7 +14899,7 @@ impl<'a, C, A> ProjectInstanceConfigListCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceConfigListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceBackupGetIamPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11700,7 +14924,7 @@ impl<'a, C, A> ProjectInstanceConfigListCall<'a, C, A> where C: BorrowMut<hyper:
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceConfigListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceBackupGetIamPolicyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11720,7 +14944,306 @@ impl<'a, C, A> ProjectInstanceConfigListCall<'a, C, A> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceConfigListCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceBackupGetIamPolicyCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Create a new database by restoring from a completed backup. The new
+/// database must be in the same project and in an instance with the same
+/// instance configuration as the instance containing
+/// the backup. The returned database long-running
+/// operation has a name of the format
+/// `projects/<project>/instances/<instance>/databases/<database>/operations/<operation_id>`,
+/// and can be used to track the progress of the operation, and to cancel it.
+/// The metadata field type is
+/// RestoreDatabaseMetadata.
+/// The response type
+/// is Database, if
+/// successful. Cancelling the returned operation will stop the restore and
+/// delete the database.
+/// There can be only one database being restored into an instance at a time.
+/// Once the restore operation completes, a new restore operation can be
+/// initiated, without waiting for the optimize operation associated with the
+/// first restore to complete.
+///
+/// A builder for the *instances.databases.restore* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_spanner1 as spanner1;
+/// use spanner1::RestoreDatabaseRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use spanner1::Spanner;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = RestoreDatabaseRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_databases_restore(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceDatabaseRestoreCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Spanner<C, A>,
+    _request: RestoreDatabaseRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceDatabaseRestoreCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceDatabaseRestoreCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.restore",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/databases:restore";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: RestoreDatabaseRequest) -> ProjectInstanceDatabaseRestoreCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the instance in which to create the
+    /// restored database. This instance must be in the same project and
+    /// have the same instance configuration as the instance containing
+    /// the source backup. Values are of the form
+    /// `projects/<project>/instances/<instance>`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectInstanceDatabaseRestoreCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceDatabaseRestoreCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseRestoreCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseRestoreCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12023,6 +15546,294 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionPartitionReadCall<'a, C, A> where C
 }
 
 
+/// Returns permissions that the caller has on the specified database or backup
+/// resource.
+/// 
+/// Attempting this RPC on a non-existent Cloud Spanner database will
+/// result in a NOT_FOUND error if the user has
+/// `spanner.databases.list` permission on the containing Cloud
+/// Spanner instance. Otherwise returns an empty set of permissions.
+/// Calling this method on a backup that does not exist will
+/// result in a NOT_FOUND error if the user has
+/// `spanner.backups.list` permission on the containing instance.
+///
+/// A builder for the *instances.databases.testIamPermissions* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_spanner1 as spanner1;
+/// use spanner1::TestIamPermissionsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use spanner1::Spanner;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = TestIamPermissionsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_databases_test_iam_permissions(req, "resource")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Spanner<C, A>,
+    _request: TestIamPermissionsRequest,
+    _resource: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, TestIamPermissionsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.testIamPermissions",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:testIamPermissions";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resource"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The Cloud Spanner resource for which permissions are being tested. The format is `projects/<project ID>/instances/<instance ID>` for instance resources and `projects/<project ID>/instances/<instance ID>/databases/<database ID>` for database resources.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Like ExecuteSql, except returns the result
 /// set as a stream. Unlike ExecuteSql, there
 /// is no limit on the size of the returned result set. However, no
@@ -12295,6 +16106,283 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionExecuteStreamingSqlCall<'a, C, A> w
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseSessionExecuteStreamingSqlCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists the supported instance configurations for a given project.
+///
+/// A builder for the *instanceConfigs.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_spanner1 as spanner1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use spanner1::Spanner;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instance_configs_list("parent")
+///              .page_token("et")
+///              .page_size(-96)
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceConfigListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Spanner<C, A>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceConfigListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceConfigListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListInstanceConfigsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "spanner.projects.instanceConfigs.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/instanceConfigs";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the project for which a list of supported instance
+    /// configurations is requested. Values are of the form
+    /// `projects/<project>`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectInstanceConfigListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// If non-empty, `page_token` should contain a
+    /// next_page_token
+    /// from a previous ListInstanceConfigsResponse.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectInstanceConfigListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Number of instance configurations to be returned in the response. If 0 or
+    /// less, defaults to the server's maximum allowed page size.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectInstanceConfigListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceConfigListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceConfigListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceConfigListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12813,9 +16901,18 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationCancelCall<'a, C, A> where C: Bor
 }
 
 
-/// Lists all sessions in a given database.
+/// Starts asynchronous cancellation on a long-running operation.  The server
+/// makes a best effort to cancel the operation, but success is not
+/// guaranteed.  If the server doesn't support this method, it returns
+/// `google.rpc.Code.UNIMPLEMENTED`.  Clients can use
+/// Operations.GetOperation or
+/// other methods to check whether the cancellation succeeded or whether the
+/// operation completed despite cancellation. On successful cancellation,
+/// the operation is not deleted; instead, it becomes an operation with
+/// an Operation.error value with a google.rpc.Status.code of 1,
+/// corresponding to `Code.CANCELLED`.
 ///
-/// A builder for the *instances.databases.sessions.list* method supported by a *project* resource.
+/// A builder for the *instances.backups.operations.cancel* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -12840,33 +16937,27 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationCancelCall<'a, C, A> where C: Bor
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().instances_databases_sessions_list("database")
-///              .page_token("accusam")
-///              .page_size(-56)
-///              .filter("sea")
+/// let result = hub.projects().instances_backups_operations_cancel("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectInstanceDatabaseSessionListCall<'a, C, A>
+pub struct ProjectInstanceBackupOperationCancelCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Spanner<C, A>,
-    _database: String,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
-    _filter: Option<String>,
+    _name: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectInstanceDatabaseSessionListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectInstanceBackupOperationCancelCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectInstanceDatabaseSessionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectInstanceBackupOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListSessionsResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -12875,20 +16966,11 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionListCall<'a, C, A> where C: BorrowM
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.sessions.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("database", self._database.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        if let Some(value) = self._filter {
-            params.push(("filter", value.to_string()));
-        }
-        for &field in ["alt", "database", "pageToken", "pageSize", "filter"].iter() {
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.backups.operations.cancel",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12900,12 +16982,12 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionListCall<'a, C, A> where C: BorrowM
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+database}/sessions";
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:cancel";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+database}", "database")].iter() {
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -12920,7 +17002,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionListCall<'a, C, A> where C: BorrowM
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["database"].iter() {
+            for param_name in ["name"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -12950,7 +17032,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionListCall<'a, C, A> where C: BorrowM
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13003,47 +17085,14 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionListCall<'a, C, A> where C: BorrowM
     }
 
 
-    /// Required. The database in which to list sessions.
+    /// The name of the operation resource to be cancelled.
     ///
-    /// Sets the *database* path property to the given value.
+    /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn database(mut self, new_value: &str) -> ProjectInstanceDatabaseSessionListCall<'a, C, A> {
-        self._database = new_value.to_string();
-        self
-    }
-    /// If non-empty, `page_token` should contain a
-    /// next_page_token from a previous
-    /// ListSessionsResponse.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectInstanceDatabaseSessionListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Number of sessions to be returned in the response. If 0 or less, defaults
-    /// to the server's maximum allowed page size.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectInstanceDatabaseSessionListCall<'a, C, A> {
-        self._page_size = Some(new_value);
-        self
-    }
-    /// An expression for filtering the results of the request. Filter rules are
-    /// case insensitive. The fields eligible for filtering are:
-    /// 
-    /// * `labels.key` where key is the name of a label
-    /// 
-    /// Some examples of using filters are:
-    /// 
-    /// * `labels.env:*` --> The session has the label "env".
-    /// * `labels.env:dev` --> The session has the label "env" and the value of
-    ///   the label contains the string "dev".
-    ///
-    /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectInstanceDatabaseSessionListCall<'a, C, A> {
-        self._filter = Some(new_value.to_string());
+    pub fn name(mut self, new_value: &str) -> ProjectInstanceBackupOperationCancelCall<'a, C, A> {
+        self._name = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -13052,7 +17101,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionListCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceDatabaseSessionListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceBackupOperationCancelCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13077,7 +17126,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionListCall<'a, C, A> where C: BorrowM
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceBackupOperationCancelCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13097,7 +17146,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionListCall<'a, C, A> where C: BorrowM
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseSessionListCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceBackupOperationCancelCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13146,9 +17195,9 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionListCall<'a, C, A> where C: BorrowM
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().instances_databases_operations_list("name")
-///              .page_token("duo")
-///              .page_size(-21)
-///              .filter("eirmod")
+///              .page_token("justo")
+///              .page_size(-52)
+///              .filter("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -13716,6 +17765,8 @@ impl<'a, C, A> ProjectInstanceCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
 /// Drops (aka deletes) a Cloud Spanner database.
+/// Completed backups for the database will be retained according to their
+/// `expire_time`.
 ///
 /// A builder for the *instances.databases.dropDatabase* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -13952,6 +18003,256 @@ impl<'a, C, A> ProjectInstanceDatabaseDropDatabaseCall<'a, C, A> where C: Borrow
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseDropDatabaseCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets the latest state of a long-running operation.  Clients can use this
+/// method to poll the operation result at intervals as recommended by the API
+/// service.
+///
+/// A builder for the *instances.backups.operations.get* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_spanner1 as spanner1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use spanner1::Spanner;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_backups_operations_get("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceBackupOperationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Spanner<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceBackupOperationGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceBackupOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.backups.operations.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the operation resource.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectInstanceBackupOperationGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceBackupOperationGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceBackupOperationGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceBackupOperationGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14214,6 +18515,302 @@ impl<'a, C, A> ProjectInstanceOperationDeleteCall<'a, C, A> where C: BorrowMut<h
 }
 
 
+/// Lists all sessions in a given database.
+///
+/// A builder for the *instances.databases.sessions.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_spanner1 as spanner1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use spanner1::Spanner;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_databases_sessions_list("database")
+///              .page_token("sadipscing")
+///              .page_size(-88)
+///              .filter("consetetur")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceDatabaseSessionListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Spanner<C, A>,
+    _database: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceDatabaseSessionListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceDatabaseSessionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListSessionsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.sessions.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("database", self._database.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "database", "pageToken", "pageSize", "filter"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+database}/sessions";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+database}", "database")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["database"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The database in which to list sessions.
+    ///
+    /// Sets the *database* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn database(mut self, new_value: &str) -> ProjectInstanceDatabaseSessionListCall<'a, C, A> {
+        self._database = new_value.to_string();
+        self
+    }
+    /// If non-empty, `page_token` should contain a
+    /// next_page_token from a previous
+    /// ListSessionsResponse.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectInstanceDatabaseSessionListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Number of sessions to be returned in the response. If 0 or less, defaults
+    /// to the server's maximum allowed page size.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectInstanceDatabaseSessionListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// An expression for filtering the results of the request. Filter rules are
+    /// case insensitive. The fields eligible for filtering are:
+    /// 
+    /// * `labels.key` where key is the name of a label
+    /// 
+    /// Some examples of using filters are:
+    /// 
+    /// * `labels.env:*` --> The session has the label "env".
+    /// * `labels.env:dev` --> The session has the label "env" and the value of
+    ///   the label contains the string "dev".
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectInstanceDatabaseSessionListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceDatabaseSessionListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseSessionListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Deletes a long-running operation. This method indicates that the client is
 /// no longer interested in the operation result. It does not cancel the
 /// operation. If the server doesn't support this method, it returns
@@ -14465,19 +19062,297 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> where C: Bor
 }
 
 
-/// Deletes an instance.
+/// Gets the access control policy for a database or backup resource.
+/// Returns an empty policy if a database or backup exists but does not have a
+/// policy set.
 /// 
-/// Immediately upon completion of the request:
-/// 
-/// * Billing ceases for all of the instance's reserved resources.
-/// 
-/// Soon afterward:
-/// 
-/// * The instance and *all of its databases* immediately and
-///   irrevocably disappear from the API. All data in the databases
-///   is permanently deleted.
+/// Authorization requires `spanner.databases.getIamPolicy` permission on
+/// resource.
+/// For backups, authorization requires `spanner.backups.getIamPolicy`
+/// permission on resource.
 ///
-/// A builder for the *instances.delete* method supported by a *project* resource.
+/// A builder for the *instances.databases.getIamPolicy* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_spanner1 as spanner1;
+/// use spanner1::GetIamPolicyRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use spanner1::Spanner;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GetIamPolicyRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_databases_get_iam_policy(req, "resource")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Spanner<C, A>,
+    _request: GetIamPolicyRequest,
+    _resource: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.getIamPolicy",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resource"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The Cloud Spanner resource for which the policy is being retrieved. The format is `projects/<project ID>/instances/<instance ID>` for instance resources and `projects/<project ID>/instances/<instance ID>/databases/<database ID>` for database resources.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists completed and pending backups.
+/// Backups returned are ordered by `create_time` in descending order,
+/// starting from the most recent `create_time`.
+///
+/// A builder for the *instances.backups.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -14502,27 +19377,33 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> where C: Bor
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().instances_delete("name")
+/// let result = hub.projects().instances_backups_list("parent")
+///              .page_token("Lorem")
+///              .page_size(-17)
+///              .filter("clita")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectInstanceDeleteCall<'a, C, A>
+pub struct ProjectInstanceBackupListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Spanner<C, A>,
-    _name: String,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _filter: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectInstanceDeleteCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectInstanceBackupListCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectInstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectInstanceBackupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListBackupsResponse)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -14531,11 +19412,20 @@ impl<'a, C, A> ProjectInstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "spanner.projects.instances.delete",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.backups.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -14547,12 +19437,12 @@ impl<'a, C, A> ProjectInstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/backups";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -14567,7 +19457,7 @@ impl<'a, C, A> ProjectInstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -14597,7 +19487,7 @@ impl<'a, C, A> ProjectInstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -14650,15 +19540,73 @@ impl<'a, C, A> ProjectInstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// Required. The name of the instance to be deleted. Values are of the form
-    /// `projects/<project>/instances/<instance>`
+    /// Required. The instance to list backups from.  Values are of the
+    /// form `projects/<project>/instances/<instance>`.
     ///
-    /// Sets the *name* path property to the given value.
+    /// Sets the *parent* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectInstanceDeleteCall<'a, C, A> {
-        self._name = new_value.to_string();
+    pub fn parent(mut self, new_value: &str) -> ProjectInstanceBackupListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// If non-empty, `page_token` should contain a
+    /// next_page_token from a
+    /// previous ListBackupsResponse to the same `parent` and with the same
+    /// `filter`.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectInstanceBackupListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Number of backups to be returned in the response. If 0 or
+    /// less, defaults to the server's maximum allowed page size.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectInstanceBackupListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// An expression that filters the list of returned backups.
+    /// 
+    /// A filter expression consists of a field name, a comparison operator, and a
+    /// value for filtering.
+    /// The value must be a string, a number, or a boolean. The comparison operator
+    /// must be one of: `<`, `>`, `<=`, `>=`, `!=`, `=`, or `:`.
+    /// Colon `:` is the contains operator. Filter rules are not case sensitive.
+    /// 
+    /// The following fields in the Backup are eligible for filtering:
+    /// 
+    /// * `name`
+    /// * `database`
+    /// * `state`
+    /// * `create_time` (and values are of the format YYYY-MM-DDTHH:MM:SSZ)
+    /// * `expire_time` (and values are of the format YYYY-MM-DDTHH:MM:SSZ)
+    /// * `size_bytes`
+    /// 
+    /// You can combine multiple expressions by enclosing each expression in
+    /// parentheses. By default, expressions are combined with AND logic, but
+    /// you can specify AND, OR, and NOT logic explicitly.
+    /// 
+    /// Here are a few examples:
+    /// 
+    /// * `name:Howl` - The backup's name contains the string "howl".
+    /// * `database:prod`
+    ///   - The database's name contains the string "prod".
+    /// * `state:CREATING` - The backup is pending creation.
+    /// * `state:READY` - The backup is fully created and ready for use.
+    /// * `(name:howl) AND (create_time < \"2018-03-28T14:50:00Z\")`
+    ///   - The backup name contains the string "howl" and `create_time`
+    ///   of the backup is before 2018-03-28T14:50:00Z.
+    /// * `expire_time < \"2018-03-28T14:50:00Z\"`
+    ///   - The backup `expire_time` is before 2018-03-28T14:50:00Z.
+    /// * `size_bytes > 10000000000` - The backup's size is greater than 10GB
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectInstanceBackupListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -14667,7 +19615,7 @@ impl<'a, C, A> ProjectInstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceBackupListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14692,7 +19640,7 @@ impl<'a, C, A> ProjectInstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDeleteCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceBackupListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14712,7 +19660,295 @@ impl<'a, C, A> ProjectInstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDeleteCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceBackupListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Returns permissions that the caller has on the specified database or backup
+/// resource.
+/// 
+/// Attempting this RPC on a non-existent Cloud Spanner database will
+/// result in a NOT_FOUND error if the user has
+/// `spanner.databases.list` permission on the containing Cloud
+/// Spanner instance. Otherwise returns an empty set of permissions.
+/// Calling this method on a backup that does not exist will
+/// result in a NOT_FOUND error if the user has
+/// `spanner.backups.list` permission on the containing instance.
+///
+/// A builder for the *instances.backups.testIamPermissions* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_spanner1 as spanner1;
+/// use spanner1::TestIamPermissionsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use spanner1::Spanner;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = TestIamPermissionsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_backups_test_iam_permissions(req, "resource")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceBackupTestIamPermissionCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Spanner<C, A>,
+    _request: TestIamPermissionsRequest,
+    _resource: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceBackupTestIamPermissionCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceBackupTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, TestIamPermissionsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.backups.testIamPermissions",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:testIamPermissions";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resource"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectInstanceBackupTestIamPermissionCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The Cloud Spanner resource for which permissions are being tested. The format is `projects/<project ID>/instances/<instance ID>` for instance resources and `projects/<project ID>/instances/<instance ID>/databases/<database ID>` for database resources.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectInstanceBackupTestIamPermissionCall<'a, C, A> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceBackupTestIamPermissionCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceBackupTestIamPermissionCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceBackupTestIamPermissionCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15220,6 +20456,256 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionGetCall<'a, C, A> where C: BorrowMu
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseSessionGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes a pending or completed Backup.
+///
+/// A builder for the *instances.backups.delete* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_spanner1 as spanner1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use spanner1::Spanner;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_backups_delete("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceBackupDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Spanner<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceBackupDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceBackupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.backups.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Name of the backup to delete.
+    /// Values are of the form
+    /// `projects/<project>/instances/<instance>/backups/<backup>`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectInstanceBackupDeleteCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectInstanceBackupDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceBackupDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceBackupDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

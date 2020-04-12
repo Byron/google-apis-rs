@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *webfonts* API at revision *20160302*. The CLI is at version *1.0.12*.
+This documentation was generated from the *webfonts* API at revision *20200302*. The CLI is at version *1.0.13*.
 
 ```bash
 webfonts1 [options]

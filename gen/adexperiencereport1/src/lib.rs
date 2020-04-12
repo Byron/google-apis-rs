@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Ad Experience Report* crate version *1.0.12+20190624*, where *20190624* is the exact revision of the *adexperiencereport:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Ad Experience Report* crate version *1.0.13+20200405*, where *20200405* is the exact revision of the *adexperiencereport:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Ad Experience Report* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/ad-experience-report/).
@@ -220,28 +220,6 @@ pub use cmn::*;
 // UTILITIES ###
 // ############
 
-/// Identifies the an OAuth2 authorization scope.
-/// A scope is needed when requesting an
-/// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
-pub enum Scope {
-    /// Test scope for access to the Zoo service
-    XapiZoo,
-}
-
-impl AsRef<str> for Scope {
-    fn as_ref(&self) -> &str {
-        match *self {
-            Scope::XapiZoo => "https://www.googleapis.com/auth/xapi.zoo",
-        }
-    }
-}
-
-impl Default for Scope {
-    fn default() -> Scope {
-        Scope::XapiZoo
-    }
-}
 
 
 
@@ -319,7 +297,7 @@ impl<'a, C, A> AdExperienceReport<C, A>
         AdExperienceReport {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://adexperiencereport.googleapis.com/".to_string(),
             _root_url: "https://adexperiencereport.googleapis.com/".to_string(),
         }
@@ -333,7 +311,7 @@ impl<'a, C, A> AdExperienceReport<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -361,30 +339,48 @@ impl<'a, C, A> AdExperienceReport<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// Summary of the ad experience rating of a site for a specific platform.
+/// A site's Ad Experience Report summary on a single platform.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlatformSummary {
-    /// Whether the site is currently under review.
+    /// Whether the site is currently under review on this platform.
     #[serde(rename="underReview")]
     pub under_review: Option<bool>,
-    /// The date on which ad filtering begins.
+    /// The time at which
+    /// [enforcement](https://support.google.com/webtools/answer/7308033) against
+    /// the site began or will begin on this platform.
+    /// 
+    /// Not set when the
+    /// filter_status
+    /// is OFF.
     #[serde(rename="enforcementTime")]
     pub enforcement_time: Option<String>,
-    /// The last time that the site changed status.
+    /// The time at which the site's status last changed on this platform.
     #[serde(rename="lastChangeTime")]
     pub last_change_time: Option<String>,
-    /// The ad filtering status of the site.
+    /// The site's [enforcement
+    /// status](https://support.google.com/webtools/answer/7308033) on this
+    /// platform.
     #[serde(rename="filterStatus")]
     pub filter_status: Option<String>,
-    /// The assigned regions for the site and platform.
+    /// The site's regions on this platform.
+    /// 
+    /// No longer populated, because there is no longer any semantic difference
+    /// between sites in different regions.
     pub region: Option<Vec<String>>,
-    /// A link that leads to a full ad experience report.
+    /// A link to the full Ad Experience Report for the site on this platform..
+    /// 
+    /// Not set in
+    /// ViolatingSitesResponse.
+    /// 
+    /// Note that you must complete the [Search Console verification
+    /// process](https://support.google.com/webmasters/answer/9008080) for the site
+    /// before you can access the full report.
     #[serde(rename="reportUrl")]
     pub report_url: Option<String>,
-    /// The status of the site reviewed for the Better Ads Standards.
+    /// The site's Ad Experience Report status on this platform.
     #[serde(rename="betterAdsStatus")]
     pub better_ads_status: Option<String>,
 }
@@ -403,13 +399,13 @@ impl Part for PlatformSummary {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SiteSummaryResponse {
-    /// Summary for the desktop review of the site.
+    /// The site's Ad Experience Report summary on desktop.
     #[serde(rename="desktopSummary")]
     pub desktop_summary: Option<PlatformSummary>,
-    /// The name of the site reviewed.
+    /// The name of the reviewed site, e.g. `google.com`.
     #[serde(rename="reviewedSite")]
     pub reviewed_site: Option<String>,
-    /// Summary for the mobile review of the site.
+    /// The site's Ad Experience Report summary on mobile.
     #[serde(rename="mobileSummary")]
     pub mobile_summary: Option<PlatformSummary>,
 }
@@ -428,7 +424,7 @@ impl ResponseResult for SiteSummaryResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ViolatingSitesResponse {
-    /// A list of summaries of violating sites.
+    /// The list of violating sites.
     #[serde(rename="violatingSites")]
     pub violating_sites: Option<Vec<SiteSummaryResponse>>,
 }
@@ -482,23 +478,18 @@ impl<'a, C, A> SiteMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a summary of the ad experience rating of a site.
+    /// Gets a site's Ad Experience Report summary.
     /// 
     /// # Arguments
     ///
-    /// * `name` - The required site name. It should be the site property whose ad experiences
-    ///            may have been reviewed, and it should be URL-encoded. For example,
-    ///            sites/https%3A%2F%2Fwww.google.com. The server will return an error of
-    ///            BAD_REQUEST if this field is not filled in. Note that if the site property
-    ///            is not yet verified in Search Console, the reportUrl field returned by the
-    ///            API will lead to the verification page, prompting the user to go through
-    ///            that process before they can gain access to the Ad Experience Report.
+    /// * `name` - Required. The name of the site whose summary to get, e.g.
+    ///            `sites/http%3A%2F%2Fwww.google.com%2F`.
+    ///            Format: `sites/{site}`
     pub fn get(&self, name: &str) -> SiteGetCall<'a, C, A> {
         SiteGetCall {
             hub: self.hub,
             _name: name.to_string(),
             _delegate: Default::default(),
-            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -547,12 +538,12 @@ impl<'a, C, A> ViolatingSiteMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists sites with Ad Experience Report statuses of "Failing" or "Warning".
+    /// Lists sites that are failing in the Ad Experience Report on at least one
+    /// platform.
     pub fn list(&self) -> ViolatingSiteListCall<'a, C, A> {
         ViolatingSiteListCall {
             hub: self.hub,
             _delegate: Default::default(),
-            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -566,7 +557,7 @@ impl<'a, C, A> ViolatingSiteMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Gets a summary of the ad experience rating of a site.
+/// Gets a site's Ad Experience Report summary.
 ///
 /// A builder for the *get* method supported by a *site* resource.
 /// It is not used directly, but through a `SiteMethods` instance.
@@ -604,7 +595,6 @@ pub struct SiteGetCall<'a, C, A>
     _name: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for SiteGetCall<'a, C, A> {}
@@ -639,8 +629,17 @@ impl<'a, C, A> SiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::XapiZoo.as_ref().to_string(), ());
+        
+        let mut key = self.hub.auth.borrow_mut().api_key();
+        if key.is_none() {
+            key = dlg.api_key();
+        }
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(Error::MissingAPIKey)
+            }
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -673,24 +672,10 @@ impl<'a, C, A> SiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
 
         loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(UserAgent(self.hub._user_agent.clone()));
 
                 dlg.pre_request();
                 req.send()
@@ -741,13 +726,10 @@ impl<'a, C, A> SiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
-    /// The required site name. It should be the site property whose ad experiences
-    /// may have been reviewed, and it should be URL-encoded. For example,
-    /// sites/https%3A%2F%2Fwww.google.com. The server will return an error of
-    /// BAD_REQUEST if this field is not filled in. Note that if the site property
-    /// is not yet verified in Search Console, the reportUrl field returned by the
-    /// API will lead to the verification page, prompting the user to go through
-    /// that process before they can gain access to the Ad Experience Report.
+    /// Required. The name of the site whose summary to get, e.g.
+    /// `sites/http%3A%2F%2Fwww.google.com%2F`.
+    /// 
+    /// Format: `sites/{site}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -794,33 +776,11 @@ impl<'a, C, A> SiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         self
     }
 
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::XapiZoo`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
 }
 
 
-/// Lists sites with Ad Experience Report statuses of "Failing" or "Warning".
+/// Lists sites that are failing in the Ad Experience Report on at least one
+/// platform.
 ///
 /// A builder for the *list* method supported by a *violatingSite* resource.
 /// It is not used directly, but through a `ViolatingSiteMethods` instance.
@@ -857,7 +817,6 @@ pub struct ViolatingSiteListCall<'a, C, A>
     hub: &'a AdExperienceReport<C, A>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for ViolatingSiteListCall<'a, C, A> {}
@@ -890,8 +849,17 @@ impl<'a, C, A> ViolatingSiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "v1/violatingSites";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::XapiZoo.as_ref().to_string(), ());
+        
+        let mut key = self.hub.auth.borrow_mut().api_key();
+        if key.is_none() {
+            key = dlg.api_key();
+        }
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(Error::MissingAPIKey)
+            }
         }
 
 
@@ -900,24 +868,10 @@ impl<'a, C, A> ViolatingSiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
         loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(UserAgent(self.hub._user_agent.clone()));
 
                 dlg.pre_request();
                 req.send()
@@ -1005,29 +959,6 @@ impl<'a, C, A> ViolatingSiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self
     }
 
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::XapiZoo`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ViolatingSiteListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
 }
 
 

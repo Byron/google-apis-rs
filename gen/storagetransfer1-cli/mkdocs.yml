@@ -1,4 +1,4 @@
-site_name: storagetransfer v1.0.12+20190702
+site_name: storagetransfer v1.0.13+20200405
 site_url: http://byron.github.io/google-apis-rs/google-storagetransfer1-cli
 site_description: A complete library to interact with storagetransfer (protocol v1)
 
@@ -15,7 +15,6 @@ pages:
 - ['transfer-jobs_list.md', 'Transfer Jobs', 'List']
 - ['transfer-jobs_patch.md', 'Transfer Jobs', 'Patch']
 - ['transfer-operations_cancel.md', 'Transfer Operations', 'Cancel']
-- ['transfer-operations_delete.md', 'Transfer Operations', 'Delete']
 - ['transfer-operations_get.md', 'Transfer Operations', 'Get']
 - ['transfer-operations_list.md', 'Transfer Operations', 'List']
 - ['transfer-operations_pause.md', 'Transfer Operations', 'Pause']

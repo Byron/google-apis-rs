@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Scheduler* crate version *1.0.12+20190617*, where *20190617* is the exact revision of the *cloudscheduler:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Cloud Scheduler* crate version *1.0.13+20200331*, where *20200331* is the exact revision of the *cloudscheduler:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Cloud Scheduler* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/scheduler/).
@@ -336,7 +336,7 @@ impl<'a, C, A> CloudScheduler<C, A>
         CloudScheduler {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://cloudscheduler.googleapis.com/".to_string(),
             _root_url: "https://cloudscheduler.googleapis.com/".to_string(),
         }
@@ -347,7 +347,7 @@ impl<'a, C, A> CloudScheduler<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -651,9 +651,7 @@ pub struct PubsubTarget {
     /// Pubsub message must contain either non-empty data, or at least one
     /// attribute.
     pub data: Option<String>,
-    /// Required.
-    /// 
-    /// The name of the Cloud Pub/Sub topic to which messages will
+    /// Required. The name of the Cloud Pub/Sub topic to which messages will
     /// be published when a job is delivered. The topic name must be in the
     /// same format as required by PubSub's
     /// [PublishRequest.name](https://cloud.google.com/pubsub/docs/reference/rpc/google.pubsub.v1#publishrequest),
@@ -761,9 +759,7 @@ pub struct HttpTarget {
     /// yourself.
     #[serde(rename="oidcToken")]
     pub oidc_token: Option<OidcToken>,
-    /// Required.
-    /// 
-    /// The full URI path that the request will be sent to. This string
+    /// Required. The full URI path that the request will be sent to. This string
     /// must begin with either "http://" or "https://". Some examples of
     /// valid values for uri are:
     /// `http://acme.com` and `https://acme.com/sales:8080`. Cloud Scheduler will
@@ -1134,8 +1130,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required.
-    ///            The job name. For example:
+    /// * `name` - Required. The job name. For example:
     ///            `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`.
     pub fn locations_jobs_pause(&self, request: PauseJobRequest, name: &str) -> ProjectLocationJobPauseCall<'a, C, A> {
         ProjectLocationJobPauseCall {
@@ -1154,8 +1149,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required.
-    ///            The job name. For example:
+    /// * `name` - Required. The job name. For example:
     ///            `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`.
     pub fn locations_jobs_delete(&self, name: &str) -> ProjectLocationJobDeleteCall<'a, C, A> {
         ProjectLocationJobDeleteCall {
@@ -1173,8 +1167,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required.
-    ///            The job name. For example:
+    /// * `name` - Required. The job name. For example:
     ///            `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`.
     pub fn locations_jobs_get(&self, name: &str) -> ProjectLocationJobGetCall<'a, C, A> {
         ProjectLocationJobGetCall {
@@ -1193,8 +1186,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required.
-    ///              The location name. For example:
+    /// * `parent` - Required. The location name. For example:
     ///              `projects/PROJECT_ID/locations/LOCATION_ID`.
     pub fn locations_jobs_create(&self, request: Job, parent: &str) -> ProjectLocationJobCreateCall<'a, C, A> {
         ProjectLocationJobCreateCall {
@@ -1213,8 +1205,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required.
-    ///              The location name. For example:
+    /// * `parent` - Required. The location name. For example:
     ///              `projects/PROJECT_ID/locations/LOCATION_ID`.
     pub fn locations_jobs_list(&self, parent: &str) -> ProjectLocationJobListCall<'a, C, A> {
         ProjectLocationJobListCall {
@@ -1240,8 +1231,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required.
-    ///            The job name. For example:
+    /// * `name` - Required. The job name. For example:
     ///            `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`.
     pub fn locations_jobs_resume(&self, request: ResumeJobRequest, name: &str) -> ProjectLocationJobResumeCall<'a, C, A> {
         ProjectLocationJobResumeCall {
@@ -1264,8 +1254,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required.
-    ///            The job name. For example:
+    /// * `name` - Required. The job name. For example:
     ///            `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`.
     pub fn locations_jobs_run(&self, request: RunJobRequest, name: &str) -> ProjectLocationJobRunCall<'a, C, A> {
         ProjectLocationJobRunCall {
@@ -1578,9 +1567,7 @@ impl<'a, C, A> ProjectLocationJobPauseCall<'a, C, A> where C: BorrowMut<hyper::C
         self._request = new_value;
         self
     }
-    /// Required.
-    /// 
-    /// The job name. For example:
+    /// Required. The job name. For example:
     /// `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`.
     ///
     /// Sets the *name* path property to the given value.
@@ -1829,9 +1816,7 @@ impl<'a, C, A> ProjectLocationJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
-    /// Required.
-    /// 
-    /// The job name. For example:
+    /// Required. The job name. For example:
     /// `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`.
     ///
     /// Sets the *name* path property to the given value.
@@ -2080,9 +2065,7 @@ impl<'a, C, A> ProjectLocationJobGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// Required.
-    /// 
-    /// The job name. For example:
+    /// Required. The job name. For example:
     /// `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`.
     ///
     /// Sets the *name* path property to the given value.
@@ -2362,9 +2345,7 @@ impl<'a, C, A> ProjectLocationJobCreateCall<'a, C, A> where C: BorrowMut<hyper::
         self._request = new_value;
         self
     }
-    /// Required.
-    /// 
-    /// The location name. For example:
+    /// Required. The location name. For example:
     /// `projects/PROJECT_ID/locations/LOCATION_ID`.
     ///
     /// Sets the *parent* path property to the given value.
@@ -2623,9 +2604,7 @@ impl<'a, C, A> ProjectLocationJobListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
-    /// Required.
-    /// 
-    /// The location name. For example:
+    /// Required. The location name. For example:
     /// `projects/PROJECT_ID/locations/LOCATION_ID`.
     ///
     /// Sets the *parent* path property to the given value.
@@ -2935,9 +2914,7 @@ impl<'a, C, A> ProjectLocationJobResumeCall<'a, C, A> where C: BorrowMut<hyper::
         self._request = new_value;
         self
     }
-    /// Required.
-    /// 
-    /// The job name. For example:
+    /// Required. The job name. For example:
     /// `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`.
     ///
     /// Sets the *name* path property to the given value.
@@ -3220,9 +3197,7 @@ impl<'a, C, A> ProjectLocationJobRunCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._request = new_value;
         self
     }
-    /// Required.
-    /// 
-    /// The job name. For example:
+    /// Required. The job name. For example:
     /// `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`.
     ///
     /// Sets the *name* path property to the given value.

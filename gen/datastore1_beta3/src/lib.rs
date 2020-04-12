@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *datastore* crate version *1.0.12+20190421*, where *20190421* is the exact revision of the *datastore:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *datastore* crate version *1.0.13+20200311*, where *20200311* is the exact revision of the *datastore:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *datastore* *v1_beta3* API can be found at the
 //! [official documentation site](https://cloud.google.com/datastore/).
@@ -333,7 +333,7 @@ impl<'a, C, A> Datastore<C, A>
         Datastore {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://datastore.googleapis.com/".to_string(),
             _root_url: "https://datastore.googleapis.com/".to_string(),
         }
@@ -344,7 +344,7 @@ impl<'a, C, A> Datastore<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -418,7 +418,7 @@ impl Part for PartitionId {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LookupRequest {
-    /// Keys of entities to look up.
+    /// Required. Keys of entities to look up.
     pub keys: Option<Vec<Key>>,
     /// The options for this lookup request.
     #[serde(rename="readOptions")]
@@ -457,7 +457,7 @@ impl ResponseResult for BeginTransactionResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AllocateIdsRequest {
-    /// A list of keys with incomplete key paths for which to allocate IDs.
+    /// Required. A list of keys with incomplete key paths for which to allocate IDs.
     /// No key may be reserved/read-only.
     pub keys: Option<Vec<Key>>,
 }
@@ -781,7 +781,7 @@ impl Part for MutationResult {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReserveIdsRequest {
-    /// A list of keys with complete key paths whose numeric IDs should not be
+    /// Required. A list of keys with complete key paths whose numeric IDs should not be
     /// auto-allocated.
     pub keys: Option<Vec<Key>>,
     /// If not empty, the ID of the database against which to make the request.
@@ -1153,7 +1153,7 @@ impl Part for Entity {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RollbackRequest {
-    /// The transaction identifier, returned by a call to
+    /// Required. The transaction identifier, returned by a call to
     /// Datastore.BeginTransaction.
     pub transaction: Option<String>,
 }
@@ -1340,7 +1340,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - The ID of the project against which to make the request.
+    /// * `projectId` - Required. The ID of the project against which to make the request.
     pub fn run_query(&self, request: RunQueryRequest, project_id: &str) -> ProjectRunQueryCall<'a, C, A> {
         ProjectRunQueryCall {
             hub: self.hub,
@@ -1360,7 +1360,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - The ID of the project against which to make the request.
+    /// * `projectId` - Required. The ID of the project against which to make the request.
     pub fn reserve_ids(&self, request: ReserveIdsRequest, project_id: &str) -> ProjectReserveIdCall<'a, C, A> {
         ProjectReserveIdCall {
             hub: self.hub,
@@ -1379,7 +1379,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - The ID of the project against which to make the request.
+    /// * `projectId` - Required. The ID of the project against which to make the request.
     pub fn lookup(&self, request: LookupRequest, project_id: &str) -> ProjectLookupCall<'a, C, A> {
         ProjectLookupCall {
             hub: self.hub,
@@ -1399,7 +1399,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - The ID of the project against which to make the request.
+    /// * `projectId` - Required. The ID of the project against which to make the request.
     pub fn commit(&self, request: CommitRequest, project_id: &str) -> ProjectCommitCall<'a, C, A> {
         ProjectCommitCall {
             hub: self.hub,
@@ -1419,7 +1419,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - The ID of the project against which to make the request.
+    /// * `projectId` - Required. The ID of the project against which to make the request.
     pub fn allocate_ids(&self, request: AllocateIdsRequest, project_id: &str) -> ProjectAllocateIdCall<'a, C, A> {
         ProjectAllocateIdCall {
             hub: self.hub,
@@ -1438,7 +1438,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - The ID of the project against which to make the request.
+    /// * `projectId` - Required. The ID of the project against which to make the request.
     pub fn rollback(&self, request: RollbackRequest, project_id: &str) -> ProjectRollbackCall<'a, C, A> {
         ProjectRollbackCall {
             hub: self.hub,
@@ -1457,7 +1457,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - The ID of the project against which to make the request.
+    /// * `projectId` - Required. The ID of the project against which to make the request.
     pub fn begin_transaction(&self, request: BeginTransactionRequest, project_id: &str) -> ProjectBeginTransactionCall<'a, C, A> {
         ProjectBeginTransactionCall {
             hub: self.hub,
@@ -1680,7 +1680,7 @@ impl<'a, C, A> ProjectRunQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._request = new_value;
         self
     }
-    /// The ID of the project against which to make the request.
+    /// Required. The ID of the project against which to make the request.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -1956,7 +1956,7 @@ impl<'a, C, A> ProjectReserveIdCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// The ID of the project against which to make the request.
+    /// Required. The ID of the project against which to make the request.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -2231,7 +2231,7 @@ impl<'a, C, A> ProjectLookupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
-    /// The ID of the project against which to make the request.
+    /// Required. The ID of the project against which to make the request.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -2507,7 +2507,7 @@ impl<'a, C, A> ProjectCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
-    /// The ID of the project against which to make the request.
+    /// Required. The ID of the project against which to make the request.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -2783,7 +2783,7 @@ impl<'a, C, A> ProjectAllocateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._request = new_value;
         self
     }
-    /// The ID of the project against which to make the request.
+    /// Required. The ID of the project against which to make the request.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -3058,7 +3058,7 @@ impl<'a, C, A> ProjectRollbackCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._request = new_value;
         self
     }
-    /// The ID of the project against which to make the request.
+    /// Required. The ID of the project against which to make the request.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -3333,7 +3333,7 @@ impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::C
         self._request = new_value;
         self
     }
-    /// The ID of the project against which to make the request.
+    /// Required. The ID of the project against which to make the request.
     ///
     /// Sets the *project id* path property to the given value.
     ///

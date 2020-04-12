@@ -1138,6 +1138,7 @@ impl<'n> Engine<'n> {
                     "job-query.disable-spell-check" => Some(("jobQuery.disableSpellCheck", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "job-query.custom-attribute-filter" => Some(("jobQuery.customAttributeFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.employment-types" => Some(("jobQuery.employmentTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "job-query.query-language-code" => Some(("jobQuery.queryLanguageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.query" => Some(("jobQuery.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.publish-time-range.end-time" => Some(("jobQuery.publishTimeRange.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.publish-time-range.start-time" => Some(("jobQuery.publishTimeRange.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1178,7 +1179,7 @@ impl<'n> Engine<'n> {
                     "offset" => Some(("offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "disable-keyword-match" => Some(("disableKeywordMatch", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-imprecise-addresses", "commute-filter", "commute-method", "company-display-names", "company-names", "compensation-filter", "currency-code", "custom-attribute-filter", "departure-time", "device-info", "device-type", "disable-keyword-match", "disable-spell-check", "diversification-level", "domain", "employment-types", "enable-broadening", "end-time", "histogram-facets", "hours", "id", "include-jobs-with-unspecified-compensation-range", "job-categories", "job-query", "job-view", "language-codes", "latitude", "longitude", "max-compensation", "min-compensation", "minutes", "nanos", "offset", "order-by", "page-size", "page-token", "publish-time-range", "query", "range", "request-metadata", "require-precise-result-size", "road-traffic", "search-mode", "seconds", "session-id", "simple-histogram-facets", "start-coordinates", "start-time", "travel-duration", "type", "units", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-imprecise-addresses", "commute-filter", "commute-method", "company-display-names", "company-names", "compensation-filter", "currency-code", "custom-attribute-filter", "departure-time", "device-info", "device-type", "disable-keyword-match", "disable-spell-check", "diversification-level", "domain", "employment-types", "enable-broadening", "end-time", "histogram-facets", "hours", "id", "include-jobs-with-unspecified-compensation-range", "job-categories", "job-query", "job-view", "language-codes", "latitude", "longitude", "max-compensation", "min-compensation", "minutes", "nanos", "offset", "order-by", "page-size", "page-token", "publish-time-range", "query", "query-language-code", "range", "request-metadata", "require-precise-result-size", "road-traffic", "search-mode", "seconds", "session-id", "simple-histogram-facets", "start-coordinates", "start-time", "travel-duration", "type", "units", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1267,6 +1268,7 @@ impl<'n> Engine<'n> {
                     "job-query.disable-spell-check" => Some(("jobQuery.disableSpellCheck", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "job-query.custom-attribute-filter" => Some(("jobQuery.customAttributeFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.employment-types" => Some(("jobQuery.employmentTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "job-query.query-language-code" => Some(("jobQuery.queryLanguageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.query" => Some(("jobQuery.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.publish-time-range.end-time" => Some(("jobQuery.publishTimeRange.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job-query.publish-time-range.start-time" => Some(("jobQuery.publishTimeRange.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1307,7 +1309,7 @@ impl<'n> Engine<'n> {
                     "offset" => Some(("offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "disable-keyword-match" => Some(("disableKeywordMatch", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-imprecise-addresses", "commute-filter", "commute-method", "company-display-names", "company-names", "compensation-filter", "currency-code", "custom-attribute-filter", "departure-time", "device-info", "device-type", "disable-keyword-match", "disable-spell-check", "diversification-level", "domain", "employment-types", "enable-broadening", "end-time", "histogram-facets", "hours", "id", "include-jobs-with-unspecified-compensation-range", "job-categories", "job-query", "job-view", "language-codes", "latitude", "longitude", "max-compensation", "min-compensation", "minutes", "nanos", "offset", "order-by", "page-size", "page-token", "publish-time-range", "query", "range", "request-metadata", "require-precise-result-size", "road-traffic", "search-mode", "seconds", "session-id", "simple-histogram-facets", "start-coordinates", "start-time", "travel-duration", "type", "units", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-imprecise-addresses", "commute-filter", "commute-method", "company-display-names", "company-names", "compensation-filter", "currency-code", "custom-attribute-filter", "departure-time", "device-info", "device-type", "disable-keyword-match", "disable-spell-check", "diversification-level", "domain", "employment-types", "enable-broadening", "end-time", "histogram-facets", "hours", "id", "include-jobs-with-unspecified-compensation-range", "job-categories", "job-query", "job-view", "language-codes", "latitude", "longitude", "max-compensation", "min-compensation", "minutes", "nanos", "offset", "order-by", "page-size", "page-token", "publish-time-range", "query", "query-language-code", "range", "request-metadata", "require-precise-result-size", "road-traffic", "search-mode", "seconds", "session-id", "simple-histogram-facets", "start-coordinates", "start-time", "travel-duration", "type", "units", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1551,9 +1553,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required.
-        
-        Resource name of the project under which the company is created.
+                     Some(r##"Required. Resource name of the project under which the company is created.
         
         The format is "projects/{project_id}", for example,
         "projects/api-test-project"."##),
@@ -1585,9 +1585,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required.
-        
-        The resource name of the company to be deleted.
+                     Some(r##"Required. The resource name of the company to be deleted.
         
         The format is "projects/{project_id}/companies/{company_id}", for example,
         "projects/api-test-project/companies/foo"."##),
@@ -1612,9 +1610,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required.
-        
-        The resource name of the company to be retrieved.
+                     Some(r##"Required. The resource name of the company to be retrieved.
         
         The format is "projects/{project_id}/companies/{company_id}", for example,
         "projects/api-test-project/companies/foo"."##),
@@ -1639,9 +1635,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required.
-        
-        Resource name of the project under which the company is created.
+                     Some(r##"Required. Resource name of the project under which the company is created.
         
         The format is "projects/{project_id}", for example,
         "projects/api-test-project"."##),
@@ -1703,9 +1697,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required.
-        
-        Resource name of project the completion is performed within.
+                     Some(r##"Required. Resource name of project the completion is performed within.
         
         The format is "projects/{project_id}", for example,
         "projects/api-test-project"."##),
@@ -1730,9 +1722,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required.
-        
-        The resource name of the project under which the job is created.
+                     Some(r##"Required. The resource name of the project under which the job is created.
         
         The format is "projects/{project_id}", for example,
         "projects/api-test-project"."##),
@@ -1766,9 +1756,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required.
-        
-        The resource name of the project under which the job is created.
+                     Some(r##"Required. The resource name of the project under which the job is created.
         
         The format is "projects/{project_id}", for example,
         "projects/api-test-project"."##),
@@ -1802,9 +1790,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required.
-        
-        The resource name of the job to be deleted.
+                     Some(r##"Required. The resource name of the job to be deleted.
         
         The format is "projects/{project_id}/jobs/{job_id}",
         for example, "projects/api-test-project/jobs/1234"."##),
@@ -1830,9 +1816,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required.
-        
-        The resource name of the job to retrieve.
+                     Some(r##"Required. The resource name of the job to retrieve.
         
         The format is "projects/{project_id}/jobs/{job_id}",
         for example, "projects/api-test-project/jobs/1234"."##),
@@ -1857,9 +1841,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required.
-        
-        The resource name of the project under which the job is created.
+                     Some(r##"Required. The resource name of the project under which the job is created.
         
         The format is "projects/{project_id}", for example,
         "projects/api-test-project"."##),
@@ -1928,9 +1910,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required.
-        
-        The resource name of the project to search within.
+                     Some(r##"Required. The resource name of the project to search within.
         
         The format is "projects/{project_id}", for example,
         "projects/api-test-project"."##),
@@ -1970,9 +1950,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required.
-        
-        The resource name of the project to search within.
+                     Some(r##"Required. The resource name of the project to search within.
         
         The format is "projects/{project_id}", for example,
         "projects/api-test-project"."##),
@@ -2003,7 +1981,7 @@ fn main() {
     
     let mut app = App::new("jobs3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190702")
+           .version("1.0.13+20200409")
            .about("Cloud Talent Solution provides the capability to create, read, update, and delete job postings, as well as search jobs based on keywords and filters.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_jobs3_cli")

@@ -1,4 +1,4 @@
-site_name: Cloud Video Intelligence v1.0.12+20190626
+site_name: Cloud Video Intelligence v1.0.13+20200325
 site_url: http://byron.github.io/google-apis-rs/google-videointelligence1-cli
 site_description: A complete library to interact with Cloud Video Intelligence (protocol v1)
 
@@ -9,9 +9,6 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
-- ['operations_cancel.md', 'Operations', 'Cancel']
-- ['operations_delete.md', 'Operations', 'Delete']
-- ['operations_get.md', 'Operations', 'Get']
 - ['operations_projects-locations-operations-cancel.md', 'Operations', 'Projects Locations Operations Cancel']
 - ['operations_projects-locations-operations-delete.md', 'Operations', 'Projects Locations Operations Delete']
 - ['operations_projects-locations-operations-get.md', 'Operations', 'Projects Locations Operations Get']

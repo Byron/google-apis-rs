@@ -75,9 +75,6 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -127,9 +124,6 @@ impl<'n> Engine<'n> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -264,19 +258,15 @@ fn main() {
     let arg_data = [
         ("sites", "methods: 'get'", vec![
             ("get",
-                    Some(r##"Gets a summary of the abusive experience rating of a site."##),
+                    Some(r##"Gets a site's Abusive Experience Report summary."##),
                     "Details at http://byron.github.io/google-apis-rs/google_abusiveexperiencereport1_cli/sites_get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The required site name. This is the site property whose abusive
-        experiences have been reviewed, and it must be URL-encoded. For example,
-        sites/https%3A%2F%2Fwww.google.com. The server will return an error of
-        BAD_REQUEST if this field is not filled in. Note that if the site property
-        is not yet verified in Search Console, the reportUrl field
-        returned by the API will lead to the verification page, prompting the user
-        to go through that process before they can gain access to the Abusive
-        Experience Report."##),
+                     Some(r##"Required. The name of the site whose summary to get, e.g.
+        `sites/http%3A%2F%2Fwww.google.com%2F`.
+        
+        Format: `sites/{site}`"##),
                      Some(true),
                      Some(false)),
         
@@ -296,7 +286,7 @@ fn main() {
         
         ("violating-sites", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Lists sites with Abusive Experience Report statuses of "Failing"."##),
+                    Some(r##"Lists sites that are failing in the Abusive Experience Report."##),
                     "Details at http://byron.github.io/google-apis-rs/google_abusiveexperiencereport1_cli/violating-sites_list",
                   vec![
                     (Some(r##"v"##),
@@ -317,14 +307,9 @@ fn main() {
     
     let mut app = App::new("abusiveexperiencereport1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190624")
+           .version("1.0.13+20200405")
            .about("Views Abusive Experience Report data, and gets a list of sites that have a significant number of abusive experiences.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_abusiveexperiencereport1_cli")
-           .arg(Arg::with_name("url")
-                   .long("scope")
-                   .help("Specify the authentication a method should be executed in. Each scope requires the user to grant this application permission to use it.If unset, it defaults to the shortest scope url for a particular method.")
-                   .multiple(true)
-                   .takes_value(true))
            .arg(Arg::with_name("folder")
                    .long("config-dir")
                    .help("A directory into which we will store our persistent data. Defaults to a user-writable directory that we will create during the first invocation.[default: ~/.google-service-cli")

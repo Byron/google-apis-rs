@@ -4,11 +4,11 @@
 [package]
 
 name = "google-pagespeedonline5-cli"
-version = "1.0.12+20190507"
+version = "1.0.13+20200318"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
-description = "A complete library to interact with pagespeedonline (protocol v5)"
+description = "A complete library to interact with Pagespeed Insights (protocol v5)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/pagespeedonline5-cli"
-homepage = "https://developers.google.com/speed/docs/insights/v5/get-started"
+homepage = "https://developers.google.com/speed/docs/insights/v5/about"
 documentation = "http://byron.github.io/google-apis-rs/google_pagespeedonline5_cli"
 license = "MIT"
 keywords = ["pagespeedonline", "google", "cli"]
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-pagespeedonline5]
 path = "../pagespeedonline5"
-version = "1.0.12+20190507"
+version = "1.0.13+20200318"

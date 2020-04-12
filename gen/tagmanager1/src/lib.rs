@@ -2,10 +2,10 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Tag Manager* crate version *1.0.12+20190516*, where *20190516* is the exact revision of the *tagmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Tag Manager* crate version *1.0.13+20200408*, where *20200408* is the exact revision of the *tagmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Tag Manager* *v1* API can be found at the
-//! [official documentation site](https://developers.google.com/tag-manager/api/v1/).
+//! [official documentation site](https://developers.google.com/tag-manager).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/tagmanager1).
 //! # Features
 //! 
@@ -407,8 +407,8 @@ impl<'a, C, A> TagManager<C, A>
         TagManager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
-            _base_url: "https://www.googleapis.com/tagmanager/v1/".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _base_url: "https://www.googleapis.com/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
@@ -418,7 +418,7 @@ impl<'a, C, A> TagManager<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -426,7 +426,7 @@ impl<'a, C, A> TagManager<C, A>
     }
 
     /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/tagmanager/v1/`.
+    /// It defaults to `https://www.googleapis.com/`.
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
@@ -452,7 +452,10 @@ impl<'a, C, A> TagManager<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountAccess {
-    /// List of Account permissions. Valid account permissions are read and manage.
+    /// List of Account permissions.
+    /// Valid account permissions are <code>read</code> and <code>manage</code>.
+    /// @mutable tagmanager.accounts.permissions.create
+    /// @mutable tagmanager.accounts.permissions.update
     pub permission: Option<Vec<String>>,
 }
 
@@ -473,9 +476,13 @@ impl Part for AccountAccess {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Tag {
     /// The start timestamp in milliseconds to schedule a tag.
+    /// @mutable tagmanager.accounts.containers.tags.create
+    /// @mutable tagmanager.accounts.containers.tags.update
     #[serde(rename="scheduleStartMs")]
     pub schedule_start_ms: Option<String>,
     /// The end timestamp in milliseconds to schedule a tag.
+    /// @mutable tagmanager.accounts.containers.tags.create
+    /// @mutable tagmanager.accounts.containers.tags.update
     #[serde(rename="scheduleEndMs")]
     pub schedule_end_ms: Option<String>,
     /// GTM Container ID.
@@ -488,19 +495,32 @@ pub struct Tag {
     #[serde(rename="tagId")]
     pub tag_id: Option<String>,
     /// True if the tag is paused.
+    /// @mutable tagmanager.accounts.containers.tags.create
+    /// @mutable tagmanager.accounts.containers.tags.update
     pub paused: Option<bool>,
     /// The list of setup tags. Currently we only allow one.
     #[serde(rename="setupTag")]
     pub setup_tag: Option<Vec<SetupTag>>,
-    /// Blocking rule IDs. If any of the listed rules evaluate to true, the tag will not fire.
+    /// Blocking rule IDs. If any of the listed rules evaluate to true, the tag
+    /// will not fire.
+    /// @mutable tagmanager.accounts.containers.tags.create
+    /// @mutable tagmanager.accounts.containers.tags.update
     #[serde(rename="blockingRuleId")]
     pub blocking_rule_id: Option<Vec<String>>,
-    /// The fingerprint of the GTM Tag as computed at storage time. This value is recomputed whenever the tag is modified.
+    /// The fingerprint of the GTM Tag as computed at storage time.
+    /// This value is recomputed whenever the tag is modified.
     pub fingerprint: Option<String>,
-    /// Firing rule IDs. A tag will fire when any of the listed rules are true and all of its blockingRuleIds (if any specified) are false.
+    /// Firing rule IDs. A tag will fire when any of the listed rules are true and
+    /// all of its <code>blockingRuleIds</code> (if any specified) are false.
+    /// @mutable tagmanager.accounts.containers.tags.create
+    /// @mutable tagmanager.accounts.containers.tags.update
     #[serde(rename="firingRuleId")]
     pub firing_rule_id: Option<Vec<String>>,
-    /// Firing trigger IDs. A tag will fire when any of the listed triggers are true and all of its blockingTriggerIds (if any specified) are false.
+    /// Firing trigger IDs. A tag will fire when any of the listed triggers are
+    /// true and all of its <code>blockingTriggerIds</code> (if any specified) are
+    /// false.
+    /// @mutable tagmanager.accounts.containers.tags.create
+    /// @mutable tagmanager.accounts.containers.tags.update
     #[serde(rename="firingTriggerId")]
     pub firing_trigger_id: Option<Vec<String>>,
     /// GTM Account ID.
@@ -510,23 +530,42 @@ pub struct Tag {
     #[serde(rename="teardownTag")]
     pub teardown_tag: Option<Vec<TeardownTag>>,
     /// Tag display name.
+    /// @mutable tagmanager.accounts.containers.tags.create
+    /// @mutable tagmanager.accounts.containers.tags.update
     pub name: Option<String>,
     /// The tag's parameters.
+    /// @mutable tagmanager.accounts.containers.tags.create
+    /// @mutable tagmanager.accounts.containers.tags.update
     pub parameter: Option<Vec<Parameter>>,
     /// User notes on how to apply this tag in the container.
+    /// @mutable tagmanager.accounts.containers.tags.create
+    /// @mutable tagmanager.accounts.containers.tags.update
     pub notes: Option<String>,
     /// Parent folder id.
     #[serde(rename="parentFolderId")]
     pub parent_folder_id: Option<String>,
-    /// User defined numeric priority of the tag. Tags are fired asynchronously in order of priority. Tags with higher numeric value fire first. A tag's priority can be a positive or negative value. The default value is 0.
+    /// User defined numeric priority of the tag. Tags are fired asynchronously in
+    /// order of priority. Tags with higher numeric value fire first. A tag's
+    /// priority can be a positive or negative value. The default value is 0.
+    /// @mutable tagmanager.accounts.containers.tags.create
+    /// @mutable tagmanager.accounts.containers.tags.update
     pub priority: Option<Parameter>,
-    /// If set to true, this tag will only fire in the live environment (e.g. not in preview or debug mode).
+    /// If set to true, this tag will only fire in the live environment (e.g. not
+    /// in preview or debug mode).
+    /// @mutable tagmanager.accounts.containers.tags.create
+    /// @mutable tagmanager.accounts.containers.tags.update
     #[serde(rename="liveOnly")]
     pub live_only: Option<bool>,
     /// GTM Tag Type.
+    /// @mutable tagmanager.accounts.containers.tags.create
+    /// @mutable tagmanager.accounts.containers.tags.update
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Blocking trigger IDs. If any of the listed triggers evaluate to true, the tag will not fire.
+    /// Blocking trigger IDs. If any of the listed triggers evaluate to true, the
+    /// tag
+    /// will not fire.
+    /// @mutable tagmanager.accounts.containers.tags.create
+    /// @mutable tagmanager.accounts.containers.tags.update
     #[serde(rename="blockingTriggerId")]
     pub blocking_trigger_id: Option<Vec<String>>,
 }
@@ -549,12 +588,24 @@ impl ResponseResult for Tag {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Container {
     /// Container Time Zone ID.
+    /// @mutable tagmanager.accounts.containers.create
+    /// @mutable tagmanager.accounts.containers.update
     #[serde(rename="timeZoneId")]
     pub time_zone_id: Option<String>,
-    /// List of enabled built-in variables. Valid values include: pageUrl, pageHostname, pagePath, referrer, event, clickElement, clickClasses, clickId, clickTarget, clickUrl, clickText, formElement, formClasses, formId, formTarget, formUrl, formText, errorMessage, errorUrl, errorLine, newHistoryFragment, oldHistoryFragment, newHistoryState, oldHistoryState, historySource, containerVersion, debugMode, randomNumber, containerId.
+    /// List of enabled built-in variables. Valid values include: <code>pageUrl,
+    /// pageHostname, pagePath, referrer, event, clickElement, clickClasses,
+    /// clickId, clickTarget, clickUrl, clickText, formElement, formClasses,
+    /// formId, formTarget, formUrl, formText, errorMessage, errorUrl, errorLine,
+    /// newHistoryFragment, oldHistoryFragment, newHistoryState, oldHistoryState,
+    /// historySource, containerVersion, debugMode, randomNumber,
+    /// containerId</code>.
+    /// @mutable tagmanager.accounts.containers.create
+    /// @mutable tagmanager.accounts.containers.update
     #[serde(rename="enabledBuiltInVariable")]
     pub enabled_built_in_variable: Option<Vec<String>>,
     /// Container Country ID.
+    /// @mutable tagmanager.accounts.containers.create
+    /// @mutable tagmanager.accounts.containers.update
     #[serde(rename="timeZoneCountryId")]
     pub time_zone_country_id: Option<String>,
     /// Container Public ID.
@@ -564,16 +615,26 @@ pub struct Container {
     #[serde(rename="containerId")]
     pub container_id: Option<String>,
     /// Optional list of domain names associated with the Container.
+    /// @mutable tagmanager.accounts.containers.create
+    /// @mutable tagmanager.accounts.containers.update
     #[serde(rename="domainName")]
     pub domain_name: Option<Vec<String>>,
     /// Container Notes.
+    /// @mutable tagmanager.accounts.containers.create
+    /// @mutable tagmanager.accounts.containers.update
     pub notes: Option<String>,
     /// Container display name.
+    /// @mutable tagmanager.accounts.containers.create
+    /// @mutable tagmanager.accounts.containers.update
     pub name: Option<String>,
-    /// List of Usage Contexts for the Container. Valid values include: web, android, ios.
+    /// List of Usage Contexts for the Container. Valid values include: <code>web,
+    /// android, ios</code>.
+    /// @mutable tagmanager.accounts.containers.create
+    /// @mutable tagmanager.accounts.containers.update
     #[serde(rename="usageContext")]
     pub usage_context: Option<Vec<String>>,
-    /// The fingerprint of the GTM Container as computed at storage time. This value is recomputed whenever the account is modified.
+    /// The fingerprint of the GTM Container as computed at storage time.  This
+    /// value is recomputed whenever the account is modified.
     pub fingerprint: Option<String>,
     /// GTM Account ID.
     #[serde(rename="accountId")]
@@ -631,9 +692,13 @@ impl ResponseResult for PublishContainerVersionResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Macro {
     /// The start timestamp in milliseconds to schedule a macro.
+    /// @mutable tagmanager.accounts.containers.macros.create
+    /// @mutable tagmanager.accounts.containers.macros.update
     #[serde(rename="scheduleStartMs")]
     pub schedule_start_ms: Option<String>,
     /// The end timestamp in milliseconds to schedule a macro.
+    /// @mutable tagmanager.accounts.containers.macros.create
+    /// @mutable tagmanager.accounts.containers.macros.update
     #[serde(rename="scheduleEndMs")]
     pub schedule_end_ms: Option<String>,
     /// The Macro ID uniquely identifies the GTM Macro.
@@ -643,27 +708,44 @@ pub struct Macro {
     #[serde(rename="containerId")]
     pub container_id: Option<String>,
     /// The macro's parameters.
+    /// @mutable tagmanager.accounts.containers.macros.create
+    /// @mutable tagmanager.accounts.containers.macros.update
     pub parameter: Option<Vec<Parameter>>,
     /// User notes on how to apply this macro in the container.
+    /// @mutable tagmanager.accounts.containers.macros.create
+    /// @mutable tagmanager.accounts.containers.macros.update
     pub notes: Option<String>,
-    /// The fingerprint of the GTM Macro as computed at storage time. This value is recomputed whenever the macro is modified.
+    /// The fingerprint of the GTM Macro as computed at storage time.
+    /// This value is recomputed whenever the macro is modified.
     pub fingerprint: Option<String>,
-    /// For mobile containers only: A list of rule IDs for disabling conditional macros; the macro is enabled if one of the enabling rules is true while all the disabling rules are false. Treated as an unordered set.
+    /// For mobile containers only: A list of rule IDs for disabling conditional
+    /// macros; the macro is enabled if one of the enabling rules is true while all
+    /// the disabling rules are false. Treated as an unordered set.
+    /// @mutable tagmanager.accounts.containers.macros.create
+    /// @mutable tagmanager.accounts.containers.macros.update
     #[serde(rename="disablingRuleId")]
     pub disabling_rule_id: Option<Vec<String>>,
-    /// For mobile containers only: A list of rule IDs for enabling conditional macros; the macro is enabled if one of the enabling rules is true while all the disabling rules are false. Treated as an unordered set.
+    /// For mobile containers only: A list of rule IDs for enabling conditional
+    /// macros; the macro is enabled if one of the enabling rules is true while all
+    /// the disabling rules are false. Treated as an unordered set.
+    /// @mutable tagmanager.accounts.containers.macros.create
+    /// @mutable tagmanager.accounts.containers.macros.update
     #[serde(rename="enablingRuleId")]
     pub enabling_rule_id: Option<Vec<String>>,
     /// GTM Account ID.
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// GTM Macro Type.
+    /// @mutable tagmanager.accounts.containers.macros.create
+    /// @mutable tagmanager.accounts.containers.macros.update
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Parent folder id.
     #[serde(rename="parentFolderId")]
     pub parent_folder_id: Option<String>,
     /// Macro display name.
+    /// @mutable tagmanager.accounts.containers.macros.create
+    /// @mutable tagmanager.accounts.containers.macros.update
     pub name: Option<String>,
 }
 
@@ -748,14 +830,19 @@ impl ResponseResult for ListVariablesResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Account {
     /// Whether the account shares data anonymously with Google and others.
+    /// @mutable tagmanager.accounts.create
+    /// @mutable tagmanager.accounts.update
     #[serde(rename="shareData")]
     pub share_data: Option<bool>,
     /// The Account ID uniquely identifies the GTM Account.
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Account display name.
+    /// @mutable tagmanager.accounts.create
+    /// @mutable tagmanager.accounts.update
     pub name: Option<String>,
-    /// The fingerprint of the GTM Account as computed at storage time. This value is recomputed whenever the account is modified.
+    /// The fingerprint of the GTM Account as computed at storage time.
+    /// This value is recomputed whenever the account is modified.
     pub fingerprint: Option<String>,
 }
 
@@ -774,15 +861,22 @@ pub struct Rule {
     #[serde(rename="containerId")]
     pub container_id: Option<String>,
     /// Rule display name.
+    /// @mutable tagmanager.accounts.containers.rules.create
+    /// @mutable tagmanager.accounts.containers.rules.update
     pub name: Option<String>,
     /// The Rule ID uniquely identifies the GTM Rule.
     #[serde(rename="ruleId")]
     pub rule_id: Option<String>,
     /// User notes on how to apply this rule in the container.
+    /// @mutable tagmanager.accounts.containers.rules.create
+    /// @mutable tagmanager.accounts.containers.rules.update
     pub notes: Option<String>,
-    /// The fingerprint of the GTM Rule as computed at storage time. This value is recomputed whenever the rule is modified.
+    /// The fingerprint of the GTM Rule as computed at storage time.
+    /// This value is recomputed whenever the rule is modified.
     pub fingerprint: Option<String>,
     /// The list of conditions that make up this rule (implicit AND between them).
+    /// @mutable tagmanager.accounts.containers.rules.create
+    /// @mutable tagmanager.accounts.containers.rules.update
     pub condition: Option<Vec<Condition>>,
     /// GTM Account ID.
     #[serde(rename="accountId")]
@@ -810,7 +904,9 @@ pub struct ListAccountsResponse {
 impl ResponseResult for ListAccountsResponse {}
 
 
-/// Represents a Google Tag Manager Environment. Note that a user can create, delete and update environments of type USER, but can only update the enable_debug and url fields of environments of other types.
+/// Represents a Google Tag Manager Environment. Note that a user can create,
+/// delete and update environments of type USER, but can only update the
+/// enable_debug and url fields of environments of other types.
 /// 
 /// # Activities
 /// 
@@ -827,14 +923,21 @@ pub struct Environment {
     /// The environment authorization code.
     #[serde(rename="authorizationCode")]
     pub authorization_code: Option<String>,
-    /// The environment description. Can be set or changed only on USER type environments.
+    /// The environment description. Can be set or changed only on USER type
+    /// environments.
+    /// @mutable tagmanager.accounts.containers.environments.create
+    /// @mutable tagmanager.accounts.containers.environments.update
     pub description: Option<String>,
     /// GTM Environment ID uniquely identifies the GTM Environment.
     #[serde(rename="environmentId")]
     pub environment_id: Option<String>,
     /// Default preview page url for the environment.
+    /// @mutable tagmanager.accounts.containers.environments.create
+    /// @mutable tagmanager.accounts.containers.environments.update
     pub url: Option<String>,
     /// Whether or not to enable debug by default on for the environment.
+    /// @mutable tagmanager.accounts.containers.environments.create
+    /// @mutable tagmanager.accounts.containers.environments.update
     #[serde(rename="enableDebug")]
     pub enable_debug: Option<bool>,
     /// GTM Container ID.
@@ -843,10 +946,11 @@ pub struct Environment {
     /// The last update time-stamp for the authorization code.
     #[serde(rename="authorizationTimestampMs")]
     pub authorization_timestamp_ms: Option<String>,
-    /// 
+    /// no description provided
     #[serde(rename="containerVersionId")]
     pub container_version_id: Option<String>,
-    /// The fingerprint of the GTM environment as computed at storage time. This value is recomputed whenever the environment is modified.
+    /// The fingerprint of the GTM environment as computed at storage time.
+    /// This value is recomputed whenever the environment is modified.
     pub fingerprint: Option<String>,
     /// GTM Account ID.
     #[serde(rename="accountId")]
@@ -854,7 +958,10 @@ pub struct Environment {
     /// The type of this environment.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// The environment display name. Can be set or changed only on USER type environments.
+    /// The environment display name. Can be set or changed only on USER type
+    /// environments.
+    /// @mutable tagmanager.accounts.containers.environments.create
+    /// @mutable tagmanager.accounts.containers.environments.update
     pub name: Option<String>,
 }
 
@@ -910,7 +1017,9 @@ pub struct ContainerVersion {
     /// The macros in the container that this version was taken from.
     #[serde(rename="macro")]
     pub macro_: Option<Vec<Macro>>,
-    /// User notes on how to apply this container version in the container.
+    /// User notes on how to apply this container version in the
+    /// container.
+    /// @mutable tagmanager.accounts.containers.versions.update
     pub notes: Option<String>,
     /// The rules in the container that this version was taken from.
     pub rule: Option<Vec<Rule>>,
@@ -919,7 +1028,9 @@ pub struct ContainerVersion {
     /// The Container Version ID uniquely identifies the GTM Container Version.
     #[serde(rename="containerVersionId")]
     pub container_version_id: Option<String>,
-    /// The fingerprint of the GTM Container Version as computed at storage time. This value is recomputed whenever the container version is modified.
+    /// The fingerprint of the GTM Container Version as computed at
+    /// storage time. This value is recomputed whenever the container version is
+    /// modified.
     pub fingerprint: Option<String>,
     /// The variables in the container that this version was taken from.
     pub variable: Option<Vec<Variable>>,
@@ -929,6 +1040,7 @@ pub struct ContainerVersion {
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// Container version display name.
+    /// @mutable tagmanager.accounts.containers.versions.update
     pub name: Option<String>,
 }
 
@@ -965,9 +1077,14 @@ impl ResponseResult for CreateContainerVersionResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContainerAccess {
     /// GTM Container ID.
+    /// @mutable tagmanager.accounts.permissions.create
+    /// @mutable tagmanager.accounts.permissions.update
     #[serde(rename="containerId")]
     pub container_id: Option<String>,
-    /// List of Container permissions. Valid container permissions are: read, edit, delete, publish.
+    /// List of Container permissions.
+    /// Valid container permissions are: <code>read, edit, delete, publish</code>.
+    /// @mutable tagmanager.accounts.permissions.create
+    /// @mutable tagmanager.accounts.permissions.update
     pub permission: Option<Vec<String>>,
 }
 
@@ -988,12 +1105,17 @@ impl Part for ContainerAccess {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserAccess {
     /// GTM Container access permissions.
+    /// @mutable tagmanager.accounts.permissions.create
+    /// @mutable tagmanager.accounts.permissions.update
     #[serde(rename="containerAccess")]
     pub container_access: Option<Vec<ContainerAccess>>,
     /// GTM Account access permissions.
+    /// @mutable tagmanager.accounts.permissions.create
+    /// @mutable tagmanager.accounts.permissions.update
     #[serde(rename="accountAccess")]
     pub account_access: Option<AccountAccess>,
     /// User's email address.
+    /// @mutable tagmanager.accounts.permissions.create
     #[serde(rename="emailAddress")]
     pub email_address: Option<String>,
     /// Account Permission ID.
@@ -1032,8 +1154,11 @@ pub struct Folder {
     #[serde(rename="containerId")]
     pub container_id: Option<String>,
     /// Folder display name.
+    /// @mutable tagmanager.accounts.containers.folders.create
+    /// @mutable tagmanager.accounts.containers.folders.update
     pub name: Option<String>,
-    /// The fingerprint of the GTM Folder as computed at storage time. This value is recomputed whenever the folder is modified.
+    /// The fingerprint of the GTM Folder as computed at storage time.
+    /// This value is recomputed whenever the folder is modified.
     pub fingerprint: Option<String>,
 }
 
@@ -1048,20 +1173,62 @@ impl ResponseResult for Folder {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Parameter {
     /// This map parameter's parameters (must have keys; keys must be unique).
+    /// @mutable tagmanager.accounts.containers.variables.create
+    /// @mutable tagmanager.accounts.containers.variables.update
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
+    /// @mutable tagmanager.accounts.containers.tags.create
+    /// @mutable tagmanager.accounts.containers.tags.update
     pub map: Option<Vec<Parameter>>,
     /// This list parameter's parameters (keys will be ignored).
+    /// @mutable tagmanager.accounts.containers.variables.create
+    /// @mutable tagmanager.accounts.containers.variables.update
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
+    /// @mutable tagmanager.accounts.containers.tags.create
+    /// @mutable tagmanager.accounts.containers.tags.update
     pub list: Option<Vec<Parameter>>,
-    /// The named key that uniquely identifies a parameter. Required for top-level parameters, as well as map values. Ignored for list values.
+    /// The named key that uniquely identifies a parameter.  Required for top-level
+    /// parameters, as well as map values.  Ignored for list values.
+    /// @mutable tagmanager.accounts.containers.variables.create
+    /// @mutable tagmanager.accounts.containers.variables.update
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
+    /// @mutable tagmanager.accounts.containers.tags.create
+    /// @mutable tagmanager.accounts.containers.tags.update
     pub key: Option<String>,
-    /// A parameter's value (may contain variable references such as "{{myVariable}}") as appropriate to the specified type.
+    /// A parameter's value (may contain variable references such as
+    /// "{{myVariable}}")
+    /// as appropriate to the specified type.
+    /// @mutable tagmanager.accounts.containers.variables.create
+    /// @mutable tagmanager.accounts.containers.variables.update
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
+    /// @mutable tagmanager.accounts.containers.tags.create
+    /// @mutable tagmanager.accounts.containers.tags.update
     pub value: Option<String>,
-    /// The parameter type. Valid values are: 
-    /// - boolean: The value represents a boolean, represented as 'true' or 'false' 
-    /// - integer: The value represents a 64-bit signed integer value, in base 10 
-    /// - list: A list of parameters should be specified 
-    /// - map: A map of parameters should be specified 
-    /// - template: The value represents any text; this can include variable references (even variable references that might return non-string types) 
-    /// - trigger_reference: The value represents a trigger, represented as the trigger id
+    /// The parameter type.  Valid values are:<ul>
+    /// 
+    /// <li><code>boolean</code>: The value represents a boolean, represented as
+    ///     'true' or 'false'</li>
+    /// <li><code>integer</code>: The value represents a 64-bit signed integer
+    ///     value, in base 10</li>
+    /// <li><code>list</code>: A list of parameters should be specified</li>
+    /// <li><code>map</code>: A map of parameters should be specified</li>
+    /// <li><code>template</code>: The value represents any text; this can include
+    ///     variable references (even variable references that might return
+    ///     non-string types)</li>
+    /// <li><code>trigger_reference</code>: The value represents a trigger,
+    ///     represented as the trigger id</li>
+    /// <li><code>tag_reference</code>: The value represents a tag, represented as
+    ///     the tag name</li>
+    /// </ul>
+    /// @mutable tagmanager.accounts.containers.variables.create
+    /// @mutable tagmanager.accounts.containers.variables.update
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
+    /// @mutable tagmanager.accounts.containers.tags.create
+    /// @mutable tagmanager.accounts.containers.tags.update
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
@@ -1100,81 +1267,156 @@ impl ResponseResult for ListTagsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Trigger {
-    /// Max time to fire Timer Events (in seconds). Only valid for AMP Timer trigger.
+    /// Max time to fire Timer Events (in seconds). Only valid for AMP Timer
+    /// trigger.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="maxTimerLengthSeconds")]
     pub max_timer_length_seconds: Option<Parameter>,
-    /// A visibility trigger minimum continuous visible time (in milliseconds). Only valid for AMP Visibility trigger.
+    /// A visibility trigger minimum continuous visible time (in milliseconds).
+    /// Only valid for AMP Visibility trigger.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="continuousTimeMinMilliseconds")]
     pub continuous_time_min_milliseconds: Option<Parameter>,
-    /// A visibility trigger minimum total visible time (in milliseconds). Only valid for AMP Visibility trigger.
+    /// A visibility trigger minimum total visible time (in milliseconds).
+    /// Only valid for AMP Visibility trigger.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="totalTimeMinMilliseconds")]
     pub total_time_min_milliseconds: Option<Parameter>,
-    /// Globally unique id of the trigger that auto-generates this (a Form Submit, Link Click or Timer listener) if any. Used to make incompatible auto-events work together with trigger filtering based on trigger ids. This value is populated during output generation since the tags implied by triggers don't exist until then. Only valid for Form Submit, Link Click and Timer triggers.
+    /// Globally unique id of the trigger that auto-generates this (a Form Submit,
+    /// Link Click or Timer listener) if any. Used to make incompatible auto-events
+    /// work together with trigger filtering based on trigger ids. This value is
+    /// populated during output generation since the tags implied by triggers don't
+    /// exist until then. Only valid for Form Submit, Link Click and Timer
+    /// triggers.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="uniqueTriggerId")]
     pub unique_trigger_id: Option<Parameter>,
-    /// List of integer percentage values for scroll triggers. The trigger will fire when each percentage is reached when the view is scrolled vertically. Only valid for AMP scroll triggers.
+    /// List of integer percentage values for scroll triggers. The trigger will
+    /// fire when each percentage is reached when the view is scrolled vertically.
+    /// Only valid for AMP scroll triggers.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="verticalScrollPercentageList")]
     pub vertical_scroll_percentage_list: Option<Parameter>,
-    /// A click trigger CSS selector (i.e. "a", "button" etc.). Only valid for AMP Click trigger.
+    /// A click trigger CSS selector (i.e. "a", "button" etc.). Only valid for AMP
+    /// Click trigger.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     pub selector: Option<Parameter>,
     /// The Trigger ID uniquely identifies the GTM Trigger.
     #[serde(rename="triggerId")]
     pub trigger_id: Option<String>,
-    /// List of integer percentage values for scroll triggers. The trigger will fire when each percentage is reached when the view is scrolled horizontally. Only valid for AMP scroll triggers.
+    /// List of integer percentage values for scroll triggers. The trigger will
+    /// fire when each percentage is reached when the view is scrolled
+    /// horizontally. Only valid for AMP scroll triggers.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="horizontalScrollPercentageList")]
     pub horizontal_scroll_percentage_list: Option<Parameter>,
     /// GTM Container ID.
     #[serde(rename="containerId")]
     pub container_id: Option<String>,
-    /// The fingerprint of the GTM Trigger as computed at storage time. This value is recomputed whenever the trigger is modified.
+    /// The fingerprint of the GTM Trigger as computed at storage time.
+    /// This value is recomputed whenever the trigger is modified.
     pub fingerprint: Option<String>,
-    /// A visibility trigger maximum percent visibility. Only valid for AMP Visibility trigger.
+    /// A visibility trigger maximum percent visibility. Only valid for AMP
+    /// Visibility trigger.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="visiblePercentageMax")]
     pub visible_percentage_max: Option<Parameter>,
     /// GTM Account ID.
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// The trigger will only fire iff all Conditions are true.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     pub filter: Option<Vec<Condition>>,
-    /// Whether or not we should delay the form submissions or link opening until all of the tags have fired (by preventing the default action and later simulating the default action). Only valid for Form Submission and Link Click triggers.
+    /// Whether or not we should delay the form submissions or link opening
+    /// until all of the tags have fired (by preventing the default
+    /// action and later simulating the default action). Only valid for
+    /// Form Submission and Link Click triggers.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="waitForTags")]
     pub wait_for_tags: Option<Parameter>,
     /// Trigger display name.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     pub name: Option<String>,
-    /// A visibility trigger minimum percent visibility. Only valid for AMP Visibility trigger.
+    /// A visibility trigger minimum percent visibility. Only valid for AMP
+    /// Visibility trigger.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="visiblePercentageMin")]
     pub visible_percentage_min: Option<Parameter>,
     /// Defines the data layer event that causes this trigger.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Time between triggering recurring Timer Events (in milliseconds). Only valid for Timer triggers.
+    /// Time between triggering recurring Timer Events (in milliseconds). Only
+    /// valid for Timer triggers.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     pub interval: Option<Parameter>,
-    /// Time between Timer Events to fire (in seconds). Only valid for AMP Timer trigger.
+    /// Time between Timer Events to fire (in seconds). Only valid for AMP Timer
+    /// trigger.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="intervalSeconds")]
     pub interval_seconds: Option<Parameter>,
     /// Name of the GTM event that is fired. Only valid for Timer triggers.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="eventName")]
     pub event_name: Option<Parameter>,
-    /// A visibility trigger CSS selector (i.e. "#id"). Only valid for AMP Visibility trigger.
+    /// A visibility trigger CSS selector (i.e. "#id"). Only valid for AMP
+    /// Visibility trigger.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="visibilitySelector")]
     pub visibility_selector: Option<Parameter>,
-    /// How long to wait (in milliseconds) for tags to fire when 'waits_for_tags' above evaluates to true. Only valid for Form Submission and Link Click triggers.
+    /// How long to wait (in milliseconds) for tags to fire when 'waits_for_tags'
+    /// above evaluates to <code>true</code>.  Only valid for Form Submission and
+    /// Link Click triggers.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="waitForTagsTimeout")]
     pub wait_for_tags_timeout: Option<Parameter>,
-    /// Limit of the number of GTM events this Timer Trigger will fire. If no limit is set, we will continue to fire GTM events until the user leaves the page. Only valid for Timer triggers.
+    /// Limit of the number of GTM events this Timer Trigger will fire. If no limit
+    /// is set, we will continue to fire GTM events until the user leaves the page.
+    /// Only valid for Timer triggers.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     pub limit: Option<Parameter>,
-    /// Whether or not we should only fire tags if the form submit or link click event is not cancelled by some other event handler (e.g. because of validation). Only valid for Form Submission and Link Click triggers.
+    /// Whether or not we should only fire tags if the form submit or link click
+    /// event is not cancelled by some other event handler (e.g. because of
+    /// validation). Only valid for Form Submission and Link Click triggers.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="checkValidation")]
     pub check_validation: Option<Parameter>,
-    /// Used in the case of custom event, which is fired iff all Conditions are true.
+    /// Used in the case of custom event, which is fired iff all Conditions are
+    /// true.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="customEventFilter")]
     pub custom_event_filter: Option<Vec<Condition>>,
     /// Additional parameters.
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.create
+    /// @mutable tagmanager.accounts.containers.workspaces.triggers.update
     pub parameter: Option<Vec<Parameter>>,
     /// Parent folder id.
     #[serde(rename="parentFolderId")]
     pub parent_folder_id: Option<String>,
     /// Used in the case of auto event tracking.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="autoEventFilter")]
     pub auto_event_filter: Option<Vec<Condition>>,
 }
@@ -1235,7 +1477,8 @@ pub struct CreateContainerVersionRequestVersionOptions {
     pub notes: Option<String>,
     /// The name of the container version to be created.
     pub name: Option<String>,
-    /// The creation of this version may be for quick preview and shouldn't be saved.
+    /// The creation of this version may be for quick preview and
+    /// shouldn't be saved.
     #[serde(rename="quickPreview")]
     pub quick_preview: Option<bool>,
 }
@@ -1267,7 +1510,9 @@ impl ResponseResult for ListTriggersResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetupTag {
-    /// If true, fire the main tag if and only if the setup tag fires successfully. If false, fire the main tag regardless of setup tag firing status.
+    /// If true, fire the main tag if and only if the setup tag fires
+    /// successfully.
+    /// If false, fire the main tag regardless of setup tag firing status.
     #[serde(rename="stopOnSetupFailure")]
     pub stop_on_setup_failure: Option<bool>,
     /// The name of the setup tag.
@@ -1371,35 +1616,56 @@ impl ResponseResult for ListContainerVersionsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Variable {
     /// The start timestamp in milliseconds to schedule a variable.
+    /// @mutable tagmanager.accounts.containers.variables.create
+    /// @mutable tagmanager.accounts.containers.variables.update
     #[serde(rename="scheduleStartMs")]
     pub schedule_start_ms: Option<String>,
     /// The end timestamp in milliseconds to schedule a variable.
+    /// @mutable tagmanager.accounts.containers.variables.create
+    /// @mutable tagmanager.accounts.containers.variables.update
     #[serde(rename="scheduleEndMs")]
     pub schedule_end_ms: Option<String>,
     /// Variable display name.
+    /// @mutable tagmanager.accounts.containers.variables.create
+    /// @mutable tagmanager.accounts.containers.variables.update
     pub name: Option<String>,
     /// The variable's parameters.
+    /// @mutable tagmanager.accounts.containers.variables.create
+    /// @mutable tagmanager.accounts.containers.variables.update
     pub parameter: Option<Vec<Parameter>>,
     /// User notes on how to apply this variable in the container.
+    /// @mutable tagmanager.accounts.containers.variables.create
+    /// @mutable tagmanager.accounts.containers.variables.update
     pub notes: Option<String>,
     /// GTM Container ID.
     #[serde(rename="containerId")]
     pub container_id: Option<String>,
-    /// For mobile containers only: A list of trigger IDs for enabling conditional variables; the variable is enabled if one of the enabling triggers is true while all the disabling triggers are false. Treated as an unordered set.
+    /// For mobile containers only: A list of trigger IDs for enabling conditional
+    /// variables; the variable is enabled if one of the enabling triggers is true
+    /// while all the disabling triggers are false. Treated as an unordered set.
+    /// @mutable tagmanager.accounts.containers.variables.create
+    /// @mutable tagmanager.accounts.containers.variables.update
     #[serde(rename="enablingTriggerId")]
     pub enabling_trigger_id: Option<Vec<String>>,
-    /// The fingerprint of the GTM Variable as computed at storage time. This value is recomputed whenever the variable is modified.
+    /// The fingerprint of the GTM Variable as computed at storage time.
+    /// This value is recomputed whenever the variable is modified.
     pub fingerprint: Option<String>,
     /// GTM Account ID.
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
     /// GTM Variable Type.
+    /// @mutable tagmanager.accounts.containers.variables.create
+    /// @mutable tagmanager.accounts.containers.variables.update
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Parent folder id.
     #[serde(rename="parentFolderId")]
     pub parent_folder_id: Option<String>,
-    /// For mobile containers only: A list of trigger IDs for disabling conditional variables; the variable is enabled if one of the enabling trigger is true while all the disabling trigger are false. Treated as an unordered set.
+    /// For mobile containers only: A list of trigger IDs for disabling conditional
+    /// variables; the variable is enabled if one of the enabling trigger is true
+    /// while all the disabling trigger are false. Treated as an unordered set.
+    /// @mutable tagmanager.accounts.containers.variables.create
+    /// @mutable tagmanager.accounts.containers.variables.update
     #[serde(rename="disablingTriggerId")]
     pub disabling_trigger_id: Option<Vec<String>>,
     /// The Variable ID uniquely identifies the GTM Variable.
@@ -1417,7 +1683,9 @@ impl ResponseResult for Variable {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TeardownTag {
-    /// If true, fire the teardown tag if and only if the main tag fires successfully. If false, fire the teardown tag regardless of main tag firing status.
+    /// If true, fire the teardown tag if and only if the main tag fires
+    /// successfully.
+    /// If false, fire the teardown tag regardless of main tag firing status.
     #[serde(rename="stopTeardownOnFailure")]
     pub stop_teardown_on_failure: Option<bool>,
     /// The name of the teardown tag.
@@ -1434,13 +1702,28 @@ impl Part for TeardownTag {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Condition {
-    /// A list of named parameters (key/value), depending on the condition's type. Notes: 
-    /// - For binary operators, include parameters named arg0 and arg1 for specifying the left and right operands, respectively. 
-    /// - At this time, the left operand (arg0) must be a reference to a variable. 
-    /// - For case-insensitive Regex matching, include a boolean parameter named ignore_case that is set to true. If not specified or set to any other value, the matching will be case sensitive. 
-    /// - To negate an operator, include a boolean parameter named negate boolean parameter that is set to true.
+    /// A list of named parameters (key/value), depending on the condition's type.
+    /// Notes:<ul>
+    /// 
+    /// <li>For binary operators, include parameters named <code>arg0</code> and
+    ///    <code>arg1</code> for specifying the left and right operands,
+    ///    respectively.</li>
+    /// <li>At this time, the left operand (<code>arg0</code>) must be a reference
+    ///     to a variable.</li>
+    /// <li>For case-insensitive Regex matching, include a boolean parameter named
+    ///     <code>ignore_case</code> that is set to <code>true</code>.
+    ///     If not specified or set to any other value, the matching will be case
+    ///     sensitive.</li>
+    /// <li>To negate an operator, include a boolean parameter named
+    ///     <code>negate</code> boolean parameter that is set to <code>true</code>.
+    ///     </li>
+    /// </ul>
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     pub parameter: Option<Vec<Parameter>>,
     /// The type of operator for this condition.
+    /// @mutable tagmanager.accounts.containers.triggers.create
+    /// @mutable tagmanager.accounts.containers.triggers.update
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
@@ -1511,11 +1794,12 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all users that have access to the account along with Account and Container Permissions granted to each of them.
+    /// List all users that have access to the account along with Account and
+    /// Container Permissions granted to each of them.
     /// 
     /// # Arguments
     ///
-    /// * `accountId` - The GTM Account ID. @required tagmanager.accounts.permissions.list
+    /// * `accountId` - The GTM Account ID.
     pub fn permissions_list(&self, account_id: &str) -> AccountPermissionListCall<'a, C, A> {
         AccountPermissionListCall {
             hub: self.hub,
@@ -1589,7 +1873,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes a user from the account, revoking access to it and all of its containers.
+    /// Removes a user from the account, revoking access to it and all of its
+    /// containers.
     /// 
     /// # Arguments
     ///
@@ -2064,7 +2349,10 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Restores a Container Version. This will overwrite the container's current configuration (including its variables, triggers and tags). The operation will not have any effect on the version that is being served (i.e. the published version).
+    /// Restores a Container Version. This will overwrite the container's current
+    /// configuration (including its variables, triggers and tags). The operation
+    /// will not have any effect on the version that is being served (i.e. the
+    /// published version).
     /// 
     /// # Arguments
     ///
@@ -2491,7 +2779,8 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    /// * `containerVersionId` - The GTM Container Version ID. Specify published to retrieve the currently published version.
+    /// * `containerVersionId` - The GTM Container Version ID. Specify <code>published</code> to retrieve
+    ///                          the currently published version.
     pub fn containers_versions_get(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionGetCall<'a, C, A> {
         AccountContainerVersionGetCall {
             hub: self.hub,
@@ -2584,7 +2873,7 @@ impl<'a, C, A> AccountContainerListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -2714,13 +3003,17 @@ impl<'a, C, A> AccountContainerListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -2753,7 +3046,8 @@ impl<'a, C, A> AccountContainerListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// List all users that have access to the account along with Account and Container Permissions granted to each of them.
+/// List all users that have access to the account along with Account and
+/// Container Permissions granted to each of them.
 ///
 /// A builder for the *permissions.list* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -2824,7 +3118,7 @@ impl<'a, C, A> AccountPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/permissions";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/permissions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -2924,7 +3218,7 @@ impl<'a, C, A> AccountPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// The GTM Account ID. @required tagmanager.accounts.permissions.list
+    /// The GTM Account ID.
     ///
     /// Sets the *account id* path property to the given value.
     ///
@@ -2954,13 +3248,17 @@ impl<'a, C, A> AccountPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3073,7 +3371,7 @@ impl<'a, C, A> AccountContainerEnvironmentCreateCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/environments";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/environments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -3237,13 +3535,17 @@ impl<'a, C, A> AccountContainerEnvironmentCreateCall<'a, C, A> where C: BorrowMu
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3354,7 +3656,7 @@ impl<'a, C, A> AccountPermissionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/permissions";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/permissions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -3508,13 +3810,17 @@ impl<'a, C, A> AccountPermissionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3621,7 +3927,7 @@ impl<'a, C, A> AccountContainerEnvironmentDeleteCall<'a, C, A> where C: BorrowMu
         }
 
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/environments/{environmentId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/environments/{environmentId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -3761,13 +4067,17 @@ impl<'a, C, A> AccountContainerEnvironmentDeleteCall<'a, C, A> where C: BorrowMu
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -3800,7 +4110,8 @@ impl<'a, C, A> AccountContainerEnvironmentDeleteCall<'a, C, A> where C: BorrowMu
 }
 
 
-/// Removes a user from the account, revoking access to it and all of its containers.
+/// Removes a user from the account, revoking access to it and all of its
+/// containers.
 ///
 /// A builder for the *permissions.delete* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -3872,7 +4183,7 @@ impl<'a, C, A> AccountPermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
         }
 
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/permissions/{permissionId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/permissions/{permissionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -4002,13 +4313,17 @@ impl<'a, C, A> AccountPermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4114,7 +4429,7 @@ impl<'a, C, A> AccountContainerGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -4254,13 +4569,17 @@ impl<'a, C, A> AccountContainerGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4376,7 +4695,7 @@ impl<'a, C, A> AccountContainerVersionListCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/versions";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -4530,13 +4849,17 @@ impl<'a, C, A> AccountContainerVersionListCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4656,7 +4979,7 @@ impl<'a, C, A> AccountContainerTriggerUpdateCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/triggers/{triggerId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/triggers/{triggerId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -4810,7 +5133,8 @@ impl<'a, C, A> AccountContainerTriggerUpdateCall<'a, C, A> where C: BorrowMut<hy
         self._trigger_id = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the trigger in storage.
+    /// When provided, this fingerprint must match the fingerprint of the trigger
+    /// in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C, A> {
@@ -4837,13 +5161,17 @@ impl<'a, C, A> AccountContainerTriggerUpdateCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -4951,7 +5279,7 @@ impl<'a, C, A> AccountContainerTriggerGetCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/triggers/{triggerId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/triggers/{triggerId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -5101,13 +5429,17 @@ impl<'a, C, A> AccountContainerTriggerGetCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5212,7 +5544,7 @@ impl<'a, C, A> AccountContainerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
         }
 
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
@@ -5342,13 +5674,17 @@ impl<'a, C, A> AccountContainerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5455,7 +5791,7 @@ impl<'a, C, A> AccountContainerFolderDeleteCall<'a, C, A> where C: BorrowMut<hyp
         }
 
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/folders/{folderId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/folders/{folderId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -5595,13 +5931,17 @@ impl<'a, C, A> AccountContainerFolderDeleteCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5712,7 +6052,7 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -5866,13 +6206,17 @@ impl<'a, C, A> AccountContainerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -5979,7 +6323,7 @@ impl<'a, C, A> AccountContainerTagDeleteCall<'a, C, A> where C: BorrowMut<hyper:
         }
 
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/tags/{tagId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/tags/{tagId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -6119,13 +6463,17 @@ impl<'a, C, A> AccountContainerTagDeleteCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -6233,7 +6581,7 @@ impl<'a, C, A> AccountContainerFolderEntityListCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/folders/{folderId}/entities";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/folders/{folderId}/entities";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -6383,13 +6731,17 @@ impl<'a, C, A> AccountContainerFolderEntityListCall<'a, C, A> where C: BorrowMut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderEntityListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -6497,7 +6849,7 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/undelete";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/undelete";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
         }
@@ -6647,13 +6999,17 @@ impl<'a, C, A> AccountContainerVersionUndeleteCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUndeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -6759,7 +7115,7 @@ impl<'a, C, A> AccountContainerEnvironmentListCall<'a, C, A> where C: BorrowMut<
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/environments";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/environments";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -6899,13 +7255,17 @@ impl<'a, C, A> AccountContainerEnvironmentListCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7011,7 +7371,7 @@ impl<'a, C, A> AccountContainerTagListCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/tags";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/tags";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -7151,13 +7511,17 @@ impl<'a, C, A> AccountContainerTagListCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7270,7 +7634,7 @@ impl<'a, C, A> AccountContainerVersionPublishCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/publish";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/publish";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Publish.as_ref().to_string(), ());
         }
@@ -7400,7 +7764,8 @@ impl<'a, C, A> AccountContainerVersionPublishCall<'a, C, A> where C: BorrowMut<h
         self._container_version_id = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the container version in storage.
+    /// When provided, this fingerprint must match the fingerprint of the
+    /// container version in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C, A> {
@@ -7427,13 +7792,17 @@ impl<'a, C, A> AccountContainerVersionPublishCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionPublishCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7541,7 +7910,7 @@ impl<'a, C, A> AccountContainerFolderGetCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/folders/{folderId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/folders/{folderId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -7691,13 +8060,17 @@ impl<'a, C, A> AccountContainerFolderGetCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -7805,7 +8178,7 @@ impl<'a, C, A> AccountContainerEnvironmentGetCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/environments/{environmentId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/environments/{environmentId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -7955,13 +8328,17 @@ impl<'a, C, A> AccountContainerEnvironmentGetCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -8074,7 +8451,7 @@ impl<'a, C, A> AccountContainerTagCreateCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/tags";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/tags";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -8238,13 +8615,17 @@ impl<'a, C, A> AccountContainerTagCreateCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -8350,7 +8731,7 @@ impl<'a, C, A> AccountContainerTriggerListCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/triggers";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/triggers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -8490,13 +8871,17 @@ impl<'a, C, A> AccountContainerTriggerListCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -8603,7 +8988,7 @@ impl<'a, C, A> AccountContainerVersionDeleteCall<'a, C, A> where C: BorrowMut<hy
         }
 
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
         }
@@ -8743,13 +9128,17 @@ impl<'a, C, A> AccountContainerVersionDeleteCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -8865,7 +9254,7 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageAccount.as_ref().to_string(), ());
         }
@@ -8999,7 +9388,8 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._account_id = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the account in storage.
+    /// When provided, this fingerprint must match the fingerprint of the account
+    /// in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountUpdateCall<'a, C, A> {
@@ -9026,13 +9416,17 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9145,7 +9539,7 @@ impl<'a, C, A> AccountContainerVersionCreateCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/versions";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
         }
@@ -9309,13 +9703,17 @@ impl<'a, C, A> AccountContainerVersionCreateCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9421,7 +9819,7 @@ impl<'a, C, A> AccountPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/permissions/{permissionId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/permissions/{permissionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -9561,13 +9959,17 @@ impl<'a, C, A> AccountPermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9702,7 +10104,7 @@ impl<'a, C, A> AccountContainerMoveFolderUpdateCall<'a, C, A> where C: BorrowMut
         }
 
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/move_folders/{folderId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/move_folders/{folderId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -9890,13 +10292,17 @@ impl<'a, C, A> AccountContainerMoveFolderUpdateCall<'a, C, A> where C: BorrowMut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMoveFolderUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -9929,7 +10335,10 @@ impl<'a, C, A> AccountContainerMoveFolderUpdateCall<'a, C, A> where C: BorrowMut
 }
 
 
-/// Restores a Container Version. This will overwrite the container's current configuration (including its variables, triggers and tags). The operation will not have any effect on the version that is being served (i.e. the published version).
+/// Restores a Container Version. This will overwrite the container's current
+/// configuration (including its variables, triggers and tags). The operation
+/// will not have any effect on the version that is being served (i.e. the
+/// published version).
 ///
 /// A builder for the *containers.versions.restore* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -10004,7 +10413,7 @@ impl<'a, C, A> AccountContainerVersionRestoreCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/restore";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/restore";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -10154,13 +10563,17 @@ impl<'a, C, A> AccountContainerVersionRestoreCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionRestoreCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -10273,7 +10686,7 @@ impl<'a, C, A> AccountContainerVariableCreateCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/variables";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/variables";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -10437,13 +10850,17 @@ impl<'a, C, A> AccountContainerVariableCreateCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -10549,7 +10966,7 @@ impl<'a, C, A> AccountContainerVariableListCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/variables";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/variables";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -10689,13 +11106,17 @@ impl<'a, C, A> AccountContainerVariableListCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -10803,7 +11224,7 @@ impl<'a, C, A> AccountContainerTagGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/tags/{tagId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/tags/{tagId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -10953,13 +11374,17 @@ impl<'a, C, A> AccountContainerTagGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -11067,7 +11492,7 @@ impl<'a, C, A> AccountContainerVariableGetCall<'a, C, A> where C: BorrowMut<hype
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/variables/{variableId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/variables/{variableId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -11217,13 +11642,17 @@ impl<'a, C, A> AccountContainerVariableGetCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -11330,7 +11759,7 @@ impl<'a, C, A> AccountContainerTriggerDeleteCall<'a, C, A> where C: BorrowMut<hy
         }
 
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/triggers/{triggerId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/triggers/{triggerId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -11470,13 +11899,17 @@ impl<'a, C, A> AccountContainerTriggerDeleteCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -11589,7 +12022,7 @@ impl<'a, C, A> AccountContainerTriggerCreateCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/triggers";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/triggers";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -11753,13 +12186,17 @@ impl<'a, C, A> AccountContainerTriggerCreateCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -11879,7 +12316,7 @@ impl<'a, C, A> AccountContainerFolderUpdateCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/folders/{folderId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/folders/{folderId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -12033,7 +12470,8 @@ impl<'a, C, A> AccountContainerFolderUpdateCall<'a, C, A> where C: BorrowMut<hyp
         self._folder_id = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the folder in storage.
+    /// When provided, this fingerprint must match the fingerprint of the folder in
+    /// storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerFolderUpdateCall<'a, C, A> {
@@ -12060,13 +12498,17 @@ impl<'a, C, A> AccountContainerFolderUpdateCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -12168,7 +12610,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -12267,13 +12709,17 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -12386,7 +12832,7 @@ impl<'a, C, A> AccountPermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/permissions/{permissionId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/permissions/{permissionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::ManageUser.as_ref().to_string(), ());
         }
@@ -12550,13 +12996,17 @@ impl<'a, C, A> AccountPermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -12663,7 +13113,7 @@ impl<'a, C, A> AccountContainerVariableDeleteCall<'a, C, A> where C: BorrowMut<h
         }
 
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/variables/{variableId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/variables/{variableId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -12803,13 +13253,17 @@ impl<'a, C, A> AccountContainerVariableDeleteCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -12924,7 +13378,7 @@ impl<'a, C, A> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C, A> where 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/reauthorize_environments/{environmentId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/reauthorize_environments/{environmentId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Publish.as_ref().to_string(), ());
         }
@@ -13098,13 +13552,17 @@ impl<'a, C, A> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C, A> where 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -13208,7 +13666,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -13338,13 +13796,17 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -13462,7 +13924,7 @@ impl<'a, C, A> AccountContainerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -13606,7 +14068,8 @@ impl<'a, C, A> AccountContainerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._container_id = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the container in storage.
+    /// When provided, this fingerprint must match the fingerprint of the
+    /// container in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, C, A> {
@@ -13633,13 +14096,17 @@ impl<'a, C, A> AccountContainerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -13759,7 +14226,7 @@ impl<'a, C, A> AccountContainerTagUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/tags/{tagId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/tags/{tagId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -13913,7 +14380,8 @@ impl<'a, C, A> AccountContainerTagUpdateCall<'a, C, A> where C: BorrowMut<hyper:
         self._tag_id = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the tag in storage.
+    /// When provided, this fingerprint must match the fingerprint of the tag in
+    /// storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C, A> {
@@ -13940,13 +14408,17 @@ impl<'a, C, A> AccountContainerTagUpdateCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -14066,7 +14538,7 @@ impl<'a, C, A> AccountContainerEnvironmentUpdateCall<'a, C, A> where C: BorrowMu
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/environments/{environmentId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/environments/{environmentId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -14220,7 +14692,8 @@ impl<'a, C, A> AccountContainerEnvironmentUpdateCall<'a, C, A> where C: BorrowMu
         self._environment_id = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the environment in storage.
+    /// When provided, this fingerprint must match the fingerprint of the
+    /// environment in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a, C, A> {
@@ -14247,13 +14720,17 @@ impl<'a, C, A> AccountContainerEnvironmentUpdateCall<'a, C, A> where C: BorrowMu
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -14366,7 +14843,7 @@ impl<'a, C, A> AccountContainerFolderCreateCall<'a, C, A> where C: BorrowMut<hyp
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/folders";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/folders";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -14530,13 +15007,17 @@ impl<'a, C, A> AccountContainerFolderCreateCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -14642,7 +15123,7 @@ impl<'a, C, A> AccountContainerFolderListCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/folders";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/folders";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -14782,13 +15263,17 @@ impl<'a, C, A> AccountContainerFolderListCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -14908,7 +15393,7 @@ impl<'a, C, A> AccountContainerVersionUpdateCall<'a, C, A> where C: BorrowMut<hy
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainerversion.as_ref().to_string(), ());
         }
@@ -15062,7 +15547,8 @@ impl<'a, C, A> AccountContainerVersionUpdateCall<'a, C, A> where C: BorrowMut<hy
         self._container_version_id = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the container version in storage.
+    /// When provided, this fingerprint must match the fingerprint of the
+    /// container version in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C, A> {
@@ -15089,13 +15575,17 @@ impl<'a, C, A> AccountContainerVersionUpdateCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -15215,7 +15705,7 @@ impl<'a, C, A> AccountContainerVariableUpdateCall<'a, C, A> where C: BorrowMut<h
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/variables/{variableId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/variables/{variableId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::EditContainer.as_ref().to_string(), ());
         }
@@ -15369,7 +15859,8 @@ impl<'a, C, A> AccountContainerVariableUpdateCall<'a, C, A> where C: BorrowMut<h
         self._variable_id = new_value.to_string();
         self
     }
-    /// When provided, this fingerprint must match the fingerprint of the variable in storage.
+    /// When provided, this fingerprint must match the fingerprint of the variable
+    /// in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C, A> {
@@ -15396,13 +15887,17 @@ impl<'a, C, A> AccountContainerVariableUpdateCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
@@ -15510,7 +16005,7 @@ impl<'a, C, A> AccountContainerVersionGetCall<'a, C, A> where C: BorrowMut<hyper
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}";
+        let mut url = self.hub._base_url.clone() + "tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
@@ -15630,7 +16125,8 @@ impl<'a, C, A> AccountContainerVersionGetCall<'a, C, A> where C: BorrowMut<hyper
         self._container_id = new_value.to_string();
         self
     }
-    /// The GTM Container Version ID. Specify published to retrieve the currently published version.
+    /// The GTM Container Version ID. Specify <code>published</code> to retrieve
+    /// the currently published version.
     ///
     /// Sets the *container version id* path property to the given value.
     ///
@@ -15660,13 +16156,17 @@ impl<'a, C, A> AccountContainerVersionGetCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());

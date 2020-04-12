@@ -1,4 +1,4 @@
-site_name: Security Command Center v1.0.12+20190628
+site_name: Security Command Center v1.0.13+20200406
 site_url: http://byron.github.io/google-apis-rs/google-securitycenter1-cli
 site_description: A complete library to interact with Security Command Center (protocol v1)
 
@@ -14,6 +14,11 @@ pages:
 - ['organizations_assets-run-discovery.md', 'Organizations', 'Assets Run Discovery']
 - ['organizations_assets-update-security-marks.md', 'Organizations', 'Assets Update Security Marks']
 - ['organizations_get-organization-settings.md', 'Organizations', 'Get Organization Settings']
+- ['organizations_notification-configs-create.md', 'Organizations', 'Notification Configs Create']
+- ['organizations_notification-configs-delete.md', 'Organizations', 'Notification Configs Delete']
+- ['organizations_notification-configs-get.md', 'Organizations', 'Notification Configs Get']
+- ['organizations_notification-configs-list.md', 'Organizations', 'Notification Configs List']
+- ['organizations_notification-configs-patch.md', 'Organizations', 'Notification Configs Patch']
 - ['organizations_operations-cancel.md', 'Organizations', 'Operations Cancel']
 - ['organizations_operations-delete.md', 'Organizations', 'Operations Delete']
 - ['organizations_operations-get.md', 'Organizations', 'Operations Get']

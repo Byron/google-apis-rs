@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Talent Solution* crate version *1.0.12+20190702*, where *20190702* is the exact revision of the *jobs:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Cloud Talent Solution* crate version *1.0.13+20200409*, where *20200409* is the exact revision of the *jobs:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Cloud Talent Solution* *v3* API can be found at the
 //! [official documentation site](https://cloud.google.com/talent-solution/job-search/docs/).
@@ -335,7 +335,7 @@ impl<'a, C, A> CloudTalentSolution<C, A>
         CloudTalentSolution {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://jobs.googleapis.com/".to_string(),
             _root_url: "https://jobs.googleapis.com/".to_string(),
         }
@@ -346,7 +346,7 @@ impl<'a, C, A> CloudTalentSolution<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -374,24 +374,6 @@ impl<'a, C, A> CloudTalentSolution<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// Output only.
-/// 
-/// Spell check result.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SpellingCorrection {
-    /// Indicates if the query was corrected by the spell checker.
-    pub corrected: Option<bool>,
-    /// Correction output consisting of the corrected keyword string.
-    #[serde(rename="correctedText")]
-    pub corrected_text: Option<String>,
-}
-
-impl Part for SpellingCorrection {}
-
-
 /// Input only.
 /// 
 /// Geographic region of the search.
@@ -400,27 +382,18 @@ impl Part for SpellingCorrection {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocationFilter {
-    /// Optional.
-    /// 
-    /// 
-    /// The distance_in_miles is applied when the location being searched for is
+    /// Optional. The distance_in_miles is applied when the location being searched for is
     /// identified as a city or smaller. When the location being searched for is a
     /// state or larger, this field is ignored.
     #[serde(rename="distanceInMiles")]
     pub distance_in_miles: Option<f64>,
-    /// Optional.
-    /// 
-    /// The latitude and longitude of the geographic center from which to
+    /// Optional. The latitude and longitude of the geographic center from which to
     /// search. This field's ignored if `address` is provided.
     #[serde(rename="latLng")]
     pub lat_lng: Option<LatLng>,
-    /// Optional.
-    /// 
-    /// The address name, such as "Mountain View" or "Bay Area".
+    /// Optional. The address name, such as "Mountain View" or "Bay Area".
     pub address: Option<String>,
-    /// Optional.
-    /// 
-    /// Allows the client to return jobs without a
+    /// Optional. Allows the client to return jobs without a
     /// set location, specifically, telecommuting jobs (telecommuting is considered
     /// by the service as a special location.
     /// Job.posting_region indicates if a job permits telecommuting.
@@ -438,9 +411,7 @@ pub struct LocationFilter {
     /// treated as less relevant than other jobs in the search response.
     #[serde(rename="telecommutePreference")]
     pub telecommute_preference: Option<String>,
-    /// Optional.
-    /// 
-    /// CLDR region code of the country/region of the address. This is used
+    /// Optional. CLDR region code of the country/region of the address. This is used
     /// to address ambiguity of the user-input location, for example, "Liverpool"
     /// against "Liverpool, NY, US" or "Liverpool, UK".
     /// 
@@ -470,13 +441,30 @@ impl Part for LocationFilter {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateJobRequest {
-    /// Required.
-    /// 
-    /// The Job to be created.
+    /// Required. The Job to be created.
     pub job: Option<Job>,
 }
 
 impl RequestValue for CreateJobRequest {}
+
+
+/// Device information collected from the job seeker, candidate, or
+/// other entity conducting the job search. Providing this information improves
+/// the quality of the search results across devices.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeviceInfo {
+    /// Optional. Type of the device.
+    #[serde(rename="deviceType")]
+    pub device_type: Option<String>,
+    /// Optional. A device-specific ID. The ID must be a unique identifier that
+    /// distinguishes the device from other devices.
+    pub id: Option<String>,
+}
+
+impl Part for DeviceInfo {}
 
 
 /// Compensation range.
@@ -485,16 +473,12 @@ impl RequestValue for CreateJobRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CompensationRange {
-    /// Optional.
-    /// 
-    /// The minimum amount of compensation. If left empty, the value is set
+    /// Optional. The minimum amount of compensation. If left empty, the value is set
     /// to zero and the currency code is set to match the
     /// currency code of max_compensation.
     #[serde(rename="minCompensation")]
     pub min_compensation: Option<Money>,
-    /// Optional.
-    /// 
-    /// The maximum amount of compensation. If left empty, the value is set
+    /// Optional. The maximum amount of compensation. If left empty, the value is set
     /// to a maximal compensation value and the currency code is set to
     /// match the currency code of
     /// min_compensation.
@@ -712,9 +696,7 @@ impl Part for TimeOfDay {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchDeleteJobsRequest {
-    /// Required.
-    /// 
-    /// The filter string specifies the jobs to be deleted.
+    /// Required. The filter string specifies the jobs to be deleted.
     /// 
     /// Supported operator: =, AND
     /// 
@@ -792,9 +774,7 @@ impl Part for CommuteInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UpdateCompanyRequest {
-    /// Required.
-    /// 
-    /// The company resource to replace the current resource in the system.
+    /// Required. The company resource to replace the current resource in the system.
     pub company: Option<Company>,
     /// Optional but strongly recommended for the best service
     /// experience.
@@ -823,15 +803,11 @@ pub struct CustomAttributeHistogramRequest {
     /// each key as a string.
     #[serde(rename="stringValueHistogram")]
     pub string_value_histogram: Option<bool>,
-    /// Optional.
-    /// 
-    /// Specifies buckets used to perform a range histogram on Job's
+    /// Optional. Specifies buckets used to perform a range histogram on Job's
     /// filterable long custom field values, or min/max value requirements.
     #[serde(rename="longValueHistogramBucketingOption")]
     pub long_value_histogram_bucketing_option: Option<NumericBucketingOption>,
-    /// Required.
-    /// 
-    /// Specifies the custom field key to perform a histogram on. If specified
+    /// Required. Specifies the custom field key to perform a histogram on. If specified
     /// without `long_value_histogram_bucketing_option`, histogram on string values
     /// of the given `key` is triggered, otherwise histogram is performed on long
     /// values.
@@ -856,9 +832,7 @@ impl Part for CustomAttributeHistogramRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Company {
-    /// Required.
-    /// 
-    /// The display name of the company, for example, "Google, LLC".
+    /// Required. The display name of the company, for example, "Google LLC".
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
     /// Required during company update.
@@ -869,48 +843,36 @@ pub struct Company {
     /// The format is "projects/{project_id}/companies/{company_id}", for example,
     /// "projects/api-test-project/companies/foo".
     pub name: Option<String>,
-    /// Optional.
-    /// 
-    /// The URI to employer's career site or careers page on the employer's web
+    /// Optional. The URI to employer's career site or careers page on the employer's web
     /// site, for example, "https://careers.google.com".
     #[serde(rename="careerSiteUri")]
     pub career_site_uri: Option<String>,
     /// Output only. Derived details about the company.
     #[serde(rename="derivedInfo")]
     pub derived_info: Option<CompanyDerivedInfo>,
-    /// Optional.
-    /// 
-    /// Equal Employment Opportunity legal disclaimer text to be
+    /// Optional. Equal Employment Opportunity legal disclaimer text to be
     /// associated with all jobs, and typically to be displayed in all
     /// roles.
     /// 
     /// The maximum number of allowed characters is 500.
     #[serde(rename="eeoText")]
     pub eeo_text: Option<String>,
-    /// Optional.
-    /// 
-    /// A URI that hosts the employer's company logo.
+    /// Optional. A URI that hosts the employer's company logo.
     #[serde(rename="imageUri")]
     pub image_uri: Option<String>,
-    /// Optional.
-    /// 
-    /// The street address of the company's main headquarters, which may be
+    /// Optional. The street address of the company's main headquarters, which may be
     /// different from the job location. The service attempts
     /// to geolocate the provided address, and populates a more specific
     /// location wherever possible in DerivedInfo.headquarters_location.
     #[serde(rename="headquartersAddress")]
     pub headquarters_address: Option<String>,
-    /// Required.
-    /// 
-    /// Client side company identifier, used to uniquely identify the
+    /// Required. Client side company identifier, used to uniquely identify the
     /// company.
     /// 
     /// The maximum number of allowed characters is 255.
     #[serde(rename="externalId")]
     pub external_id: Option<String>,
-    /// Optional.
-    /// 
-    /// The URI representing the company's primary web site or home page,
+    /// Optional. The URI representing the company's primary web site or home page,
     /// for example, "https://www.google.com".
     /// 
     /// The maximum number of allowed characters is 255.
@@ -920,17 +882,13 @@ pub struct Company {
     /// public availability by the service when job content appears suspicious,
     /// abusive, or spammy.
     pub suspended: Option<bool>,
-    /// Optional.
-    /// 
-    /// Set to true if it is the hiring agency that post jobs for other
+    /// Optional. Set to true if it is the hiring agency that post jobs for other
     /// employers.
     /// 
     /// Defaults to false if not provided.
     #[serde(rename="hiringAgency")]
     pub hiring_agency: Option<bool>,
-    /// Optional.
-    /// 
-    /// A list of keys of filterable Job.custom_attributes, whose
+    /// Optional. A list of keys of filterable Job.custom_attributes, whose
     /// corresponding `string_values` are used in keyword search. Jobs with
     /// `string_values` under these specified field keys are returned if any
     /// of the values matches the search keyword. Custom field values with
@@ -938,9 +896,7 @@ pub struct Company {
     /// and those keyword queries need to be surrounded by quotes.
     #[serde(rename="keywordSearchableJobCustomAttributes")]
     pub keyword_searchable_job_custom_attributes: Option<Vec<String>>,
-    /// Optional.
-    /// 
-    /// The employer's company size.
+    /// Optional. The employer's company size.
     pub size: Option<String>,
 }
 
@@ -981,9 +937,7 @@ impl Part for CompletionResult {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateCompanyRequest {
-    /// Required.
-    /// 
-    /// The company to be created.
+    /// Required. The company to be created.
     pub company: Option<Company>,
 }
 
@@ -1005,9 +959,7 @@ impl RequestValue for CreateCompanyRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Job {
-    /// Optional.
-    /// 
-    /// The language of the posting. This field is distinct from
+    /// Optional. The language of the posting. This field is distinct from
     /// any requirements for fluency that are associated with the job.
     /// 
     /// Language codes must be in BCP-47 format, such as "en-US" or "sr-Latn".
@@ -1020,9 +972,7 @@ pub struct Job {
     /// defaults to 'en_US'.
     #[serde(rename="languageCode")]
     pub language_code: Option<String>,
-    /// Optional.
-    /// 
-    /// Options for job processing.
+    /// Optional. Options for job processing.
     #[serde(rename="processingOptions")]
     pub processing_options: Option<ProcessingOptions>,
     /// Optional but strongly recommended for the best service experience.
@@ -1046,30 +996,22 @@ pub struct Job {
     /// Output only. Display name of the company listing the job.
     #[serde(rename="companyDisplayName")]
     pub company_display_name: Option<String>,
-    /// Required.
-    /// 
-    /// The resource name of the company listing the job, such as
+    /// Required. The resource name of the company listing the job, such as
     /// "projects/api-test-project/companies/foo".
     #[serde(rename="companyName")]
     pub company_name: Option<String>,
     /// Output only. Derived details about the job posting.
     #[serde(rename="derivedInfo")]
     pub derived_info: Option<JobDerivedInfo>,
-    /// Optional.
-    /// 
-    /// A description of bonus, commission, and other compensation
+    /// Optional. A description of bonus, commission, and other compensation
     /// incentives associated with the job not including salary or pay.
     /// 
     /// The maximum number of allowed characters is 10,000.
     pub incentives: Option<String>,
-    /// Optional.
-    /// 
-    /// The benefits included with the job.
+    /// Optional. The benefits included with the job.
     #[serde(rename="jobBenefits")]
     pub job_benefits: Option<Vec<String>>,
-    /// Optional.
-    /// 
-    /// A description of the qualifications required to perform the
+    /// Optional. A description of the qualifications required to perform the
     /// job. The use of this field is recommended
     /// as an alternative to using the more general description field.
     /// 
@@ -1078,9 +1020,7 @@ pub struct Job {
     /// 
     /// The maximum number of allowed characters is 10,000.
     pub qualifications: Option<String>,
-    /// Optional.
-    /// 
-    /// The employment type(s) of a job, for example,
+    /// Optional. The employment type(s) of a job, for example,
     /// full time or
     /// part time.
     #[serde(rename="employmentTypes")]
@@ -1088,21 +1028,17 @@ pub struct Job {
     /// Output only. The timestamp when this job posting was created.
     #[serde(rename="postingCreateTime")]
     pub posting_create_time: Option<String>,
-    /// Optional.
+    /// Deprecated. The job is only visible to the owner.
     /// 
     /// The visibility of the job.
     /// 
     /// Defaults to Visibility.ACCOUNT_ONLY if not specified.
     pub visibility: Option<String>,
-    /// Optional.
-    /// 
-    /// The end timestamp of the job. Typically this field is used for contracting
+    /// Optional. The end timestamp of the job. Typically this field is used for contracting
     /// engagements. Invalid timestamps are ignored.
     #[serde(rename="jobEndTime")]
     pub job_end_time: Option<String>,
-    /// Optional.
-    /// 
-    /// The job PostingRegion (for example, state, country) throughout which
+    /// Optional. The job PostingRegion (for example, state, country) throughout which
     /// the job is available. If this field is set, a
     /// LocationFilter in a search query within the job region
     /// finds this job posting if an exact location match isn't specified.
@@ -1162,15 +1098,11 @@ pub struct Job {
     /// Use of this field in job queries and API calls is preferred over the use of
     /// requisition_id since this value is unique.
     pub name: Option<String>,
-    /// Required.
-    /// 
-    /// The title of the job, such as "Software Engineer"
+    /// Required. The title of the job, such as "Software Engineer"
     /// 
     /// The maximum number of allowed characters is 500.
     pub title: Option<String>,
-    /// Required.
-    /// 
-    /// The description of the job, which typically includes a multi-paragraph
+    /// Required. The description of the job, which typically includes a multi-paragraph
     /// description of the company and related information. Separate fields are
     /// provided on the job object for responsibilities,
     /// qualifications, and other job characteristics. Use of
@@ -1181,9 +1113,7 @@ pub struct Job {
     /// 
     /// The maximum number of allowed characters is 100,000.
     pub description: Option<String>,
-    /// Optional.
-    /// 
-    /// A promotion value of the job, as determined by the client.
+    /// Optional. A promotion value of the job, as determined by the client.
     /// The value determines the sort order of the jobs returned when searching for
     /// jobs using the featured jobs search call, with higher promotional values
     /// being returned first and ties being resolved by relevance sort. Only the
@@ -1192,9 +1122,7 @@ pub struct Job {
     /// Default value is 0, and negative values are treated as 0.
     #[serde(rename="promotionValue")]
     pub promotion_value: Option<i32>,
-    /// Optional.
-    /// 
-    /// A map of fields to hold both filterable and non-filterable custom job
+    /// Optional. A map of fields to hold both filterable and non-filterable custom job
     /// attributes that are not covered by the provided structured fields.
     /// 
     /// The keys of the map are strings up to 64 bytes and must match the
@@ -1208,14 +1136,10 @@ pub struct Job {
     /// is 50KB.
     #[serde(rename="customAttributes")]
     pub custom_attributes: Option<HashMap<String, CustomAttribute>>,
-    /// Optional.
-    /// 
-    /// The desired education degrees for the job, such as Bachelors, Masters.
+    /// Optional. The desired education degrees for the job, such as Bachelors, Masters.
     #[serde(rename="degreeTypes")]
     pub degree_types: Option<Vec<String>>,
-    /// Optional.
-    /// 
-    /// A description of job responsibilities. The use of this field is
+    /// Optional. A description of job responsibilities. The use of this field is
     /// recommended as an alternative to using the more general description
     /// field.
     /// 
@@ -1224,35 +1148,25 @@ pub struct Job {
     /// 
     /// The maximum number of allowed characters is 10,000.
     pub responsibilities: Option<String>,
-    /// Optional.
-    /// 
-    /// The start timestamp of the job in UTC time zone. Typically this field
+    /// Optional. The start timestamp of the job in UTC time zone. Typically this field
     /// is used for contracting engagements. Invalid timestamps are ignored.
     #[serde(rename="jobStartTime")]
     pub job_start_time: Option<String>,
-    /// Optional.
-    /// 
-    /// Job compensation information.
+    /// Optional. Job compensation information.
     #[serde(rename="compensationInfo")]
     pub compensation_info: Option<CompensationInfo>,
-    /// Optional.
-    /// 
-    /// The department or functional area within the company with the open
+    /// Optional. The department or functional area within the company with the open
     /// position.
     /// 
     /// The maximum number of allowed characters is 255.
     pub department: Option<String>,
-    /// Optional.
-    /// 
-    /// The experience level associated with the job, such as "Entry Level".
+    /// Optional. The experience level associated with the job, such as "Entry Level".
     #[serde(rename="jobLevel")]
     pub job_level: Option<String>,
     /// Output only. The timestamp when this job posting was last updated.
     #[serde(rename="postingUpdateTime")]
     pub posting_update_time: Option<String>,
-    /// Required.
-    /// 
-    /// The requisition ID, also referred to as the posting ID, assigned by the
+    /// Required. The requisition ID, also referred to as the posting ID, assigned by the
     /// client to identify a job. This field is intended to be used by clients
     /// for client identification and tracking of postings. A job is not allowed
     /// to be created if there is another job with the same [company_name],
@@ -1261,9 +1175,7 @@ pub struct Job {
     /// The maximum number of allowed characters is 255.
     #[serde(rename="requisitionId")]
     pub requisition_id: Option<String>,
-    /// Optional.
-    /// 
-    /// The timestamp this job posting was most recently published. The default
+    /// Optional. The timestamp this job posting was most recently published. The default
     /// value is the time the request arrives at the server. Invalid timestamps are
     /// ignored.
     #[serde(rename="postingPublishTime")]
@@ -1283,15 +1195,11 @@ impl ResponseResult for Job {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RequestMetadata {
-    /// Optional.
-    /// 
-    /// The type of device used by the job seeker at the time of the call to the
+    /// Optional. The type of device used by the job seeker at the time of the call to the
     /// service.
     #[serde(rename="deviceInfo")]
     pub device_info: Option<DeviceInfo>,
-    /// Required.
-    /// 
-    /// The client-defined scope or source of the service call, which typically
+    /// Required. The client-defined scope or source of the service call, which typically
     /// is the domain on
     /// which the service has been implemented and is currently being run.
     /// 
@@ -1306,9 +1214,7 @@ pub struct RequestMetadata {
     /// 
     /// The maximum number of allowed characters is 255.
     pub domain: Option<String>,
-    /// Required.
-    /// 
-    /// A unique user identification string, as determined by the client.
+    /// Required. A unique user identification string, as determined by the client.
     /// To have the strongest positive impact on search quality
     /// make sure the client-level is unique.
     /// Obfuscate this field for privacy concerns before
@@ -1321,9 +1227,7 @@ pub struct RequestMetadata {
     /// The maximum number of allowed characters is 255.
     #[serde(rename="userId")]
     pub user_id: Option<String>,
-    /// Required.
-    /// 
-    /// A unique session identification string. A session is defined as the
+    /// Required. A unique session identification string. A session is defined as the
     /// duration of an end user's interaction with the service over a certain
     /// period.
     /// Obfuscate this field for privacy concerns before
@@ -1347,9 +1251,7 @@ impl Part for RequestMetadata {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomAttribute {
-    /// Optional.
-    /// 
-    /// If the `filterable` flag is true, custom field values are searchable.
+    /// Optional. If the `filterable` flag is true, custom field values are searchable.
     /// If false, values are not searchable.
     /// 
     /// Default is false.
@@ -1361,7 +1263,7 @@ pub struct CustomAttribute {
     /// `CASE_INSENSITIVE_MATCH`) search.
     /// For filterable `string_value`s, a maximum total number of 200 values
     /// is allowed, with each `string_value` has a byte size of no more than
-    /// 255B. For unfilterable `string_values`, the maximum total byte size of
+    /// 500B. For unfilterable `string_values`, the maximum total byte size of
     /// unfilterable `string_values` is 50KB.
     /// 
     /// Empty string is not allowed.
@@ -1381,6 +1283,24 @@ pub struct CustomAttribute {
 impl Part for CustomAttribute {}
 
 
+/// Output only.
+/// 
+/// Spell check result.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SpellingCorrection {
+    /// Indicates if the query was corrected by the spell checker.
+    pub corrected: Option<bool>,
+    /// Correction output consisting of the corrected keyword string.
+    #[serde(rename="correctedText")]
+    pub corrected_text: Option<String>,
+}
+
+impl Part for SpellingCorrection {}
+
+
 /// A compensation entry that represents one component of compensation, such
 /// as base pay, bonus, or other compensation type.
 /// 
@@ -1394,30 +1314,20 @@ impl Part for CustomAttribute {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CompensationEntry {
-    /// Optional.
-    /// 
-    /// Compensation amount.
+    /// Optional. Compensation amount.
     pub amount: Option<Money>,
-    /// Optional.
-    /// 
-    /// Compensation description.  For example, could
+    /// Optional. Compensation description.  For example, could
     /// indicate equity terms or provide additional context to an estimated
     /// bonus.
     pub description: Option<String>,
-    /// Optional.
-    /// 
-    /// Compensation range.
+    /// Optional. Compensation range.
     pub range: Option<CompensationRange>,
-    /// Optional.
-    /// 
-    /// Compensation type.
+    /// Optional. Compensation type.
     /// 
     /// Default is CompensationUnit.COMPENSATION_TYPE_UNSPECIFIED.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Optional.
-    /// 
-    /// Expected number of units paid each year. If not specified, when
+    /// Optional. Expected number of units paid each year. If not specified, when
     /// Job.employment_types is FULLTIME, a default value is inferred
     /// based on unit. Default values:
     /// - HOURLY: 2080
@@ -1427,9 +1337,7 @@ pub struct CompensationEntry {
     /// - ANNUAL: 1
     #[serde(rename="expectedUnitsPerYear")]
     pub expected_units_per_year: Option<f64>,
-    /// Optional.
-    /// 
-    /// Frequency of the specified amount.
+    /// Optional. Frequency of the specified amount.
     /// 
     /// Default is CompensationUnit.COMPENSATION_UNIT_UNSPECIFIED.
     pub unit: Option<String>,
@@ -1463,23 +1371,15 @@ impl Part for TimestampRange {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CompensationFilter {
-    /// Required.
-    /// 
-    /// Specify desired `base compensation entry's`
+    /// Required. Specify desired `base compensation entry's`
     /// CompensationInfo.CompensationUnit.
     pub units: Option<Vec<String>>,
-    /// Optional.
-    /// 
-    /// Compensation range.
+    /// Optional. Compensation range.
     pub range: Option<CompensationRange>,
-    /// Required.
-    /// 
-    /// Type of filter.
+    /// Required. Type of filter.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Optional.
-    /// 
-    /// If set to true, jobs with unspecified compensation range fields are
+    /// Optional. If set to true, jobs with unspecified compensation range fields are
     /// included.
     #[serde(rename="includeJobsWithUnspecifiedCompensationRange")]
     pub include_jobs_with_unspecified_compensation_range: Option<bool>,
@@ -1496,22 +1396,16 @@ impl Part for CompensationFilter {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HistogramFacets {
-    /// Optional.
-    /// 
-    /// Specifies the simple type of histogram facets, for example,
+    /// Optional. Specifies the simple type of histogram facets, for example,
     /// `COMPANY_SIZE`, `EMPLOYMENT_TYPE` etc.
     #[serde(rename="simpleHistogramFacets")]
     pub simple_histogram_facets: Option<Vec<String>>,
-    /// Optional.
-    /// 
-    /// Specifies the custom attributes histogram requests.
+    /// Optional. Specifies the custom attributes histogram requests.
     /// Duplicate values of CustomAttributeHistogramRequest.key are not
     /// allowed.
     #[serde(rename="customAttributeHistogramFacets")]
     pub custom_attribute_histogram_facets: Option<Vec<CustomAttributeHistogramRequest>>,
-    /// Optional.
-    /// 
-    /// Specifies compensation field-based histogram requests.
+    /// Optional. Specifies compensation field-based histogram requests.
     /// Duplicate values of CompensationHistogramRequest.type are not allowed.
     #[serde(rename="compensationHistogramFacets")]
     pub compensation_histogram_facets: Option<Vec<CompensationHistogramRequest>>,
@@ -1535,9 +1429,7 @@ impl Part for HistogramFacets {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ClientEvent {
-    /// Required.
-    /// 
-    /// A unique identifier, generated by the client application. This `event_id`
+    /// Required. A unique identifier, generated by the client application. This `event_id`
     /// is used to establish the relationship between different events
     /// (see parent_event_id).
     #[serde(rename="eventId")]
@@ -1546,15 +1438,11 @@ pub struct ClientEvent {
     /// implements Cloud Talent Solution.
     #[serde(rename="jobEvent")]
     pub job_event: Option<JobEvent>,
-    /// Required.
-    /// 
-    /// A unique ID generated in the API responses. It can be found in
+    /// Required. A unique ID generated in the API responses. It can be found in
     /// ResponseMetadata.request_id.
     #[serde(rename="requestId")]
     pub request_id: Option<String>,
-    /// Optional.
-    /// 
-    /// The event_id of an event that resulted in the current event. For example, a
+    /// Optional. The event_id of an event that resulted in the current event. For example, a
     /// Job view event usually follows a parent
     /// impression event: A job seeker first does a
     /// search where a list of jobs appears
@@ -1563,9 +1451,7 @@ pub struct ClientEvent {
     /// view).
     #[serde(rename="parentEventId")]
     pub parent_event_id: Option<String>,
-    /// Optional.
-    /// 
-    /// Extra information about this event. Used for storing information with no
+    /// Optional. Extra information about this event. Used for storing information with no
     /// matching field in event payload, for example, user application specific
     /// context or details.
     /// 
@@ -1573,9 +1459,7 @@ pub struct ClientEvent {
     /// values is 2 KB.
     #[serde(rename="extraInfo")]
     pub extra_info: Option<HashMap<String, String>>,
-    /// Required.
-    /// 
-    /// The timestamp of the event.
+    /// Required. The timestamp of the event.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
 }
@@ -1634,9 +1518,7 @@ impl Part for HistogramResults {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProcessingOptions {
-    /// Optional.
-    /// 
-    /// Option for job HTML content sanitization. Applied fields are:
+    /// Optional. Option for job HTML content sanitization. Applied fields are:
     /// 
     /// * description
     /// * applicationInfo.instruction
@@ -1650,9 +1532,7 @@ pub struct ProcessingOptions {
     /// Defaults to HtmlSanitization.SIMPLE_FORMATTING_ONLY.
     #[serde(rename="htmlSanitization")]
     pub html_sanitization: Option<String>,
-    /// Optional.
-    /// 
-    /// If set to `true`, the service does not attempt to resolve a
+    /// Optional. If set to `true`, the service does not attempt to resolve a
     /// more precise address for the job.
     #[serde(rename="disableStreetAddressResolution")]
     pub disable_street_address_resolution: Option<bool>,
@@ -1728,9 +1608,7 @@ impl ResponseResult for ListJobsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchJobsRequest {
-    /// Optional.
-    /// 
-    /// The criteria determining how search results are sorted. Default is
+    /// Optional. The criteria determining how search results are sorted. Default is
     /// "relevance desc".
     /// 
     /// Supported options are:
@@ -1762,9 +1640,7 @@ pub struct SearchJobsRequest {
     /// search results.
     #[serde(rename="orderBy")]
     pub order_by: Option<String>,
-    /// Optional.
-    /// 
-    /// Controls whether highly similar jobs are returned next to each other in
+    /// Optional. Controls whether highly similar jobs are returned next to each other in
     /// the search results. Jobs are identified as highly similar based on
     /// their titles, job categories, and locations. Highly similar results are
     /// clustered so that only one representative job of the cluster is
@@ -1775,56 +1651,40 @@ pub struct SearchJobsRequest {
     /// is specified.
     #[serde(rename="diversificationLevel")]
     pub diversification_level: Option<String>,
-    /// Optional.
-    /// 
-    /// Controls whether to broaden the search when it produces sparse results.
+    /// Optional. Controls whether to broaden the search when it produces sparse results.
     /// Broadened queries append results to the end of the matching results
     /// list.
     /// 
     /// Defaults to false.
     #[serde(rename="enableBroadening")]
     pub enable_broadening: Option<bool>,
-    /// Optional.
-    /// 
-    /// Query used to search against jobs, such as keyword, location filters, etc.
+    /// Optional. Query used to search against jobs, such as keyword, location filters, etc.
     #[serde(rename="jobQuery")]
     pub job_query: Option<JobQuery>,
-    /// Optional.
-    /// 
-    /// A limit on the number of jobs returned in the search results.
+    /// Optional. A limit on the number of jobs returned in the search results.
     /// Increasing this value above the default value of 10 can increase search
     /// response time. The value can be between 1 and 100.
     #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
-    /// Optional.
-    /// 
-    /// Histogram requests for jobs matching JobQuery.
+    /// Optional. Histogram requests for jobs matching JobQuery.
     #[serde(rename="histogramFacets")]
     pub histogram_facets: Option<HistogramFacets>,
-    /// Optional.
-    /// 
-    /// Mode of a search.
+    /// Optional. Mode of a search.
     /// 
     /// Defaults to SearchMode.JOB_SEARCH.
     #[serde(rename="searchMode")]
     pub search_mode: Option<String>,
-    /// Optional.
-    /// 
-    /// The token specifying the current offset within
+    /// Optional. The token specifying the current offset within
     /// search results. See SearchJobsResponse.next_page_token for
     /// an explanation of how to obtain the next set of query results.
     #[serde(rename="pageToken")]
     pub page_token: Option<String>,
-    /// Required.
-    /// 
-    /// The meta information collected about the job searcher, used to improve the
+    /// Required. The meta information collected about the job searcher, used to improve the
     /// search quality of the service. The identifiers (such as `user_id`) are
     /// provided by users, and must be unique and consistent.
     #[serde(rename="requestMetadata")]
     pub request_metadata: Option<RequestMetadata>,
-    /// Optional.
-    /// 
-    /// Controls if the search job request requires the return of a precise
+    /// Optional. Controls if the search job request requires the return of a precise
     /// count of the first 300 results. Setting this to `true` ensures
     /// consistency in the number of results per page. Best practice is to set this
     /// value to true if a client allows users to jump directly to a
@@ -1835,26 +1695,22 @@ pub struct SearchJobsRequest {
     /// Defaults to false.
     #[serde(rename="requirePreciseResultSize")]
     pub require_precise_result_size: Option<bool>,
-    /// Optional.
-    /// 
-    /// The desired job attributes returned for jobs in the
+    /// Optional. The desired job attributes returned for jobs in the
     /// search response. Defaults to JobView.SMALL if no value is specified.
     #[serde(rename="jobView")]
     pub job_view: Option<String>,
-    /// Optional.
-    /// 
-    /// An integer that specifies the current offset (that is, starting result
+    /// Optional. An integer that specifies the current offset (that is, starting result
     /// location, amongst the jobs deemed by the API as relevant) in search
     /// results. This field is only considered if page_token is unset.
+    /// 
+    /// The maximum allowed value is 5000. Otherwise an error is thrown.
     /// 
     /// For example, 0 means to  return results starting from the first matching
     /// job, and 10 means to return from the 11th job. This can be used for
     /// pagination, (for example, pageSize = 10 and offset = 10 means to return
     /// from the second page).
     pub offset: Option<i32>,
-    /// Optional.
-    /// 
-    /// Controls whether to disable exact keyword match on Job.job_title,
+    /// Optional. Controls whether to disable exact keyword match on Job.job_title,
     /// Job.description, Job.company_display_name, Job.locations,
     /// Job.qualifications. When disable keyword match is turned off, a
     /// keyword match returns jobs that do not match given category filters when
@@ -1924,9 +1780,7 @@ pub struct CompensationInfo {
     /// See CompensationEntry for explanation on compensation annualization.
     #[serde(rename="annualizedBaseCompensationRange")]
     pub annualized_base_compensation_range: Option<CompensationRange>,
-    /// Optional.
-    /// 
-    /// Job compensation information.
+    /// Optional. Job compensation information.
     /// 
     /// At most one entry can be of type
     /// CompensationInfo.CompensationType.BASE, which is
@@ -1945,14 +1799,10 @@ impl Part for CompensationInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CompensationHistogramRequest {
-    /// Required.
-    /// 
-    /// Numeric histogram options, like buckets, whether include min or max value.
+    /// Required. Numeric histogram options, like buckets, whether include min or max value.
     #[serde(rename="bucketingOption")]
     pub bucketing_option: Option<NumericBucketingOption>,
-    /// Required.
-    /// 
-    /// Type of the request, representing which field the histogramming should be
+    /// Required. Type of the request, representing which field the histogramming should be
     /// performed over. A single request can only specify one histogram of each
     /// `CompensationHistogramRequestType`.
     #[serde(rename="type")]
@@ -1996,7 +1846,7 @@ impl Part for CustomAttributeHistogramResult {}
 /// 
 /// Advice on address input / editing:
 ///  - Use an i18n-ready address widget such as
-///    https://github.com/googlei18n/libaddressinput)
+///    https://github.com/google/libaddressinput)
 /// - Users should not be presented with UI elements for input or editing of
 ///   fields outside countries where that field is used.
 /// 
@@ -2121,18 +1971,14 @@ impl Part for BucketRange {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobQuery {
-    /// Optional.
-    /// 
-    /// This flag controls the spell-check feature. If false, the
+    /// Optional. This flag controls the spell-check feature. If false, the
     /// service attempts to correct a misspelled query,
     /// for example, "enginee" is corrected to "engineer".
     /// 
     /// Defaults to false: a spell check is performed.
     #[serde(rename="disableSpellCheck")]
     pub disable_spell_check: Option<bool>,
-    /// Optional.
-    /// 
-    /// This filter specifies a structured syntax to match against the
+    /// Optional. This filter specifies a structured syntax to match against the
     /// Job.custom_attributes marked as `filterable`.
     /// 
     /// The syntax for this expression is a subset of SQL syntax.
@@ -2149,16 +1995,14 @@ pub struct JobQuery {
     /// Boolean expressions (AND/OR/NOT) are supported up to 3 levels of
     /// nesting (for example, "((A AND B AND C) OR NOT D) AND E"), a maximum of 100
     /// comparisons or functions are allowed in the expression. The expression
-    /// must be < 3000 bytes in length.
+    /// must be < 6000 bytes in length.
     /// 
     /// Sample Query:
     /// `(LOWER(driving_license)="class \"a\"" OR EMPTY(driving_license)) AND
     /// driving_years > 10`
     #[serde(rename="customAttributeFilter")]
     pub custom_attribute_filter: Option<String>,
-    /// Optional.
-    /// 
-    /// The employment type filter specifies the employment type of jobs to
+    /// Optional. The employment type filter specifies the employment type of jobs to
     /// search against, such as EmploymentType.FULL_TIME.
     /// 
     /// If a value is not specified, jobs in the search results includes any
@@ -2168,9 +2012,18 @@ pub struct JobQuery {
     /// any of the specified employment types.
     #[serde(rename="employmentTypes")]
     pub employment_types: Option<Vec<String>>,
-    /// Optional.
+    /// The language code of query. For example, "en-US". This field helps to
+    /// better interpret the query.
     /// 
-    /// This filter specifies the locale of jobs to search against,
+    /// If a value isn't specified, the query language code is automatically
+    /// detected, which may not be accurate.
+    /// 
+    /// Language code should be in BCP-47 format, such as "en-US" or "sr-Latn".
+    /// For more information, see
+    /// [Tags for Identifying Languages](https://tools.ietf.org/html/bcp47).
+    #[serde(rename="queryLanguageCode")]
+    pub query_language_code: Option<String>,
+    /// Optional. This filter specifies the locale of jobs to search against,
     /// for example, "en-US".
     /// 
     /// If a value isn't specified, the search results can contain jobs in any
@@ -2184,15 +2037,11 @@ pub struct JobQuery {
     /// At most 10 language code filters are allowed.
     #[serde(rename="languageCodes")]
     pub language_codes: Option<Vec<String>>,
-    /// Optional.
-    /// 
-    /// Jobs published within a range specified by this filter are searched
+    /// Optional. Jobs published within a range specified by this filter are searched
     /// against.
     #[serde(rename="publishTimeRange")]
     pub publish_time_range: Option<TimestampRange>,
-    /// Optional.
-    /// 
-    ///  Allows filtering jobs by commute time with different travel methods (for
+    /// Optional. Allows filtering jobs by commute time with different travel methods (for
     ///  example, driving or public transit). Note: This only works with COMMUTE
     ///  MODE. When specified, [JobQuery.location_filters] is
     ///  ignored.
@@ -2200,9 +2049,7 @@ pub struct JobQuery {
     ///  Currently we don't support sorting by commute time.
     #[serde(rename="commuteFilter")]
     pub commute_filter: Option<CommuteFilter>,
-    /// Optional.
-    /// 
-    /// The category filter specifies the categories of jobs to search against.
+    /// Optional. The category filter specifies the categories of jobs to search against.
     /// See Category for more information.
     /// 
     /// If a value is not specified, jobs from any category are searched against.
@@ -2211,16 +2058,12 @@ pub struct JobQuery {
     /// categories are searched against.
     #[serde(rename="jobCategories")]
     pub job_categories: Option<Vec<String>>,
-    /// Optional.
-    /// 
-    /// The query string that matches against the job title, description, and
+    /// Optional. The query string that matches against the job title, description, and
     /// location fields.
     /// 
     /// The maximum number of allowed characters is 255.
     pub query: Option<String>,
-    /// Optional.
-    /// 
-    /// This filter specifies the company entities to search against.
+    /// Optional. This filter specifies the company entities to search against.
     /// 
     /// If a value isn't specified, jobs are searched for against all
     /// companies.
@@ -2234,9 +2077,7 @@ pub struct JobQuery {
     /// At most 20 company filters are allowed.
     #[serde(rename="companyNames")]
     pub company_names: Option<Vec<String>>,
-    /// Optional.
-    /// 
-    /// This filter specifies the exact company display
+    /// Optional. This filter specifies the exact company display
     /// name of the jobs to search against.
     /// 
     /// If a value isn't specified, jobs within the search results are
@@ -2248,9 +2089,7 @@ pub struct JobQuery {
     /// At most 20 company display name filters are allowed.
     #[serde(rename="companyDisplayNames")]
     pub company_display_names: Option<Vec<String>>,
-    /// Optional.
-    /// 
-    /// The location filter specifies geo-regions containing the jobs to
+    /// Optional. The location filter specifies geo-regions containing the jobs to
     /// search against. See LocationFilter for more information.
     /// 
     /// If a location value isn't specified, jobs fitting the other search
@@ -2264,9 +2103,7 @@ pub struct JobQuery {
     /// At most 5 location filters are allowed.
     #[serde(rename="locationFilters")]
     pub location_filters: Option<Vec<LocationFilter>>,
-    /// Optional.
-    /// 
-    /// This search filter is applied only to
+    /// Optional. This search filter is applied only to
     /// Job.compensation_info. For example, if the filter is specified
     /// as "Hourly job with per-hour compensation > $15", only jobs meeting
     /// these criteria are searched. If a filter isn't defined, all open jobs
@@ -2397,29 +2234,6 @@ pub struct LatLng {
 impl Part for LatLng {}
 
 
-/// Device information collected from the job seeker, candidate, or
-/// other entity conducting the job search. Providing this information improves
-/// the quality of the search results across devices.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeviceInfo {
-    /// Optional.
-    /// 
-    /// Type of the device.
-    #[serde(rename="deviceType")]
-    pub device_type: Option<String>,
-    /// Optional.
-    /// 
-    /// A device-specific ID. The ID must be a unique identifier that
-    /// distinguishes the device from other devices.
-    pub id: Option<String>,
-}
-
-impl Part for DeviceInfo {}
-
-
 /// Input only.
 /// 
 /// Update job request.
@@ -2433,9 +2247,7 @@ impl Part for DeviceInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UpdateJobRequest {
-    /// Required.
-    /// 
-    /// The Job to be updated.
+    /// Required. The Job to be updated.
     pub job: Option<Job>,
     /// Optional but strongly recommended to be provided for the best service
     /// experience.
@@ -2480,17 +2292,13 @@ impl Part for JobDerivedInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobEvent {
-    /// Required.
-    /// 
-    /// The job name(s) associated with this event.
+    /// Required. The job name(s) associated with this event.
     /// For example, if this is an impression event,
     /// this field contains the identifiers of all jobs shown to the job seeker.
     /// If this was a view event, this field contains the
     /// identifier of the viewed job.
     pub jobs: Option<Vec<String>>,
-    /// Required.
-    /// 
-    /// The type of the event (see JobEventType).
+    /// Required. The type of the event (see JobEventType).
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
@@ -2532,27 +2340,20 @@ impl Part for HistogramResult {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommuteFilter {
-    /// Required.
-    /// 
-    /// The latitude and longitude of the location from which to calculate the
+    /// Required. The latitude and longitude of the location from which to calculate the
     /// commute time.
     #[serde(rename="startCoordinates")]
     pub start_coordinates: Option<LatLng>,
-    /// Optional.
-    /// 
-    /// The departure time used to calculate traffic impact, represented as
+    /// Optional. The departure time used to calculate traffic impact, represented as
     /// google.type.TimeOfDay in local time zone.
     /// 
     /// Currently traffic model is restricted to hour level resolution.
     #[serde(rename="departureTime")]
     pub departure_time: Option<TimeOfDay>,
-    /// Required.
-    /// 
-    /// The method of transportation for which to calculate the commute time.
+    /// Required. The method of transportation for which to calculate the commute time.
     #[serde(rename="commuteMethod")]
     pub commute_method: Option<String>,
-    /// Optional.
-    /// If true, jobs without "precise" addresses (street level addresses or GPS
+    /// Optional. If true, jobs without "precise" addresses (street level addresses or GPS
     /// coordinates) might also be returned. For city and coarser level addresses,
     /// text matching is used. If this field is set to false or is not specified,
     /// only jobs that include precise addresses are returned by Commute
@@ -2564,15 +2365,11 @@ pub struct CommuteFilter {
     /// `travel_duration` time of 0 regardless of distance from the job seeker.
     #[serde(rename="allowImpreciseAddresses")]
     pub allow_imprecise_addresses: Option<bool>,
-    /// Required.
-    /// 
-    /// The maximum travel time in seconds. The maximum allowed value is `3600s`
+    /// Required. The maximum travel time in seconds. The maximum allowed value is `3600s`
     /// (one hour). Format is `123s`.
     #[serde(rename="travelDuration")]
     pub travel_duration: Option<String>,
-    /// Optional.
-    /// 
-    /// Specifies the traffic density to use when calculating commute time.
+    /// Optional. Specifies the traffic density to use when calculating commute time.
     #[serde(rename="roadTraffic")]
     pub road_traffic: Option<String>,
 }
@@ -2591,9 +2388,7 @@ impl Part for CommuteFilter {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateClientEventRequest {
-    /// Required.
-    /// 
-    /// Events issued when end user interacts with customer's application that
+    /// Required. Events issued when end user interacts with customer's application that
     /// uses Cloud Talent Solution.
     #[serde(rename="clientEvent")]
     pub client_event: Option<ClientEvent>,
@@ -2610,17 +2405,13 @@ impl RequestValue for CreateClientEventRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NumericBucketingOption {
-    /// Required.
-    /// 
-    /// Two adjacent values form a histogram bucket. Values should be in
+    /// Required. Two adjacent values form a histogram bucket. Values should be in
     /// ascending order. For example, if [5, 10, 15] are provided, four buckets are
     /// created: (-inf, 5), 5, 10), [10, 15), [15, inf). At most 20
     /// [buckets_bound is supported.
     #[serde(rename="bucketBounds")]
     pub bucket_bounds: Option<Vec<f64>>,
-    /// Optional.
-    /// 
-    /// If set to true, the histogram result includes minimum/maximum
+    /// Optional. If set to true, the histogram result includes minimum/maximum
     /// value of the numeric field.
     #[serde(rename="requiresMinMax")]
     pub requires_min_max: Option<bool>,
@@ -2705,8 +2496,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required.
-    ///              Resource name of the project under which the company is created.
+    /// * `parent` - Required. Resource name of the project under which the company is created.
     ///              The format is "projects/{project_id}", for example,
     ///              "projects/api-test-project".
     pub fn companies_create(&self, request: CreateCompanyRequest, parent: &str) -> ProjectCompanyCreateCall<'a, C, A> {
@@ -2726,8 +2516,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required.
-    ///              The resource name of the project under which the job is created.
+    /// * `parent` - Required. The resource name of the project under which the job is created.
     ///              The format is "projects/{project_id}", for example,
     ///              "projects/api-test-project".
     pub fn jobs_list(&self, parent: &str) -> ProjectJobListCall<'a, C, A> {
@@ -2753,8 +2542,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required.
-    ///            The resource name of the job to be deleted.
+    /// * `name` - Required. The resource name of the job to be deleted.
     ///            The format is "projects/{project_id}/jobs/{job_id}",
     ///            for example, "projects/api-test-project/jobs/1234".
     pub fn jobs_delete(&self, name: &str) -> ProjectJobDeleteCall<'a, C, A> {
@@ -2773,8 +2561,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required.
-    ///            The resource name of the company to be retrieved.
+    /// * `name` - Required. The resource name of the company to be retrieved.
     ///            The format is "projects/{project_id}/companies/{company_id}", for example,
     ///            "projects/api-test-project/companies/foo".
     pub fn companies_get(&self, name: &str) -> ProjectCompanyGetCall<'a, C, A> {
@@ -2798,8 +2585,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required.
-    ///              The resource name of the project to search within.
+    /// * `parent` - Required. The resource name of the project to search within.
     ///              The format is "projects/{project_id}", for example,
     ///              "projects/api-test-project".
     pub fn jobs_search(&self, request: SearchJobsRequest, parent: &str) -> ProjectJobSearchCall<'a, C, A> {
@@ -2819,8 +2605,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required.
-    ///              Resource name of the project under which the company is created.
+    /// * `parent` - Required. Resource name of the project under which the company is created.
     ///              The format is "projects/{project_id}", for example,
     ///              "projects/api-test-project".
     pub fn companies_list(&self, parent: &str) -> ProjectCompanyListCall<'a, C, A> {
@@ -2843,8 +2628,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required.
-    ///            The resource name of the job to retrieve.
+    /// * `name` - Required. The resource name of the job to retrieve.
     ///            The format is "projects/{project_id}/jobs/{job_id}",
     ///            for example, "projects/api-test-project/jobs/1234".
     pub fn jobs_get(&self, name: &str) -> ProjectJobGetCall<'a, C, A> {
@@ -2873,8 +2657,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required.
-    ///              The resource name of the project to search within.
+    /// * `parent` - Required. The resource name of the project to search within.
     ///              The format is "projects/{project_id}", for example,
     ///              "projects/api-test-project".
     pub fn jobs_search_for_alert(&self, request: SearchJobsRequest, parent: &str) -> ProjectJobSearchForAlertCall<'a, C, A> {
@@ -2898,8 +2681,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required.
-    ///              The resource name of the project under which the job is created.
+    /// * `parent` - Required. The resource name of the project under which the job is created.
     ///              The format is "projects/{project_id}", for example,
     ///              "projects/api-test-project".
     pub fn jobs_create(&self, request: CreateJobRequest, parent: &str) -> ProjectJobCreateCall<'a, C, A> {
@@ -2945,8 +2727,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required.
-    ///              The resource name of the project under which the job is created.
+    /// * `parent` - Required. The resource name of the project under which the job is created.
     ///              The format is "projects/{project_id}", for example,
     ///              "projects/api-test-project".
     pub fn jobs_batch_delete(&self, request: BatchDeleteJobsRequest, parent: &str) -> ProjectJobBatchDeleteCall<'a, C, A> {
@@ -2967,8 +2748,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required.
-    ///            The resource name of the company to be deleted.
+    /// * `name` - Required. The resource name of the company to be deleted.
     ///            The format is "projects/{project_id}/companies/{company_id}", for example,
     ///            "projects/api-test-project/companies/foo".
     pub fn companies_delete(&self, name: &str) -> ProjectCompanyDeleteCall<'a, C, A> {
@@ -3016,8 +2796,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required.
-    ///            Resource name of project the completion is performed within.
+    /// * `name` - Required. Resource name of project the completion is performed within.
     ///            The format is "projects/{project_id}", for example,
     ///            "projects/api-test-project".
     pub fn complete(&self, name: &str) -> ProjectCompleteCall<'a, C, A> {
@@ -3537,9 +3316,7 @@ impl<'a, C, A> ProjectCompanyCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._request = new_value;
         self
     }
-    /// Required.
-    /// 
-    /// Resource name of the project under which the company is created.
+    /// Required. Resource name of the project under which the company is created.
     /// 
     /// The format is "projects/{project_id}", for example,
     /// "projects/api-test-project".
@@ -3810,9 +3587,7 @@ impl<'a, C, A> ProjectJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// Required.
-    /// 
-    /// The resource name of the project under which the job is created.
+    /// Required. The resource name of the project under which the job is created.
     /// 
     /// The format is "projects/{project_id}", for example,
     /// "projects/api-test-project".
@@ -3825,18 +3600,14 @@ impl<'a, C, A> ProjectJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._parent = new_value.to_string();
         self
     }
-    /// Optional.
-    /// 
-    /// The starting point of a query result.
+    /// Optional. The starting point of a query result.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectJobListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional.
-    /// 
-    /// The maximum number of jobs to be returned per page of results.
+    /// Optional. The maximum number of jobs to be returned per page of results.
     /// 
     /// If job_view is set to JobView.JOB_VIEW_ID_ONLY, the maximum allowed
     /// page size is 1000. Otherwise, the maximum allowed page size is 100.
@@ -3848,9 +3619,7 @@ impl<'a, C, A> ProjectJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._page_size = Some(new_value);
         self
     }
-    /// Optional.
-    /// 
-    /// The desired job attributes returned for jobs in the
+    /// Optional. The desired job attributes returned for jobs in the
     /// search response. Defaults to JobView.JOB_VIEW_FULL if no value is
     /// specified.
     ///
@@ -3859,9 +3628,7 @@ impl<'a, C, A> ProjectJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._job_view = Some(new_value.to_string());
         self
     }
-    /// Required.
-    /// 
-    /// The filter string specifies the jobs to be enumerated.
+    /// Required. The filter string specifies the jobs to be enumerated.
     /// 
     /// Supported operator: =, AND
     /// 
@@ -4122,9 +3889,7 @@ impl<'a, C, A> ProjectJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// Required.
-    /// 
-    /// The resource name of the job to be deleted.
+    /// Required. The resource name of the job to be deleted.
     /// 
     /// The format is "projects/{project_id}/jobs/{job_id}",
     /// for example, "projects/api-test-project/jobs/1234".
@@ -4375,9 +4140,7 @@ impl<'a, C, A> ProjectCompanyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// Required.
-    /// 
-    /// The resource name of the company to be retrieved.
+    /// Required. The resource name of the company to be retrieved.
     /// 
     /// The format is "projects/{project_id}/companies/{company_id}", for example,
     /// "projects/api-test-project/companies/foo".
@@ -4663,9 +4426,7 @@ impl<'a, C, A> ProjectJobSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// Required.
-    /// 
-    /// The resource name of the project to search within.
+    /// Required. The resource name of the project to search within.
     /// 
     /// The format is "projects/{project_id}", for example,
     /// "projects/api-test-project".
@@ -4931,9 +4692,7 @@ impl<'a, C, A> ProjectCompanyListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// Required.
-    /// 
-    /// Resource name of the project under which the company is created.
+    /// Required. Resource name of the project under which the company is created.
     /// 
     /// The format is "projects/{project_id}", for example,
     /// "projects/api-test-project".
@@ -4946,9 +4705,7 @@ impl<'a, C, A> ProjectCompanyListCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._parent = new_value.to_string();
         self
     }
-    /// Optional.
-    /// 
-    /// Set to true if the companies requested must have open jobs.
+    /// Optional. Set to true if the companies requested must have open jobs.
     /// 
     /// Defaults to false.
     /// 
@@ -4960,18 +4717,14 @@ impl<'a, C, A> ProjectCompanyListCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._require_open_jobs = Some(new_value);
         self
     }
-    /// Optional.
-    /// 
-    /// The starting indicator from which to return results.
+    /// Optional. The starting indicator from which to return results.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectCompanyListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Optional.
-    /// 
-    /// The maximum number of companies to be returned, at most 100.
+    /// Optional. The maximum number of companies to be returned, at most 100.
     /// Default is 100 if a non-positive number is provided.
     ///
     /// Sets the *page size* query property to the given value.
@@ -5218,9 +4971,7 @@ impl<'a, C, A> ProjectJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Required.
-    /// 
-    /// The resource name of the job to retrieve.
+    /// Required. The resource name of the job to retrieve.
     /// 
     /// The format is "projects/{project_id}/jobs/{job_id}",
     /// for example, "projects/api-test-project/jobs/1234".
@@ -5511,9 +5262,7 @@ impl<'a, C, A> ProjectJobSearchForAlertCall<'a, C, A> where C: BorrowMut<hyper::
         self._request = new_value;
         self
     }
-    /// Required.
-    /// 
-    /// The resource name of the project to search within.
+    /// Required. The resource name of the project to search within.
     /// 
     /// The format is "projects/{project_id}", for example,
     /// "projects/api-test-project".
@@ -5798,9 +5547,7 @@ impl<'a, C, A> ProjectJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// Required.
-    /// 
-    /// The resource name of the project under which the job is created.
+    /// Required. The resource name of the project under which the job is created.
     /// 
     /// The format is "projects/{project_id}", for example,
     /// "projects/api-test-project".
@@ -6369,9 +6116,7 @@ impl<'a, C, A> ProjectJobBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._request = new_value;
         self
     }
-    /// Required.
-    /// 
-    /// The resource name of the project under which the job is created.
+    /// Required. The resource name of the project under which the job is created.
     /// 
     /// The format is "projects/{project_id}", for example,
     /// "projects/api-test-project".
@@ -6623,9 +6368,7 @@ impl<'a, C, A> ProjectCompanyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
-    /// Required.
-    /// 
-    /// The resource name of the company to be deleted.
+    /// Required. The resource name of the company to be deleted.
     /// 
     /// The format is "projects/{project_id}/companies/{company_id}", for example,
     /// "projects/api-test-project/companies/foo".
@@ -7205,9 +6948,7 @@ impl<'a, C, A> ProjectCompleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// Required.
-    /// 
-    /// Resource name of project the completion is performed within.
+    /// Required. Resource name of project the completion is performed within.
     /// 
     /// The format is "projects/{project_id}", for example,
     /// "projects/api-test-project".
@@ -7220,27 +6961,21 @@ impl<'a, C, A> ProjectCompleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._name = new_value.to_string();
         self
     }
-    /// Optional.
-    /// 
-    /// The completion topic. The default is CompletionType.COMBINED.
+    /// Optional. The completion topic. The default is CompletionType.COMBINED.
     ///
     /// Sets the *type* query property to the given value.
     pub fn type_(mut self, new_value: &str) -> ProjectCompleteCall<'a, C, A> {
         self._type_ = Some(new_value.to_string());
         self
     }
-    /// Optional.
-    /// 
-    /// The scope of the completion. The defaults is CompletionScope.PUBLIC.
+    /// Optional. The scope of the completion. The defaults is CompletionScope.PUBLIC.
     ///
     /// Sets the *scope* query property to the given value.
     pub fn scope(mut self, new_value: &str) -> ProjectCompleteCall<'a, C, A> {
         self._scope = Some(new_value.to_string());
         self
     }
-    /// Required.
-    /// 
-    /// The query used to generate suggestions.
+    /// Required. The query used to generate suggestions.
     /// 
     /// The maximum number of allowed characters is 255.
     ///
@@ -7249,9 +6984,7 @@ impl<'a, C, A> ProjectCompleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._query = Some(new_value.to_string());
         self
     }
-    /// Required.
-    /// 
-    /// Completion result count.
+    /// Required. Completion result count.
     /// 
     /// The maximum allowed page size is 10.
     ///
@@ -7260,9 +6993,7 @@ impl<'a, C, A> ProjectCompleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._page_size = Some(new_value);
         self
     }
-    /// Optional.
-    /// 
-    /// The list of languages of the query. This is
+    /// Optional. The list of languages of the query. This is
     /// the BCP-47 language code, such as "en-US" or "sr-Latn".
     /// For more information, see
     /// [Tags for Identifying Languages](https://tools.ietf.org/html/bcp47).
@@ -7313,9 +7044,7 @@ impl<'a, C, A> ProjectCompleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._language_code = Some(new_value.to_string());
         self
     }
-    /// Optional.
-    /// 
-    /// If provided, restricts completion to specified company.
+    /// Optional. If provided, restricts completion to specified company.
     /// 
     /// The format is "projects/{project_id}/companies/{company_id}", for example,
     /// "projects/api-test-project/companies/foo".

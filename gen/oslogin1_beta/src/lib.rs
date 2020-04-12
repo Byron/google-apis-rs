@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud OS Login* crate version *1.0.12+20190614*, where *20190614* is the exact revision of the *oslogin:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Cloud OS Login* crate version *1.0.13+20200329*, where *20200329* is the exact revision of the *oslogin:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Cloud OS Login* *v1_beta* API can be found at the
 //! [official documentation site](https://cloud.google.com/compute/docs/oslogin/).
@@ -345,7 +345,7 @@ impl<'a, C, A> CloudOSLogin<C, A>
         CloudOSLogin {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://oslogin.googleapis.com/".to_string(),
             _root_url: "https://oslogin.googleapis.com/".to_string(),
         }
@@ -356,7 +356,7 @@ impl<'a, C, A> CloudOSLogin<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -402,7 +402,7 @@ pub struct LoginProfile {
     /// A map from SSH public key fingerprint to the associated key object.
     #[serde(rename="sshPublicKeys")]
     pub ssh_public_keys: Option<HashMap<String, SshPublicKey>>,
-    /// A unique user ID.
+    /// Required. A unique user ID.
     pub name: Option<String>,
 }
 
@@ -466,13 +466,15 @@ impl ResponseResult for Empty {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SshPublicKey {
-    /// An expiration time in microseconds since epoch.
-    #[serde(rename="expirationTimeUsec")]
-    pub expiration_time_usec: Option<String>,
     /// Public key text in SSH format, defined by
     /// <a href="https://www.ietf.org/rfc/rfc4253.txt" target="_blank">RFC4253</a>
     /// section 6.6.
     pub key: Option<String>,
+    /// Output only. The canonical resource name.
+    pub name: Option<String>,
+    /// An expiration time in microseconds since epoch.
+    #[serde(rename="expirationTimeUsec")]
+    pub expiration_time_usec: Option<String>,
     /// Output only. The SHA-256 fingerprint of the SSH public key.
     pub fingerprint: Option<String>,
 }
@@ -491,8 +493,8 @@ pub struct PosixAccount {
     pub username: Option<String>,
     /// The path to the logic shell for this account.
     pub shell: Option<String>,
-    /// The user ID.
-    pub uid: Option<String>,
+    /// Output only. The canonical resource name.
+    pub name: Option<String>,
     /// Only one POSIX account can be marked as primary.
     pub primary: Option<bool>,
     /// The operating system type where this account applies.
@@ -512,6 +514,8 @@ pub struct PosixAccount {
     /// Output only. A POSIX account identifier.
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
+    /// The user ID.
+    pub uid: Option<String>,
 }
 
 impl Part for PosixAccount {}
@@ -567,7 +571,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - A reference to the POSIX account to update. POSIX accounts are identified
+    /// * `name` - Required. A reference to the POSIX account to update. POSIX accounts are identified
     ///            by the project ID they are associated with. A reference to the POSIX
     ///            account is in format `users/{user}/projects/{project}`.
     pub fn projects_delete(&self, name: &str) -> UserProjectDeleteCall<'a, C, A> {
@@ -608,7 +612,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The fingerprint of the public key to update. Public keys are identified by
+    /// * `name` - Required. The fingerprint of the public key to update. Public keys are identified by
     ///            their SHA-256 fingerprint. The fingerprint of the public key is in format
     ///            `users/{user}/sshPublicKeys/{fingerprint}`.
     pub fn ssh_public_keys_delete(&self, name: &str) -> UserSshPublicKeyDeleteCall<'a, C, A> {
@@ -628,7 +632,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The unique ID for the user in format `users/{user}`.
+    /// * `name` - Required. The unique ID for the user in format `users/{user}`.
     pub fn get_login_profile(&self, name: &str) -> UserGetLoginProfileCall<'a, C, A> {
         UserGetLoginProfileCall {
             hub: self.hub,
@@ -647,7 +651,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The fingerprint of the public key to retrieve. Public keys are identified
+    /// * `name` - Required. The fingerprint of the public key to retrieve. Public keys are identified
     ///            by their SHA-256 fingerprint. The fingerprint of the public key is in
     ///            format `users/{user}/sshPublicKeys/{fingerprint}`.
     pub fn ssh_public_keys_get(&self, name: &str) -> UserSshPublicKeyGetCall<'a, C, A> {
@@ -668,7 +672,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The fingerprint of the public key to update. Public keys are identified by
+    /// * `name` - Required. The fingerprint of the public key to update. Public keys are identified by
     ///            their SHA-256 fingerprint. The fingerprint of the public key is in format
     ///            `users/{user}/sshPublicKeys/{fingerprint}`.
     pub fn ssh_public_keys_patch(&self, request: SshPublicKey, name: &str) -> UserSshPublicKeyPatchCall<'a, C, A> {
@@ -867,7 +871,7 @@ impl<'a, C, A> UserProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// A reference to the POSIX account to update. POSIX accounts are identified
+    /// Required. A reference to the POSIX account to update. POSIX accounts are identified
     /// by the project ID they are associated with. A reference to the POSIX
     /// account is in format `users/{user}/projects/{project}`.
     ///
@@ -1410,7 +1414,7 @@ impl<'a, C, A> UserSshPublicKeyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
-    /// The fingerprint of the public key to update. Public keys are identified by
+    /// Required. The fingerprint of the public key to update. Public keys are identified by
     /// their SHA-256 fingerprint. The fingerprint of the public key is in format
     /// `users/{user}/sshPublicKeys/{fingerprint}`.
     ///
@@ -1671,7 +1675,7 @@ impl<'a, C, A> UserGetLoginProfileCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// The unique ID for the user in format `users/{user}`.
+    /// Required. The unique ID for the user in format `users/{user}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -1933,7 +1937,7 @@ impl<'a, C, A> UserSshPublicKeyGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// The fingerprint of the public key to retrieve. Public keys are identified
+    /// Required. The fingerprint of the public key to retrieve. Public keys are identified
     /// by their SHA-256 fingerprint. The fingerprint of the public key is in
     /// format `users/{user}/sshPublicKeys/{fingerprint}`.
     ///
@@ -2220,7 +2224,7 @@ impl<'a, C, A> UserSshPublicKeyPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._request = new_value;
         self
     }
-    /// The fingerprint of the public key to update. Public keys are identified by
+    /// Required. The fingerprint of the public key to update. Public keys are identified by
     /// their SHA-256 fingerprint. The fingerprint of the public key is in format
     /// `users/{user}/sshPublicKeys/{fingerprint}`.
     ///

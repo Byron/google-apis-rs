@@ -1,4 +1,4 @@
-site_name: IAM Credentials v1.0.12+20190620
+site_name: IAM Credentials v1.0.13+20200327
 site_url: http://byron.github.io/google-apis-rs/google-iamcredentials1-cli
 site_description: A complete library to interact with IAM Credentials (protocol v1)
 
@@ -11,7 +11,6 @@ pages:
 - ['index.md', 'Home']
 - ['projects_service-accounts-generate-access-token.md', 'Projects', 'Service Accounts Generate Access Token']
 - ['projects_service-accounts-generate-id-token.md', 'Projects', 'Service Accounts Generate Id Token']
-- ['projects_service-accounts-generate-identity-binding-access-token.md', 'Projects', 'Service Accounts Generate Identity Binding Access Token']
 - ['projects_service-accounts-sign-blob.md', 'Projects', 'Service Accounts Sign Blob']
 - ['projects_service-accounts-sign-jwt.md', 'Projects', 'Service Accounts Sign Jwt']
 

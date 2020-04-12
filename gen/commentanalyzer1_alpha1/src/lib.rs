@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Comment Analyzer* crate version *1.0.12+20190616*, where *20190616* is the exact revision of the *commentanalyzer:v1alpha1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Comment Analyzer* crate version *1.0.13+20200405*, where *20200405* is the exact revision of the *commentanalyzer:v1alpha1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Comment Analyzer* *v1_alpha1* API can be found at the
 //! [official documentation site](https://github.com/conversationai/perspectiveapi/blob/master/README.md).
@@ -329,7 +329,7 @@ impl<'a, C, A> CommentAnalyzer<C, A>
         CommentAnalyzer {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://commentanalyzer.googleapis.com/".to_string(),
             _root_url: "https://commentanalyzer.googleapis.com/".to_string(),
         }
@@ -340,7 +340,7 @@ impl<'a, C, A> CommentAnalyzer<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -406,14 +406,9 @@ impl ResponseResult for SuggestCommentScoreResponse {}
 pub struct SuggestCommentScoreRequest {
     /// The comment being scored.
     pub comment: Option<TextEntry>,
-    /// The language(s) of the comment and context (if none are specified, the
-    /// language is automatically detected). If multiple languages are specified,
-    /// the text is checked in all of them that are supported. Both ISO and BCP-47
-    /// language codes are accepted.
-    /// Current Language Restrictions:
-    ///  * Only English text ("en") is supported.
-    /// If none of the languages specified by the caller are supported, an
-    /// `UNIMPLEMENTED` error is returned.
+    /// The language(s) of the comment and context. If none are specified, we
+    /// attempt to automatically detect the language. Both ISO and BCP-47 language
+    /// codes are accepted.
     pub languages: Option<Vec<String>>,
     /// Session ID. Used to join related RPCs into a single session. For example,
     /// an interactive tool that calls both the AnalyzeComment and
@@ -457,6 +452,7 @@ impl RequestValue for SuggestCommentScoreRequest {}
 
 
 /// The comment analysis request message.
+/// LINT.IfChange
 /// 
 /// # Activities
 /// 
@@ -473,14 +469,15 @@ pub struct AnalyzeCommentRequest {
     /// service may store comments/context for debugging purposes.
     #[serde(rename="doNotStore")]
     pub do_not_store: Option<bool>,
-    /// The language(s) of the comment and context (if none are specified, the
-    /// language is automatically detected). If multiple languages are specified,
-    /// the text is checked in all of them that are supported. Both ISO and BCP-47
-    /// language codes are accepted.
-    /// Current Language Restrictions:
-    ///  * Only English text ("en") is supported.
-    /// If none of the languages specified by the caller are supported, an
-    /// `UNIMPLEMENTED` error is returned.
+    /// The language(s) of the comment and context. If none are specified, we
+    /// attempt to automatically detect the language. Specifying multiple languages
+    /// means the text contains multiple lanugages. Both ISO and BCP-47 language
+    /// codes are accepted.
+    /// 
+    /// The server returns an error if no language was specified and language
+    /// detection fails. The server also returns an error if the languages (either
+    /// specified by the caller, or auto-detected) are not *all* supported by the
+    /// service.
     pub languages: Option<Vec<String>>,
     /// Session ID. Used to join related RPCs into a single session. For example,
     /// an interactive tool that calls both the AnalyzeComment and
@@ -495,16 +492,12 @@ pub struct AnalyzeCommentRequest {
     pub client_token: Option<String>,
     /// Specification of requested attributes. The AttributeParameters serve as
     /// configuration for each associated attribute. The map keys are attribute
-    /// names. The following attributes are available:
-    /// "ATTACK_ON_AUTHOR" - Attack on author of original article or post.
-    /// "ATTACK_ON_COMMENTER" - Attack on fellow commenter.
-    /// "ATTACK_ON_PUBLISHER" - Attack on publisher of article/post.
-    /// "INCOHERENT" - Difficult to understand, nonsensical.
-    /// "INFLAMMATORY" - Intending to provoke or inflame.
-    /// "OBSCENE" - Obscene, such as cursing.
-    /// "OFF_TOPIC" - Not related to the original topic.
-    /// "SPAM" - Commercial/advertising spam content.
-    /// "UNSUBSTANTIAL" - Trivial.
+    /// names. The available attributes may be different on each RFE installation,
+    /// and can be seen by calling ListAttributes (see above).
+    /// For the prod installation, known as Perspective API, at
+    /// blade:commentanalyzer-esf and commentanalyzer.googleapis.com, see
+    /// go/checker-models (internal) and
+    /// https://github.com/conversationai/perspectiveapi/blob/master/2-api/models.md#all-attribute-types.
     #[serde(rename="requestedAttributes")]
     pub requested_attributes: Option<HashMap<String, AttributeParameters>>,
     /// An advisory parameter that will return span annotations if the model
@@ -537,10 +530,10 @@ pub struct AnalyzeCommentResponse {
     /// The language(s) used by CommentAnalyzer service to choose which Model to
     /// use when analyzing the comment. Might better be called
     /// "effective_languages". The logic used to make the choice is as follows:
-    /// if Request.languages.empty()
-    /// effective_languages = detected_languages
-    /// else
+    /// if !Request.languages.empty()
     /// effective_languages = Request.languages
+    /// else
+    /// effective_languages = detected_languages[0]
     pub languages: Option<Vec<String>>,
     /// Scores for the requested attributes. The map keys are attribute names (same
     /// as the requested_attribute field in AnalyzeCommentRequest, for example

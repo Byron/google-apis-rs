@@ -1,8 +1,8 @@
-site_name: SQL Admin v1.0.12+20190607
-site_url: http://byron.github.io/google-apis-rs/google-sqladmin1_beta4-cli
+site_name: SQL Admin v1.0.13+20200331
+site_url: http://byron.github.io/google-apis-rs/google-sql1_beta4-cli
 site_description: A complete library to interact with SQL Admin (protocol v1beta4)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/sqladmin1_beta4-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/sql1_beta4-cli
 
 docs_dir: docs
 site_dir: build_html
@@ -43,6 +43,9 @@ pages:
 - ['instances_update.md', 'Instances', 'Update']
 - ['operations_get.md', 'Operations', 'Get']
 - ['operations_list.md', 'Operations', 'List']
+- ['projects_instances-reschedule-maintenance.md', 'Projects', 'Instances Reschedule Maintenance']
+- ['projects_instances-start-external-sync.md', 'Projects', 'Instances Start External Sync']
+- ['projects_instances-verify-external-sync-settings.md', 'Projects', 'Instances Verify External Sync Settings']
 - ['ssl-certs_create-ephemeral.md', 'Ssl Certs', 'Create Ephemeral']
 - ['ssl-certs_delete.md', 'Ssl Certs', 'Delete']
 - ['ssl-certs_get.md', 'Ssl Certs', 'Get']

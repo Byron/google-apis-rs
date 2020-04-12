@@ -242,6 +242,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -255,6 +258,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["options-requested-policy-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -725,9 +729,11 @@ impl<'n> Engine<'n> {
                     "topic" => Some(("topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message-retention-duration" => Some(("messageRetentionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retain-acked-messages" => Some(("retainAckedMessages", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "dead-letter-policy.dead-letter-topic" => Some(("deadLetterPolicy.deadLetterTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dead-letter-policy.max-delivery-attempts" => Some(("deadLetterPolicy.maxDeliveryAttempts", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "expiration-policy.ttl" => Some(("expirationPolicy.ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "audience", "expiration-policy", "labels", "message-retention-duration", "name", "oidc-token", "push-config", "push-endpoint", "retain-acked-messages", "service-account-email", "topic", "ttl"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "audience", "dead-letter-policy", "dead-letter-topic", "expiration-policy", "labels", "max-delivery-attempts", "message-retention-duration", "name", "oidc-token", "push-config", "push-endpoint", "retain-acked-messages", "service-account-email", "topic", "ttl"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -897,6 +903,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -910,6 +919,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["options-requested-policy-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1210,9 +1220,11 @@ impl<'n> Engine<'n> {
                     "subscription.topic" => Some(("subscription.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.message-retention-duration" => Some(("subscription.messageRetentionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.retain-acked-messages" => Some(("subscription.retainAckedMessages", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "subscription.dead-letter-policy.dead-letter-topic" => Some(("subscription.deadLetterPolicy.deadLetterTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription.dead-letter-policy.max-delivery-attempts" => Some(("subscription.deadLetterPolicy.maxDeliveryAttempts", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "subscription.expiration-policy.ttl" => Some(("subscription.expirationPolicy.ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "audience", "expiration-policy", "labels", "message-retention-duration", "name", "oidc-token", "push-config", "push-endpoint", "retain-acked-messages", "service-account-email", "subscription", "topic", "ttl", "update-mask"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "audience", "dead-letter-policy", "dead-letter-topic", "expiration-policy", "labels", "max-delivery-attempts", "message-retention-duration", "name", "oidc-token", "push-config", "push-endpoint", "retain-acked-messages", "service-account-email", "subscription", "topic", "ttl", "update-mask"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1813,6 +1825,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(arg_from_str(value.unwrap_or("-0"), err, "options-requested-policy-version", "integer"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1826,6 +1841,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["options-requested-policy-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2598,13 +2614,12 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Optional user-provided name for this snapshot.
-        If the name is not provided in the request, the server will assign a random
-        name for this snapshot on the same project as the subscription.
-        Note that for REST API requests, you must specify a name.  See the
-        <a href="https://cloud.google.com/pubsub/docs/admin#resource_names">
-        resource name rules</a>.
-        Format is `projects/{project}/snapshots/{snap}`."##),
+                     Some(r##"Required. User-provided name for this snapshot. If the name is not provided in the
+        request, the server will assign a random name for this snapshot on the same
+        project as the subscription. Note that for REST API requests, you must
+        specify a name.  See the <a
+        href="https://cloud.google.com/pubsub/docs/admin#resource_names"> resource
+        name rules</a>. Format is `projects/{project}/snapshots/{snap}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2641,7 +2656,7 @@ fn main() {
                   vec![
                     (Some(r##"snapshot"##),
                      None,
-                     Some(r##"The name of the snapshot to delete.
+                     Some(r##"Required. The name of the snapshot to delete.
         Format is `projects/{project}/snapshots/{snap}`."##),
                      Some(true),
                      Some(false)),
@@ -2668,7 +2683,7 @@ fn main() {
                   vec![
                     (Some(r##"snapshot"##),
                      None,
-                     Some(r##"The name of the snapshot to get.
+                     Some(r##"Required. The name of the snapshot to get.
         Format is `projects/{project}/snapshots/{snap}`."##),
                      Some(true),
                      Some(false)),
@@ -2721,7 +2736,7 @@ fn main() {
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"The name of the project in which to list snapshots.
+                     Some(r##"Required. The name of the project in which to list snapshots.
         Format is `projects/{project-id}`."##),
                      Some(true),
                      Some(false)),
@@ -2773,7 +2788,9 @@ fn main() {
                   ]),
             ("snapshots-set-iam-policy",
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
-        existing policy."##),
+        existing policy.
+        
+        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_snapshots-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -2848,7 +2865,7 @@ fn main() {
                   vec![
                     (Some(r##"subscription"##),
                      None,
-                     Some(r##"The subscription whose message is being acknowledged.
+                     Some(r##"Required. The subscription whose message is being acknowledged.
         Format is `projects/{project}/subscriptions/{sub}`."##),
                      Some(true),
                      Some(false)),
@@ -2889,7 +2906,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the subscription. It must have the format
+                     Some(r##"Required. The name of the subscription. It must have the format
         `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
         start with a letter, and contain only letters (`[A-Za-z]`), numbers
         (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
@@ -2926,7 +2943,7 @@ fn main() {
                   vec![
                     (Some(r##"subscription"##),
                      None,
-                     Some(r##"The subscription to delete.
+                     Some(r##"Required. The subscription to delete.
         Format is `projects/{project}/subscriptions/{sub}`."##),
                      Some(true),
                      Some(false)),
@@ -2949,7 +2966,7 @@ fn main() {
                   vec![
                     (Some(r##"subscription"##),
                      None,
-                     Some(r##"The name of the subscription to get.
+                     Some(r##"Required. The name of the subscription to get.
         Format is `projects/{project}/subscriptions/{sub}`."##),
                      Some(true),
                      Some(false)),
@@ -2997,7 +3014,7 @@ fn main() {
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"The name of the project in which to list subscriptions.
+                     Some(r##"Required. The name of the project in which to list subscriptions.
         Format is `projects/{project-id}`."##),
                      Some(true),
                      Some(false)),
@@ -3024,7 +3041,7 @@ fn main() {
                   vec![
                     (Some(r##"subscription"##),
                      None,
-                     Some(r##"The name of the subscription.
+                     Some(r##"Required. The name of the subscription.
         Format is `projects/{project}/subscriptions/{sub}`."##),
                      Some(true),
                      Some(false)),
@@ -3058,7 +3075,7 @@ fn main() {
                   vec![
                     (Some(r##"subscription"##),
                      None,
-                     Some(r##"The name of the subscription.
+                     Some(r##"Required. The name of the subscription.
         Format is `projects/{project}/subscriptions/{sub}`."##),
                      Some(true),
                      Some(false)),
@@ -3088,7 +3105,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the subscription. It must have the format
+                     Some(r##"Required. The name of the subscription. It must have the format
         `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
         start with a letter, and contain only letters (`[A-Za-z]`), numbers
         (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
@@ -3123,7 +3140,7 @@ fn main() {
                   vec![
                     (Some(r##"subscription"##),
                      None,
-                     Some(r##"The subscription from which messages should be pulled.
+                     Some(r##"Required. The subscription from which messages should be pulled.
         Format is `projects/{project}/subscriptions/{sub}`."##),
                      Some(true),
                      Some(false)),
@@ -3159,7 +3176,7 @@ fn main() {
                   vec![
                     (Some(r##"subscription"##),
                      None,
-                     Some(r##"The subscription to affect."##),
+                     Some(r##"Required. The subscription to affect."##),
                      Some(true),
                      Some(false)),
         
@@ -3183,7 +3200,9 @@ fn main() {
                   ]),
             ("subscriptions-set-iam-policy",
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
-        existing policy."##),
+        existing policy.
+        
+        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_subscriptions-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3254,7 +3273,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the topic. It must have the format
+                     Some(r##"Required. The name of the topic. It must have the format
         `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
         and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),
         underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent
@@ -3291,7 +3310,7 @@ fn main() {
                   vec![
                     (Some(r##"topic"##),
                      None,
-                     Some(r##"Name of the topic to delete.
+                     Some(r##"Required. Name of the topic to delete.
         Format is `projects/{project}/topics/{topic}`."##),
                      Some(true),
                      Some(false)),
@@ -3314,7 +3333,7 @@ fn main() {
                   vec![
                     (Some(r##"topic"##),
                      None,
-                     Some(r##"The name of the topic to get.
+                     Some(r##"Required. The name of the topic to get.
         Format is `projects/{project}/topics/{topic}`."##),
                      Some(true),
                      Some(false)),
@@ -3362,7 +3381,7 @@ fn main() {
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"The name of the project in which to list topics.
+                     Some(r##"Required. The name of the project in which to list topics.
         Format is `projects/{project-id}`."##),
                      Some(true),
                      Some(false)),
@@ -3386,7 +3405,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the topic. It must have the format
+                     Some(r##"Required. The name of the topic. It must have the format
         `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
         and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),
         underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent
@@ -3420,7 +3439,7 @@ fn main() {
                   vec![
                     (Some(r##"topic"##),
                      None,
-                     Some(r##"The messages in the request will be published on this topic.
+                     Some(r##"Required. The messages in the request will be published on this topic.
         Format is `projects/{project}/topics/{topic}`."##),
                      Some(true),
                      Some(false)),
@@ -3445,7 +3464,9 @@ fn main() {
                   ]),
             ("topics-set-iam-policy",
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
-        existing policy."##),
+        existing policy.
+        
+        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_topics-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3484,7 +3505,7 @@ fn main() {
                   vec![
                     (Some(r##"topic"##),
                      None,
-                     Some(r##"The name of the topic that snapshots are attached to.
+                     Some(r##"Required. The name of the topic that snapshots are attached to.
         Format is `projects/{project}/topics/{topic}`."##),
                      Some(true),
                      Some(false)),
@@ -3507,7 +3528,7 @@ fn main() {
                   vec![
                     (Some(r##"topic"##),
                      None,
-                     Some(r##"The name of the topic that subscriptions are attached to.
+                     Some(r##"Required. The name of the topic that subscriptions are attached to.
         Format is `projects/{project}/topics/{topic}`."##),
                      Some(true),
                      Some(false)),
@@ -3565,7 +3586,7 @@ fn main() {
     
     let mut app = App::new("pubsub1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190625")
+           .version("1.0.13+20200403")
            .about("Provides reliable, many-to-many, asynchronous messaging between applications.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pubsub1_cli")

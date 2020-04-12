@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Vault* API at revision *20190614*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Vault* API at revision *20200330*. The CLI is at version *1.0.13*.
 
 ```bash
 vault1 [options]
@@ -58,6 +58,8 @@ vault1 [options]
                 saved-queries-list <matter-id> [-p <v>]... [-o <out>]
                 undelete <matter-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <matter-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        operations
+                delete <name> [-p <v>]... [-o <out>]
   vault1 --help
 
 Configuration:

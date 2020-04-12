@@ -210,6 +210,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "wipe-reason-message" => {
+                    call = call.wipe_reason_message(value.unwrap_or(""));
+                },
                 "wipe-data-flags" => {
                     call = call.add_wipe_data_flags(value.unwrap_or(""));
                 },
@@ -226,7 +229,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["wipe-data-flags"].iter().map(|v|*v));
+                                                                           v.extend(["wipe-reason-message", "wipe-data-flags"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -744,6 +747,7 @@ impl<'n> Engine<'n> {
                     "hardware-info.model" => Some(("hardwareInfo.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "hardware-info.brand" => Some(("hardwareInfo.brand", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "hardware-info.manufacturer" => Some(("hardwareInfo.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.device-posture" => Some(("securityPosture.devicePosture", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-info.imei" => Some(("networkInfo.imei", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-info.network-operator-name" => Some(("networkInfo.networkOperatorName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-info.meid" => Some(("networkInfo.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -762,7 +766,7 @@ impl<'n> Engine<'n> {
                     "memory-info.total-ram" => Some(("memoryInfo.totalRam", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enrollment-time" => Some(("enrollmentTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-identifier", "adb-enabled", "android-build-number", "android-build-time", "android-device-policy-version-code", "android-device-policy-version-name", "android-version", "api-level", "applied-policy-name", "applied-policy-version", "applied-state", "battery-shutdown-temperatures", "battery-throttling-temperatures", "bootloader-version", "brand", "cpu-shutdown-temperatures", "cpu-throttling-temperatures", "default-message", "development-settings-enabled", "device-baseband-version", "device-build-signature", "device-kernel-version", "device-settings", "disabled-reason", "encryption-status", "enrollment-time", "enrollment-token-data", "enrollment-token-name", "gpu-shutdown-temperatures", "gpu-throttling-temperatures", "hardware", "hardware-info", "imei", "is-device-secure", "is-encrypted", "last-policy-compliance-report-time", "last-policy-sync-time", "last-status-report-time", "localized-messages", "management-mode", "manufacturer", "meid", "memory-info", "model", "name", "network-info", "network-operator-name", "policy-compliant", "policy-name", "previous-device-names", "primary-language-code", "security-patch-level", "serial-number", "skin-shutdown-temperatures", "skin-throttling-temperatures", "software-info", "state", "system-properties", "total-internal-storage", "total-ram", "unknown-sources-enabled", "user", "user-name", "verify-apps-enabled", "wifi-mac-address"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-identifier", "adb-enabled", "android-build-number", "android-build-time", "android-device-policy-version-code", "android-device-policy-version-name", "android-version", "api-level", "applied-policy-name", "applied-policy-version", "applied-state", "battery-shutdown-temperatures", "battery-throttling-temperatures", "bootloader-version", "brand", "cpu-shutdown-temperatures", "cpu-throttling-temperatures", "default-message", "development-settings-enabled", "device-baseband-version", "device-build-signature", "device-kernel-version", "device-posture", "device-settings", "disabled-reason", "encryption-status", "enrollment-time", "enrollment-token-data", "enrollment-token-name", "gpu-shutdown-temperatures", "gpu-throttling-temperatures", "hardware", "hardware-info", "imei", "is-device-secure", "is-encrypted", "last-policy-compliance-report-time", "last-policy-sync-time", "last-status-report-time", "localized-messages", "management-mode", "manufacturer", "meid", "memory-info", "model", "name", "network-info", "network-operator-name", "policy-compliant", "policy-name", "previous-device-names", "primary-language-code", "security-patch-level", "security-posture", "serial-number", "skin-shutdown-temperatures", "skin-throttling-temperatures", "software-info", "state", "system-properties", "total-internal-storage", "total-ram", "unknown-sources-enabled", "user", "user-name", "verify-apps-enabled", "wifi-mac-address"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1305,6 +1309,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "kiosk-customization.status-bar" => Some(("kioskCustomization.statusBar", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kiosk-customization.device-settings" => Some(("kioskCustomization.deviceSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kiosk-customization.system-navigation" => Some(("kioskCustomization.systemNavigation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kiosk-customization.power-button-actions" => Some(("kioskCustomization.powerButtonActions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kiosk-customization.system-error-warnings" => Some(("kioskCustomization.systemErrorWarnings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-roaming-disabled" => Some(("dataRoamingDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "network-reset-disabled" => Some(("networkResetDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1314,6 +1323,7 @@ impl<'n> Engine<'n> {
                     "minimum-api-level" => Some(("minimumApiLevel", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "permitted-input-methods.package-names" => Some(("permittedInputMethods.packageNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "status-reporting-settings.network-info-enabled" => Some(("statusReportingSettings.networkInfoEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status-reporting-settings.system-properties-enabled" => Some(("statusReportingSettings.systemPropertiesEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status-reporting-settings.memory-info-enabled" => Some(("statusReportingSettings.memoryInfoEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status-reporting-settings.hardware-status-enabled" => Some(("statusReportingSettings.hardwareStatusEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status-reporting-settings.device-settings-enabled" => Some(("statusReportingSettings.deviceSettingsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1326,6 +1336,7 @@ impl<'n> Engine<'n> {
                     "bluetooth-config-disabled" => Some(("bluetoothConfigDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "location-mode" => Some(("locationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mobile-networks-config-disabled" => Some(("mobileNetworksConfigDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-security-overrides.untrusted-apps-policy" => Some(("advancedSecurityOverrides.untrustedAppsPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "install-unknown-sources-allowed" => Some(("installUnknownSourcesAllowed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "block-applications-enabled" => Some(("blockApplicationsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "remove-user-disabled" => Some(("removeUserDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1340,6 +1351,7 @@ impl<'n> Engine<'n> {
                     "password-requirements.password-scope" => Some(("passwordRequirements.passwordScope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "password-requirements.password-expiration-timeout" => Some(("passwordRequirements.passwordExpirationTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "password-requirements.maximum-failed-passwords-for-wipe" => Some(("passwordRequirements.maximumFailedPasswordsForWipe", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "password-requirements.require-password-unlock" => Some(("passwordRequirements.requirePasswordUnlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "password-requirements.password-minimum-symbols" => Some(("passwordRequirements.passwordMinimumSymbols", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "password-requirements.password-quality" => Some(("passwordRequirements.passwordQuality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "password-requirements.password-minimum-length" => Some(("passwordRequirements.passwordMinimumLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1394,6 +1406,7 @@ impl<'n> Engine<'n> {
                     "stay-on-plugged-modes" => Some(("stayOnPluggedModes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "screen-capture-disabled" => Some(("screenCaptureDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "credentials-config-disabled" => Some(("credentialsConfigDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "permitted-accessibility-services.package-names" => Some(("permittedAccessibilityServices.packageNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "install-apps-disabled" => Some(("installAppsDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "adjust-volume-disabled" => Some(("adjustVolumeDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "short-support-message.default-message" => Some(("shortSupportMessage.defaultMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1402,7 +1415,7 @@ impl<'n> Engine<'n> {
                     "private-key-selection-enabled" => Some(("privateKeySelectionEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "create-windows-disabled" => Some(("createWindowsDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-types-with-management-disabled", "add-user-disabled", "adjust-volume-disabled", "always-on-vpn-package", "android-device-policy-tracks", "app-auto-update-policy", "application-reporting-settings", "application-reports-enabled", "auto-time-required", "block-applications-enabled", "bluetooth-config-disabled", "bluetooth-contact-sharing-disabled", "bluetooth-disabled", "camera-disabled", "cell-broadcasts-config-disabled", "create-windows-disabled", "credentials-config-disabled", "data-roaming-disabled", "debugging-features-allowed", "default-message", "default-permission-policy", "device-owner-lock-screen-info", "device-settings-enabled", "display-info-enabled", "encryption-policy", "end-minutes", "ensure-verify-apps-enabled", "excluded-hosts", "factory-reset-disabled", "frp-admin-emails", "fun-disabled", "hardware-status-enabled", "host", "include-removed-apps", "install-apps-disabled", "install-unknown-sources-allowed", "keyguard-disabled", "keyguard-disabled-features", "kiosk-custom-launcher-enabled", "localized-messages", "location-mode", "lockdown-enabled", "long-support-message", "maximum-failed-passwords-for-wipe", "maximum-time-to-lock", "memory-info-enabled", "minimum-api-level", "mobile-networks-config-disabled", "modify-accounts-disabled", "mount-physical-media-disabled", "name", "network-escape-hatch-enabled", "network-info-enabled", "network-reset-disabled", "outgoing-beam-disabled", "outgoing-calls-disabled", "pac-uri", "package-name", "package-names", "password-expiration-timeout", "password-history-length", "password-minimum-length", "password-minimum-letters", "password-minimum-lower-case", "password-minimum-non-letter", "password-minimum-numeric", "password-minimum-symbols", "password-minimum-upper-case", "password-quality", "password-requirements", "password-scope", "permitted-input-methods", "play-store-mode", "port", "power-management-events-enabled", "private-key-selection-enabled", "recommended-global-proxy", "remove-user-disabled", "safe-boot-disabled", "screen-capture-disabled", "set-user-icon-disabled", "set-wallpaper-disabled", "share-location-disabled", "short-support-message", "skip-first-use-hints-enabled", "sms-disabled", "software-info-enabled", "start-minutes", "status-bar-disabled", "status-reporting-settings", "stay-on-plugged-modes", "system-update", "tethering-config-disabled", "type", "uninstall-apps-disabled", "unmute-microphone-disabled", "usb-file-transfer-disabled", "usb-mass-storage-enabled", "version", "vpn-config-disabled", "wifi-config-disabled", "wifi-configs-lockdown-enabled"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-types-with-management-disabled", "add-user-disabled", "adjust-volume-disabled", "advanced-security-overrides", "always-on-vpn-package", "android-device-policy-tracks", "app-auto-update-policy", "application-reporting-settings", "application-reports-enabled", "auto-time-required", "block-applications-enabled", "bluetooth-config-disabled", "bluetooth-contact-sharing-disabled", "bluetooth-disabled", "camera-disabled", "cell-broadcasts-config-disabled", "create-windows-disabled", "credentials-config-disabled", "data-roaming-disabled", "debugging-features-allowed", "default-message", "default-permission-policy", "device-owner-lock-screen-info", "device-settings", "device-settings-enabled", "display-info-enabled", "encryption-policy", "end-minutes", "ensure-verify-apps-enabled", "excluded-hosts", "factory-reset-disabled", "frp-admin-emails", "fun-disabled", "hardware-status-enabled", "host", "include-removed-apps", "install-apps-disabled", "install-unknown-sources-allowed", "keyguard-disabled", "keyguard-disabled-features", "kiosk-custom-launcher-enabled", "kiosk-customization", "localized-messages", "location-mode", "lockdown-enabled", "long-support-message", "maximum-failed-passwords-for-wipe", "maximum-time-to-lock", "memory-info-enabled", "minimum-api-level", "mobile-networks-config-disabled", "modify-accounts-disabled", "mount-physical-media-disabled", "name", "network-escape-hatch-enabled", "network-info-enabled", "network-reset-disabled", "outgoing-beam-disabled", "outgoing-calls-disabled", "pac-uri", "package-name", "package-names", "password-expiration-timeout", "password-history-length", "password-minimum-length", "password-minimum-letters", "password-minimum-lower-case", "password-minimum-non-letter", "password-minimum-numeric", "password-minimum-symbols", "password-minimum-upper-case", "password-quality", "password-requirements", "password-scope", "permitted-accessibility-services", "permitted-input-methods", "play-store-mode", "port", "power-button-actions", "power-management-events-enabled", "private-key-selection-enabled", "recommended-global-proxy", "remove-user-disabled", "require-password-unlock", "safe-boot-disabled", "screen-capture-disabled", "set-user-icon-disabled", "set-wallpaper-disabled", "share-location-disabled", "short-support-message", "skip-first-use-hints-enabled", "sms-disabled", "software-info-enabled", "start-minutes", "status-bar", "status-bar-disabled", "status-reporting-settings", "stay-on-plugged-modes", "system-error-warnings", "system-navigation", "system-properties-enabled", "system-update", "tethering-config-disabled", "type", "uninstall-apps-disabled", "unmute-microphone-disabled", "untrusted-apps-policy", "usb-file-transfer-disabled", "usb-mass-storage-enabled", "version", "vpn-config-disabled", "wifi-config-disabled", "wifi-configs-lockdown-enabled"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1834,12 +1847,13 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "parent-frame-url" => Some(("parentFrameUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "value" => Some(("value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "permissions" => Some(("permissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "parent-frame-url" => Some(("parentFrameUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enabled-features" => Some(("enabledFeatures", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "value" => Some(("value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "parent-frame-url", "permissions", "value"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["enabled-features", "name", "parent-frame-url", "permissions", "value"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2766,7 +2780,7 @@ fn main() {
     
     let mut app = App::new("androidmanagement1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190624")
+           .version("1.0.13+20200330")
            .about("The Android Management API provides remote enterprise management of Android devices and apps.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidmanagement1_cli")
            .arg(Arg::with_name("url")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Texttospeech* crate version *1.0.12+20190628*, where *20190628* is the exact revision of the *texttospeech:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Texttospeech* crate version *1.0.13+20200406*, where *20200406* is the exact revision of the *texttospeech:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Texttospeech* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/text-to-speech/).
@@ -321,7 +321,7 @@ impl<'a, C, A> Texttospeech<C, A>
         Texttospeech {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://texttospeech.googleapis.com/".to_string(),
             _root_url: "https://texttospeech.googleapis.com/".to_string(),
         }
@@ -335,7 +335,7 @@ impl<'a, C, A> Texttospeech<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -448,7 +448,7 @@ pub struct AudioConfig {
     /// increase 20 semitones from the original pitch. -20 means decrease 20
     /// semitones from the original pitch.
     pub pitch: Option<f64>,
-    /// The synthesis sample rate (in hertz) for this audio. Optional. When this is
+    /// Optional. The synthesis sample rate (in hertz) for this audio. When this is
     /// specified in SynthesizeSpeechRequest, if this is different from the voice's
     /// natural sample rate, then the synthesizer will honor this request by
     /// converting to the desired sample rate (which might result in worse audio
@@ -484,16 +484,16 @@ impl Part for AudioConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VoiceSelectionParams {
-    /// The preferred gender of the voice. Optional; if not set, the service will
+    /// The preferred gender of the voice. If not set, the service will
     /// choose a voice based on the other parameters such as language_code and
     /// name. Note that this is only a preference, not requirement; if a
     /// voice of the appropriate gender is not available, the synthesizer should
     /// substitute a voice with a different gender rather than failing the request.
     #[serde(rename="ssmlGender")]
     pub ssml_gender: Option<String>,
-    /// The language (and optionally also the region) of the voice expressed as a
+    /// Required. The language (and potentially also the region) of the voice expressed as a
     /// [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag, e.g.
-    /// "en-US". Required. This should not include a script tag (e.g. use
+    /// "en-US". This should not include a script tag (e.g. use
     /// "cmn-cn" rather than "cmn-Hant-cn"), because the script will be inferred
     /// from the input provided in the SynthesisInput.  The TTS service
     /// will use this parameter to help choose an appropriate voice.  Note that
@@ -504,7 +504,7 @@ pub struct VoiceSelectionParams {
     /// Bokmal) instead of "no" (Norwegian)".
     #[serde(rename="languageCode")]
     pub language_code: Option<String>,
-    /// The name of the voice. Optional; if not set, the service will choose a
+    /// The name of the voice. If not set, the service will choose a
     /// voice based on the other parameters such as language_code and gender.
     pub name: Option<String>,
 }
@@ -1084,7 +1084,7 @@ impl<'a, C, A> VoiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// Optional (but recommended)
+    /// Optional. Recommended.
     /// [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag. If
     /// specified, the ListVoices call will only return voices that can be used to
     /// synthesize this language_code. E.g. when specifying "en-NZ", you will get

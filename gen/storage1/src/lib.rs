@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storage* crate version *1.0.12+20190624*, where *20190624* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *storage* crate version *1.0.13+20200326*, where *20200326* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *storage* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/storage/docs/json_api/).
@@ -416,9 +416,9 @@ impl<'a, C, A> Storage<C, A>
         Storage {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
-            _base_url: "https://www.googleapis.com/storage/v1/".to_string(),
-            _root_url: "https://www.googleapis.com/".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
+            _base_url: "https://storage.googleapis.com/storage/v1/".to_string(),
+            _root_url: "https://storage.googleapis.com/".to_string(),
         }
     }
 
@@ -448,7 +448,7 @@ impl<'a, C, A> Storage<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -456,7 +456,7 @@ impl<'a, C, A> Storage<C, A>
     }
 
     /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/storage/v1/`.
+    /// It defaults to `https://storage.googleapis.com/storage/v1/`.
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
@@ -464,7 +464,7 @@ impl<'a, C, A> Storage<C, A>
     }
 
     /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://www.googleapis.com/`.
+    /// It defaults to `https://storage.googleapis.com/`.
     ///
     /// Returns the previously set root url.
     pub fn root_url(&mut self, new_root_url: String) -> String {
@@ -666,7 +666,7 @@ pub struct BucketLifecycleRuleCondition {
     /// Relevant only for versioned objects. If the value is true, this condition matches live objects; if the value is false, it matches archived objects.
     #[serde(rename="isLive")]
     pub is_live: Option<bool>,
-    /// Objects having any of the storage classes specified by this condition will be matched. Values include MULTI_REGIONAL, REGIONAL, NEARLINE, COLDLINE, STANDARD, and DURABLE_REDUCED_AVAILABILITY.
+    /// Objects having any of the storage classes specified by this condition will be matched. Values include MULTI_REGIONAL, REGIONAL, NEARLINE, COLDLINE, ARCHIVE, STANDARD, and DURABLE_REDUCED_AVAILABILITY.
     #[serde(rename="matchesStorageClass")]
     pub matches_storage_class: Option<Vec<String>>,
     /// Age of an object (in days). This condition is satisfied when an object reaches the specified age.
@@ -784,6 +784,8 @@ pub struct Policy {
     pub etag: Option<String>,
     /// The kind of item this is. For policies, this is always storage#policy. This field is ignored on input.
     pub kind: Option<String>,
+    /// The IAM policy format version.
+    pub version: Option<i32>,
 }
 
 impl RequestValue for Policy {}
@@ -1051,7 +1053,7 @@ pub struct BucketIamConfiguration {
     /// The bucket's uniform bucket-level access configuration.
     #[serde(rename="uniformBucketLevelAccess")]
     pub uniform_bucket_level_access: Option<BucketIamConfigurationUniformBucketLevelAccess>,
-    /// The bucket's Bucket Policy Only configuration.
+    /// The bucket's uniform bucket-level access configuration. The feature was formerly known as Bucket Policy Only. For backward compatibility, this field will be populated with identical information as the uniformBucketLevelAccess field. We recommend using the uniformBucketLevelAccess field to enable and disable the feature.
     #[serde(rename="bucketPolicyOnly")]
     pub bucket_policy_only: Option<BucketIamConfigurationBucketPolicyOnly>,
 }
@@ -1180,6 +1182,9 @@ pub struct Bucket {
     pub billing: Option<BucketBilling>,
     /// Encryption configuration for a bucket.
     pub encryption: Option<BucketEncryption>,
+    /// The zone or zones from which the bucket is intended to use zonal quota. Requests for data from outside the specified affinities are still allowed but won't be able to use zonal quota. The zone or zones need to be within the bucket location otherwise the requests will fail with a 400 Bad Request response.
+    #[serde(rename="zoneAffinity")]
+    pub zone_affinity: Option<Vec<String>>,
     /// The bucket's lifecycle configuration. See lifecycle management for more information.
     pub lifecycle: Option<BucketLifecycle>,
     /// HTTP 1.1 Entity tag for the bucket.
@@ -1189,9 +1194,12 @@ pub struct Bucket {
     /// The type of the bucket location.
     #[serde(rename="locationType")]
     pub location_type: Option<String>,
+    /// If set, objects placed in this bucket are required to be separated by disaster domain.
+    #[serde(rename="zoneSeparation")]
+    pub zone_separation: Option<bool>,
     /// The bucket's versioning configuration.
     pub versioning: Option<BucketVersioning>,
-    /// The bucket's default storage class, used whenever no storageClass is specified for a newly-created object. This defines how objects in the bucket are stored and determines the SLA and the cost of storage. Values include MULTI_REGIONAL, REGIONAL, STANDARD, NEARLINE, COLDLINE, and DURABLE_REDUCED_AVAILABILITY. If this value is not specified when the bucket is created, it will default to STANDARD. For more information, see storage classes.
+    /// The bucket's default storage class, used whenever no storageClass is specified for a newly-created object. This defines how objects in the bucket are stored and determines the SLA and the cost of storage. Values include MULTI_REGIONAL, REGIONAL, STANDARD, NEARLINE, COLDLINE, ARCHIVE, and DURABLE_REDUCED_AVAILABILITY. If this value is not specified when the bucket is created, it will default to STANDARD. For more information, see storage classes.
     #[serde(rename="storageClass")]
     pub storage_class: Option<String>,
 }
@@ -1201,7 +1209,7 @@ impl Resource for Bucket {}
 impl ResponseResult for Bucket {}
 
 
-/// The bucket's Bucket Policy Only configuration.
+/// The bucket's uniform bucket-level access configuration. The feature was formerly known as Bucket Policy Only. For backward compatibility, this field will be populated with identical information as the uniformBucketLevelAccess field. We recommend using the uniformBucketLevelAccess field to enable and disable the feature.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2297,12 +2305,14 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
             _bucket: bucket.to_string(),
             _versions: Default::default(),
             _user_project: Default::default(),
+            _start_offset: Default::default(),
             _provisional_user_project: Default::default(),
             _projection: Default::default(),
             _prefix: Default::default(),
             _page_token: Default::default(),
             _max_results: Default::default(),
             _include_trailing_delimiter: Default::default(),
+            _end_offset: Default::default(),
             _delimiter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2482,12 +2492,14 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
             _bucket: bucket.to_string(),
             _versions: Default::default(),
             _user_project: Default::default(),
+            _start_offset: Default::default(),
             _provisional_user_project: Default::default(),
             _projection: Default::default(),
             _prefix: Default::default(),
             _page_token: Default::default(),
             _max_results: Default::default(),
             _include_trailing_delimiter: Default::default(),
+            _end_offset: Default::default(),
             _delimiter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2551,6 +2563,7 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
             _if_generation_not_match: Default::default(),
             _if_generation_match: Default::default(),
             _destination_predefined_acl: Default::default(),
+            _destination_kms_key_name: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3012,6 +3025,7 @@ impl<'a, C, A> BucketMethods<'a, C, A> {
             _bucket: bucket.to_string(),
             _user_project: Default::default(),
             _provisional_user_project: Default::default(),
+            _options_requested_policy_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -8898,13 +8912,15 @@ impl<'a, C, A> ObjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// let result = hub.objects().watch_all(req, "bucket")
 ///              .versions(false)
 ///              .user_project("et")
-///              .provisional_user_project("sed")
-///              .projection("sit")
-///              .prefix("takimata")
-///              .page_token("elitr")
-///              .max_results(10)
+///              .start_offset("sed")
+///              .provisional_user_project("sit")
+///              .projection("takimata")
+///              .prefix("elitr")
+///              .page_token("nonumy")
+///              .max_results(86)
 ///              .include_trailing_delimiter(true)
-///              .delimiter("Lorem")
+///              .end_offset("Lorem")
+///              .delimiter("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -8916,12 +8932,14 @@ pub struct ObjectWatchAllCall<'a, C, A>
     _bucket: String,
     _versions: Option<bool>,
     _user_project: Option<String>,
+    _start_offset: Option<String>,
     _provisional_user_project: Option<String>,
     _projection: Option<String>,
     _prefix: Option<String>,
     _page_token: Option<String>,
     _max_results: Option<u32>,
     _include_trailing_delimiter: Option<bool>,
+    _end_offset: Option<String>,
     _delimiter: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
@@ -8944,13 +8962,16 @@ impl<'a, C, A> ObjectWatchAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "storage.objects.watchAll",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(15 + self._additional_params.len());
         params.push(("bucket", self._bucket.to_string()));
         if let Some(value) = self._versions {
             params.push(("versions", value.to_string()));
         }
         if let Some(value) = self._user_project {
             params.push(("userProject", value.to_string()));
+        }
+        if let Some(value) = self._start_offset {
+            params.push(("startOffset", value.to_string()));
         }
         if let Some(value) = self._provisional_user_project {
             params.push(("provisionalUserProject", value.to_string()));
@@ -8970,10 +8991,13 @@ impl<'a, C, A> ObjectWatchAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         if let Some(value) = self._include_trailing_delimiter {
             params.push(("includeTrailingDelimiter", value.to_string()));
         }
+        if let Some(value) = self._end_offset {
+            params.push(("endOffset", value.to_string()));
+        }
         if let Some(value) = self._delimiter {
             params.push(("delimiter", value.to_string()));
         }
-        for &field in ["alt", "bucket", "versions", "userProject", "provisionalUserProject", "projection", "prefix", "pageToken", "maxResults", "includeTrailingDelimiter", "delimiter"].iter() {
+        for &field in ["alt", "bucket", "versions", "userProject", "startOffset", "provisionalUserProject", "projection", "prefix", "pageToken", "maxResults", "includeTrailingDelimiter", "endOffset", "delimiter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9133,6 +9157,13 @@ impl<'a, C, A> ObjectWatchAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._user_project = Some(new_value.to_string());
         self
     }
+    /// Filter results to objects whose names are lexicographically equal to or after startOffset. If endOffset is also set, the objects listed will have names between startOffset (inclusive) and endOffset (exclusive).
+    ///
+    /// Sets the *start offset* query property to the given value.
+    pub fn start_offset(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
+        self._start_offset = Some(new_value.to_string());
+        self
+    }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
@@ -9173,6 +9204,13 @@ impl<'a, C, A> ObjectWatchAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// Sets the *include trailing delimiter* query property to the given value.
     pub fn include_trailing_delimiter(mut self, new_value: bool) -> ObjectWatchAllCall<'a, C, A> {
         self._include_trailing_delimiter = Some(new_value);
+        self
+    }
+    /// Filter results to objects whose names are lexicographically before endOffset. If startOffset is also set, the objects listed will have names between startOffset (inclusive) and endOffset (exclusive).
+    ///
+    /// Sets the *end offset* query property to the given value.
+    pub fn end_offset(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
+        self._end_offset = Some(new_value.to_string());
         self
     }
     /// Returns results in a directory-like mode. items will contain only objects whose names, aside from the prefix, do not contain delimiter. Objects whose names, aside from the prefix, contain delimiter will have their name, truncated after the delimiter, returned in prefixes. Duplicate prefixes are omitted.
@@ -9275,9 +9313,9 @@ impl<'a, C, A> ObjectWatchAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().set_iam_policy(req, "bucket", "object")
-///              .user_project("ut")
-///              .provisional_user_project("ut")
-///              .generation("amet.")
+///              .user_project("amet.")
+///              .provisional_user_project("ipsum")
+///              .generation("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -9588,9 +9626,9 @@ impl<'a, C, A> ObjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().get_iam_policy("bucket", "object")
-///              .user_project("dolor")
-///              .provisional_user_project("sea")
-///              .generation("ut")
+///              .user_project("ut")
+///              .provisional_user_project("eirmod")
+///              .generation("sanctus")
 ///              .doit();
 /// # }
 /// ```
@@ -9882,15 +9920,15 @@ impl<'a, C, A> ObjectGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().update(req, "bucket", "object")
-///              .user_project("voluptua.")
-///              .provisional_user_project("dolor")
-///              .projection("et")
-///              .predefined_acl("et")
-///              .if_metageneration_not_match("vero")
-///              .if_metageneration_match("ut")
-///              .if_generation_not_match("sed")
-///              .if_generation_match("et")
-///              .generation("ipsum")
+///              .user_project("et")
+///              .provisional_user_project("et")
+///              .projection("vero")
+///              .predefined_acl("ut")
+///              .if_metageneration_not_match("sed")
+///              .if_metageneration_match("et")
+///              .if_generation_not_match("ipsum")
+///              .if_generation_match("justo")
+///              .generation("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -10274,17 +10312,17 @@ impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().insert(req, "bucket")
-///              .user_project("dolore")
-///              .provisional_user_project("vero")
-///              .projection("dolor")
-///              .predefined_acl("takimata")
+///              .user_project("dolor")
+///              .provisional_user_project("takimata")
+///              .projection("et")
+///              .predefined_acl("nonumy")
 ///              .name("et")
-///              .kms_key_name("nonumy")
-///              .if_metageneration_not_match("et")
-///              .if_metageneration_match("sed")
-///              .if_generation_not_match("no")
-///              .if_generation_match("invidunt")
-///              .content_encoding("rebum.")
+///              .kms_key_name("sed")
+///              .if_metageneration_not_match("no")
+///              .if_metageneration_match("invidunt")
+///              .if_generation_not_match("rebum.")
+///              .if_generation_match("labore")
+///              .content_encoding("aliquyam")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -10786,12 +10824,12 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().compose(req, "destinationBucket", "destinationObject")
-///              .user_project("elitr")
-///              .provisional_user_project("consetetur")
-///              .kms_key_name("sea")
-///              .if_metageneration_match("elitr")
-///              .if_generation_match("At")
-///              .destination_predefined_acl("sea")
+///              .user_project("sea")
+///              .provisional_user_project("elitr")
+///              .kms_key_name("At")
+///              .if_metageneration_match("sea")
+///              .if_generation_match("consetetur")
+///              .destination_predefined_acl("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -11135,13 +11173,13 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().delete("bucket", "object")
-///              .user_project("accusam")
-///              .provisional_user_project("dolores")
-///              .if_metageneration_not_match("consetetur")
-///              .if_metageneration_match("dolor")
-///              .if_generation_not_match("aliquyam")
-///              .if_generation_match("elitr")
-///              .generation("ea")
+///              .user_project("consetetur")
+///              .provisional_user_project("dolor")
+///              .if_metageneration_not_match("aliquyam")
+///              .if_metageneration_match("elitr")
+///              .if_generation_not_match("ea")
+///              .if_generation_match("et")
+///              .generation("Stet")
 ///              .doit();
 /// # }
 /// ```
@@ -11461,14 +11499,16 @@ impl<'a, C, A> ObjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().list("bucket")
 ///              .versions(false)
-///              .user_project("sed")
-///              .provisional_user_project("dolor")
-///              .projection("sanctus")
-///              .prefix("dolore")
-///              .page_token("Lorem")
-///              .max_results(5)
-///              .include_trailing_delimiter(true)
-///              .delimiter("eirmod")
+///              .user_project("sanctus")
+///              .start_offset("dolore")
+///              .provisional_user_project("Lorem")
+///              .projection("consetetur")
+///              .prefix("consetetur")
+///              .page_token("eirmod")
+///              .max_results(65)
+///              .include_trailing_delimiter(false)
+///              .end_offset("et")
+///              .delimiter("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -11479,12 +11519,14 @@ pub struct ObjectListCall<'a, C, A>
     _bucket: String,
     _versions: Option<bool>,
     _user_project: Option<String>,
+    _start_offset: Option<String>,
     _provisional_user_project: Option<String>,
     _projection: Option<String>,
     _prefix: Option<String>,
     _page_token: Option<String>,
     _max_results: Option<u32>,
     _include_trailing_delimiter: Option<bool>,
+    _end_offset: Option<String>,
     _delimiter: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
@@ -11507,13 +11549,16 @@ impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "storage.objects.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(14 + self._additional_params.len());
         params.push(("bucket", self._bucket.to_string()));
         if let Some(value) = self._versions {
             params.push(("versions", value.to_string()));
         }
         if let Some(value) = self._user_project {
             params.push(("userProject", value.to_string()));
+        }
+        if let Some(value) = self._start_offset {
+            params.push(("startOffset", value.to_string()));
         }
         if let Some(value) = self._provisional_user_project {
             params.push(("provisionalUserProject", value.to_string()));
@@ -11533,10 +11578,13 @@ impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._include_trailing_delimiter {
             params.push(("includeTrailingDelimiter", value.to_string()));
         }
+        if let Some(value) = self._end_offset {
+            params.push(("endOffset", value.to_string()));
+        }
         if let Some(value) = self._delimiter {
             params.push(("delimiter", value.to_string()));
         }
-        for &field in ["alt", "bucket", "versions", "userProject", "provisionalUserProject", "projection", "prefix", "pageToken", "maxResults", "includeTrailingDelimiter", "delimiter"].iter() {
+        for &field in ["alt", "bucket", "versions", "userProject", "startOffset", "provisionalUserProject", "projection", "prefix", "pageToken", "maxResults", "includeTrailingDelimiter", "endOffset", "delimiter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11672,6 +11720,13 @@ impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._user_project = Some(new_value.to_string());
         self
     }
+    /// Filter results to objects whose names are lexicographically equal to or after startOffset. If endOffset is also set, the objects listed will have names between startOffset (inclusive) and endOffset (exclusive).
+    ///
+    /// Sets the *start offset* query property to the given value.
+    pub fn start_offset(mut self, new_value: &str) -> ObjectListCall<'a, C, A> {
+        self._start_offset = Some(new_value.to_string());
+        self
+    }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
@@ -11712,6 +11767,13 @@ impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// Sets the *include trailing delimiter* query property to the given value.
     pub fn include_trailing_delimiter(mut self, new_value: bool) -> ObjectListCall<'a, C, A> {
         self._include_trailing_delimiter = Some(new_value);
+        self
+    }
+    /// Filter results to objects whose names are lexicographically before endOffset. If startOffset is also set, the objects listed will have names between startOffset (inclusive) and endOffset (exclusive).
+    ///
+    /// Sets the *end offset* query property to the given value.
+    pub fn end_offset(mut self, new_value: &str) -> ObjectListCall<'a, C, A> {
+        self._end_offset = Some(new_value.to_string());
         self
     }
     /// Returns results in a directory-like mode. items will contain only objects whose names, aside from the prefix, do not contain delimiter. Objects whose names, aside from the prefix, contain delimiter will have their name, truncated after the delimiter, returned in prefixes. Duplicate prefixes are omitted.
@@ -11808,9 +11870,9 @@ impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().test_iam_permissions("bucket", "object", "permissions")
-///              .user_project("sadipscing")
-///              .provisional_user_project("accusam")
-///              .generation("magna")
+///              .user_project("rebum.")
+///              .provisional_user_project("et")
+///              .generation("clita")
 ///              .doit();
 /// # }
 /// ```
@@ -12119,19 +12181,20 @@ impl<'a, C, A> ObjectTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().copy(req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
-///              .user_project("eos")
-///              .source_generation("dolores")
-///              .provisional_user_project("vero")
-///              .projection("consetetur")
-///              .if_source_metageneration_not_match("vero")
-///              .if_source_metageneration_match("consetetur")
-///              .if_source_generation_not_match("eos")
-///              .if_source_generation_match("justo")
-///              .if_metageneration_not_match("tempor")
-///              .if_metageneration_match("gubergren")
-///              .if_generation_not_match("dolore")
-///              .if_generation_match("amet.")
-///              .destination_predefined_acl("dolore")
+///              .user_project("vero")
+///              .source_generation("consetetur")
+///              .provisional_user_project("eos")
+///              .projection("justo")
+///              .if_source_metageneration_not_match("tempor")
+///              .if_source_metageneration_match("gubergren")
+///              .if_source_generation_not_match("dolore")
+///              .if_source_generation_match("amet.")
+///              .if_metageneration_not_match("dolore")
+///              .if_metageneration_match("magna")
+///              .if_generation_not_match("elitr")
+///              .if_generation_match("magna")
+///              .destination_predefined_acl("ipsum")
+///              .destination_kms_key_name("invidunt")
 ///              .doit();
 /// # }
 /// ```
@@ -12157,6 +12220,7 @@ pub struct ObjectCopyCall<'a, C, A>
     _if_generation_not_match: Option<String>,
     _if_generation_match: Option<String>,
     _destination_predefined_acl: Option<String>,
+    _destination_kms_key_name: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -12178,7 +12242,7 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "storage.objects.copy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(20 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(21 + self._additional_params.len());
         params.push(("sourceBucket", self._source_bucket.to_string()));
         params.push(("sourceObject", self._source_object.to_string()));
         params.push(("destinationBucket", self._destination_bucket.to_string()));
@@ -12222,7 +12286,10 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._destination_predefined_acl {
             params.push(("destinationPredefinedAcl", value.to_string()));
         }
-        for &field in ["alt", "sourceBucket", "sourceObject", "destinationBucket", "destinationObject", "userProject", "sourceGeneration", "provisionalUserProject", "projection", "ifSourceMetagenerationNotMatch", "ifSourceMetagenerationMatch", "ifSourceGenerationNotMatch", "ifSourceGenerationMatch", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "destinationPredefinedAcl"].iter() {
+        if let Some(value) = self._destination_kms_key_name {
+            params.push(("destinationKmsKeyName", value.to_string()));
+        }
+        for &field in ["alt", "sourceBucket", "sourceObject", "destinationBucket", "destinationObject", "userProject", "sourceGeneration", "provisionalUserProject", "projection", "ifSourceMetagenerationNotMatch", "ifSourceMetagenerationMatch", "ifSourceGenerationNotMatch", "ifSourceGenerationMatch", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "destinationPredefinedAcl", "destinationKmsKeyName"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12489,6 +12556,13 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._destination_predefined_acl = Some(new_value.to_string());
         self
     }
+    /// Resource name of the Cloud KMS key, of the form projects/my-project/locations/global/keyRings/my-kr/cryptoKeys/my-key, that will be used to encrypt the object. Overrides the object metadata's kms_key_name value, if any.
+    ///
+    /// Sets the *destination kms key name* query property to the given value.
+    pub fn destination_kms_key_name(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
+        self._destination_kms_key_name = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -12582,15 +12656,15 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().patch(req, "bucket", "object")
-///              .user_project("magna")
-///              .provisional_user_project("ipsum")
-///              .projection("invidunt")
-///              .predefined_acl("accusam")
-///              .if_metageneration_not_match("labore")
-///              .if_metageneration_match("diam")
-///              .if_generation_not_match("nonumy")
-///              .if_generation_match("sed")
-///              .generation("diam")
+///              .user_project("diam")
+///              .provisional_user_project("nonumy")
+///              .projection("sed")
+///              .predefined_acl("diam")
+///              .if_metageneration_not_match("magna")
+///              .if_metageneration_match("dolor")
+///              .if_generation_not_match("Lorem")
+///              .if_generation_match("dolor")
+///              .generation("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -12967,9 +13041,9 @@ impl<'a, C, A> ObjectPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().get("bucket", "object", "entity")
-///              .user_project("dolor")
-///              .provisional_user_project("vero")
-///              .generation("nonumy")
+///              .user_project("consetetur")
+///              .provisional_user_project("erat")
+///              .generation("amet.")
 ///              .doit();
 /// # }
 /// ```
@@ -13273,9 +13347,9 @@ impl<'a, C, A> ObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().patch(req, "bucket", "object", "entity")
-///              .user_project("erat")
-///              .provisional_user_project("amet.")
-///              .generation("dolores")
+///              .user_project("sed")
+///              .provisional_user_project("et")
+///              .generation("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -13598,9 +13672,9 @@ impl<'a, C, A> ObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().list("bucket", "object")
-///              .user_project("sed")
-///              .provisional_user_project("et")
-///              .generation("aliquyam")
+///              .user_project("aliquyam")
+///              .provisional_user_project("sadipscing")
+///              .generation("magna")
 ///              .doit();
 /// # }
 /// ```
@@ -13886,9 +13960,9 @@ impl<'a, C, A> ObjectAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().delete("bucket", "object", "entity")
-///              .user_project("sadipscing")
-///              .provisional_user_project("magna")
-///              .generation("gubergren")
+///              .user_project("sit")
+///              .provisional_user_project("amet")
+///              .generation("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -14181,9 +14255,9 @@ impl<'a, C, A> ObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().update(req, "bucket", "object", "entity")
-///              .user_project("amet")
+///              .user_project("diam")
 ///              .provisional_user_project("eirmod")
-///              .generation("sanctus")
+///              .generation("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -14512,9 +14586,9 @@ impl<'a, C, A> ObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().insert(req, "bucket", "object")
-///              .user_project("diam")
-///              .provisional_user_project("eirmod")
-///              .generation("sadipscing")
+///              .user_project("sit")
+///              .provisional_user_project("dolore")
+///              .generation("et")
 ///              .doit();
 /// # }
 /// ```
@@ -14831,13 +14905,13 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().patch(req, "bucket")
-///              .user_project("sed")
-///              .provisional_user_project("sit")
-///              .projection("dolore")
-///              .predefined_default_object_acl("et")
-///              .predefined_acl("At")
-///              .if_metageneration_not_match("sit")
-///              .if_metageneration_match("ut")
+///              .user_project("sit")
+///              .provisional_user_project("ut")
+///              .projection("diam")
+///              .predefined_default_object_acl("tempor")
+///              .predefined_acl("et")
+///              .if_metageneration_not_match("erat")
+///              .if_metageneration_match("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -15186,13 +15260,13 @@ impl<'a, C, A> BucketPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().update(req, "bucket")
-///              .user_project("tempor")
-///              .provisional_user_project("et")
-///              .projection("erat")
+///              .user_project("et")
+///              .provisional_user_project("clita")
+///              .projection("sed")
 ///              .predefined_default_object_acl("dolores")
-///              .predefined_acl("kasd")
-///              .if_metageneration_not_match("et")
-///              .if_metageneration_match("clita")
+///              .predefined_acl("clita")
+///              .if_metageneration_not_match("eos")
+///              .if_metageneration_match("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -15535,11 +15609,11 @@ impl<'a, C, A> BucketUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().get("bucket")
-///              .user_project("dolores")
-///              .provisional_user_project("clita")
-///              .projection("eos")
-///              .if_metageneration_not_match("amet")
-///              .if_metageneration_match("sed")
+///              .user_project("takimata")
+///              .provisional_user_project("sit")
+///              .projection("labore")
+///              .if_metageneration_not_match("nonumy")
+///              .if_metageneration_match("erat")
 ///              .doit();
 /// # }
 /// ```
@@ -15835,10 +15909,10 @@ impl<'a, C, A> BucketGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().delete("bucket")
-///              .user_project("sit")
-///              .provisional_user_project("labore")
-///              .if_metageneration_not_match("nonumy")
-///              .if_metageneration_match("erat")
+///              .user_project("erat")
+///              .provisional_user_project("et")
+///              .if_metageneration_not_match("amet")
+///              .if_metageneration_match("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -16112,8 +16186,8 @@ impl<'a, C, A> BucketDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().lock_retention_policy("bucket", "ifMetagenerationMatch")
-///              .user_project("et")
-///              .provisional_user_project("amet")
+///              .user_project("justo")
+///              .provisional_user_project("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -16394,11 +16468,11 @@ impl<'a, C, A> BucketLockRetentionPolicyCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().insert(req, "project")
-///              .user_project("voluptua.")
-///              .provisional_user_project("rebum.")
-///              .projection("justo")
-///              .predefined_default_object_acl("labore")
-///              .predefined_acl("voluptua.")
+///              .user_project("takimata")
+///              .provisional_user_project("dolor")
+///              .projection("takimata")
+///              .predefined_default_object_acl("voluptua.")
+///              .predefined_acl("no")
 ///              .doit();
 /// # }
 /// ```
@@ -16698,8 +16772,8 @@ impl<'a, C, A> BucketInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().test_iam_permissions("bucket", "permissions")
-///              .user_project("takimata")
-///              .provisional_user_project("voluptua.")
+///              .user_project("et")
+///              .provisional_user_project("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -16985,8 +17059,8 @@ impl<'a, C, A> BucketTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().set_iam_policy(req, "bucket")
-///              .user_project("aliquyam")
-///              .provisional_user_project("magna")
+///              .user_project("sit")
+///              .provisional_user_project("et")
 ///              .doit();
 /// # }
 /// ```
@@ -17274,8 +17348,9 @@ impl<'a, C, A> BucketSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().get_iam_policy("bucket")
-///              .user_project("sed")
-///              .provisional_user_project("est")
+///              .user_project("sea")
+///              .provisional_user_project("nonumy")
+///              .options_requested_policy_version(-45)
 ///              .doit();
 /// # }
 /// ```
@@ -17286,6 +17361,7 @@ pub struct BucketGetIamPolicyCall<'a, C, A>
     _bucket: String,
     _user_project: Option<String>,
     _provisional_user_project: Option<String>,
+    _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -17307,7 +17383,7 @@ impl<'a, C, A> BucketGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "storage.buckets.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("bucket", self._bucket.to_string()));
         if let Some(value) = self._user_project {
             params.push(("userProject", value.to_string()));
@@ -17315,7 +17391,10 @@ impl<'a, C, A> BucketGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
         if let Some(value) = self._provisional_user_project {
             params.push(("provisionalUserProject", value.to_string()));
         }
-        for &field in ["alt", "bucket", "userProject", "provisionalUserProject"].iter() {
+        if let Some(value) = self._options_requested_policy_version {
+            params.push(("optionsRequestedPolicyVersion", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "userProject", "provisionalUserProject", "optionsRequestedPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -17451,6 +17530,13 @@ impl<'a, C, A> BucketGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
+    /// The IAM policy format version to be returned. If the optionsRequestedPolicyVersion is for an older version that doesn't support part of the requested IAM policy, the request fails.
+    ///
+    /// Sets the *options requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> BucketGetIamPolicyCall<'a, C, A> {
+        self._options_requested_policy_version = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -17538,12 +17624,12 @@ impl<'a, C, A> BucketGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().list("project")
-///              .user_project("et")
-///              .provisional_user_project("consetetur")
-///              .projection("sea")
-///              .prefix("nonumy")
-///              .page_token("consetetur")
-///              .max_results(28)
+///              .user_project("clita")
+///              .provisional_user_project("sea")
+///              .projection("vero")
+///              .prefix("dolores")
+///              .page_token("magna")
+///              .max_results(64)
 ///              .doit();
 /// # }
 /// ```
@@ -17835,7 +17921,7 @@ impl<'a, C, A> BucketListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_update(req, "projectId", "accessId")
-///              .user_project("vero")
+///              .user_project("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -18124,7 +18210,7 @@ impl<'a, C, A> ProjectHmacKeyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_delete("projectId", "accessId")
-///              .user_project("ut")
+///              .user_project("et")
 ///              .doit();
 /// # }
 /// ```
@@ -18377,7 +18463,7 @@ impl<'a, C, A> ProjectHmacKeyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_get("projectId", "accessId")
-///              .user_project("sit")
+///              .user_project("kasd")
 ///              .doit();
 /// # }
 /// ```
@@ -18641,11 +18727,11 @@ impl<'a, C, A> ProjectHmacKeyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_list("projectId")
-///              .user_project("dolores")
-///              .show_deleted_keys(true)
-///              .service_account_email("sanctus")
-///              .page_token("takimata")
-///              .max_results(89)
+///              .user_project("sadipscing")
+///              .show_deleted_keys(false)
+///              .service_account_email("clita")
+///              .page_token("ipsum")
+///              .max_results(2)
 ///              .doit();
 /// # }
 /// ```
@@ -18941,7 +19027,7 @@ impl<'a, C, A> ProjectHmacKeyListCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_create("projectId", "serviceAccountEmail")
-///              .user_project("et")
+///              .user_project("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -19205,8 +19291,8 @@ impl<'a, C, A> ProjectHmacKeyCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().service_account_get("projectId")
-///              .user_project("ipsum")
-///              .provisional_user_project("dolor")
+///              .user_project("duo")
+///              .provisional_user_project("et")
 ///              .doit();
 /// # }
 /// ```

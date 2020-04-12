@@ -25,14 +25,25 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud IAP* API at revision *20190628*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Cloud IAP* API at revision *20200406*. The CLI is at version *1.0.13*.
 
 ```bash
 iap1 [options]
         methods
                 get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                get-iap-settings <name> [-p <v>]... [-o <out>]
                 set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                update-iap-settings <name> (-r <kv>)... [-p <v>]... [-o <out>]
+        projects
+                brands-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                brands-get <name> [-p <v>]... [-o <out>]
+                brands-identity-aware-proxy-clients-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                brands-identity-aware-proxy-clients-delete <name> [-p <v>]... [-o <out>]
+                brands-identity-aware-proxy-clients-get <name> [-p <v>]... [-o <out>]
+                brands-identity-aware-proxy-clients-list <parent> [-p <v>]... [-o <out>]
+                brands-identity-aware-proxy-clients-reset-secret <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                brands-list <parent> [-p <v>]... [-o <out>]
   iap1 --help
 
 Configuration:

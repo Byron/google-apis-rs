@@ -1,4 +1,4 @@
-site_name: Vault v1.0.12+20190614
+site_name: Vault v1.0.13+20200330
 site_url: http://byron.github.io/google-apis-rs/google-vault1-cli
 site_description: A complete library to interact with Vault (protocol v1)
 
@@ -37,6 +37,7 @@ pages:
 - ['matters_saved-queries-list.md', 'Matters', 'Saved Queries List']
 - ['matters_undelete.md', 'Matters', 'Undelete']
 - ['matters_update.md', 'Matters', 'Update']
+- ['operations_delete.md', 'Operations', 'Delete']
 
 theme: readthedocs
 

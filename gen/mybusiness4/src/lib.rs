@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *My Business* crate version *1.0.12+0*, where *0* is the exact revision of the *mybusiness:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *My Business* crate version *1.0.13+0*, where *0* is the exact revision of the *mybusiness:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *My Business* *v4* API can be found at the
 //! [official documentation site](https://developers.google.com/my-business/).
@@ -70,7 +70,7 @@
 //! let r = hub.accounts().locations_media_create(...).doit()
 //! let r = hub.accounts().locations_local_posts_get(...).doit()
 //! let r = hub.accounts().locations_reviews_update_reply(...).doit()
-//! let r = hub.accounts().locations_list(...).doit()
+//! let r = hub.accounts().list_recommend_google_locations(...).doit()
 //! let r = hub.accounts().invitations_decline(...).doit()
 //! let r = hub.accounts().locations_questions_list(...).doit()
 //! let r = hub.accounts().locations_create(...).doit()
@@ -82,14 +82,14 @@
 //! let r = hub.accounts().locations_media_customers_get(...).doit()
 //! let r = hub.accounts().list(...).doit()
 //! let r = hub.accounts().locations_local_posts_patch(...).doit()
-//! let r = hub.accounts().list_recommend_google_locations(...).doit()
+//! let r = hub.accounts().locations_transfer(...).doit()
 //! let r = hub.accounts().locations_reviews_get(...).doit()
 //! let r = hub.accounts().locations_local_posts_create(...).doit()
 //! let r = hub.accounts().locations_questions_answers_upsert(...).doit()
 //! let r = hub.accounts().admins_patch(...).doit()
 //! let r = hub.accounts().locations_find_matches(...).doit()
 //! let r = hub.accounts().locations_verifications_list(...).doit()
-//! let r = hub.accounts().locations_associate(...).doit()
+//! let r = hub.accounts().locations_list(...).doit()
 //! let r = hub.accounts().locations_admins_delete(...).doit()
 //! let r = hub.accounts().locations_delete(...).doit()
 //! let r = hub.accounts().delete_notifications(...).doit()
@@ -107,7 +107,7 @@
 //! let r = hub.accounts().locations_admins_create(...).doit()
 //! let r = hub.accounts().locations_media_start_upload(...).doit()
 //! let r = hub.accounts().locations_report_insights(...).doit()
-//! let r = hub.accounts().locations_transfer(...).doit()
+//! let r = hub.accounts().locations_associate(...).doit()
 //! let r = hub.accounts().locations_reviews_list(...).doit()
 //! let r = hub.accounts().locations_get(...).doit()
 //! let r = hub.accounts().locations_questions_answers_list(...).doit()
@@ -174,12 +174,12 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.accounts().locations_list("parent")
+//! let result = hub.accounts().locations_questions_list("parent")
 //!              .page_token("accusam")
 //!              .page_size(-8)
 //!              .order_by("justo")
-//!              .language_code("amet.")
-//!              .filter("erat")
+//!              .filter("amet.")
+//!              .answers_per_question(-81)
 //!              .doit();
 //! 
 //! match result {
@@ -334,12 +334,12 @@ pub use cmn::*;
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().locations_list("parent")
+/// let result = hub.accounts().locations_questions_list("parent")
 ///              .page_token("sea")
 ///              .page_size(-90)
 ///              .order_by("dolores")
-///              .language_code("gubergren")
-///              .filter("sadipscing")
+///              .filter("gubergren")
+///              .answers_per_question(-95)
 ///              .doit();
 /// 
 /// match result {
@@ -377,7 +377,7 @@ impl<'a, C, A> MyBusiness<C, A>
         MyBusiness {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://mybusiness.googleapis.com/".to_string(),
             _root_url: "https://mybusiness.googleapis.com/".to_string(),
         }
@@ -403,7 +403,7 @@ impl<'a, C, A> MyBusiness<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -431,27 +431,19 @@ impl<'a, C, A> MyBusiness<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// A category describing what this business is (not what it does). For a list of
-/// valid category IDs, and the mappings to their human-readable names, see
-/// [categories.list](/my-business/reference/rest/v4/categories/list).
+/// Request message for Media.StartUploadMediaItemData.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations media start upload accounts](struct.AccountLocationMediaStartUploadCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Category {
-    /// Output only. The human-readable name of the category. This is set when
-    /// reading the location. When modifying the location, `category_id` must be
-    /// set.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// A stable ID (provided by Google) for this category.
-    /// The `category_id` must be specified when modifying the category (when
-    /// creating or updating a location).
-    #[serde(rename="categoryId")]
-    pub category_id: Option<String>,
-}
+pub struct StartUploadMediaItemDataRequest { _never_set: Option<bool> }
 
-impl Part for Category {}
+impl RequestValue for StartUploadMediaItemDataRequest {}
 
 
 /// Represents the author of a question or answer
@@ -521,10 +513,10 @@ impl RequestValue for ReportLocationInsightsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalPostEvent {
-    /// Name of the event.
-    pub title: Option<String>,
     /// Event start and end date/time.
     pub schedule: Option<TimeInterval>,
+    /// Name of the event.
+    pub title: Option<String>,
 }
 
 impl Part for LocalPostEvent {}
@@ -536,11 +528,11 @@ impl Part for LocalPostEvent {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AddressVerificationData {
+    /// Address that a postcard can be sent to.
+    pub address: Option<PostalAddress>,
     /// Merchant's business name.
     #[serde(rename="businessName")]
     pub business_name: Option<String>,
-    /// Address that a postcard can be sent to.
-    pub address: Option<PostalAddress>,
 }
 
 impl Part for AddressVerificationData {}
@@ -620,48 +612,36 @@ pub struct Attribution {
 impl Part for Attribution {}
 
 
-/// Metadata for an attribute. Contains display information for the attribute,
-/// including a localized name and a heading for grouping related attributes
-/// together.
+/// Represents a Location that is present on
+/// Google. This can be a location that has been claimed by the user, someone
+/// else, or could be unclaimed.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [report google locations](struct.GoogleLocationReportCall.html) (none)
+/// * [search google locations](struct.GoogleLocationSearchCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AttributeMetadata {
-    /// For some types of attributes (for example, enums), a list of supported
-    /// values and corresponding display names for those values is provided.
-    #[serde(rename="valueMetadata")]
-    pub value_metadata: Option<Vec<AttributeValueMetadata>>,
-    /// The localized display name for the attribute, if available; otherwise,
-    /// the English display name.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// If true, the attribute is deprecated and should no longer be used. If
-    /// deprecated, updating this attribute will not result in an error, but
-    /// updates will not be saved. At some point after being deprecated, the
-    /// attribute will be removed entirely and it will become an error.
-    #[serde(rename="isDeprecated")]
-    pub is_deprecated: Option<bool>,
-    /// The localized display name of the group that contains this attribute, if
-    /// available; otherwise, the English group name. Related attributes are
-    /// collected into a group and should be displayed together under the heading
-    /// given here.
-    #[serde(rename="groupDisplayName")]
-    pub group_display_name: Option<String>,
-    /// The ID of the attribute.
-    #[serde(rename="attributeId")]
-    pub attribute_id: Option<String>,
-    /// The value type for the attribute. Values set and retrieved should be
-    /// expected to be of this type.
-    #[serde(rename="valueType")]
-    pub value_type: Option<String>,
-    /// If true, the attribute supports multiple values. If false, only a single
-    /// value should be provided.
-    #[serde(rename="isRepeatable")]
-    pub is_repeatable: Option<bool>,
+pub struct GoogleLocation {
+    /// A URL that will redirect the user to the request admin rights UI.
+    /// This field is only present if the location has already been claimed by
+    /// any user, including the current user.
+    #[serde(rename="requestAdminRightsUrl")]
+    pub request_admin_rights_url: Option<String>,
+    /// The sparsely populated Location
+    /// information. This field can be re-used in
+    /// CreateLocation if it is
+    /// not currently claimed by a user.
+    pub location: Option<Location>,
+    /// Resource name of this GoogleLocation, in the format
+    /// `googleLocations/{googleLocationId}`.
+    pub name: Option<String>,
 }
 
-impl Part for AttributeMetadata {}
+impl Resource for GoogleLocation {}
 
 
 /// A Google Cloud Pub/Sub topic where notifications can be published when a
@@ -680,6 +660,11 @@ impl Part for AttributeMetadata {}
 pub struct Notifications {
     /// Output only. The notifications resource name.
     pub name: Option<String>,
+    /// The types of notifications that will be sent to the Cloud Pub/Sub topic.
+    /// At least one must be specified. To stop receiving notifications entirely,
+    /// use DeleteNotifications.
+    #[serde(rename="notificationTypes")]
+    pub notification_types: Option<Vec<String>>,
     /// The Google Cloud Pub/Sub topic that will receive notifications when
     /// locations managed by this account are updated. If unset, no notifications
     /// will be posted.
@@ -688,11 +673,6 @@ pub struct Notifications {
     /// least Publish permissions on the Cloud Pub/Sub topic.
     #[serde(rename="topicName")]
     pub topic_name: Option<String>,
-    /// The types of notifications that will be sent to the Cloud Pub/Sub topic.
-    /// At least one must be specified. To stop receiving notifications entirely,
-    /// use DeleteNotifications.
-    #[serde(rename="notificationTypes")]
-    pub notification_types: Option<Vec<String>>,
 }
 
 impl RequestValue for Notifications {}
@@ -819,7 +799,7 @@ impl Part for TimeInterval {}
 /// * [locations media create accounts](struct.AccountLocationMediaCreateCall.html) (none)
 /// * [locations local posts get accounts](struct.AccountLocationLocalPostGetCall.html) (none)
 /// * [locations reviews update reply accounts](struct.AccountLocationReviewUpdateReplyCall.html) (none)
-/// * [locations list accounts](struct.AccountLocationListCall.html) (none)
+/// * [list recommend google locations accounts](struct.AccountListRecommendGoogleLocationCall.html) (none)
 /// * [invitations decline accounts](struct.AccountInvitationDeclineCall.html) (none)
 /// * [locations questions list accounts](struct.AccountLocationQuestionListCall.html) (none)
 /// * [locations create accounts](struct.AccountLocationCreateCall.html) (none)
@@ -831,14 +811,14 @@ impl Part for TimeInterval {}
 /// * [locations media customers get accounts](struct.AccountLocationMediaCustomerGetCall.html) (none)
 /// * [list accounts](struct.AccountListCall.html) (none)
 /// * [locations local posts patch accounts](struct.AccountLocationLocalPostPatchCall.html) (none)
-/// * [list recommend google locations accounts](struct.AccountListRecommendGoogleLocationCall.html) (none)
+/// * [locations transfer accounts](struct.AccountLocationTransferCall.html) (none)
 /// * [locations reviews get accounts](struct.AccountLocationReviewGetCall.html) (none)
 /// * [locations local posts create accounts](struct.AccountLocationLocalPostCreateCall.html) (none)
 /// * [locations questions answers upsert accounts](struct.AccountLocationQuestionAnswerUpsertCall.html) (none)
 /// * [admins patch accounts](struct.AccountAdminPatchCall.html) (none)
 /// * [locations find matches accounts](struct.AccountLocationFindMatcheCall.html) (none)
 /// * [locations verifications list accounts](struct.AccountLocationVerificationListCall.html) (none)
-/// * [locations associate accounts](struct.AccountLocationAssociateCall.html) (none)
+/// * [locations list accounts](struct.AccountLocationListCall.html) (none)
 /// * [locations admins delete accounts](struct.AccountLocationAdminDeleteCall.html) (none)
 /// * [locations delete accounts](struct.AccountLocationDeleteCall.html) (none)
 /// * [delete notifications accounts](struct.AccountDeleteNotificationCall.html) (none)
@@ -856,7 +836,7 @@ impl Part for TimeInterval {}
 /// * [locations admins create accounts](struct.AccountLocationAdminCreateCall.html) (none)
 /// * [locations media start upload accounts](struct.AccountLocationMediaStartUploadCall.html) (none)
 /// * [locations report insights accounts](struct.AccountLocationReportInsightCall.html) (none)
-/// * [locations transfer accounts](struct.AccountLocationTransferCall.html) (none)
+/// * [locations associate accounts](struct.AccountLocationAssociateCall.html) (none)
 /// * [locations reviews list accounts](struct.AccountLocationReviewListCall.html) (none)
 /// * [locations get accounts](struct.AccountLocationGetCall.html) (none)
 /// * [locations questions answers list accounts](struct.AccountLocationQuestionAnswerListCall.html) (none)
@@ -1142,15 +1122,15 @@ impl ResponseResult for GoogleUpdatedLocation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListAnswersResponse {
-    /// The total number of answers posted for this question across all pages.
-    #[serde(rename="totalSize")]
-    pub total_size: Option<i32>,
     /// If the number of answers exceeds the requested max page size, this field
     /// is populated with a token to fetch the next page of answers on a subsequent
     /// call. If there are no more answers, this field is not present in the
     /// response.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// The total number of answers posted for this question across all pages.
+    #[serde(rename="totalSize")]
+    pub total_size: Option<i32>,
     /// The requested answers.
     pub answers: Option<Vec<Answer>>,
 }
@@ -1684,15 +1664,15 @@ impl RequestValue for FetchVerificationOptionsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrganizationInfo {
-    /// The registered domain for the account.
-    #[serde(rename="registeredDomain")]
-    pub registered_domain: Option<String>,
-    /// The postal address for the account.
-    #[serde(rename="postalAddress")]
-    pub postal_address: Option<PostalAddress>,
     /// The contact number for the organization.
     #[serde(rename="phoneNumber")]
     pub phone_number: Option<String>,
+    /// The postal address for the account.
+    #[serde(rename="postalAddress")]
+    pub postal_address: Option<PostalAddress>,
+    /// The registered domain for the account.
+    #[serde(rename="registeredDomain")]
+    pub registered_domain: Option<String>,
 }
 
 impl Part for OrganizationInfo {}
@@ -1851,15 +1831,15 @@ impl ResponseResult for ListAccountsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListQuestionsResponse {
-    /// The total number of questions posted for this location across all pages.
-    #[serde(rename="totalSize")]
-    pub total_size: Option<i32>,
     /// If the number of questions exceeds the requested max page size, this field
     /// is populated with a token to fetch the next page of questions on a
     /// subsequent call. If there are no more questions, this field is not present
     /// in the response.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// The total number of questions posted for this location across all pages.
+    #[serde(rename="totalSize")]
+    pub total_size: Option<i32>,
     /// The requested questions,
     pub questions: Option<Vec<Question>>,
 }
@@ -1917,11 +1897,11 @@ pub struct Verification {
     pub state: Option<String>,
     /// The method of the verification.
     pub method: Option<String>,
-    /// Resource name of the verification.
-    pub name: Option<String>,
     /// The timestamp when the verification is requested.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
+    /// Resource name of the verification.
+    pub name: Option<String>,
 }
 
 impl Part for Verification {}
@@ -1988,67 +1968,85 @@ pub struct LocalPostProduct {
 impl Part for LocalPostProduct {}
 
 
-/// Response message for Reviews.ListReviews.
+/// Alternate/surrogate key references for a location.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations reviews list accounts](struct.AccountLocationReviewListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListReviewsResponse {
-    /// The reviews.
-    pub reviews: Option<Vec<Review>>,
-    /// If the number of reviews exceeded the requested page size, this field
-    /// is populated with a token to fetch the next page of reviews on a
-    /// subsequent call to ListReviews. If there are no more reviews, this
-    /// field is not present in the response.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The total number of reviews for this location.
-    #[serde(rename="totalReviewCount")]
-    pub total_review_count: Option<i32>,
-    /// The average star rating of all reviews for this location
-    /// on a scale of 1 to 5, where 5 is the highest rating.
-    #[serde(rename="averageRating")]
-    pub average_rating: Option<f64>,
+pub struct LocationKey {
+    /// Output only. If this location has a Google+ page associated with it, this
+    /// is populated with the Google+ page ID for this location.
+    #[serde(rename="plusPageId")]
+    pub plus_page_id: Option<String>,
+    /// Output only. A value of true indicates that an unset place ID is
+    /// deliberate, which is different from no association being made yet.
+    #[serde(rename="explicitNoPlaceId")]
+    pub explicit_no_place_id: Option<bool>,
+    /// If this location has been verified and is connected to/appears on Google
+    /// Maps, this field is populated with the place ID for the location.
+    /// This ID can be used in various Places APIs.
+    /// 
+    /// If this location is unverified, this field may be populated if the location
+    /// has been associated with a place that appears on Google Maps.
+    /// 
+    /// This field can be set during Create calls, but not for Update.
+    /// 
+    /// The additional `explicit_no_place_id` bool qualifies whether an unset
+    /// place ID is deliberate or not.
+    #[serde(rename="placeId")]
+    pub place_id: Option<String>,
+    /// Output only. The `request_id` used to create this location. May be empty if
+    /// this location was created outside of the GMB API or Google My Business
+    /// Locations.
+    #[serde(rename="requestId")]
+    pub request_id: Option<String>,
 }
 
-impl ResponseResult for ListReviewsResponse {}
+impl Part for LocationKey {}
 
 
-/// Represents a Location that is present on
-/// Google. This can be a location that has been claimed by the user, someone
-/// else, or could be unclaimed.
+/// Metadata for an attribute. Contains display information for the attribute,
+/// including a localized name and a heading for grouping related attributes
+/// together.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [report google locations](struct.GoogleLocationReportCall.html) (none)
-/// * [search google locations](struct.GoogleLocationSearchCall.html) (none)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleLocation {
-    /// A URL that will redirect the user to the request admin rights UI.
-    /// This field is only present if the location has already been claimed by
-    /// any user, including the current user.
-    #[serde(rename="requestAdminRightsUrl")]
-    pub request_admin_rights_url: Option<String>,
-    /// Resource name of this GoogleLocation, in the format
-    /// `googleLocations/{googleLocationId}`.
-    pub name: Option<String>,
-    /// The sparsely populated Location
-    /// information. This field can be re-used in
-    /// CreateLocation if it is
-    /// not currently claimed by a user.
-    pub location: Option<Location>,
+pub struct AttributeMetadata {
+    /// For some types of attributes (for example, enums), a list of supported
+    /// values and corresponding display names for those values is provided.
+    #[serde(rename="valueMetadata")]
+    pub value_metadata: Option<Vec<AttributeValueMetadata>>,
+    /// The localized display name for the attribute, if available; otherwise,
+    /// the English display name.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// If true, the attribute is deprecated and should no longer be used. If
+    /// deprecated, updating this attribute will not result in an error, but
+    /// updates will not be saved. At some point after being deprecated, the
+    /// attribute will be removed entirely and it will become an error.
+    #[serde(rename="isDeprecated")]
+    pub is_deprecated: Option<bool>,
+    /// The localized display name of the group that contains this attribute, if
+    /// available; otherwise, the English group name. Related attributes are
+    /// collected into a group and should be displayed together under the heading
+    /// given here.
+    #[serde(rename="groupDisplayName")]
+    pub group_display_name: Option<String>,
+    /// The ID of the attribute.
+    #[serde(rename="attributeId")]
+    pub attribute_id: Option<String>,
+    /// The value type for the attribute. Values set and retrieved should be
+    /// expected to be of this type.
+    #[serde(rename="valueType")]
+    pub value_type: Option<String>,
+    /// If true, the attribute supports multiple values. If false, only a single
+    /// value should be provided.
+    #[serde(rename="isRepeatable")]
+    pub is_repeatable: Option<bool>,
 }
 
-impl Resource for GoogleLocation {}
+impl Part for AttributeMetadata {}
 
 
 /// A chain is a brand that your business's locations can be affiliated with.
@@ -2085,9 +2083,6 @@ impl ResponseResult for Chain {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Money {
-    /// The whole units of the amount.
-    /// For example if `currencyCode` is `"USD"`, then 1 unit is one US dollar.
-    pub units: Option<String>,
     /// Number of nano (10^-9) units of the amount.
     /// The value must be between -999,999,999 and +999,999,999 inclusive.
     /// If `units` is positive, `nanos` must be positive or zero.
@@ -2095,6 +2090,9 @@ pub struct Money {
     /// If `units` is negative, `nanos` must be negative or zero.
     /// For example $-1.75 is represented as `units`=-1 and `nanos`=-750,000,000.
     pub nanos: Option<i32>,
+    /// The whole units of the amount.
+    /// For example if `currencyCode` is `"USD"`, then 1 unit is one US dollar.
+    pub units: Option<String>,
     /// The 3-letter currency code defined in ISO 4217.
     #[serde(rename="currencyCode")]
     pub currency_code: Option<String>,
@@ -2211,32 +2209,40 @@ pub struct LocationDrivingDirectionMetrics {
     /// The location resource name this metric value belongs to.
     #[serde(rename="locationName")]
     pub location_name: Option<String>,
-    /// Driving-direction requests by source region. By convention, these
-    /// are sorted by count with at most 10 results.
-    #[serde(rename="topDirectionSources")]
-    pub top_direction_sources: Option<Vec<TopDirectionSources>>,
     /// Time zone (IANA timezone IDs, for example, 'Europe/London') of the
     /// location.
     #[serde(rename="timeZone")]
     pub time_zone: Option<String>,
+    /// Driving-direction requests by source region. By convention, these
+    /// are sorted by count with at most 10 results.
+    #[serde(rename="topDirectionSources")]
+    pub top_direction_sources: Option<Vec<TopDirectionSources>>,
 }
 
 impl Part for LocationDrivingDirectionMetrics {}
 
 
-/// Request message for Media.StartUploadMediaItemData.
+/// A category describing what this business is (not what it does). For a list of
+/// valid category IDs, and the mappings to their human-readable names, see
+/// [categories.list](/my-business/reference/rest/v4/categories/list).
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations media start upload accounts](struct.AccountLocationMediaStartUploadCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct StartUploadMediaItemDataRequest { _never_set: Option<bool> }
+pub struct Category {
+    /// Output only. The human-readable name of the category. This is set when
+    /// reading the location. When modifying the location, `category_id` must be
+    /// set.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// A stable ID (provided by Google) for this category.
+    /// The `category_id` must be specified when modifying the category (when
+    /// creating or updating a location).
+    #[serde(rename="categoryId")]
+    pub category_id: Option<String>,
+}
 
-impl RequestValue for StartUploadMediaItemDataRequest {}
+impl Part for Category {}
 
 
 /// Response message for Media.ListMediaItems.
@@ -2397,26 +2403,27 @@ pub struct MediaItem {
     /// display this attribution as provided to your users and must not delete or
     /// alter the attribution.
     pub attribution: Option<Attribution>,
-    /// The resource name for this media item.
-    /// `accounts/{account_id}/locations/{location_id}/media/{media_key}`
-    pub name: Option<String>,
-    /// Output only. Where provided, the URL of a thumbnail image for this media
-    /// item.
-    #[serde(rename="thumbnailUrl")]
-    pub thumbnail_url: Option<String>,
+    /// Output only. The dimensions (width and height) in pixels.
+    pub dimensions: Option<Dimensions>,
+    /// Description for this media item. Descriptions cannot be modified through
+    /// the My Business API, but can be set when creating a new media item that is
+    /// not a cover photo.
+    pub description: Option<String>,
     /// Output only. Google-hosted URL for this media item. This URL is not static
     /// since it may change over time. For video this will be a preview image with
     /// an overlaid play icon.
     #[serde(rename="googleUrl")]
     pub google_url: Option<String>,
+    /// Output only. Statistics for this media item.
+    pub insights: Option<MediaInsights>,
     /// The format of this media item. Must be set when the media item is created,
     /// and is read-only on all other requests. Cannot be updated.
     #[serde(rename="mediaFormat")]
     pub media_format: Option<String>,
-    /// Output only. The dimensions (width and height) in pixels.
-    pub dimensions: Option<Dimensions>,
-    /// Output only. Statistics for this media item.
-    pub insights: Option<MediaInsights>,
+    /// Output only. Where provided, the URL of a thumbnail image for this media
+    /// item.
+    #[serde(rename="thumbnailUrl")]
+    pub thumbnail_url: Option<String>,
     /// Required when calling `CreatePhoto`. Describes how this media item is
     /// connected to its location. Must be either a category (for example,
     /// EXTERIOR) or the ID of a price list item.
@@ -2429,10 +2436,9 @@ pub struct MediaItem {
     /// Output only. Creation time of this media item.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
-    /// Description for this media item. Descriptions cannot be modified through
-    /// the My Business API, but can be set when creating a new media item that is
-    /// not a cover photo.
-    pub description: Option<String>,
+    /// The resource name for this media item.
+    /// `accounts/{account_id}/locations/{location_id}/media/{media_key}`
+    pub name: Option<String>,
 }
 
 impl RequestValue for MediaItem {}
@@ -2445,13 +2451,13 @@ impl ResponseResult for MediaItem {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Duplicate {
+    /// Indicates whether the user has access to the location it duplicates.
+    pub access: Option<String>,
     /// The resource name of the location that this duplicates. Only populated
     /// if the authenticated user has access rights to that location and that
     /// location is not deleted.
     #[serde(rename="locationName")]
     pub location_name: Option<String>,
-    /// Indicates whether the user has access to the location it duplicates.
-    pub access: Option<String>,
     /// The place ID of the location that this duplicates.
     #[serde(rename="placeId")]
     pub place_id: Option<String>,
@@ -2504,13 +2510,13 @@ pub struct TimeOfDay {
     /// Hours of day in 24 hour format. Should be from 0 to 23. An API may choose
     /// to allow the value "24:00:00" for scenarios like business closing time.
     pub hours: Option<i32>,
+    /// Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.
+    pub nanos: Option<i32>,
+    /// Minutes of hour of day. Must be from 0 to 59.
+    pub minutes: Option<i32>,
     /// Seconds of minutes of the time. Must normally be from 0 to 59. An API may
     /// allow the value 60 if it allows leap-seconds.
     pub seconds: Option<i32>,
-    /// Minutes of hour of day. Must be from 0 to 59.
-    pub minutes: Option<i32>,
-    /// Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.
-    pub nanos: Option<i32>,
 }
 
 impl Part for TimeOfDay {}
@@ -2628,16 +2634,16 @@ impl RequestValue for AcceptInvitationRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Date {
-    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
-    /// a year.
-    pub year: Option<i32>,
+    /// Month of year. Must be from 1 to 12, or 0 if specifying a year without a
+    /// month and day.
+    pub month: Option<i32>,
     /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
     /// if specifying a year by itself or a year and month where the day is not
     /// significant.
     pub day: Option<i32>,
-    /// Month of year. Must be from 1 to 12, or 0 if specifying a year without a
-    /// month and day.
-    pub month: Option<i32>,
+    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
+    /// a year.
+    pub year: Option<i32>,
 }
 
 impl Part for Date {}
@@ -2681,16 +2687,16 @@ impl Part for Section {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListRecommendedGoogleLocationsResponse {
-    /// The total number of recommended locations for this GMB account,
-    /// irrespective of pagination.
-    #[serde(rename="totalSize")]
-    pub total_size: Option<i32>,
     /// During pagination, if there are more locations available to be fetched in
     /// the next page, this field is populated with a token to fetch the next page
     /// of locations in a subsequent call. If there are no more locations to be
     /// fetched, this field is not present in the response.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// The total number of recommended locations for this GMB account,
+    /// irrespective of pagination.
+    #[serde(rename="totalSize")]
+    pub total_size: Option<i32>,
     /// The locations recommended to a GMB account.
     /// Each of these represents a GoogleLocation that
     /// is present on Maps.
@@ -2727,41 +2733,35 @@ pub struct ReportLocalPostInsightsResponse {
 impl ResponseResult for ReportLocalPostInsightsResponse {}
 
 
-/// Alternate/surrogate key references for a location.
+/// Response message for Reviews.ListReviews.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations reviews list accounts](struct.AccountLocationReviewListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LocationKey {
-    /// Output only. If this location has a Google+ page associated with it, this
-    /// is populated with the Google+ page ID for this location.
-    #[serde(rename="plusPageId")]
-    pub plus_page_id: Option<String>,
-    /// Output only. A value of true indicates that an unset place ID is
-    /// deliberate, which is different from no association being made yet.
-    #[serde(rename="explicitNoPlaceId")]
-    pub explicit_no_place_id: Option<bool>,
-    /// If this location has been verified and is connected to/appears on Google
-    /// Maps, this field is populated with the place ID for the location.
-    /// This ID can be used in various Places APIs.
-    /// 
-    /// If this location is unverified, this field may be populated if the location
-    /// has been associated with a place that appears on Google Maps.
-    /// 
-    /// This field can be set during Create calls, but not for Update.
-    /// 
-    /// The additional `explicit_no_place_id` bool qualifies whether an unset
-    /// place ID is deliberate or not.
-    #[serde(rename="placeId")]
-    pub place_id: Option<String>,
-    /// Output only. The `request_id` used to create this location. May be empty if
-    /// this location was created outside of the GMB API or Google My Business
-    /// Locations.
-    #[serde(rename="requestId")]
-    pub request_id: Option<String>,
+pub struct ListReviewsResponse {
+    /// If the number of reviews exceeded the requested page size, this field
+    /// is populated with a token to fetch the next page of reviews on a
+    /// subsequent call to ListReviews. If there are no more reviews, this
+    /// field is not present in the response.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The reviews.
+    pub reviews: Option<Vec<Review>>,
+    /// The total number of reviews for this location.
+    #[serde(rename="totalReviewCount")]
+    pub total_review_count: Option<i32>,
+    /// The average star rating of all reviews for this location
+    /// on a scale of 1 to 5, where 5 is the highest rating.
+    #[serde(rename="averageRating")]
+    pub average_rating: Option<f64>,
 }
 
-impl Part for LocationKey {}
+impl ResponseResult for ListReviewsResponse {}
 
 
 /// Token generated by a vetted partner.
@@ -2919,30 +2919,6 @@ pub struct TimeDimension {
 impl Part for TimeDimension {}
 
 
-/// Response message for Verifications.ListVerifications.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations verifications list accounts](struct.AccountLocationVerificationListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListVerificationsResponse {
-    /// If the number of verifications exceeded the requested page size, this field
-    /// will be populated with a token to fetch the next page of verification on a
-    /// subsequent call. If there are no more attributes, this field will not be
-    /// present in the response.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// List of the verifications.
-    pub verifications: Option<Vec<Verification>>,
-}
-
-impl ResponseResult for ListVerificationsResponse {}
-
-
 /// Response message for GoogleLocations.SearchGoogleLocations.
 /// 
 /// # Activities
@@ -2977,12 +2953,14 @@ impl ResponseResult for SearchGoogleLocationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalPost {
+    /// Event information. Required for topic types `EVENT` and `OFFER`.
+    pub event: Option<LocalPostEvent>,
     /// The language of the local post.
     #[serde(rename="languageCode")]
     pub language_code: Option<String>,
-    /// Output only. Time of the last modification of the post made by the user.
-    #[serde(rename="updateTime")]
-    pub update_time: Option<String>,
+    /// Additional data for product posts. This should only be set when the
+    /// topic_type is PRODUCT.
+    pub product: Option<LocalPostProduct>,
     /// Required. The topic type of the post: standard, event, offer, or product.
     #[serde(rename="topicType")]
     pub topic_type: Option<String>,
@@ -2995,12 +2973,9 @@ pub struct LocalPost {
     /// The media associated with the post. source_url is the only supported data
     /// field for a LocalPost MediaItem.
     pub media: Option<Vec<MediaItem>>,
-    /// Output only. Time of the creation of the post.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
-    /// Additional data for product posts. This should only be set when the
-    /// topic_type is PRODUCT.
-    pub product: Option<LocalPostProduct>,
+    /// Output only. Time of the last modification of the post made by the user.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
     /// Output only. The link to the local post in Google search. This link can
     /// be used to share the post via social media, email, text, etc.
     #[serde(rename="searchUrl")]
@@ -3014,8 +2989,9 @@ pub struct LocalPost {
     /// for topic type `OFFER`.
     #[serde(rename="callToAction")]
     pub call_to_action: Option<CallToAction>,
-    /// Event information. Required for topic types `EVENT` and `OFFER`.
-    pub event: Option<LocalPostEvent>,
+    /// Output only. Time of the creation of the post.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
 }
 
 impl RequestValue for LocalPost {}
@@ -3036,9 +3012,10 @@ impl ResponseResult for LocalPost {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Attribute {
-    /// The ID of the attribute. Attribute IDs are provided by Google.
-    #[serde(rename="attributeId")]
-    pub attribute_id: Option<String>,
+    /// When the attribute value type is URL, this field contains the value(s) for
+    /// this attribute, and the other values fields must be empty.
+    #[serde(rename="urlValues")]
+    pub url_values: Option<Vec<UrlAttributeValue>>,
     /// Output only. The type of value that this attribute contains. This should be
     /// used to determine how to interpret the value.
     #[serde(rename="valueType")]
@@ -3049,14 +3026,13 @@ pub struct Attribute {
     /// This is a repeated field where multiple attribute values may be provided.
     /// Attribute types only support one value.
     pub values: Option<Vec<String>>,
+    /// The ID of the attribute. Attribute IDs are provided by Google.
+    #[serde(rename="attributeId")]
+    pub attribute_id: Option<String>,
     /// When the attribute value type is REPEATED_ENUM, this contains the attribute
     /// value, and the other values fields must be empty.
     #[serde(rename="repeatedEnumValue")]
     pub repeated_enum_value: Option<RepeatedEnumAttributeValue>,
-    /// When the attribute value type is URL, this field contains the value(s) for
-    /// this attribute, and the other values fields must be empty.
-    #[serde(rename="urlValues")]
-    pub url_values: Option<Vec<UrlAttributeValue>>,
 }
 
 impl Resource for Attribute {}
@@ -3081,12 +3057,12 @@ impl Part for VettedPartnerInput {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TargetLocation {
-    /// The name of the location to which the user is invited.
-    #[serde(rename="locationName")]
-    pub location_name: Option<String>,
     /// The address of the location to which the user is invited.
     #[serde(rename="locationAddress")]
     pub location_address: Option<String>,
+    /// The name of the location to which the user is invited.
+    #[serde(rename="locationName")]
+    pub location_name: Option<String>,
 }
 
 impl Part for TargetLocation {}
@@ -3238,6 +3214,24 @@ pub struct CompleteVerificationResponse {
 impl ResponseResult for CompleteVerificationResponse {}
 
 
+/// Response message for Verifications.FetchVerificationOptions.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations fetch verification options accounts](struct.AccountLocationFetchVerificationOptionCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FetchVerificationOptionsResponse {
+    /// The available verification options.
+    pub options: Option<Vec<VerificationOption>>,
+}
+
+impl ResponseResult for FetchVerificationOptionsResponse {}
+
+
 /// Response message for Locations.ListLocations.
 /// 
 /// # Activities
@@ -3265,41 +3259,45 @@ pub struct ListLocationsResponse {
 impl ResponseResult for ListLocationsResponse {}
 
 
-/// Request message for Insights.ReportLocalPostInsights
+/// Name to be used when displaying the chain.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ChainName {
+    /// The BCP 47 code of language of the name.
+    #[serde(rename="languageCode")]
+    pub language_code: Option<String>,
+    /// The display name for this chain.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+}
+
+impl Part for ChainName {}
+
+
+/// Response message for Locations.FindMatchingLocations.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations local posts report insights accounts](struct.AccountLocationLocalPostReportInsightCall.html) (request)
+/// * [locations find matches accounts](struct.AccountLocationFindMatcheCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReportLocalPostInsightsRequest {
-    /// Required. The list of posts for which to fetch insights data. All posts
-    /// have to belong to the location whose name is specified in the `name` field.
-    #[serde(rename="localPostNames")]
-    pub local_post_names: Option<Vec<String>>,
-    /// A request to include basic metric insights in the report. This request
-    /// applies to all posts requested.
-    #[serde(rename="basicRequest")]
-    pub basic_request: Option<BasicMetricsRequest>,
+pub struct FindMatchingLocationsResponse {
+    /// When the matching algorithm was last executed for this location.
+    #[serde(rename="matchTime")]
+    pub match_time: Option<String>,
+    /// A collection of locations that are potential matches to the specified
+    /// location, listed in order from best to least match. If there is an exact
+    /// match, it will be in the first position.
+    #[serde(rename="matchedLocations")]
+    pub matched_locations: Option<Vec<MatchedLocation>>,
 }
 
-impl RequestValue for ReportLocalPostInsightsRequest {}
-
-
-/// All information pertaining to the location's profile.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Profile {
-    /// Description of the location in your own voice, not editable by anyone else.
-    pub description: Option<String>,
-}
-
-impl Part for Profile {}
+impl ResponseResult for FindMatchingLocationsResponse {}
 
 
 /// A region with its associated request count.
@@ -3471,45 +3469,41 @@ pub struct RelationshipData {
 impl Part for RelationshipData {}
 
 
-/// Name to be used when displaying the chain.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ChainName {
-    /// The BCP 47 code of language of the name.
-    #[serde(rename="languageCode")]
-    pub language_code: Option<String>,
-    /// The display name for this chain.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-}
-
-impl Part for ChainName {}
-
-
-/// Response message for Locations.FindMatchingLocations.
+/// Request message for Insights.ReportLocalPostInsights
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations find matches accounts](struct.AccountLocationFindMatcheCall.html) (response)
+/// * [locations local posts report insights accounts](struct.AccountLocationLocalPostReportInsightCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FindMatchingLocationsResponse {
-    /// When the matching algorithm was last executed for this location.
-    #[serde(rename="matchTime")]
-    pub match_time: Option<String>,
-    /// A collection of locations that are potential matches to the specified
-    /// location, listed in order from best to least match. If there is an exact
-    /// match, it will be in the first position.
-    #[serde(rename="matchedLocations")]
-    pub matched_locations: Option<Vec<MatchedLocation>>,
+pub struct ReportLocalPostInsightsRequest {
+    /// Required. The list of posts for which to fetch insights data. All posts
+    /// have to belong to the location whose name is specified in the `name` field.
+    #[serde(rename="localPostNames")]
+    pub local_post_names: Option<Vec<String>>,
+    /// A request to include basic metric insights in the report. This request
+    /// applies to all posts requested.
+    #[serde(rename="basicRequest")]
+    pub basic_request: Option<BasicMetricsRequest>,
 }
 
-impl ResponseResult for FindMatchingLocationsResponse {}
+impl RequestValue for ReportLocalPostInsightsRequest {}
+
+
+/// All information pertaining to the location's profile.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Profile {
+    /// Description of the location in your own voice, not editable by anyone else.
+    pub description: Option<String>,
+}
+
+impl Part for Profile {}
 
 
 /// A series of Metrics and BreakdownMetrics associated with a Location over
@@ -3556,40 +3550,46 @@ pub struct Admin {
     /// specified resource.
     #[serde(rename="pendingInvitation")]
     pub pending_invitation: Option<bool>,
-    /// The name of the admin. When making the initial invitation, this is the
-    /// invitee's email address. On `GET` calls, the user's email address is
-    /// returned if the invitation is still pending. Otherwise, it contains
-    /// the user's first and last names.
-    #[serde(rename="adminName")]
-    pub admin_name: Option<String>,
     /// The resource name. For account admins, this is in the form:
     /// `accounts/{account_id}/admins/{admin_id}`
     /// 
     /// For location admins, this is in the form:
     /// `accounts/{account_id}/locations/{location_id}/admins/{admin_id}`
     pub name: Option<String>,
+    /// The name of the admin. When making the initial invitation, this is the
+    /// invitee's email address. On `GET` calls, the user's email address is
+    /// returned if the invitation is still pending. Otherwise, it contains
+    /// the user's first and last names.
+    #[serde(rename="adminName")]
+    pub admin_name: Option<String>,
 }
 
 impl RequestValue for Admin {}
 impl ResponseResult for Admin {}
 
 
-/// Response message for Verifications.FetchVerificationOptions.
+/// Response message for Verifications.ListVerifications.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations fetch verification options accounts](struct.AccountLocationFetchVerificationOptionCall.html) (response)
+/// * [locations verifications list accounts](struct.AccountLocationVerificationListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FetchVerificationOptionsResponse {
-    /// The available verification options.
-    pub options: Option<Vec<VerificationOption>>,
+pub struct ListVerificationsResponse {
+    /// If the number of verifications exceeded the requested page size, this field
+    /// will be populated with a token to fetch the next page of verification on a
+    /// subsequent call. If there are no more attributes, this field will not be
+    /// present in the response.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// List of the verifications.
+    pub verifications: Option<Vec<Verification>>,
 }
 
-impl ResponseResult for FetchVerificationOptionsResponse {}
+impl ResponseResult for ListVerificationsResponse {}
 
 
 /// A single list item. Each variation of an item in the price list should
@@ -3803,12 +3803,12 @@ impl Part for TopDirectionSources {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OpenInfo {
-    /// Indicates whether or not the Location is currently open for business.
-    /// All locations are open by default, unless updated to be closed.
-    pub status: Option<String>,
     /// Output only. Indicates whether this business is eligible for re-open.
     #[serde(rename="canReopen")]
     pub can_reopen: Option<bool>,
+    /// Indicates whether or not the Location is currently open for business.
+    /// All locations are open by default, unless updated to be closed.
+    pub status: Option<String>,
     /// The date on which the location first opened. If the exact day is not known,
     /// month and year only can be provided. The date must be in the past or be
     /// no more than one year in the future.
@@ -4326,22 +4326,27 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the locations for the specified account.
+    /// List all the GoogleLocations that
+    /// have been recommended to the specified GMB account.
+    /// Recommendations are provided for personal accounts and location groups
+    /// only, requests for all other account types will result in an error.
+    /// The recommendations for location groups are based on the locations in that
+    /// group.
+    /// 
+    /// The recommendations for personal accounts are based on all of
+    /// the locations that the user has access to on Google My Business (which
+    /// includes locations they can access through location groups), and is a
+    /// superset of all recommendations generated for the user.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The name of the account to fetch locations from. If the Account is of AccountType PERSONAL, only Locations that are
-    ///              directly owned by the Account are returned, otherwise it will return all
-    ///              accessible locations from the Account, either directly or indirectly.
-    pub fn locations_list(&self, parent: &str) -> AccountLocationListCall<'a, C, A> {
-        AccountLocationListCall {
+    /// * `name` - Name of the account resource to fetch recommended Google locations for.
+    pub fn list_recommend_google_locations(&self, name: &str) -> AccountListRecommendGoogleLocationCall<'a, C, A> {
+        AccountListRecommendGoogleLocationCall {
             hub: self.hub,
-            _parent: parent.to_string(),
+            _name: name.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
-            _order_by: Default::default(),
-            _language_code: Default::default(),
-            _filter: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
         }
@@ -4548,27 +4553,21 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all the GoogleLocations that
-    /// have been recommended to the specified GMB account.
-    /// Recommendations are provided for personal accounts and location groups
-    /// only, requests for all other account types will result in an error.
-    /// The recommendations for location groups are based on the locations in that
-    /// group.
-    /// 
-    /// The recommendations for personal accounts are based on all of
-    /// the locations that the user has access to on Google My Business (which
-    /// includes locations they can access through location groups), and is a
-    /// superset of all recommendations generated for the user.
+    /// Moves a location from an account that the user owns to another account
+    /// that the same user administers. The user must be an owner of the account
+    /// the location is currently associated with and must also be at least a
+    /// manager of the destination account. Returns the Location with its new
+    /// resource name.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Name of the account resource to fetch recommended Google locations for.
-    pub fn list_recommend_google_locations(&self, name: &str) -> AccountListRecommendGoogleLocationCall<'a, C, A> {
-        AccountListRecommendGoogleLocationCall {
+    /// * `request` - No description provided.
+    /// * `name` - The name of the location to transfer.
+    pub fn locations_transfer(&self, request: TransferLocationRequest, name: &str) -> AccountLocationTransferCall<'a, C, A> {
+        AccountLocationTransferCall {
             hub: self.hub,
+            _request: request,
             _name: name.to_string(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
         }
@@ -4688,20 +4687,22 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Associates a location to a place ID. Any previous association is
-    /// overwritten. This operation is only valid if the location is unverified.
-    /// The association must be valid, that is, it appears in the list of
-    /// `FindMatchingLocations`.
+    /// Lists the locations for the specified account.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `name` - The resource name of the location to associate.
-    pub fn locations_associate(&self, request: AssociateLocationRequest, name: &str) -> AccountLocationAssociateCall<'a, C, A> {
-        AccountLocationAssociateCall {
+    /// * `parent` - The name of the account to fetch locations from. If the Account is of AccountType PERSONAL, only Locations that are
+    ///              directly owned by the Account are returned, otherwise it will return all
+    ///              accessible locations from the Account, either directly or indirectly.
+    pub fn locations_list(&self, parent: &str) -> AccountLocationListCall<'a, C, A> {
+        AccountLocationListCall {
             hub: self.hub,
-            _request: request,
-            _name: name.to_string(),
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _order_by: Default::default(),
+            _language_code: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
         }
@@ -5024,18 +5025,17 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Moves a location from an account that the user owns to another account
-    /// that the same user administers. The user must be an owner of the account
-    /// the location is currently associated with and must also be at least a
-    /// manager of the destination account. Returns the Location with its new
-    /// resource name.
+    /// Associates a location to a place ID. Any previous association is
+    /// overwritten. This operation is only valid if the location is unverified.
+    /// The association must be valid, that is, it appears in the list of
+    /// `FindMatchingLocations`.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the location to transfer.
-    pub fn locations_transfer(&self, request: TransferLocationRequest, name: &str) -> AccountLocationTransferCall<'a, C, A> {
-        AccountLocationTransferCall {
+    /// * `name` - The resource name of the location to associate.
+    pub fn locations_associate(&self, request: AssociateLocationRequest, name: &str) -> AccountLocationAssociateCall<'a, C, A> {
+        AccountLocationAssociateCall {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
@@ -9335,9 +9335,19 @@ impl<'a, C, A> AccountLocationReviewUpdateReplyCall<'a, C, A> where C: BorrowMut
 }
 
 
-/// Lists the locations for the specified account.
+/// List all the GoogleLocations that
+/// have been recommended to the specified GMB account.
+/// Recommendations are provided for personal accounts and location groups
+/// only, requests for all other account types will result in an error.
+/// The recommendations for location groups are based on the locations in that
+/// group.
+/// 
+/// The recommendations for personal accounts are based on all of
+/// the locations that the user has access to on Google My Business (which
+/// includes locations they can access through location groups), and is a
+/// superset of all recommendations generated for the user.
 ///
-/// A builder for the *locations.list* method supported by a *account* resource.
+/// A builder for the *listRecommendGoogleLocations* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
@@ -9362,36 +9372,30 @@ impl<'a, C, A> AccountLocationReviewUpdateReplyCall<'a, C, A> where C: BorrowMut
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().locations_list("parent")
+/// let result = hub.accounts().list_recommend_google_locations("name")
 ///              .page_token("dolor")
 ///              .page_size(-39)
-///              .order_by("elitr")
-///              .language_code("amet")
-///              .filter("no")
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountLocationListCall<'a, C, A>
+pub struct AccountListRecommendGoogleLocationCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a MyBusiness<C, A>,
-    _parent: String,
+    _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _order_by: Option<String>,
-    _language_code: Option<String>,
-    _filter: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, A> CallBuilder for AccountLocationListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for AccountListRecommendGoogleLocationCall<'a, C, A> {}
 
-impl<'a, C, A> AccountLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> AccountListRecommendGoogleLocationCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListLocationsResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListRecommendedGoogleLocationsResponse)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -9400,26 +9404,17 @@ impl<'a, C, A> AccountLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "mybusiness.accounts.locations.list",
+        dlg.begin(MethodInfo { id: "mybusiness.accounts.listRecommendGoogleLocations",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
         }
-        if let Some(value) = self._order_by {
-            params.push(("orderBy", value.to_string()));
-        }
-        if let Some(value) = self._language_code {
-            params.push(("languageCode", value.to_string()));
-        }
-        if let Some(value) = self._filter {
-            params.push(("filter", value.to_string()));
-        }
-        for &field in ["alt", "parent", "pageToken", "pageSize", "orderBy", "languageCode", "filter"].iter() {
+        for &field in ["alt", "name", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9431,7 +9426,7 @@ impl<'a, C, A> AccountLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v4/{+parent}/locations";
+        let mut url = self.hub._base_url.clone() + "v4/{+name}:recommendGoogleLocations";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -9445,7 +9440,7 @@ impl<'a, C, A> AccountLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -9460,7 +9455,7 @@ impl<'a, C, A> AccountLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["parent"].iter() {
+            for param_name in ["name"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -9529,68 +9524,29 @@ impl<'a, C, A> AccountLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// The name of the account to fetch locations from. If the Account is of AccountType PERSONAL, only Locations that are
-    /// directly owned by the Account are returned, otherwise it will return all
-    /// accessible locations from the Account, either directly or indirectly.
+    /// Name of the account resource to fetch recommended Google locations for.
     ///
-    /// Sets the *parent* path property to the given value.
+    /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountLocationListCall<'a, C, A> {
-        self._parent = new_value.to_string();
+    pub fn name(mut self, new_value: &str) -> AccountListRecommendGoogleLocationCall<'a, C, A> {
+        self._name = new_value.to_string();
         self
     }
-    /// If specified, it fetches the next `page` of locations. The page token
-    /// is returned by previous calls to `ListLocations` when there were more
-    /// locations than could fit in the requested page size.
+    /// If specified, the next page of locations is retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountLocationListCall<'a, C, A> {
+    pub fn page_token(mut self, new_value: &str) -> AccountListRecommendGoogleLocationCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// How many locations to fetch per page. Default is 100,
-    /// minimum is 1, and maximum page size is 100.
+    /// How many locations to fetch per page. Default is 25, minimum is 1, and
+    /// maximum page size is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountLocationListCall<'a, C, A> {
+    pub fn page_size(mut self, new_value: i32) -> AccountListRecommendGoogleLocationCall<'a, C, A> {
         self._page_size = Some(new_value);
-        self
-    }
-    /// Sorting order for the request. Multiple fields should be comma-separated,
-    /// following SQL syntax.
-    /// The default sorting order is ascending. To specify descending order, a
-    /// suffix " desc" should be added.
-    /// Valid fields to order_by are location_name and store_code. For example:
-    /// "location_name, store_code desc" or "location_name" or "store_code desc"
-    ///
-    /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AccountLocationListCall<'a, C, A> {
-        self._order_by = Some(new_value.to_string());
-        self
-    }
-    /// The BCP 47 code of language to get display location properties in. If this
-    /// language is not available, they will be provided in the language of the
-    /// location. If neither is available, they will be provided in English.
-    ///
-    /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> AccountLocationListCall<'a, C, A> {
-        self._language_code = Some(new_value.to_string());
-        self
-    }
-    /// A filter constraining the locations to return. The response includes
-    /// only entries that match the filter. If `filter` is empty, then
-    /// constraints are applied and all locations (paginated) are retrieved for
-    /// the requested account.
-    /// 
-    /// For more information about valid fields and example usage, see [Work with
-    /// Location Data
-    /// Guide](https://developers.google.com/my-business/content/location-data#filter_results_when_you_list_locations).
-    ///
-    /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AccountLocationListCall<'a, C, A> {
-        self._filter = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -9599,7 +9555,7 @@ impl<'a, C, A> AccountLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountLocationListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountListRecommendGoogleLocationCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9624,7 +9580,7 @@ impl<'a, C, A> AccountLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountListRecommendGoogleLocationCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9912,11 +9868,11 @@ impl<'a, C, A> AccountInvitationDeclineCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().locations_questions_list("parent")
-///              .page_token("dolore")
-///              .page_size(-37)
-///              .order_by("aliquyam")
-///              .filter("accusam")
-///              .answers_per_question(-56)
+///              .page_token("no")
+///              .page_size(-36)
+///              .order_by("eirmod")
+///              .filter("dolore")
+///              .answers_per_question(-37)
 ///              .doit();
 /// # }
 /// ```
@@ -10204,8 +10160,8 @@ impl<'a, C, A> AccountLocationQuestionListCall<'a, C, A> where C: BorrowMut<hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().locations_create(req, "parent")
-///              .validate_only(true)
-///              .request_id("duo")
+///              .validate_only(false)
+///              .request_id("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -11824,10 +11780,10 @@ impl<'a, C, A> AccountLocationMediaCustomerGetCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().list()
-///              .page_token("consetetur")
-///              .page_size(-36)
-///              .name("ea")
-///              .filter("sed")
+///              .page_token("et")
+///              .page_size(-46)
+///              .name("et")
+///              .filter("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -12072,7 +12028,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().locations_local_posts_patch(req, "name")
-///              .update_mask("dolor")
+///              .update_mask("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -12301,19 +12257,13 @@ impl<'a, C, A> AccountLocationLocalPostPatchCall<'a, C, A> where C: BorrowMut<hy
 }
 
 
-/// List all the GoogleLocations that
-/// have been recommended to the specified GMB account.
-/// Recommendations are provided for personal accounts and location groups
-/// only, requests for all other account types will result in an error.
-/// The recommendations for location groups are based on the locations in that
-/// group.
-/// 
-/// The recommendations for personal accounts are based on all of
-/// the locations that the user has access to on Google My Business (which
-/// includes locations they can access through location groups), and is a
-/// superset of all recommendations generated for the user.
+/// Moves a location from an account that the user owns to another account
+/// that the same user administers. The user must be an owner of the account
+/// the location is currently associated with and must also be at least a
+/// manager of the destination account. Returns the Location with its new
+/// resource name.
 ///
-/// A builder for the *listRecommendGoogleLocations* method supported by a *account* resource.
+/// A builder for the *locations.transfer* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
@@ -12325,6 +12275,7 @@ impl<'a, C, A> AccountLocationLocalPostPatchCall<'a, C, A> where C: BorrowMut<hy
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_mybusiness4 as mybusiness4;
+/// use mybusiness4::TransferLocationRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -12335,33 +12286,35 @@ impl<'a, C, A> AccountLocationLocalPostPatchCall<'a, C, A> where C: BorrowMut<hy
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = MyBusiness::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = TransferLocationRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().list_recommend_google_locations("name")
-///              .page_token("et")
-///              .page_size(-96)
+/// let result = hub.accounts().locations_transfer(req, "name")
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountListRecommendGoogleLocationCall<'a, C, A>
+pub struct AccountLocationTransferCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a MyBusiness<C, A>,
+    _request: TransferLocationRequest,
     _name: String,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, A> CallBuilder for AccountListRecommendGoogleLocationCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for AccountLocationTransferCall<'a, C, A> {}
 
-impl<'a, C, A> AccountListRecommendGoogleLocationCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> AccountLocationTransferCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListRecommendedGoogleLocationsResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Location)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -12370,17 +12323,11 @@ impl<'a, C, A> AccountListRecommendGoogleLocationCall<'a, C, A> where C: BorrowM
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "mybusiness.accounts.listRecommendGoogleLocations",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "mybusiness.accounts.locations.transfer",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        for &field in ["alt", "name", "pageToken", "pageSize"].iter() {
+        for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12392,7 +12339,7 @@ impl<'a, C, A> AccountListRecommendGoogleLocationCall<'a, C, A> where C: BorrowM
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v4/{+name}:recommendGoogleLocations";
+        let mut url = self.hub._base_url.clone() + "v4/{+name}:transfer";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -12433,13 +12380,28 @@ impl<'a, C, A> AccountListRecommendGoogleLocationCall<'a, C, A> where C: BorrowM
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()));
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -12490,29 +12452,23 @@ impl<'a, C, A> AccountListRecommendGoogleLocationCall<'a, C, A> where C: BorrowM
     }
 
 
-    /// Name of the account resource to fetch recommended Google locations for.
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: TransferLocationRequest) -> AccountLocationTransferCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the location to transfer.
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountListRecommendGoogleLocationCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationTransferCall<'a, C, A> {
         self._name = new_value.to_string();
-        self
-    }
-    /// If specified, the next page of locations is retrieved.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountListRecommendGoogleLocationCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// How many locations to fetch per page. Default is 25, minimum is 1, and
-    /// maximum page size is 100.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountListRecommendGoogleLocationCall<'a, C, A> {
-        self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -12521,7 +12477,7 @@ impl<'a, C, A> AccountListRecommendGoogleLocationCall<'a, C, A> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountListRecommendGoogleLocationCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountLocationTransferCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12546,7 +12502,7 @@ impl<'a, C, A> AccountListRecommendGoogleLocationCall<'a, C, A> where C: BorrowM
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountListRecommendGoogleLocationCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationTransferCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13808,8 +13764,8 @@ impl<'a, C, A> AccountLocationFindMatcheCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().locations_verifications_list("parent")
-///              .page_token("vero")
-///              .page_size(-28)
+///              .page_token("voluptua.")
+///              .page_size(-56)
 ///              .doit();
 /// # }
 /// ```
@@ -14023,12 +13979,9 @@ impl<'a, C, A> AccountLocationVerificationListCall<'a, C, A> where C: BorrowMut<
 }
 
 
-/// Associates a location to a place ID. Any previous association is
-/// overwritten. This operation is only valid if the location is unverified.
-/// The association must be valid, that is, it appears in the list of
-/// `FindMatchingLocations`.
+/// Lists the locations for the specified account.
 ///
-/// A builder for the *locations.associate* method supported by a *account* resource.
+/// A builder for the *locations.list* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
@@ -14040,7 +13993,6 @@ impl<'a, C, A> AccountLocationVerificationListCall<'a, C, A> where C: BorrowMut<
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_mybusiness4 as mybusiness4;
-/// use mybusiness4::AssociateLocationRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -14051,35 +14003,39 @@ impl<'a, C, A> AccountLocationVerificationListCall<'a, C, A> where C: BorrowMut<
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = MyBusiness::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = AssociateLocationRequest::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().locations_associate(req, "name")
+/// let result = hub.accounts().locations_list("parent")
+///              .page_token("justo")
+///              .page_size(-52)
+///              .order_by("vero")
+///              .language_code("diam")
+///              .filter("rebum.")
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountLocationAssociateCall<'a, C, A>
+pub struct AccountLocationListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a MyBusiness<C, A>,
-    _request: AssociateLocationRequest,
-    _name: String,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _language_code: Option<String>,
+    _filter: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, A> CallBuilder for AccountLocationAssociateCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for AccountLocationListCall<'a, C, A> {}
 
-impl<'a, C, A> AccountLocationAssociateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> AccountLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListLocationsResponse)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -14088,11 +14044,26 @@ impl<'a, C, A> AccountLocationAssociateCall<'a, C, A> where C: BorrowMut<hyper::
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "mybusiness.accounts.locations.associate",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
+        dlg.begin(MethodInfo { id: "mybusiness.accounts.locations.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._order_by {
+            params.push(("orderBy", value.to_string()));
+        }
+        if let Some(value) = self._language_code {
+            params.push(("languageCode", value.to_string()));
+        }
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "orderBy", "languageCode", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -14104,7 +14075,7 @@ impl<'a, C, A> AccountLocationAssociateCall<'a, C, A> where C: BorrowMut<hyper::
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v4/{+name}:associate";
+        let mut url = self.hub._base_url.clone() + "v4/{+parent}/locations";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -14118,7 +14089,7 @@ impl<'a, C, A> AccountLocationAssociateCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -14133,7 +14104,7 @@ impl<'a, C, A> AccountLocationAssociateCall<'a, C, A> where C: BorrowMut<hyper::
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -14145,28 +14116,13 @@ impl<'a, C, A> AccountLocationAssociateCall<'a, C, A> where C: BorrowMut<hyper::
 
         let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()));
 
                 dlg.pre_request();
                 req.send()
@@ -14217,23 +14173,68 @@ impl<'a, C, A> AccountLocationAssociateCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
+    /// The name of the account to fetch locations from. If the Account is of AccountType PERSONAL, only Locations that are
+    /// directly owned by the Account are returned, otherwise it will return all
+    /// accessible locations from the Account, either directly or indirectly.
     ///
-    /// Sets the *request* property to the given value.
+    /// Sets the *parent* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AssociateLocationRequest) -> AccountLocationAssociateCall<'a, C, A> {
-        self._request = new_value;
+    pub fn parent(mut self, new_value: &str) -> AccountLocationListCall<'a, C, A> {
+        self._parent = new_value.to_string();
         self
     }
-    /// The resource name of the location to associate.
+    /// If specified, it fetches the next `page` of locations. The page token
+    /// is returned by previous calls to `ListLocations` when there were more
+    /// locations than could fit in the requested page size.
     ///
-    /// Sets the *name* path property to the given value.
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> AccountLocationListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// How many locations to fetch per page. Default is 100,
+    /// minimum is 1, and maximum page size is 100.
     ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationAssociateCall<'a, C, A> {
-        self._name = new_value.to_string();
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> AccountLocationListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Sorting order for the request. Multiple fields should be comma-separated,
+    /// following SQL syntax.
+    /// The default sorting order is ascending. To specify descending order, a
+    /// suffix " desc" should be added.
+    /// Valid fields to order_by are location_name and store_code. For example:
+    /// "location_name, store_code desc" or "location_name" or "store_code desc"
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(mut self, new_value: &str) -> AccountLocationListCall<'a, C, A> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// The BCP 47 code of language to get display location properties in. If this
+    /// language is not available, they will be provided in the language of the
+    /// location. If neither is available, they will be provided in English.
+    ///
+    /// Sets the *language code* query property to the given value.
+    pub fn language_code(mut self, new_value: &str) -> AccountLocationListCall<'a, C, A> {
+        self._language_code = Some(new_value.to_string());
+        self
+    }
+    /// A filter constraining the locations to return. The response includes
+    /// only entries that match the filter. If `filter` is empty, then
+    /// constraints are applied and all locations (paginated) are retrieved for
+    /// the requested account.
+    /// 
+    /// For more information about valid fields and example usage, see [Work with
+    /// Location Data
+    /// Guide](https://developers.google.com/my-business/content/location-data#filter_results_when_you_list_locations).
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> AccountLocationListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -14242,7 +14243,7 @@ impl<'a, C, A> AccountLocationAssociateCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountLocationAssociateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountLocationListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14267,7 +14268,7 @@ impl<'a, C, A> AccountLocationAssociateCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationAssociateCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18320,13 +18321,12 @@ impl<'a, C, A> AccountLocationReportInsightCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Moves a location from an account that the user owns to another account
-/// that the same user administers. The user must be an owner of the account
-/// the location is currently associated with and must also be at least a
-/// manager of the destination account. Returns the Location with its new
-/// resource name.
+/// Associates a location to a place ID. Any previous association is
+/// overwritten. This operation is only valid if the location is unverified.
+/// The association must be valid, that is, it appears in the list of
+/// `FindMatchingLocations`.
 ///
-/// A builder for the *locations.transfer* method supported by a *account* resource.
+/// A builder for the *locations.associate* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
@@ -18338,7 +18338,7 @@ impl<'a, C, A> AccountLocationReportInsightCall<'a, C, A> where C: BorrowMut<hyp
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_mybusiness4 as mybusiness4;
-/// use mybusiness4::TransferLocationRequest;
+/// use mybusiness4::AssociateLocationRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -18352,32 +18352,32 @@ impl<'a, C, A> AccountLocationReportInsightCall<'a, C, A> where C: BorrowMut<hyp
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = TransferLocationRequest::default();
+/// let mut req = AssociateLocationRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().locations_transfer(req, "name")
+/// let result = hub.accounts().locations_associate(req, "name")
 ///              .doit();
 /// # }
 /// ```
-pub struct AccountLocationTransferCall<'a, C, A>
+pub struct AccountLocationAssociateCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a MyBusiness<C, A>,
-    _request: TransferLocationRequest,
+    _request: AssociateLocationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C, A> CallBuilder for AccountLocationTransferCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for AccountLocationAssociateCall<'a, C, A> {}
 
-impl<'a, C, A> AccountLocationTransferCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> AccountLocationAssociateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Location)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -18386,7 +18386,7 @@ impl<'a, C, A> AccountLocationTransferCall<'a, C, A> where C: BorrowMut<hyper::C
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "mybusiness.accounts.locations.transfer",
+        dlg.begin(MethodInfo { id: "mybusiness.accounts.locations.associate",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
@@ -18402,7 +18402,7 @@ impl<'a, C, A> AccountLocationTransferCall<'a, C, A> where C: BorrowMut<hyper::C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v4/{+name}:transfer";
+        let mut url = self.hub._base_url.clone() + "v4/{+name}:associate";
         
         let mut key = self.hub.auth.borrow_mut().api_key();
         if key.is_none() {
@@ -18520,17 +18520,17 @@ impl<'a, C, A> AccountLocationTransferCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TransferLocationRequest) -> AccountLocationTransferCall<'a, C, A> {
+    pub fn request(mut self, new_value: AssociateLocationRequest) -> AccountLocationAssociateCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// The name of the location to transfer.
+    /// The resource name of the location to associate.
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationTransferCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationAssociateCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -18540,7 +18540,7 @@ impl<'a, C, A> AccountLocationTransferCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountLocationTransferCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> AccountLocationAssociateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18565,7 +18565,7 @@ impl<'a, C, A> AccountLocationTransferCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationTransferCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationAssociateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

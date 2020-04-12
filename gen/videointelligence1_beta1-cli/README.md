@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Video Intelligence* API at revision *20171122*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Cloud Video Intelligence* API at revision *20171122*. The CLI is at version *1.0.13*.
 
 ```bash
 videointelligence1-beta1 [options]

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-searchconsole1-cli"
-version = "1.0.12+20190629"
+version = "1.0.13+20200409"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Search Console (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/searchconsole1-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-searchconsole1]
 path = "../searchconsole1"
-version = "1.0.12+20190629"
+version = "1.0.13+20200409"

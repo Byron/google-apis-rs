@@ -3,32 +3,34 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/api/README.md.mako'
 DO NOT EDIT !
 -->
-The `google-sqladmin1_beta4` library allows access to all features of the *Google SQL Admin* service.
+The `google-sql1_beta4` library allows access to all features of the *Google SQL Admin* service.
 
-This documentation was generated from *SQL Admin* crate version *1.0.12+20190607*, where *20190607* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+This documentation was generated from *SQL Admin* crate version *1.0.13+20200331*, where *20200331* is the exact revision of the *sql:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 
 Everything else about the *SQL Admin* *v1_beta4* API can be found at the
-[official documentation site](https://cloud.google.com/sql/docs/reference/latest).
+[official documentation site](https://developers.google.com/cloud-sql/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.SQLAdmin.html) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.SQLAdmin.html) ... 
 
-* [backup runs](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.BackupRun.html)
- * [*delete*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.BackupRunDeleteCall.html), [*get*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.BackupRunGetCall.html), [*insert*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.BackupRunInsertCall.html) and [*list*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.BackupRunListCall.html)
-* [databases](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.Database.html)
- * [*delete*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.DatabaseDeleteCall.html), [*get*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.DatabaseGetCall.html), [*insert*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.DatabaseInsertCall.html), [*list*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.DatabaseListCall.html), [*patch*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.DatabasePatchCall.html) and [*update*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.DatabaseUpdateCall.html)
-* [flags](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.Flag.html)
- * [*list*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.FlagListCall.html)
+* [backup runs](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.BackupRun.html)
+ * [*delete*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.BackupRunDeleteCall.html), [*get*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.BackupRunGetCall.html), [*insert*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.BackupRunInsertCall.html) and [*list*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.BackupRunListCall.html)
+* [databases](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.Database.html)
+ * [*delete*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.DatabaseDeleteCall.html), [*get*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.DatabaseGetCall.html), [*insert*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.DatabaseInsertCall.html), [*list*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.DatabaseListCall.html), [*patch*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.DatabasePatchCall.html) and [*update*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.DatabaseUpdateCall.html)
+* [flags](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.Flag.html)
+ * [*list*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.FlagListCall.html)
 * instances
- * [*add server ca*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceAddServerCaCall.html), [*clone*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceCloneCall.html), [*delete*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceDeleteCall.html), [*demote master*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceDemoteMasterCall.html), [*export*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceExportCall.html), [*failover*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceFailoverCall.html), [*get*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceGetCall.html), [*import*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceImportCall.html), [*insert*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceInsertCall.html), [*list*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceListCall.html), [*list server cas*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceListServerCaCall.html), [*patch*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstancePatchCall.html), [*promote replica*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstancePromoteReplicaCall.html), [*reset ssl config*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceResetSslConfigCall.html), [*restart*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceRestartCall.html), [*restore backup*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceRestoreBackupCall.html), [*rotate server ca*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceRotateServerCaCall.html), [*start replica*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceStartReplicaCall.html), [*stop replica*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceStopReplicaCall.html), [*truncate log*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceTruncateLogCall.html) and [*update*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.InstanceUpdateCall.html)
-* [operations](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.Operation.html)
- * [*get*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.OperationGetCall.html) and [*list*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.OperationListCall.html)
-* [ssl certs](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.SslCert.html)
- * [*create ephemeral*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.SslCertCreateEphemeralCall.html), [*delete*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.SslCertDeleteCall.html), [*get*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.SslCertGetCall.html), [*insert*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.SslCertInsertCall.html) and [*list*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.SslCertListCall.html)
-* [tiers](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.Tier.html)
- * [*list*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.TierListCall.html)
-* [users](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.User.html)
- * [*delete*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.UserDeleteCall.html), [*insert*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.UserInsertCall.html), [*list*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.UserListCall.html) and [*update*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.UserUpdateCall.html)
+ * [*add server ca*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceAddServerCaCall.html), [*clone*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceCloneCall.html), [*delete*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceDeleteCall.html), [*demote master*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceDemoteMasterCall.html), [*export*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceExportCall.html), [*failover*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceFailoverCall.html), [*get*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceGetCall.html), [*import*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceImportCall.html), [*insert*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceInsertCall.html), [*list*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceListCall.html), [*list server cas*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceListServerCaCall.html), [*patch*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstancePatchCall.html), [*promote replica*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstancePromoteReplicaCall.html), [*reset ssl config*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceResetSslConfigCall.html), [*restart*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceRestartCall.html), [*restore backup*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceRestoreBackupCall.html), [*rotate server ca*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceRotateServerCaCall.html), [*start replica*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceStartReplicaCall.html), [*stop replica*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceStopReplicaCall.html), [*truncate log*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceTruncateLogCall.html) and [*update*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.InstanceUpdateCall.html)
+* [operations](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.Operation.html)
+ * [*get*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.OperationGetCall.html) and [*list*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.OperationListCall.html)
+* projects
+ * [*instances reschedule maintenance*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.ProjectInstanceRescheduleMaintenanceCall.html), [*instances start external sync*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.ProjectInstanceStartExternalSyncCall.html) and [*instances verify external sync settings*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.ProjectInstanceVerifyExternalSyncSettingCall.html)
+* [ssl certs](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.SslCert.html)
+ * [*create ephemeral*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.SslCertCreateEphemeralCall.html), [*delete*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.SslCertDeleteCall.html), [*get*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.SslCertGetCall.html), [*insert*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.SslCertInsertCall.html) and [*list*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.SslCertListCall.html)
+* [tiers](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.Tier.html)
+ * [*list*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.TierListCall.html)
+* [users](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.User.html)
+ * [*delete*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.UserDeleteCall.html), [*insert*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.UserInsertCall.html), [*list*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.UserListCall.html) and [*update*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.UserUpdateCall.html)
 
 
 
@@ -37,17 +39,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/struct.SQLAdmin.html)**
+* **[Hub](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/struct.SQLAdmin.html)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/trait.CallBuilder.html)
-* **[Resources](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/trait.Resource.html)**
+    * creates [*Method Builders*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.MethodsBuilder.html) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.CallBuilder.html)
+* **[Resources](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.Resource.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/trait.Part.html)**
+    * **[Parts](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.Part.html)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/trait.CallBuilder.html)**
+* **[Activities](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.CallBuilder.html)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -67,7 +69,9 @@ let r = hub.instances().demote_master(...).doit()
 let r = hub.users().delete(...).doit()
 let r = hub.databases().delete(...).doit()
 let r = hub.instances().failover(...).doit()
+let r = hub.projects().instances_reschedule_maintenance(...).doit()
 let r = hub.databases().patch(...).doit()
+let r = hub.projects().instances_start_external_sync(...).doit()
 let r = hub.instances().reset_ssl_config(...).doit()
 let r = hub.instances().promote_replica(...).doit()
 let r = hub.databases().update(...).doit()
@@ -106,7 +110,7 @@ To use this library, you would put the following lines into your `Cargo.toml` fi
 
 ```toml
 [dependencies]
-google-sqladmin1_beta4 = "*"
+google-sql1_beta4 = "*"
 # This project intentionally uses an old version of Hyper. See
 # https://github.com/Byron/google-apis-rs/issues/173 for more
 # information.
@@ -123,12 +127,12 @@ yup-oauth2 = "^1.0"
 extern crate hyper;
 extern crate hyper_rustls;
 extern crate yup_oauth2 as oauth2;
-extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
-use sqladmin1_beta4::User;
-use sqladmin1_beta4::{Result, Error};
+extern crate google_sql1_beta4 as sql1_beta4;
+use sql1_beta4::User;
+use sql1_beta4::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-use sqladmin1_beta4::SQLAdmin;
+use sql1_beta4::SQLAdmin;
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
@@ -150,7 +154,8 @@ let mut req = User::default();
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.users().update(req, "project", "instance", "name")
+let result = hub.users().update(req, "project", "instance")
+             .name("Stet")
              .host("sed")
              .doit();
 
@@ -174,17 +179,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/enum.Result.html) enumeration as return value of 
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/enum.Result.html), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.ResponseResult.html), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -194,29 +199,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/trait.Delegate.html) to the 
-[Method Builder](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.Delegate.html) to the 
+[Method Builder](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.CallBuilder.html) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/trait.RequestValue.html) and 
-[decodable](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [enocodable](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.RequestValue.html) and 
+[decodable](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.Part.html) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-sqladmin1_beta4/1.0.12+20190607/google_sqladmin1_beta4/trait.RequestValue.html) are moved
+* [request values](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 
@@ -225,7 +230,7 @@ Arguments will always be copied or cloned into the builder, to make them indepen
 [google-go-api]: https://github.com/google/google-api-go-client
 
 # License
-The **sqladmin1_beta4** library was generated by Sebastian Thiel, and is placed 
+The **sql1_beta4** library was generated by Sebastian Thiel, and is placed 
 under the *MIT* license.
 You can read the full text at the repository's [license file][repo-license].
 

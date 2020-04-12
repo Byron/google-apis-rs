@@ -803,7 +803,7 @@ fn main() {
                   vec![
                     (Some(r##"debuggee-id"##),
                      None,
-                     Some(r##"Identifies the debuggee."##),
+                     Some(r##"Required. Identifies the debuggee."##),
                      Some(true),
                      Some(false)),
         
@@ -832,7 +832,7 @@ fn main() {
                   vec![
                     (Some(r##"debuggee-id"##),
                      None,
-                     Some(r##"Identifies the debuggee being debugged."##),
+                     Some(r##"Required. Identifies the debuggee being debugged."##),
                      Some(true),
                      Some(false)),
         
@@ -900,13 +900,13 @@ fn main() {
                   vec![
                     (Some(r##"debuggee-id"##),
                      None,
-                     Some(r##"ID of the debuggee whose breakpoint to delete."##),
+                     Some(r##"Required. ID of the debuggee whose breakpoint to delete."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"breakpoint-id"##),
                      None,
-                     Some(r##"ID of the breakpoint to delete."##),
+                     Some(r##"Required. ID of the breakpoint to delete."##),
                      Some(true),
                      Some(false)),
         
@@ -928,13 +928,13 @@ fn main() {
                   vec![
                     (Some(r##"debuggee-id"##),
                      None,
-                     Some(r##"ID of the debuggee whose breakpoint to get."##),
+                     Some(r##"Required. ID of the debuggee whose breakpoint to get."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"breakpoint-id"##),
                      None,
-                     Some(r##"ID of the breakpoint to get."##),
+                     Some(r##"Required. ID of the breakpoint to get."##),
                      Some(true),
                      Some(false)),
         
@@ -956,7 +956,7 @@ fn main() {
                   vec![
                     (Some(r##"debuggee-id"##),
                      None,
-                     Some(r##"ID of the debuggee whose breakpoints to list."##),
+                     Some(r##"Required. ID of the debuggee whose breakpoints to list."##),
                      Some(true),
                      Some(false)),
         
@@ -978,7 +978,7 @@ fn main() {
                   vec![
                     (Some(r##"debuggee-id"##),
                      None,
-                     Some(r##"ID of the debuggee where the breakpoint is to be set."##),
+                     Some(r##"Required. ID of the debuggee where the breakpoint is to be set."##),
                      Some(true),
                      Some(false)),
         
@@ -1022,7 +1022,7 @@ fn main() {
     
     let mut app = App::new("clouddebugger2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190614")
+           .version("1.0.13+20200405")
            .about("Examines the call stack and variables of a running application without stopping or slowing it down.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli")

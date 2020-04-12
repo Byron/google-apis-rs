@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Bigtable Admin* API at revision *20190506*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Bigtable Admin* API at revision *20200211*. The CLI is at version *1.0.13*.
 
 ```bash
 bigtableadmin2 [options]
@@ -40,6 +40,9 @@ bigtableadmin2 [options]
                 instances-app-profiles-get <name> [-p <v>]... [-o <out>]
                 instances-app-profiles-list <parent> [-p <v>]... [-o <out>]
                 instances-app-profiles-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-clusters-backups-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-clusters-backups-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-clusters-backups-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-clusters-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-clusters-delete <name> [-p <v>]... [-o <out>]
                 instances-clusters-get <name> [-p <v>]... [-o <out>]

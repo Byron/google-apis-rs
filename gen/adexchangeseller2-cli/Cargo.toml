@@ -4,7 +4,7 @@
 [package]
 
 name = "google-adexchangeseller2-cli"
-version = "1.0.12+20171101"
+version = "1.0.13+20171101"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Ad Exchange Seller (protocol v2.0)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangeseller2-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-adexchangeseller2]
 path = "../adexchangeseller2"
-version = "1.0.12+20171101"
+version = "1.0.13+20171101"

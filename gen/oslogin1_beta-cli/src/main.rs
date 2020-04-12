@@ -128,11 +128,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "key" => Some(("key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "expiration-time-usec" => Some(("expirationTimeUsec", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["expiration-time-usec", "fingerprint", "key"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["expiration-time-usec", "fingerprint", "key", "name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -375,11 +376,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "key" => Some(("key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "expiration-time-usec" => Some(("expirationTimeUsec", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["expiration-time-usec", "fingerprint", "key"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["expiration-time-usec", "fingerprint", "key", "name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -567,7 +569,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The unique ID for the user in format `users/{user}`."##),
+                     Some(r##"Required. The unique ID for the user in format `users/{user}`."##),
                      Some(true),
                      Some(false)),
         
@@ -619,7 +621,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"A reference to the POSIX account to update. POSIX accounts are identified
+                     Some(r##"Required. A reference to the POSIX account to update. POSIX accounts are identified
         by the project ID they are associated with. A reference to the POSIX
         account is in format `users/{user}/projects/{project}`."##),
                      Some(true),
@@ -643,7 +645,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The fingerprint of the public key to update. Public keys are identified by
+                     Some(r##"Required. The fingerprint of the public key to update. Public keys are identified by
         their SHA-256 fingerprint. The fingerprint of the public key is in format
         `users/{user}/sshPublicKeys/{fingerprint}`."##),
                      Some(true),
@@ -667,7 +669,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The fingerprint of the public key to retrieve. Public keys are identified
+                     Some(r##"Required. The fingerprint of the public key to retrieve. Public keys are identified
         by their SHA-256 fingerprint. The fingerprint of the public key is in
         format `users/{user}/sshPublicKeys/{fingerprint}`."##),
                      Some(true),
@@ -692,7 +694,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The fingerprint of the public key to update. Public keys are identified by
+                     Some(r##"Required. The fingerprint of the public key to update. Public keys are identified by
         their SHA-256 fingerprint. The fingerprint of the public key is in format
         `users/{user}/sshPublicKeys/{fingerprint}`."##),
                      Some(true),
@@ -722,8 +724,8 @@ fn main() {
     
     let mut app = App::new("oslogin1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190614")
-           .about("You can use OS Login to manage access to your VM instances using IAM roles. For more information, read [OS Login](/compute/docs/oslogin/).")
+           .version("1.0.13+20200329")
+           .about("You can use OS Login to manage access to your VM instances using IAM roles.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_oslogin1_beta_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

@@ -796,7 +796,7 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The ID of the project against which to make the request."##),
+                     Some(r##"Required. The ID of the project against which to make the request."##),
                      Some(true),
                      Some(false)),
         
@@ -824,7 +824,7 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The ID of the project against which to make the request."##),
+                     Some(r##"Required. The ID of the project against which to make the request."##),
                      Some(true),
                      Some(false)),
         
@@ -853,7 +853,7 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The ID of the project against which to make the request."##),
+                     Some(r##"Required. The ID of the project against which to make the request."##),
                      Some(true),
                      Some(false)),
         
@@ -881,7 +881,7 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The ID of the project against which to make the request."##),
+                     Some(r##"Required. The ID of the project against which to make the request."##),
                      Some(true),
                      Some(false)),
         
@@ -910,7 +910,7 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The ID of the project against which to make the request."##),
+                     Some(r##"Required. The ID of the project against which to make the request."##),
                      Some(true),
                      Some(false)),
         
@@ -938,7 +938,7 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The ID of the project against which to make the request."##),
+                     Some(r##"Required. The ID of the project against which to make the request."##),
                      Some(true),
                      Some(false)),
         
@@ -966,7 +966,7 @@ fn main() {
                   vec![
                     (Some(r##"project-id"##),
                      None,
-                     Some(r##"The ID of the project against which to make the request."##),
+                     Some(r##"Required. The ID of the project against which to make the request."##),
                      Some(true),
                      Some(false)),
         
@@ -994,7 +994,7 @@ fn main() {
     
     let mut app = App::new("datastore1-beta3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190421")
+           .version("1.0.13+20200311")
            .about("Accesses the schemaless NoSQL database to provide fully managed, robust, scalable storage for your application.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datastore1_beta3_cli")

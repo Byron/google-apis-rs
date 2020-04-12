@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Tasks* crate version *1.0.12+20190618*, where *20190618* is the exact revision of the *cloudtasks:v2beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Cloud Tasks* crate version *1.0.13+20200331*, where *20200331* is the exact revision of the *cloudtasks:v2beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Cloud Tasks* *v2_beta3* API can be found at the
 //! [official documentation site](https://cloud.google.com/tasks/).
@@ -336,7 +336,7 @@ impl<'a, C, A> CloudTasks<C, A>
         CloudTasks {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://cloudtasks.googleapis.com/".to_string(),
             _root_url: "https://cloudtasks.googleapis.com/".to_string(),
         }
@@ -347,7 +347,7 @@ impl<'a, C, A> CloudTasks<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -379,7 +379,7 @@ impl<'a, C, A> CloudTasks<C, A>
 /// 
 /// The task will be pushed to the worker as an HTTP request. If the worker
 /// or the redirected worker acknowledges the task by returning a successful HTTP
-/// response code ([`200` - `299`]), the task will removed from the queue. If
+/// response code ([`200` - `299`]), the task will be removed from the queue. If
 /// any other HTTP response code is returned or no response is received, the
 /// task will be retried according to the following:
 /// 
@@ -392,13 +392,13 @@ impl<'a, C, A> CloudTasks<C, A>
 /// 
 /// System throttling happens because:
 /// 
-/// * Cloud Tasks backoffs on all errors. Normally the backoff specified in
+/// * Cloud Tasks backs off on all errors. Normally the backoff specified in
 ///   rate limits will be used. But if the worker returns
 ///   `429` (Too Many Requests), `503` (Service Unavailable), or the rate of
 ///   errors is high, Cloud Tasks will use a higher backoff rate. The retry
 ///   specified in the `Retry-After` HTTP response header is considered.
 /// 
-/// * To prevent traffic spikes and to smooth sudden large traffic spikes,
+/// * To prevent traffic spikes and to smooth sudden increases in traffic,
 ///   dispatches ramp up slowly when the queue is newly created or idle and
 ///   if large numbers of tasks suddenly become available to dispatch (due to
 ///   spikes in create task rates, the queue being unpaused, or many tasks
@@ -585,7 +585,7 @@ pub struct AppEngineHttpRequest {
     /// In addition, Cloud Tasks sets some headers when the task is dispatched,
     /// such as headers containing information about the task; see
     /// [request
-    /// headers](https://cloud.google.com/appengine/docs/python/taskqueue/push/creating-handlers#reading_request_headers).
+    /// headers](https://cloud.google.com/tasks/docs/creating-appengine-handlers#reading_request_headers).
     /// These headers are set only when the task is dispatched, so they are not
     /// visible when the task is returned in a Cloud Tasks response.
     /// 
@@ -637,7 +637,11 @@ impl Part for AppEngineHttpRequest {}
 /// * [locations queues get iam policy projects](struct.ProjectLocationQueueGetIamPolicyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetIamPolicyRequest { _never_set: Option<bool> }
+pub struct GetIamPolicyRequest {
+    /// OPTIONAL: A `GetPolicyOptions` object for specifying options to
+    /// `GetIamPolicy`. This field is only used by Cloud IAM.
+    pub options: Option<GetPolicyOptions>,
+}
 
 impl RequestValue for GetIamPolicyRequest {}
 
@@ -710,30 +714,59 @@ pub struct PauseQueueRequest { _never_set: Option<bool> }
 impl RequestValue for PauseQueueRequest {}
 
 
-/// Represents an expression text. Example:
+/// Represents a textual expression in the Common Expression Language (CEL)
+/// syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+/// are documented at https://github.com/google/cel-spec.
+/// 
+/// Example (Comparison):
 /// 
 /// ````text
-/// title: "User account presence"
-/// description: "Determines whether the request has a user account"
-/// expression: "size(request.user) > 0"
+/// title: "Summary size limit"
+/// description: "Determines if a summary is less than 100 chars"
+/// expression: "document.summary.size() < 100"
 /// ````
+/// 
+/// Example (Equality):
+/// 
+/// ````text
+/// title: "Requestor is owner"
+/// description: "Determines if requestor is the document owner"
+/// expression: "document.owner == request.auth.claims.email"
+/// ````
+/// 
+/// Example (Logic):
+/// 
+/// ````text
+/// title: "Public documents"
+/// description: "Determine whether the document should be publicly visible"
+/// expression: "document.type != 'private' && document.type != 'internal'"
+/// ````
+/// 
+/// Example (Data Manipulation):
+/// 
+/// ````text
+/// title: "Notification string"
+/// description: "Create a notification string with a timestamp."
+/// expression: "'New message received at ' + string(document.create_time)"
+/// ````
+/// 
+/// The exact variables and functions that may be referenced within an expression
+/// are determined by the service that evaluates it. See the service
+/// documentation for additional information.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
-    /// An optional description of the expression. This is a longer text which
+    /// Optional. Description of the expression. This is a longer text which
     /// describes the expression, e.g. when hovered over it in a UI.
     pub description: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
+    /// Textual representation of an expression in Common Expression Language
+    /// syntax.
     pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error
+    /// Optional. String indicating the location of the expression for error
     /// reporting, e.g. a file name and a position in the file.
     pub location: Option<String>,
-    /// An optional title for the expression, i.e. a short string describing
+    /// Optional. Title for the expression, i.e. a short string describing
     /// its purpose. This can be used e.g. in UIs which allow to enter the
     /// expression.
     pub title: Option<String>,
@@ -882,37 +915,50 @@ impl RequestValue for Queue {}
 impl ResponseResult for Queue {}
 
 
-/// Defines an Identity and Access Management (IAM) policy. It is used to
-/// specify access control policies for Cloud Platform resources.
+/// An Identity and Access Management (IAM) policy, which specifies access
+/// controls for Google Cloud resources.
 /// 
-/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
-/// `members` to a `role`, where the members can be user accounts, Google groups,
-/// Google domains, and service accounts. A `role` is a named list of permissions
-/// defined by IAM.
+/// A `Policy` is a collection of `bindings`. A `binding` binds one or more
+/// `members` to a single `role`. Members can be user accounts, service accounts,
+/// Google groups, and domains (such as G Suite). A `role` is a named list of
+/// permissions; each `role` can be an IAM predefined role or a user-created
+/// custom role.
 /// 
-/// **JSON Example**
+/// Optionally, a `binding` can specify a `condition`, which is a logical
+/// expression that allows access to a resource only if the expression evaluates
+/// to `true`. A condition can add constraints based on attributes of the
+/// request, the resource, or both.
+/// 
+/// **JSON example:**
 /// 
 /// ````text
 /// {
 ///   "bindings": [
 ///     {
-///       "role": "roles/owner",
+///       "role": "roles/resourcemanager.organizationAdmin",
 ///       "members": [
 ///         "user:mike@example.com",
 ///         "group:admins@example.com",
 ///         "domain:google.com",
-///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
+///         "serviceAccount:my-project-id@appspot.gserviceaccount.com"
 ///       ]
 ///     },
 ///     {
-///       "role": "roles/viewer",
-///       "members": ["user:sean@example.com"]
+///       "role": "roles/resourcemanager.organizationViewer",
+///       "members": ["user:eve@example.com"],
+///       "condition": {
+///         "title": "expirable access",
+///         "description": "Does not grant access after Sep 2020",
+///         "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')",
+///       }
 ///     }
-///   ]
+///   ],
+///   "etag": "BwWWja0YfJA=",
+///   "version": 3
 /// }
 /// ````
 /// 
-/// **YAML Example**
+/// **YAML example:**
 /// 
 /// ````text
 /// bindings:
@@ -920,15 +966,21 @@ impl ResponseResult for Queue {}
 ///   - user:mike@example.com
 ///   - group:admins@example.com
 ///   - domain:google.com
-///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///   role: roles/owner
+///   - serviceAccount:my-project-id@appspot.gserviceaccount.com
+///   role: roles/resourcemanager.organizationAdmin
 /// - members:
-///   - user:sean@example.com
-///   role: roles/viewer
+///   - user:eve@example.com
+///   role: roles/resourcemanager.organizationViewer
+///   condition:
+///     title: expirable access
+///     description: Does not grant access after Sep 2020
+///     expression: request.time < timestamp('2020-10-01T00:00:00.000Z')
+/// - etag: BwWWja0YfJA=
+/// - version: 3
 /// ````
 /// 
 /// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam/docs).
+/// [IAM documentation](https://cloud.google.com/iam/docs/).
 /// 
 /// # Activities
 /// 
@@ -939,8 +991,9 @@ impl ResponseResult for Queue {}
 /// * [locations queues get iam policy projects](struct.ProjectLocationQueueGetIamPolicyCall.html) (response)
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
+    /// Associates a list of `members` to a `role`. Optionally, may specify a
+    /// `condition` that determines how and when the `bindings` are applied. Each
+    /// of the `bindings` must contain at least one member.
     pub bindings: Option<Vec<Binding>>,
     /// `etag` is used for optimistic concurrency control as a way to help
     /// prevent simultaneous updates of a policy from overwriting each other.
@@ -950,10 +1003,32 @@ pub struct Policy {
     /// systems are expected to put that etag in the request to `setIamPolicy` to
     /// ensure that their change will be applied to the same version of the policy.
     /// 
-    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
-    /// policy is overwritten blindly.
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
     pub etag: Option<String>,
-    /// Deprecated.
+    /// Specifies the format of the policy.
+    /// 
+    /// Valid values are `0`, `1`, and `3`. Requests that specify an invalid value
+    /// are rejected.
+    /// 
+    /// Any operation that affects conditional role bindings must specify version
+    /// `3`. This requirement applies to the following operations:
+    /// 
+    /// * Getting a policy that includes a conditional role binding
+    /// * Adding a conditional role binding to a policy
+    /// * Changing a conditional role binding in a policy
+    /// * Removing any role binding, with or without a condition, from a policy
+    ///   that includes conditions
+    /// 
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
+    /// 
+    /// If a policy does not include any conditions, operations on that policy may
+    /// specify any valid version or leave the field unset.
     pub version: Option<i32>,
 }
 
@@ -1379,7 +1454,7 @@ pub struct Binding {
     ///    who is authenticated with a Google account or a service account.
     /// 
     /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` .
+    ///    account. For example, `alice@example.com` .
     /// 
     /// 
     /// * `serviceAccount:{emailid}`: An email address that represents a service
@@ -1387,6 +1462,26 @@ pub struct Binding {
     /// 
     /// * `group:{emailid}`: An email address that represents a Google group.
     ///    For example, `admins@example.com`.
+    /// 
+    /// * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a user that has been recently deleted. For
+    ///    example, `alice@example.com?uid=123456789012345678901`. If the user is
+    ///    recovered, this value reverts to `user:{emailid}` and the recovered user
+    ///    retains the role in the binding.
+    /// 
+    /// * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus
+    ///    unique identifier) representing a service account that has been recently
+    ///    deleted. For example,
+    ///    `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.
+    ///    If the service account is undeleted, this value reverts to
+    ///    `serviceAccount:{emailid}` and the undeleted service account retains the
+    ///    role in the binding.
+    /// 
+    /// * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a Google group that has been recently
+    ///    deleted. For example, `admins@example.com?uid=123456789012345678901`. If
+    ///    the group is recovered, this value reverts to `group:{emailid}` and the
+    ///    recovered group retains the role in the binding.
     /// 
     /// 
     /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
@@ -1442,6 +1537,27 @@ pub struct StackdriverLoggingConfig {
 impl Part for StackdriverLoggingConfig {}
 
 
+/// Encapsulates settings provided to GetIamPolicy.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetPolicyOptions {
+    /// Optional. The policy format version to be returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
+    #[serde(rename="requestedPolicyVersion")]
+    pub requested_policy_version: Option<i32>,
+}
+
+impl Part for GetPolicyOptions {}
+
+
 /// Request message for CreateTask.
 /// 
 /// # Activities
@@ -1467,9 +1583,7 @@ pub struct CreateTaskRequest {
     /// permission on the Task resource.
     #[serde(rename="responseView")]
     pub response_view: Option<String>,
-    /// Required.
-    /// 
-    /// The task to add.
+    /// Required. The task to add.
     /// 
     /// Task names have the following format:
     /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`.
@@ -1873,8 +1987,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required.
-    ///            The task name. For example:
+    /// * `name` - Required. The task name. For example:
     ///            `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`
     pub fn locations_queues_tasks_run(&self, request: RunTaskRequest, name: &str) -> ProjectLocationQueueTaskRunCall<'a, C, A> {
         ProjectLocationQueueTaskRunCall {
@@ -1900,8 +2013,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required.
-    ///            The queue name. For example:
+    /// * `name` - Required. The queue name. For example:
     ///            `projects/PROJECT_ID/location/LOCATION_ID/queues/QUEUE_ID`
     pub fn locations_queues_pause(&self, request: PauseQueueRequest, name: &str) -> ProjectLocationQueuePauseCall<'a, C, A> {
         ProjectLocationQueuePauseCall {
@@ -1920,8 +2032,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required.
-    ///            The task name. For example:
+    /// * `name` - Required. The task name. For example:
     ///            `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`
     pub fn locations_queues_tasks_get(&self, name: &str) -> ProjectLocationQueueTaskGetCall<'a, C, A> {
         ProjectLocationQueueTaskGetCall {
@@ -1948,8 +2059,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required.
-    ///              The queue name. For example:
+    /// * `parent` - Required. The queue name. For example:
     ///              `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
     pub fn locations_queues_tasks_list(&self, parent: &str) -> ProjectLocationQueueTaskListCall<'a, C, A> {
         ProjectLocationQueueTaskListCall {
@@ -1983,8 +2093,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required.
-    ///            The queue name. For example:
+    /// * `name` - Required. The queue name. For example:
     ///            `projects/PROJECT_ID/location/LOCATION_ID/queues/QUEUE_ID`
     pub fn locations_queues_resume(&self, request: ResumeQueueRequest, name: &str) -> ProjectLocationQueueResumeCall<'a, C, A> {
         ProjectLocationQueueResumeCall {
@@ -2122,8 +2231,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required.
-    ///              The location name in which the queue will be created.
+    /// * `parent` - Required. The location name in which the queue will be created.
     ///              For example: `projects/PROJECT_ID/locations/LOCATION_ID`
     ///              The list of allowed locations can be obtained by calling Cloud
     ///              Tasks' implementation of
@@ -2157,8 +2265,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required.
-    ///            The queue name. For example:
+    /// * `name` - Required. The queue name. For example:
     ///            `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
     pub fn locations_queues_delete(&self, name: &str) -> ProjectLocationQueueDeleteCall<'a, C, A> {
         ProjectLocationQueueDeleteCall {
@@ -2198,8 +2305,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required.
-    ///              The location name.
+    /// * `parent` - Required. The location name.
     ///              For example: `projects/PROJECT_ID/locations/LOCATION_ID`
     pub fn locations_queues_list(&self, parent: &str) -> ProjectLocationQueueListCall<'a, C, A> {
         ProjectLocationQueueListCall {
@@ -2263,8 +2369,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required.
-    ///            The resource name of the queue. For example:
+    /// * `name` - Required. The resource name of the queue. For example:
     ///            `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
     pub fn locations_queues_get(&self, name: &str) -> ProjectLocationQueueGetCall<'a, C, A> {
         ProjectLocationQueueGetCall {
@@ -2288,8 +2393,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required.
-    ///            The queue name. For example:
+    /// * `name` - Required. The queue name. For example:
     ///            `projects/PROJECT_ID/location/LOCATION_ID/queues/QUEUE_ID`
     pub fn locations_queues_purge(&self, request: PurgeQueueRequest, name: &str) -> ProjectLocationQueuePurgeCall<'a, C, A> {
         ProjectLocationQueuePurgeCall {
@@ -2313,8 +2417,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required.
-    ///              The queue name. For example:
+    /// * `parent` - Required. The queue name. For example:
     ///              `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
     ///              The queue must already exist.
     pub fn locations_queues_tasks_create(&self, request: CreateTaskRequest, parent: &str) -> ProjectLocationQueueTaskCreateCall<'a, C, A> {
@@ -2338,8 +2441,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required.
-    ///            The task name. For example:
+    /// * `name` - Required. The task name. For example:
     ///            `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`
     pub fn locations_queues_tasks_delete(&self, name: &str) -> ProjectLocationQueueTaskDeleteCall<'a, C, A> {
         ProjectLocationQueueTaskDeleteCall {
@@ -2589,9 +2691,7 @@ impl<'a, C, A> ProjectLocationQueueTaskRunCall<'a, C, A> where C: BorrowMut<hype
         self._request = new_value;
         self
     }
-    /// Required.
-    /// 
-    /// The task name. For example:
+    /// Required. The task name. For example:
     /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`
     ///
     /// Sets the *name* path property to the given value.
@@ -2877,9 +2977,7 @@ impl<'a, C, A> ProjectLocationQueuePauseCall<'a, C, A> where C: BorrowMut<hyper:
         self._request = new_value;
         self
     }
-    /// Required.
-    /// 
-    /// The queue name. For example:
+    /// Required. The queue name. For example:
     /// `projects/PROJECT_ID/location/LOCATION_ID/queues/QUEUE_ID`
     ///
     /// Sets the *name* path property to the given value.
@@ -3133,9 +3231,7 @@ impl<'a, C, A> ProjectLocationQueueTaskGetCall<'a, C, A> where C: BorrowMut<hype
     }
 
 
-    /// Required.
-    /// 
-    /// The task name. For example:
+    /// Required. The task name. For example:
     /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`
     ///
     /// Sets the *name* path property to the given value.
@@ -3425,9 +3521,7 @@ impl<'a, C, A> ProjectLocationQueueTaskListCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
-    /// Required.
-    /// 
-    /// The queue name. For example:
+    /// Required. The queue name. For example:
     /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
     ///
     /// Sets the *parent* path property to the given value.
@@ -3766,9 +3860,7 @@ impl<'a, C, A> ProjectLocationQueueResumeCall<'a, C, A> where C: BorrowMut<hyper
         self._request = new_value;
         self
     }
-    /// Required.
-    /// 
-    /// The queue name. For example:
+    /// Required. The queue name. For example:
     /// `projects/PROJECT_ID/location/LOCATION_ID/queues/QUEUE_ID`
     ///
     /// Sets the *name* path property to the given value.
@@ -4962,9 +5054,7 @@ impl<'a, C, A> ProjectLocationQueueCreateCall<'a, C, A> where C: BorrowMut<hyper
         self._request = new_value;
         self
     }
-    /// Required.
-    /// 
-    /// The location name in which the queue will be created.
+    /// Required. The location name in which the queue will be created.
     /// For example: `projects/PROJECT_ID/locations/LOCATION_ID`
     /// 
     /// The list of allowed locations can be obtained by calling Cloud
@@ -5229,9 +5319,7 @@ impl<'a, C, A> ProjectLocationQueueDeleteCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// Required.
-    /// 
-    /// The queue name. For example:
+    /// Required. The queue name. For example:
     /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
     ///
     /// Sets the *name* path property to the given value.
@@ -5781,9 +5869,7 @@ impl<'a, C, A> ProjectLocationQueueListCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
-    /// Required.
-    /// 
-    /// The location name.
+    /// Required. The location name.
     /// For example: `projects/PROJECT_ID/locations/LOCATION_ID`
     ///
     /// Sets the *parent* path property to the given value.
@@ -6610,9 +6696,7 @@ impl<'a, C, A> ProjectLocationQueueGetCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    /// Required.
-    /// 
-    /// The resource name of the queue. For example:
+    /// Required. The resource name of the queue. For example:
     /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
     ///
     /// Sets the *name* path property to the given value.
@@ -6897,9 +6981,7 @@ impl<'a, C, A> ProjectLocationQueuePurgeCall<'a, C, A> where C: BorrowMut<hyper:
         self._request = new_value;
         self
     }
-    /// Required.
-    /// 
-    /// The queue name. For example:
+    /// Required. The queue name. For example:
     /// `projects/PROJECT_ID/location/LOCATION_ID/queues/QUEUE_ID`
     ///
     /// Sets the *name* path property to the given value.
@@ -7183,9 +7265,7 @@ impl<'a, C, A> ProjectLocationQueueTaskCreateCall<'a, C, A> where C: BorrowMut<h
         self._request = new_value;
         self
     }
-    /// Required.
-    /// 
-    /// The queue name. For example:
+    /// Required. The queue name. For example:
     /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
     /// 
     /// The queue must already exist.
@@ -7440,9 +7520,7 @@ impl<'a, C, A> ProjectLocationQueueTaskDeleteCall<'a, C, A> where C: BorrowMut<h
     }
 
 
-    /// Required.
-    /// 
-    /// The task name. For example:
+    /// Required. The task name. For example:
     /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`
     ///
     /// Sets the *name* path property to the given value.

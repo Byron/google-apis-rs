@@ -4,7 +4,7 @@
 [package]
 
 name = "google-binaryauthorization1_beta1-cli"
-version = "1.0.12+20190628"
+version = "1.0.13+20200327"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Binary Authorization (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/binaryauthorization1_beta1-cli"
@@ -42,4 +42,4 @@ rustls = ["yup-oauth2/no-openssl"]
 
 [dependencies.google-binaryauthorization1_beta1]
 path = "../binaryauthorization1_beta1"
-version = "1.0.12+20190628"
+version = "1.0.13+20200327"

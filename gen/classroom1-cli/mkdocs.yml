@@ -1,4 +1,4 @@
-site_name: classroom v1.0.12+20190701
+site_name: classroom v1.0.13+20200408
 site_url: http://byron.github.io/google-apis-rs/google-classroom1-cli
 site_description: A complete library to interact with classroom (protocol v1)
 

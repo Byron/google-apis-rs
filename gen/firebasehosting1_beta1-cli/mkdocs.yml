@@ -1,4 +1,4 @@
-site_name: Firebase Hosting v1.0.12+20190626
+site_name: Firebase Hosting v1.0.13+20200325
 site_url: http://byron.github.io/google-apis-rs/google-firebasehosting1_beta1-cli
 site_description: A complete library to interact with Firebase Hosting (protocol v1beta1)
 
@@ -9,6 +9,13 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['projects_operations-get.md', 'Projects', 'Operations Get']
+- ['projects_sites-channels-releases-create.md', 'Projects', 'Sites Channels Releases Create']
+- ['projects_sites-channels-releases-list.md', 'Projects', 'Sites Channels Releases List']
+- ['projects_sites-releases-create.md', 'Projects', 'Sites Releases Create']
+- ['projects_sites-releases-list.md', 'Projects', 'Sites Releases List']
+- ['sites_channels-releases-create.md', 'Sites', 'Channels Releases Create']
+- ['sites_channels-releases-list.md', 'Sites', 'Channels Releases List']
 - ['sites_domains-create.md', 'Sites', 'Domains Create']
 - ['sites_domains-delete.md', 'Sites', 'Domains Delete']
 - ['sites_domains-get.md', 'Sites', 'Domains Get']
@@ -18,9 +25,11 @@ pages:
 - ['sites_releases-create.md', 'Sites', 'Releases Create']
 - ['sites_releases-list.md', 'Sites', 'Releases List']
 - ['sites_update-config.md', 'Sites', 'Update Config']
+- ['sites_versions-clone.md', 'Sites', 'Versions Clone']
 - ['sites_versions-create.md', 'Sites', 'Versions Create']
 - ['sites_versions-delete.md', 'Sites', 'Versions Delete']
 - ['sites_versions-files-list.md', 'Sites', 'Versions Files List']
+- ['sites_versions-list.md', 'Sites', 'Versions List']
 - ['sites_versions-patch.md', 'Sites', 'Versions Patch']
 - ['sites_versions-populate-files.md', 'Sites', 'Versions Populate Files']
 

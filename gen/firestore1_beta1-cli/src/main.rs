@@ -1762,7 +1762,7 @@ fn main() {
                   vec![
                     (Some(r##"database"##),
                      None,
-                     Some(r##"The database name. In the format:
+                     Some(r##"Required. The database name. In the format:
         `projects/{project_id}/databases/{database_id}`."##),
                      Some(true),
                      Some(false)),
@@ -1791,7 +1791,7 @@ fn main() {
                   vec![
                     (Some(r##"database"##),
                      None,
-                     Some(r##"The database name. In the format:
+                     Some(r##"Required. The database name. In the format:
         `projects/{project_id}/databases/{database_id}`."##),
                      Some(true),
                      Some(false)),
@@ -1820,7 +1820,7 @@ fn main() {
                   vec![
                     (Some(r##"database"##),
                      None,
-                     Some(r##"The database name. In the format:
+                     Some(r##"Required. The database name. In the format:
         `projects/{project_id}/databases/{database_id}`."##),
                      Some(true),
                      Some(false)),
@@ -1849,7 +1849,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent resource. For example:
+                     Some(r##"Required. The parent resource. For example:
         `projects/{project_id}/databases/{database_id}/documents` or
         `projects/{project_id}/databases/{database_id}/documents/chatrooms/{chatroom_id}`"##),
                      Some(true),
@@ -1857,7 +1857,7 @@ fn main() {
         
                     (Some(r##"collection-id"##),
                      None,
-                     Some(r##"The collection ID, relative to `parent`, to list. For example: `chatrooms`."##),
+                     Some(r##"Required. The collection ID, relative to `parent`, to list. For example: `chatrooms`."##),
                      Some(true),
                      Some(false)),
         
@@ -1885,7 +1885,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the Document to delete. In the format:
+                     Some(r##"Required. The resource name of the Document to delete. In the format:
         `projects/{project_id}/databases/{database_id}/documents/{document_path}`."##),
                      Some(true),
                      Some(false)),
@@ -1908,7 +1908,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the Document to get. In the format:
+                     Some(r##"Required. The resource name of the Document to get. In the format:
         `projects/{project_id}/databases/{database_id}/documents/{document_path}`."##),
                      Some(true),
                      Some(false)),
@@ -1931,7 +1931,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent resource name. In the format:
+                     Some(r##"Required. The parent resource name. In the format:
         `projects/{project_id}/databases/{database_id}/documents` or
         `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
         For example:
@@ -1942,7 +1942,7 @@ fn main() {
         
                     (Some(r##"collection-id"##),
                      None,
-                     Some(r##"The collection ID, relative to `parent`, to list. For example: `chatrooms`
+                     Some(r##"Required. The collection ID, relative to `parent`, to list. For example: `chatrooms`
         or `messages`."##),
                      Some(true),
                      Some(false)),
@@ -1965,7 +1965,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent document. In the format:
+                     Some(r##"Required. The parent document. In the format:
         `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
         For example:
         `projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`"##),
@@ -1996,7 +1996,7 @@ fn main() {
                   vec![
                     (Some(r##"database"##),
                      None,
-                     Some(r##"The database name. In the format:
+                     Some(r##"Required. The database name. In the format:
         `projects/{project_id}/databases/{database_id}`."##),
                      Some(true),
                      Some(false)),
@@ -2054,7 +2054,7 @@ fn main() {
                   vec![
                     (Some(r##"database"##),
                      None,
-                     Some(r##"The database name. In the format:
+                     Some(r##"Required. The database name. In the format:
         `projects/{project_id}/databases/{database_id}`."##),
                      Some(true),
                      Some(false)),
@@ -2083,7 +2083,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent resource name. In the format:
+                     Some(r##"Required. The parent resource name. In the format:
         `projects/{project_id}/databases/{database_id}/documents` or
         `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
         For example:
@@ -2116,7 +2116,7 @@ fn main() {
                   vec![
                     (Some(r##"database"##),
                      None,
-                     Some(r##"The database name. In the format:
+                     Some(r##"Required. The database name. In the format:
         `projects/{project_id}/databases/{database_id}`.
         This is only required in the first message."##),
                      Some(true),
@@ -2325,7 +2325,7 @@ fn main() {
     
     let mut app = App::new("firestore1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190419")
+           .version("1.0.13+20200311")
            .about("Accesses the NoSQL document database built for automatic scaling, high performance, and ease of application development.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firestore1_beta1_cli")

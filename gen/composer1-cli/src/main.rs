@@ -87,13 +87,25 @@ impl<'n> Engine<'n> {
                     "config.node-config.service-account" => Some(("config.nodeConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.node-config.oauth-scopes" => Some(("config.nodeConfig.oauthScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.node-config.disk-size-gb" => Some(("config.nodeConfig.diskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "config.node-config.location" => Some(("config.nodeConfig.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.ip-allocation-policy.cluster-ipv4-cidr-block" => Some(("config.nodeConfig.ipAllocationPolicy.clusterIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.ip-allocation-policy.services-ipv4-cidr-block" => Some(("config.nodeConfig.ipAllocationPolicy.servicesIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.ip-allocation-policy.use-ip-aliases" => Some(("config.nodeConfig.ipAllocationPolicy.useIpAliases", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.node-config.ip-allocation-policy.services-secondary-range-name" => Some(("config.nodeConfig.ipAllocationPolicy.servicesSecondaryRangeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.ip-allocation-policy.cluster-secondary-range-name" => Some(("config.nodeConfig.ipAllocationPolicy.clusterSecondaryRangeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.node-config.subnetwork" => Some(("config.nodeConfig.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.location" => Some(("config.nodeConfig.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.node-count" => Some(("config.nodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.cloud-sql-ipv4-cidr-block" => Some(("config.privateEnvironmentConfig.cloudSqlIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.web-server-ipv4-cidr-block" => Some(("config.privateEnvironmentConfig.webServerIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.web-server-ipv4-reserved-range" => Some(("config.privateEnvironmentConfig.webServerIpv4ReservedRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.enable-private-environment" => Some(("config.privateEnvironmentConfig.enablePrivateEnvironment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.private-cluster-config.enable-private-endpoint" => Some(("config.privateEnvironmentConfig.privateClusterConfig.enablePrivateEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.private-cluster-config.master-ipv4-reserved-range" => Some(("config.privateEnvironmentConfig.privateClusterConfig.masterIpv4ReservedRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.private-cluster-config.master-ipv4-cidr-block" => Some(("config.privateEnvironmentConfig.privateClusterConfig.masterIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uuid" => Some(("uuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airflow-config-overrides", "airflow-uri", "config", "create-time", "dag-gcs-prefix", "disk-size-gb", "env-variables", "gke-cluster", "image-version", "labels", "location", "machine-type", "name", "network", "node-config", "node-count", "oauth-scopes", "pypi-packages", "python-version", "service-account", "software-config", "state", "subnetwork", "tags", "update-time", "uuid"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airflow-config-overrides", "airflow-uri", "cloud-sql-ipv4-cidr-block", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "config", "create-time", "dag-gcs-prefix", "disk-size-gb", "enable-private-endpoint", "enable-private-environment", "env-variables", "gke-cluster", "image-version", "ip-allocation-policy", "labels", "location", "machine-type", "master-ipv4-cidr-block", "master-ipv4-reserved-range", "name", "network", "node-config", "node-count", "oauth-scopes", "private-cluster-config", "private-environment-config", "pypi-packages", "python-version", "service-account", "services-ipv4-cidr-block", "services-secondary-range-name", "software-config", "state", "subnetwork", "tags", "update-time", "use-ip-aliases", "uuid", "web-server-ipv4-cidr-block", "web-server-ipv4-reserved-range"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -357,13 +369,25 @@ impl<'n> Engine<'n> {
                     "config.node-config.service-account" => Some(("config.nodeConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.node-config.oauth-scopes" => Some(("config.nodeConfig.oauthScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.node-config.disk-size-gb" => Some(("config.nodeConfig.diskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "config.node-config.location" => Some(("config.nodeConfig.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.ip-allocation-policy.cluster-ipv4-cidr-block" => Some(("config.nodeConfig.ipAllocationPolicy.clusterIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.ip-allocation-policy.services-ipv4-cidr-block" => Some(("config.nodeConfig.ipAllocationPolicy.servicesIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.ip-allocation-policy.use-ip-aliases" => Some(("config.nodeConfig.ipAllocationPolicy.useIpAliases", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.node-config.ip-allocation-policy.services-secondary-range-name" => Some(("config.nodeConfig.ipAllocationPolicy.servicesSecondaryRangeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.ip-allocation-policy.cluster-secondary-range-name" => Some(("config.nodeConfig.ipAllocationPolicy.clusterSecondaryRangeName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.node-config.subnetwork" => Some(("config.nodeConfig.subnetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.node-config.location" => Some(("config.nodeConfig.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.node-count" => Some(("config.nodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.cloud-sql-ipv4-cidr-block" => Some(("config.privateEnvironmentConfig.cloudSqlIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.web-server-ipv4-cidr-block" => Some(("config.privateEnvironmentConfig.webServerIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.web-server-ipv4-reserved-range" => Some(("config.privateEnvironmentConfig.webServerIpv4ReservedRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.enable-private-environment" => Some(("config.privateEnvironmentConfig.enablePrivateEnvironment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.private-cluster-config.enable-private-endpoint" => Some(("config.privateEnvironmentConfig.privateClusterConfig.enablePrivateEndpoint", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.private-cluster-config.master-ipv4-reserved-range" => Some(("config.privateEnvironmentConfig.privateClusterConfig.masterIpv4ReservedRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.private-environment-config.private-cluster-config.master-ipv4-cidr-block" => Some(("config.privateEnvironmentConfig.privateClusterConfig.masterIpv4CidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uuid" => Some(("uuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airflow-config-overrides", "airflow-uri", "config", "create-time", "dag-gcs-prefix", "disk-size-gb", "env-variables", "gke-cluster", "image-version", "labels", "location", "machine-type", "name", "network", "node-config", "node-count", "oauth-scopes", "pypi-packages", "python-version", "service-account", "software-config", "state", "subnetwork", "tags", "update-time", "uuid"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airflow-config-overrides", "airflow-uri", "cloud-sql-ipv4-cidr-block", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "config", "create-time", "dag-gcs-prefix", "disk-size-gb", "enable-private-endpoint", "enable-private-environment", "env-variables", "gke-cluster", "image-version", "ip-allocation-policy", "labels", "location", "machine-type", "master-ipv4-cidr-block", "master-ipv4-reserved-range", "name", "network", "node-config", "node-count", "oauth-scopes", "private-cluster-config", "private-environment-config", "pypi-packages", "python-version", "service-account", "services-ipv4-cidr-block", "services-secondary-range-name", "software-config", "state", "subnetwork", "tags", "update-time", "use-ip-aliases", "uuid", "web-server-ipv4-cidr-block", "web-server-ipv4-reserved-range"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1014,7 +1038,7 @@ fn main() {
     
     let mut app = App::new("composer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190613")
+           .version("1.0.13+20200406")
            .about("Manages Apache Airflow environments on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_composer1_cli")
            .arg(Arg::with_name("url")

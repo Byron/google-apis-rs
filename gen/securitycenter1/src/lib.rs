@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Security Command Center* crate version *1.0.12+20190628*, where *20190628* is the exact revision of the *securitycenter:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Security Command Center* crate version *1.0.13+20200406*, where *20200406* is the exact revision of the *securitycenter:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Security Command Center* *v1* API can be found at the
 //! [official documentation site](https://console.cloud.google.com/apis/api/securitycenter.googleapis.com/overview).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.SecurityCommandCenter.html) ... 
 //! 
 //! * organizations
-//!  * [*assets group*](struct.OrganizationAssetGroupCall.html), [*assets list*](struct.OrganizationAssetListCall.html), [*assets run discovery*](struct.OrganizationAssetRunDiscoveryCall.html), [*assets update security marks*](struct.OrganizationAssetUpdateSecurityMarkCall.html), [*get organization settings*](struct.OrganizationGetOrganizationSettingCall.html), [*operations cancel*](struct.OrganizationOperationCancelCall.html), [*operations delete*](struct.OrganizationOperationDeleteCall.html), [*operations get*](struct.OrganizationOperationGetCall.html), [*operations list*](struct.OrganizationOperationListCall.html), [*sources create*](struct.OrganizationSourceCreateCall.html), [*sources findings create*](struct.OrganizationSourceFindingCreateCall.html), [*sources findings group*](struct.OrganizationSourceFindingGroupCall.html), [*sources findings list*](struct.OrganizationSourceFindingListCall.html), [*sources findings patch*](struct.OrganizationSourceFindingPatchCall.html), [*sources findings set state*](struct.OrganizationSourceFindingSetStateCall.html), [*sources findings update security marks*](struct.OrganizationSourceFindingUpdateSecurityMarkCall.html), [*sources get*](struct.OrganizationSourceGetCall.html), [*sources get iam policy*](struct.OrganizationSourceGetIamPolicyCall.html), [*sources list*](struct.OrganizationSourceListCall.html), [*sources patch*](struct.OrganizationSourcePatchCall.html), [*sources set iam policy*](struct.OrganizationSourceSetIamPolicyCall.html), [*sources test iam permissions*](struct.OrganizationSourceTestIamPermissionCall.html) and [*update organization settings*](struct.OrganizationUpdateOrganizationSettingCall.html)
+//!  * [*assets group*](struct.OrganizationAssetGroupCall.html), [*assets list*](struct.OrganizationAssetListCall.html), [*assets run discovery*](struct.OrganizationAssetRunDiscoveryCall.html), [*assets update security marks*](struct.OrganizationAssetUpdateSecurityMarkCall.html), [*get organization settings*](struct.OrganizationGetOrganizationSettingCall.html), [*notification configs create*](struct.OrganizationNotificationConfigCreateCall.html), [*notification configs delete*](struct.OrganizationNotificationConfigDeleteCall.html), [*notification configs get*](struct.OrganizationNotificationConfigGetCall.html), [*notification configs list*](struct.OrganizationNotificationConfigListCall.html), [*notification configs patch*](struct.OrganizationNotificationConfigPatchCall.html), [*operations cancel*](struct.OrganizationOperationCancelCall.html), [*operations delete*](struct.OrganizationOperationDeleteCall.html), [*operations get*](struct.OrganizationOperationGetCall.html), [*operations list*](struct.OrganizationOperationListCall.html), [*sources create*](struct.OrganizationSourceCreateCall.html), [*sources findings create*](struct.OrganizationSourceFindingCreateCall.html), [*sources findings group*](struct.OrganizationSourceFindingGroupCall.html), [*sources findings list*](struct.OrganizationSourceFindingListCall.html), [*sources findings patch*](struct.OrganizationSourceFindingPatchCall.html), [*sources findings set state*](struct.OrganizationSourceFindingSetStateCall.html), [*sources findings update security marks*](struct.OrganizationSourceFindingUpdateSecurityMarkCall.html), [*sources get*](struct.OrganizationSourceGetCall.html), [*sources get iam policy*](struct.OrganizationSourceGetIamPolicyCall.html), [*sources list*](struct.OrganizationSourceListCall.html), [*sources patch*](struct.OrganizationSourcePatchCall.html), [*sources set iam policy*](struct.OrganizationSourceSetIamPolicyCall.html), [*sources test iam permissions*](struct.OrganizationSourceTestIamPermissionCall.html) and [*update organization settings*](struct.OrganizationUpdateOrganizationSettingCall.html)
 //! 
 //! 
 //! 
@@ -333,7 +333,7 @@ impl<'a, C, A> SecurityCommandCenter<C, A>
         SecurityCommandCenter {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://securitycenter.googleapis.com/".to_string(),
             _root_url: "https://securitycenter.googleapis.com/".to_string(),
         }
@@ -344,7 +344,7 @@ impl<'a, C, A> SecurityCommandCenter<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -416,154 +416,37 @@ pub struct SetIamPolicyRequest {
 impl RequestValue for SetIamPolicyRequest {}
 
 
-/// Defines an Identity and Access Management (IAM) policy. It is used to
-/// specify access control policies for Cloud Platform resources.
-/// 
-/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
-/// `members` to a `role`, where the members can be user accounts, Google groups,
-/// Google domains, and service accounts. A `role` is a named list of permissions
-/// defined by IAM.
-/// 
-/// **JSON Example**
-/// 
-/// ````text
-/// {
-///   "bindings": [
-///     {
-///       "role": "roles/owner",
-///       "members": [
-///         "user:mike@example.com",
-///         "group:admins@example.com",
-///         "domain:google.com",
-///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
-///       ]
-///     },
-///     {
-///       "role": "roles/viewer",
-///       "members": ["user:sean@example.com"]
-///     }
-///   ]
-/// }
-/// ````
-/// 
-/// **YAML Example**
-/// 
-/// ````text
-/// bindings:
-/// - members:
-///   - user:mike@example.com
-///   - group:admins@example.com
-///   - domain:google.com
-///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///   role: roles/owner
-/// - members:
-///   - user:sean@example.com
-///   role: roles/viewer
-/// ````
-/// 
-/// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam/docs).
+/// Request message for running asset discovery for an organization.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [sources get iam policy organizations](struct.OrganizationSourceGetIamPolicyCall.html) (response)
-/// * [sources set iam policy organizations](struct.OrganizationSourceSetIamPolicyCall.html) (response)
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Policy {
-    /// Specifies cloud audit logging configuration for this policy.
-    #[serde(rename="auditConfigs")]
-    pub audit_configs: Option<Vec<AuditConfig>>,
-    /// `etag` is used for optimistic concurrency control as a way to help
-    /// prevent simultaneous updates of a policy from overwriting each other.
-    /// It is strongly suggested that systems make use of the `etag` in the
-    /// read-modify-write cycle to perform policy updates in order to avoid race
-    /// conditions: An `etag` is returned in the response to `getIamPolicy`, and
-    /// systems are expected to put that etag in the request to `setIamPolicy` to
-    /// ensure that their change will be applied to the same version of the policy.
-    /// 
-    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
-    /// policy is overwritten blindly.
-    pub etag: Option<String>,
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
-    pub bindings: Option<Vec<Binding>>,
-    /// Deprecated.
-    pub version: Option<i32>,
-}
-
-impl ResponseResult for Policy {}
-
-
-/// Cloud Security Command Center's (Cloud SCC) representation of a Google Cloud
-/// Platform (GCP) resource.
+/// * [assets run discovery organizations](struct.OrganizationAssetRunDiscoveryCall.html) (request)
 /// 
-/// The Asset is a Cloud SCC resource that captures information about a single
-/// GCP resource. All modifications to an Asset are only within the context of
-/// Cloud SCC and don't affect the referenced GCP resource.
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RunAssetDiscoveryRequest { _never_set: Option<bool> }
+
+impl RequestValue for RunAssetDiscoveryRequest {}
+
+
+/// The config for streaming-based notifications, which send each event as soon
+/// as it is detected.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Asset {
-    /// Resource managed properties. These properties are managed and defined by
-    /// the GCP resource and cannot be modified by the user.
-    #[serde(rename="resourceProperties")]
-    pub resource_properties: Option<HashMap<String, String>>,
-    /// The time at which the asset was last updated, added, or deleted in Cloud
-    /// SCC.
-    #[serde(rename="updateTime")]
-    pub update_time: Option<String>,
-    /// The relative resource name of this asset. See:
-    /// https://cloud.google.com/apis/design/resource_names#relative_resource_name
-    /// Example:
-    /// "organizations/123/assets/456".
-    pub name: Option<String>,
-    /// IAM Policy information associated with the GCP resource described by the
-    /// Cloud SCC asset. This information is managed and defined by the GCP
-    /// resource and cannot be modified by the user.
-    #[serde(rename="iamPolicy")]
-    pub iam_policy: Option<IamPolicy>,
-    /// User specified security marks. These marks are entirely managed by the user
-    /// and come from the SecurityMarks resource that belongs to the asset.
-    #[serde(rename="securityMarks")]
-    pub security_marks: Option<SecurityMarks>,
-    /// The time at which the asset was created in Cloud SCC.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
-    /// Cloud SCC managed properties. These properties are managed by
-    /// Cloud SCC and cannot be modified by the user.
-    #[serde(rename="securityCenterProperties")]
-    pub security_center_properties: Option<SecurityCenterProperties>,
-}
-
-impl Part for Asset {}
-
-
-/// Request message for grouping by findings.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [sources findings group organizations](struct.OrganizationSourceFindingGroupCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GroupFindingsRequest {
-    /// Expression that defines the filter to apply across findings.
-    /// The expression is a list of one or more restrictions combined via logical
-    /// operators `AND` and `OR`.
-    /// Parentheses are supported, and `OR` has higher precedence than `AND`.
+pub struct StreamingConfig {
+    /// Expression that defines the filter to apply across create/update events
+    /// of assets or findings as specified by the event type. The expression is a
+    /// list of zero or more restrictions combined via logical operators `AND`
+    /// and `OR`. Parentheses are supported, and `OR` has higher precedence than
+    /// `AND`.
     /// 
-    /// Restrictions have the form `<field> <operator> <value>` and may have a `-`
-    /// character in front of them to indicate negation. Examples include:
-    /// 
-    ///  * name
-    ///  * source_properties.a_property
-    ///  * security_marks.marks.marka
+    /// Restrictions have the form `<field> <operator> <value>` and may have a
+    /// `-` character in front of them to indicate negation. The fields map to
+    /// those defined in the corresponding resource.
     /// 
     /// The supported operators are:
     /// 
@@ -576,91 +459,23 @@ pub struct GroupFindingsRequest {
     /// * string literals in quotes.
     /// * integer literals without quotes.
     /// * boolean literals `true` and `false` without quotes.
-    /// 
-    /// The following field and operator combinations are supported:
-    /// 
-    /// * name: `=`
-    /// * parent: `=`, `:`
-    /// * resource_name: `=`, `:`
-    /// * state: `=`, `:`
-    /// * category: `=`, `:`
-    /// * external_uri: `=`, `:`
-    /// * event_time: `>`, `<`, `>=`, `<=`
-    /// * security_marks: `=`, `:`
-    /// * source_properties: `=`, `:`, `>`, `<`, `>=`, `<=`
-    /// 
-    /// For example, `source_properties.size = 100` is a valid filter string.
     pub filter: Option<String>,
-    /// The value returned by the last `GroupFindingsResponse`; indicates
-    /// that this is a continuation of a prior `GroupFindings` call, and
-    /// that the system should return the next page of data.
-    #[serde(rename="pageToken")]
-    pub page_token: Option<String>,
-    /// When compare_duration is set, the GroupResult's "state_change" attribute is
-    /// updated to indicate whether the finding had its state changed, the
-    /// finding's state remained unchanged, or if the finding was added during the
-    /// compare_duration period of time that precedes the read_time. This is the
-    /// time between (read_time - compare_duration) and read_time.
-    /// 
-    /// The state_change value is derived based on the presence and state of the
-    /// finding at the two points in time. Intermediate state changes between the
-    /// two times don't affect the result. For example, the results aren't affected
-    /// if the finding is made inactive and then active again.
-    /// 
-    /// Possible "state_change" values when compare_duration is specified:
-    /// 
-    /// * "CHANGED":   indicates that the finding was present at the start of
-    ///   compare_duration, but changed its state at read_time.
-    /// * "UNCHANGED": indicates that the finding was present at the start of
-    ///   compare_duration and did not change state at read_time.
-    /// * "ADDED":     indicates that the finding was not present at the start
-    ///   of compare_duration, but was present at read_time.
-    /// 
-    /// If compare_duration is not specified, then the only possible state_change
-    /// is "UNUSED",  which will be the state_change set for all findings present
-    /// at read_time.
-    /// 
-    /// If this field is set then `state_change` must be a specified field in
-    /// `group_by`.
-    #[serde(rename="compareDuration")]
-    pub compare_duration: Option<String>,
-    /// The maximum number of results to return in a single response. Default is
-    /// 10, minimum is 1, maximum is 1000.
-    #[serde(rename="pageSize")]
-    pub page_size: Option<i32>,
-    /// Expression that defines what assets fields to use for grouping (including
-    /// `state_change`). The string value should follow SQL syntax: comma separated
-    /// list of fields. For example: "parent,resource_name".
-    /// 
-    /// The following fields are supported:
-    /// 
-    /// * resource_name
-    /// * category
-    /// * state
-    /// * parent
-    /// 
-    /// The following fields are supported when compare_duration is set:
-    /// 
-    /// * state_change
-    #[serde(rename="groupBy")]
-    pub group_by: Option<String>,
-    /// Time used as a reference point when filtering findings. The filter is
-    /// limited to findings existing at the supplied time and their values are
-    /// those at that specific time. Absence of this field will default to the
-    /// API's version of NOW.
-    #[serde(rename="readTime")]
-    pub read_time: Option<String>,
 }
 
-impl RequestValue for GroupFindingsRequest {}
+impl Part for StreamingConfig {}
 
 
-/// Cloud Security Command Center (Cloud SCC) finding.
+/// Security Command Center finding.
 /// 
-/// A finding is a record of assessment data (security, risk, health or privacy)
-/// ingested into Cloud SCC for presentation, notification, analysis,
-/// policy testing, and enforcement. For example, an XSS vulnerability in an
-/// App Engine application is a finding.
+/// A finding is a record of assessment data like security, risk, health, or
+/// privacy, that is ingested into Security Command Center for presentation,
+/// notification, analysis, policy testing, and enforcement. For example, a
+/// cross-site scripting (XSS) vulnerability in an App Engine application is a
+/// finding.
+/// 
+/// When adding a new field hidden behind a visibility label, ensure it is also
+/// hidden from Notifications:
+/// http://google3/java/com/google/cloud/security/riskdashboard/notification/actions/streaming/FindingTranslator.java?l=26
 /// 
 /// # Activities
 /// 
@@ -691,20 +506,22 @@ pub struct Finding {
     /// The relative resource name of this finding. See:
     /// https://cloud.google.com/apis/design/resource_names#relative_resource_name
     /// Example:
-    /// "organizations/123/sources/456/findings/789"
+    /// "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}"
     pub name: Option<String>,
     /// The relative resource name of the source the finding belongs to. See:
     /// https://cloud.google.com/apis/design/resource_names#relative_resource_name
     /// This field is immutable after creation time.
     /// For example:
-    /// "organizations/123/sources/456"
+    /// "organizations/{organization_id}/sources/{source_id}"
     pub parent: Option<String>,
     /// The state of the finding.
     pub state: Option<String>,
-    /// The full resource name of the Google Cloud Platform (GCP) resource this
-    /// finding is for. See:
+    /// For findings on Google Cloud resources, the full resource
+    /// name of the Google Cloud resource this finding is for. See:
     /// https://cloud.google.com/apis/design/resource_names#full_resource_name
-    /// This field is immutable after creation time.
+    /// When the finding is for a non-Google Cloud resource, the resourceName can
+    /// be a customer or partner defined string. This field is immutable after
+    /// creation time.
     #[serde(rename="resourceName")]
     pub resource_name: Option<String>,
     /// Output only. User specified security marks. These marks are entirely
@@ -712,18 +529,326 @@ pub struct Finding {
     /// to the finding.
     #[serde(rename="securityMarks")]
     pub security_marks: Option<SecurityMarks>,
-    /// The time at which the finding was created in Cloud SCC.
+    /// The time at which the finding was created in Security Command Center.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
-    /// The URI that, if available, points to a web page outside of Cloud SCC
-    /// where additional information about the finding can be found. This field is
-    /// guaranteed to be either empty or a well formed URL.
+    /// The URI that, if available, points to a web page outside of Security
+    /// Command Center where additional information about the finding can be found.
+    /// This field is guaranteed to be either empty or a well formed URL.
     #[serde(rename="externalUri")]
     pub external_uri: Option<String>,
 }
 
 impl RequestValue for Finding {}
 impl ResponseResult for Finding {}
+
+
+/// Security Command Center representation of a Google Cloud
+/// resource.
+/// 
+/// The Asset is a Security Command Center resource that captures information
+/// about a single Google Cloud resource. All modifications to an Asset are only
+/// within the context of Security Command Center and don't affect the referenced
+/// Google Cloud resource.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Asset {
+    /// Resource managed properties. These properties are managed and defined by
+    /// the Google Cloud resource and cannot be modified by the user.
+    #[serde(rename="resourceProperties")]
+    pub resource_properties: Option<HashMap<String, String>>,
+    /// The time at which the asset was last updated, added, or deleted in Security
+    /// Command Center.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
+    /// The relative resource name of this asset. See:
+    /// https://cloud.google.com/apis/design/resource_names#relative_resource_name
+    /// Example:
+    /// "organizations/{organization_id}/assets/{asset_id}".
+    pub name: Option<String>,
+    /// Cloud IAM Policy information associated with the Google Cloud resource
+    /// described by the Security Command Center asset. This information is managed
+    /// and defined by the Google Cloud resource and cannot be modified by the
+    /// user.
+    #[serde(rename="iamPolicy")]
+    pub iam_policy: Option<IamPolicy>,
+    /// User specified security marks. These marks are entirely managed by the user
+    /// and come from the SecurityMarks resource that belongs to the asset.
+    #[serde(rename="securityMarks")]
+    pub security_marks: Option<SecurityMarks>,
+    /// The time at which the asset was created in Security Command Center.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+    /// Security Command Center managed properties. These properties are managed by
+    /// Security Command Center and cannot be modified by the user.
+    #[serde(rename="securityCenterProperties")]
+    pub security_center_properties: Option<SecurityCenterProperties>,
+}
+
+impl Part for Asset {}
+
+
+/// Request message for grouping by findings.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [sources findings group organizations](struct.OrganizationSourceFindingGroupCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GroupFindingsRequest {
+    /// Expression that defines the filter to apply across findings.
+    /// The expression is a list of one or more restrictions combined via logical
+    /// operators `AND` and `OR`.
+    /// Parentheses are supported, and `OR` has higher precedence than `AND`.
+    /// 
+    /// Restrictions have the form `<field> <operator> <value>` and may have a `-`
+    /// character in front of them to indicate negation. Examples include:
+    /// 
+    /// * name
+    /// * source_properties.a_property
+    /// * security_marks.marks.marka
+    /// 
+    /// The supported operators are:
+    /// 
+    /// * `=` for all value types.
+    /// * `>`, `<`, `>=`, `<=` for integer values.
+    /// * `:`, meaning substring matching, for strings.
+    /// 
+    /// The supported value types are:
+    /// 
+    /// * string literals in quotes.
+    /// * integer literals without quotes.
+    /// * boolean literals `true` and `false` without quotes.
+    /// 
+    /// The following field and operator combinations are supported:
+    /// 
+    /// * name: `=`
+    /// 
+    /// * parent: `=`, `:`
+    /// 
+    /// * resource_name: `=`, `:`
+    /// 
+    /// * state: `=`, `:`
+    /// 
+    /// * category: `=`, `:`
+    /// 
+    /// * external_uri: `=`, `:`
+    /// 
+    /// * event_time: `=`, `>`, `<`, `>=`, `<=`
+    ///   
+    ///   Usage: This should be milliseconds since epoch or an RFC3339 string.
+    ///   Examples:
+    ///   "event_time = "2019-06-10T16:07:18-07:00""
+    ///   "event_time = 1560208038000"
+    /// 
+    /// * security_marks.marks: `=`, `:`
+    /// 
+    /// * source_properties: `=`, `:`, `>`, `<`, `>=`, `<=`
+    /// 
+    /// For example, `source_properties.size = 100` is a valid filter string.
+    /// 
+    /// Use a partial match on the empty string to filter based on a property
+    /// existing: "source_properties.my_property : """
+    /// 
+    /// Use a negated partial match on the empty string to filter based on a
+    /// property not existing: "-source_properties.my_property : """
+    pub filter: Option<String>,
+    /// The value returned by the last `GroupFindingsResponse`; indicates
+    /// that this is a continuation of a prior `GroupFindings` call, and
+    /// that the system should return the next page of data.
+    #[serde(rename="pageToken")]
+    pub page_token: Option<String>,
+    /// When compare_duration is set, the GroupResult's "state_change" attribute is
+    /// updated to indicate whether the finding had its state changed, the
+    /// finding's state remained unchanged, or if the finding was added during the
+    /// compare_duration period of time that precedes the read_time. This is the
+    /// time between (read_time - compare_duration) and read_time.
+    /// 
+    /// The state_change value is derived based on the presence and state of the
+    /// finding at the two points in time. Intermediate state changes between the
+    /// two times don't affect the result. For example, the results aren't affected
+    /// if the finding is made inactive and then active again.
+    /// 
+    /// Possible "state_change" values when compare_duration is specified:
+    /// 
+    /// * "CHANGED":   indicates that the finding was present and matched the given
+    ///   filter at the start of compare_duration, but changed its
+    ///   state at read_time.
+    /// * "UNCHANGED": indicates that the finding was present and matched the given
+    ///   filter at the start of compare_duration and did not change
+    ///   state at read_time.
+    /// * "ADDED":     indicates that the finding did not match the given filter or
+    ///   was not present at the start of compare_duration, but was
+    ///   present at read_time.
+    /// * "REMOVED":   indicates that the finding was present and matched the
+    ///   filter at the start of compare_duration, but did not match
+    ///   the filter at read_time.
+    /// 
+    /// If compare_duration is not specified, then the only possible state_change
+    /// is "UNUSED",  which will be the state_change set for all findings present
+    /// at read_time.
+    /// 
+    /// If this field is set then `state_change` must be a specified field in
+    /// `group_by`.
+    #[serde(rename="compareDuration")]
+    pub compare_duration: Option<String>,
+    /// The maximum number of results to return in a single response. Default is
+    /// 10, minimum is 1, maximum is 1000.
+    #[serde(rename="pageSize")]
+    pub page_size: Option<i32>,
+    /// Required. Expression that defines what assets fields to use for grouping (including
+    /// `state_change`). The string value should follow SQL syntax: comma separated
+    /// list of fields. For example: "parent,resource_name".
+    /// 
+    /// The following fields are supported:
+    /// 
+    /// * resource_name
+    /// * category
+    /// * state
+    /// * parent
+    /// 
+    /// The following fields are supported when compare_duration is set:
+    /// 
+    /// * state_change
+    #[serde(rename="groupBy")]
+    pub group_by: Option<String>,
+    /// Time used as a reference point when filtering findings. The filter is
+    /// limited to findings existing at the supplied time and their values are
+    /// those at that specific time. Absence of this field will default to the
+    /// API's version of NOW.
+    #[serde(rename="readTime")]
+    pub read_time: Option<String>,
+}
+
+impl RequestValue for GroupFindingsRequest {}
+
+
+/// An Identity and Access Management (IAM) policy, which specifies access
+/// controls for Google Cloud resources.
+/// 
+/// A `Policy` is a collection of `bindings`. A `binding` binds one or more
+/// `members` to a single `role`. Members can be user accounts, service accounts,
+/// Google groups, and domains (such as G Suite). A `role` is a named list of
+/// permissions; each `role` can be an IAM predefined role or a user-created
+/// custom role.
+/// 
+/// Optionally, a `binding` can specify a `condition`, which is a logical
+/// expression that allows access to a resource only if the expression evaluates
+/// to `true`. A condition can add constraints based on attributes of the
+/// request, the resource, or both.
+/// 
+/// **JSON example:**
+/// 
+/// ````text
+/// {
+///   "bindings": [
+///     {
+///       "role": "roles/resourcemanager.organizationAdmin",
+///       "members": [
+///         "user:mike@example.com",
+///         "group:admins@example.com",
+///         "domain:google.com",
+///         "serviceAccount:my-project-id@appspot.gserviceaccount.com"
+///       ]
+///     },
+///     {
+///       "role": "roles/resourcemanager.organizationViewer",
+///       "members": ["user:eve@example.com"],
+///       "condition": {
+///         "title": "expirable access",
+///         "description": "Does not grant access after Sep 2020",
+///         "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')",
+///       }
+///     }
+///   ],
+///   "etag": "BwWWja0YfJA=",
+///   "version": 3
+/// }
+/// ````
+/// 
+/// **YAML example:**
+/// 
+/// ````text
+/// bindings:
+/// - members:
+///   - user:mike@example.com
+///   - group:admins@example.com
+///   - domain:google.com
+///   - serviceAccount:my-project-id@appspot.gserviceaccount.com
+///   role: roles/resourcemanager.organizationAdmin
+/// - members:
+///   - user:eve@example.com
+///   role: roles/resourcemanager.organizationViewer
+///   condition:
+///     title: expirable access
+///     description: Does not grant access after Sep 2020
+///     expression: request.time < timestamp('2020-10-01T00:00:00.000Z')
+/// - etag: BwWWja0YfJA=
+/// - version: 3
+/// ````
+/// 
+/// For a description of IAM and its features, see the
+/// [IAM documentation](https://cloud.google.com/iam/docs/).
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [sources get iam policy organizations](struct.OrganizationSourceGetIamPolicyCall.html) (response)
+/// * [sources set iam policy organizations](struct.OrganizationSourceSetIamPolicyCall.html) (response)
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Policy {
+    /// Specifies cloud audit logging configuration for this policy.
+    #[serde(rename="auditConfigs")]
+    pub audit_configs: Option<Vec<AuditConfig>>,
+    /// `etag` is used for optimistic concurrency control as a way to help
+    /// prevent simultaneous updates of a policy from overwriting each other.
+    /// It is strongly suggested that systems make use of the `etag` in the
+    /// read-modify-write cycle to perform policy updates in order to avoid race
+    /// conditions: An `etag` is returned in the response to `getIamPolicy`, and
+    /// systems are expected to put that etag in the request to `setIamPolicy` to
+    /// ensure that their change will be applied to the same version of the policy.
+    /// 
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
+    pub etag: Option<String>,
+    /// Associates a list of `members` to a `role`. Optionally, may specify a
+    /// `condition` that determines how and when the `bindings` are applied. Each
+    /// of the `bindings` must contain at least one member.
+    pub bindings: Option<Vec<Binding>>,
+    /// Specifies the format of the policy.
+    /// 
+    /// Valid values are `0`, `1`, and `3`. Requests that specify an invalid value
+    /// are rejected.
+    /// 
+    /// Any operation that affects conditional role bindings must specify version
+    /// `3`. This requirement applies to the following operations:
+    /// 
+    /// * Getting a policy that includes a conditional role binding
+    /// * Adding a conditional role binding to a policy
+    /// * Changing a conditional role binding in a policy
+    /// * Removing any role binding, with or without a condition, from a policy
+    ///   that includes conditions
+    /// 
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
+    /// 
+    /// If a policy does not include any conditions, operations on that policy may
+    /// specify any valid version or leave the field unset.
+    pub version: Option<i32>,
+}
+
+impl ResponseResult for Policy {}
 
 
 /// Response message for listing assets.
@@ -774,6 +899,7 @@ impl ResponseResult for ListAssetsResponse {}
 /// 
 /// * [operations cancel organizations](struct.OrganizationOperationCancelCall.html) (response)
 /// * [operations delete organizations](struct.OrganizationOperationDeleteCall.html) (response)
+/// * [notification configs delete organizations](struct.OrganizationNotificationConfigDeleteCall.html) (response)
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
@@ -825,20 +951,35 @@ pub struct TestIamPermissionsResponse {
 impl ResponseResult for TestIamPermissionsResponse {}
 
 
-/// Result containing the Finding and its StateChange.
+/// Response message for group by findings.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [sources findings group organizations](struct.OrganizationSourceFindingGroupCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListFindingsResult {
-    /// Finding matching the search request.
-    pub finding: Option<Finding>,
-    /// State change of the finding between the points in time.
-    #[serde(rename="stateChange")]
-    pub state_change: Option<String>,
+pub struct GroupFindingsResponse {
+    /// Token to retrieve the next page of results, or empty if there are no more
+    /// results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The total number of results matching the query.
+    #[serde(rename="totalSize")]
+    pub total_size: Option<i32>,
+    /// Group results. There exists an element for each existing unique
+    /// combination of property/values. The element contains a count for the number
+    /// of times those specific property/values appear.
+    #[serde(rename="groupByResults")]
+    pub group_by_results: Option<Vec<GroupResult>>,
+    /// Time used for executing the groupBy request.
+    #[serde(rename="readTime")]
+    pub read_time: Option<String>,
 }
 
-impl Part for ListFindingsResult {}
+impl ResponseResult for GroupFindingsResponse {}
 
 
 /// Result containing the properties and count of a groupBy request.
@@ -867,9 +1008,9 @@ impl Part for GroupResult {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetFindingStateRequest {
-    /// The desired State of the finding.
+    /// Required. The desired State of the finding.
     pub state: Option<String>,
-    /// The time at which the updated state takes effect.
+    /// Required. The time at which the updated state takes effect.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
 }
@@ -877,39 +1018,56 @@ pub struct SetFindingStateRequest {
 impl RequestValue for SetFindingStateRequest {}
 
 
-/// Request message for running asset discovery for an organization.
+/// Cloud Security Command Center (Cloud SCC) notification configs.
+/// 
+/// A notification config is a Cloud SCC resource that contains the configuration
+/// to send notifications for create/update events of findings, assets and etc.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [assets run discovery organizations](struct.OrganizationAssetRunDiscoveryCall.html) (request)
+/// * [notification configs create organizations](struct.OrganizationNotificationConfigCreateCall.html) (request|response)
+/// * [notification configs get organizations](struct.OrganizationNotificationConfigGetCall.html) (response)
+/// * [notification configs patch organizations](struct.OrganizationNotificationConfigPatchCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RunAssetDiscoveryRequest { _never_set: Option<bool> }
+pub struct NotificationConfig {
+    /// The PubSub topic to send notifications to. Its format is
+    /// "projects/[project_id]/topics/[topic]".
+    #[serde(rename="pubsubTopic")]
+    pub pubsub_topic: Option<String>,
+    /// Output only. The service account that needs "pubsub.topics.publish"
+    /// permission to publish to the PubSub topic.
+    #[serde(rename="serviceAccount")]
+    pub service_account: Option<String>,
+    /// The description of the notification config (max of 1024 characters).
+    pub description: Option<String>,
+    /// The relative resource name of this notification config. See:
+    /// https://cloud.google.com/apis/design/resource_names#relative_resource_name
+    /// Example:
+    /// "organizations/{organization_id}/notificationConfigs/notify_public_bucket".
+    pub name: Option<String>,
+    /// The config for triggering streaming-based notifications.
+    #[serde(rename="streamingConfig")]
+    pub streaming_config: Option<StreamingConfig>,
+}
 
-impl RequestValue for RunAssetDiscoveryRequest {}
+impl RequestValue for NotificationConfig {}
+impl ResponseResult for NotificationConfig {}
 
 
-/// Cloud SCC managed properties. These properties are managed by Cloud SCC and
-/// cannot be modified by the user.
+/// Security Command Center managed properties. These properties are managed by
+/// Security Command Center and cannot be modified by the user.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SecurityCenterProperties {
-    /// The type of the GCP resource. Examples include: APPLICATION,
-    /// PROJECT, and ORGANIZATION. This is a case insensitive field defined by
-    /// Cloud SCC and/or the producer of the resource and is immutable
-    /// after create time.
-    #[serde(rename="resourceType")]
-    pub resource_type: Option<String>,
-    /// The full resource name of the GCP resource this asset
-    /// represents. This field is immutable after create time. See:
-    /// https://cloud.google.com/apis/design/resource_names#full_resource_name
-    #[serde(rename="resourceName")]
-    pub resource_name: Option<String>,
+    /// The user defined display name for this resource.
+    #[serde(rename="resourceDisplayName")]
+    pub resource_display_name: Option<String>,
     /// The full resource name of the immediate parent of the resource. See:
     /// https://cloud.google.com/apis/design/resource_names#full_resource_name
     #[serde(rename="resourceParent")]
@@ -921,6 +1079,23 @@ pub struct SecurityCenterProperties {
     /// Owners of the Google Cloud resource.
     #[serde(rename="resourceOwners")]
     pub resource_owners: Option<Vec<String>>,
+    /// The type of the Google Cloud resource. Examples include: APPLICATION,
+    /// PROJECT, and ORGANIZATION. This is a case insensitive field defined by
+    /// Security Command Center and/or the producer of the resource and is
+    /// immutable after create time.
+    #[serde(rename="resourceType")]
+    pub resource_type: Option<String>,
+    /// The user defined display name for the project of this resource.
+    #[serde(rename="resourceProjectDisplayName")]
+    pub resource_project_display_name: Option<String>,
+    /// The full resource name of the Google Cloud resource this asset
+    /// represents. This field is immutable after create time. See:
+    /// https://cloud.google.com/apis/design/resource_names#full_resource_name
+    #[serde(rename="resourceName")]
+    pub resource_name: Option<String>,
+    /// The user defined display name for the parent of this resource.
+    #[serde(rename="resourceParentDisplayName")]
+    pub resource_parent_display_name: Option<String>,
 }
 
 impl Part for SecurityCenterProperties {}
@@ -955,40 +1130,9 @@ pub struct ListFindingsResponse {
 impl ResponseResult for ListFindingsResponse {}
 
 
-/// Response message for grouping by assets.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [assets group organizations](struct.OrganizationAssetGroupCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GroupAssetsResponse {
-    /// Token to retrieve the next page of results, or empty if there are no more
-    /// results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The total number of results matching the query.
-    #[serde(rename="totalSize")]
-    pub total_size: Option<i32>,
-    /// Group results. There exists an element for each existing unique
-    /// combination of property/values. The element contains a count for the number
-    /// of times those specific property/values appear.
-    #[serde(rename="groupByResults")]
-    pub group_by_results: Option<Vec<GroupResult>>,
-    /// Time used for executing the groupBy request.
-    #[serde(rename="readTime")]
-    pub read_time: Option<String>,
-}
-
-impl ResponseResult for GroupAssetsResponse {}
-
-
-/// User specified security marks that are attached to the parent Cloud Security
-/// Command Center (Cloud SCC) resource. Security marks are scoped within a Cloud
-/// SCC organization -- they can be modified and viewed by all users who have
+/// User specified security marks that are attached to the parent Security
+/// Command Center resource. Security marks are scoped within a Security Command
+/// Center organization -- they can be modified and viewed by all users who have
 /// proper permissions on the organization.
 /// 
 /// # Activities
@@ -1004,8 +1148,8 @@ pub struct SecurityMarks {
     /// The relative resource name of the SecurityMarks. See:
     /// https://cloud.google.com/apis/design/resource_names#relative_resource_name
     /// Examples:
-    /// "organizations/123/assets/456/securityMarks"
-    /// "organizations/123/sources/456/findings/789/securityMarks".
+    /// "organizations/{organization_id}/assets/{asset_id}/securityMarks"
+    /// "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}/securityMarks".
     pub name: Option<String>,
     /// Mutable user specified security marks belonging to the parent resource.
     /// Constraints are as follows:
@@ -1031,7 +1175,7 @@ impl ResponseResult for SecurityMarks {}
 ///     {
 ///       "log_type": "DATA_READ",
 ///       "exempted_members": [
-///         "user:foo@gmail.com"
+///         "user:jose@example.com"
 ///       ]
 ///     },
 ///     {
@@ -1042,7 +1186,7 @@ impl ResponseResult for SecurityMarks {}
 /// ````
 /// 
 /// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
-/// foo@gmail.com from DATA_READ logging.
+/// jose@example.com from DATA_READ logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1079,6 +1223,33 @@ pub struct GetIamPolicyRequest {
 impl RequestValue for GetIamPolicyRequest {}
 
 
+/// Information related to the Google Cloud resource that is
+/// associated with this finding.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ResourceType {
+    /// The human readable name of project that the resource belongs to.
+    #[serde(rename="projectDisplayName")]
+    pub project_display_name: Option<String>,
+    /// The full resource name of project that the resource belongs to.
+    #[serde(rename="projectName")]
+    pub project_name: Option<String>,
+    /// The full resource name of resource's parent.
+    #[serde(rename="parentName")]
+    pub parent_name: Option<String>,
+    /// The full resource name of the resource. See:
+    /// https://cloud.google.com/apis/design/resource_names#full_resource_name
+    pub name: Option<String>,
+    /// The human readable name of resource's parent.
+    #[serde(rename="parentDisplayName")]
+    pub parent_display_name: Option<String>,
+}
+
+impl Part for ResourceType {}
+
+
 /// Request message for `TestIamPermissions` method.
 /// 
 /// # Activities
@@ -1100,30 +1271,59 @@ pub struct TestIamPermissionsRequest {
 impl RequestValue for TestIamPermissionsRequest {}
 
 
-/// Represents an expression text. Example:
+/// Represents a textual expression in the Common Expression Language (CEL)
+/// syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+/// are documented at https://github.com/google/cel-spec.
+/// 
+/// Example (Comparison):
 /// 
 /// ````text
-/// title: "User account presence"
-/// description: "Determines whether the request has a user account"
-/// expression: "size(request.user) > 0"
+/// title: "Summary size limit"
+/// description: "Determines if a summary is less than 100 chars"
+/// expression: "document.summary.size() < 100"
 /// ````
+/// 
+/// Example (Equality):
+/// 
+/// ````text
+/// title: "Requestor is owner"
+/// description: "Determines if requestor is the document owner"
+/// expression: "document.owner == request.auth.claims.email"
+/// ````
+/// 
+/// Example (Logic):
+/// 
+/// ````text
+/// title: "Public documents"
+/// description: "Determine whether the document should be publicly visible"
+/// expression: "document.type != 'private' && document.type != 'internal'"
+/// ````
+/// 
+/// Example (Data Manipulation):
+/// 
+/// ````text
+/// title: "Notification string"
+/// description: "Create a notification string with a timestamp."
+/// expression: "'New message received at ' + string(document.create_time)"
+/// ````
+/// 
+/// The exact variables and functions that may be referenced within an expression
+/// are determined by the service that evaluates it. See the service
+/// documentation for additional information.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
-    /// An optional description of the expression. This is a longer text which
+    /// Optional. Description of the expression. This is a longer text which
     /// describes the expression, e.g. when hovered over it in a UI.
     pub description: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
+    /// Textual representation of an expression in Common Expression Language
+    /// syntax.
     pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error
+    /// Optional. String indicating the location of the expression for error
     /// reporting, e.g. a file name and a position in the file.
     pub location: Option<String>,
-    /// An optional title for the expression, i.e. a short string describing
+    /// Optional. Title for the expression, i.e. a short string describing
     /// its purpose. This can be used e.g. in UIs which allow to enter the
     /// expression.
     pub title: Option<String>,
@@ -1132,8 +1332,8 @@ pub struct Expr {
 impl Part for Expr {}
 
 
-/// User specified settings that are attached to the Cloud Security Command
-/// Center (Cloud SCC) organization.
+/// User specified settings that are attached to the Security Command
+/// Center organization.
 /// 
 /// # Activities
 /// 
@@ -1151,7 +1351,7 @@ pub struct OrganizationSettings {
     /// The relative resource name of the settings. See:
     /// https://cloud.google.com/apis/design/resource_names#relative_resource_name
     /// Example:
-    /// "organizations/123/organizationSettings".
+    /// "organizations/{organization_id}/organizationSettings".
     pub name: Option<String>,
     /// A flag that indicates if Asset Discovery should be enabled. If the flag is
     /// set to `true`, then discovery of assets will occur. If it is set to `false,
@@ -1205,18 +1405,50 @@ pub struct GroupAssetsRequest {
     /// The following field and operator combinations are supported:
     /// 
     /// * name: `=`
-    /// * update_time: `>`, `<`, `>=`, `<=`, `=`
-    /// * create_time: `>`, `<`, `>=`, `<=`, `=`
+    /// 
+    /// * update_time: `=`, `>`, `<`, `>=`, `<=`
+    ///   
+    ///   Usage: This should be milliseconds since epoch or an RFC3339 string.
+    ///   Examples:
+    ///   "update_time = "2019-06-10T16:07:18-07:00""
+    ///   "update_time = 1560208038000"
+    /// 
+    /// * create_time: `=`, `>`, `<`, `>=`, `<=`
+    ///   
+    ///   Usage: This should be milliseconds since epoch or an RFC3339 string.
+    ///   Examples:
+    ///   "create_time = "2019-06-10T16:07:18-07:00""
+    ///   "create_time = 1560208038000"
+    /// 
     /// * iam_policy.policy_blob: `=`, `:`
+    /// 
     /// * resource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`
-    /// * security_marks: `=`, `:`
+    /// 
+    /// * security_marks.marks: `=`, `:`
+    /// 
     /// * security_center_properties.resource_name: `=`, `:`
+    /// 
+    /// * security_center_properties.resource_display_name: `=`, `:`
+    /// 
     /// * security_center_properties.resource_type: `=`, `:`
+    /// 
     /// * security_center_properties.resource_parent: `=`, `:`
+    /// 
+    /// * security_center_properties.resource_parent_display_name: `=`, `:`
+    /// 
     /// * security_center_properties.resource_project: `=`, `:`
+    /// 
+    /// * security_center_properties.resource_project_display_name: `=`, `:`
+    /// 
     /// * security_center_properties.resource_owners: `=`, `:`
     /// 
     /// For example, `resource_properties.size = 100` is a valid filter string.
+    /// 
+    /// Use a partial match on the empty string to filter based on a property
+    /// existing: "resource_properties.my_property : """
+    /// 
+    /// Use a negated partial match on the empty string to filter based on a
+    /// property not existing: "-resource_properties.my_property : """
     pub filter: Option<String>,
     /// The value returned by the last `GroupAssetsResponse`; indicates
     /// that this is a continuation of a prior `GroupAssets` call, and that the
@@ -1256,7 +1488,7 @@ pub struct GroupAssetsRequest {
     /// 10, minimum is 1, maximum is 1000.
     #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
-    /// Expression that defines what assets fields to use for grouping. The string
+    /// Required. Expression that defines what assets fields to use for grouping. The string
     /// value should follow SQL syntax: comma separated list of fields. For
     /// example:
     /// "security_center_properties.resource_project,security_center_properties.project".
@@ -1264,12 +1496,16 @@ pub struct GroupAssetsRequest {
     /// The following fields are supported when compare_duration is not set:
     /// 
     /// * security_center_properties.resource_project
+    /// * security_center_properties.resource_project_display_name
     /// * security_center_properties.resource_type
     /// * security_center_properties.resource_parent
+    /// * security_center_properties.resource_parent_display_name
     /// 
     /// The following fields are supported when compare_duration is set:
     /// 
     /// * security_center_properties.resource_type
+    /// * security_center_properties.resource_project_display_name
+    /// * security_center_properties.resource_parent_display_name
     #[serde(rename="groupBy")]
     pub group_by: Option<String>,
     /// Time used as a reference point when filtering assets. The filter is limited
@@ -1283,17 +1519,35 @@ pub struct GroupAssetsRequest {
 impl RequestValue for GroupAssetsRequest {}
 
 
-/// Response message for group by findings.
+/// Result containing the Finding and its StateChange.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListFindingsResult {
+    /// Finding matching the search request.
+    pub finding: Option<Finding>,
+    /// Output only. Resource that is associated with this finding.
+    pub resource: Option<ResourceType>,
+    /// State change of the finding between the points in time.
+    #[serde(rename="stateChange")]
+    pub state_change: Option<String>,
+}
+
+impl Part for ListFindingsResult {}
+
+
+/// Response message for grouping by assets.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [sources findings group organizations](struct.OrganizationSourceFindingGroupCall.html) (response)
+/// * [assets group organizations](struct.OrganizationAssetGroupCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GroupFindingsResponse {
+pub struct GroupAssetsResponse {
     /// Token to retrieve the next page of results, or empty if there are no more
     /// results.
     #[serde(rename="nextPageToken")]
@@ -1311,7 +1565,7 @@ pub struct GroupFindingsResponse {
     pub read_time: Option<String>,
 }
 
-impl ResponseResult for GroupFindingsResponse {}
+impl ResponseResult for GroupAssetsResponse {}
 
 
 /// The response message for Operations.ListOperations.
@@ -1335,9 +1589,10 @@ pub struct ListOperationsResponse {
 impl ResponseResult for ListOperationsResponse {}
 
 
-/// Cloud Security Command Center's (Cloud SCC) finding source. A finding source
+/// Security Command Center finding source. A finding source
 /// is an entity or a mechanism that can produce a finding. A source is like a
-/// container of findings that come from the same scanner, logger, monitor, etc.
+/// container of findings that come from the same scanner, logger, monitor, and
+/// other tools.
 /// 
 /// # Activities
 /// 
@@ -1359,16 +1614,16 @@ pub struct Source {
     pub display_name: Option<String>,
     /// The description of the source (max of 1024 characters).
     /// Example:
-    /// "Cloud Security Scanner is a web security scanner for common
+    /// "Web Security Scanner is a web security scanner for common
     /// vulnerabilities in App Engine applications. It can automatically
     /// scan and detect four common vulnerabilities, including cross-site-scripting
     /// (XSS), Flash injection, mixed content (HTTP in HTTPS), and
-    /// outdated/insecure libraries."
+    /// outdated or insecure libraries."
     pub description: Option<String>,
     /// The relative resource name of this source. See:
     /// https://cloud.google.com/apis/design/resource_names#relative_resource_name
     /// Example:
-    /// "organizations/123/sources/456"
+    /// "organizations/{organization_id}/sources/{source_id}"
     pub name: Option<String>,
 }
 
@@ -1383,9 +1638,13 @@ impl ResponseResult for Source {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetPolicyOptions {
     /// Optional. The policy format version to be returned.
-    /// Acceptable values are 0 and 1.
-    /// If the value is 0, or the field is omitted, policy format version 1 will be
-    /// returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
     #[serde(rename="requestedPolicyVersion")]
     pub requested_policy_version: Option<i32>,
 }
@@ -1417,7 +1676,7 @@ pub struct Binding {
     ///    who is authenticated with a Google account or a service account.
     /// 
     /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` .
+    ///    account. For example, `alice@example.com` .
     /// 
     /// 
     /// * `serviceAccount:{emailid}`: An email address that represents a service
@@ -1425,6 +1684,26 @@ pub struct Binding {
     /// 
     /// * `group:{emailid}`: An email address that represents a Google group.
     ///    For example, `admins@example.com`.
+    /// 
+    /// * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a user that has been recently deleted. For
+    ///    example, `alice@example.com?uid=123456789012345678901`. If the user is
+    ///    recovered, this value reverts to `user:{emailid}` and the recovered user
+    ///    retains the role in the binding.
+    /// 
+    /// * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus
+    ///    unique identifier) representing a service account that has been recently
+    ///    deleted. For example,
+    ///    `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.
+    ///    If the service account is undeleted, this value reverts to
+    ///    `serviceAccount:{emailid}` and the undeleted service account retains the
+    ///    role in the binding.
+    /// 
+    /// * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a Google group that has been recently
+    ///    deleted. For example, `admins@example.com?uid=123456789012345678901`. If
+    ///    the group is recovered, this value reverts to `group:{emailid}` and the
+    ///    recovered group retains the role in the binding.
     /// 
     /// 
     /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
@@ -1435,6 +1714,29 @@ pub struct Binding {
 }
 
 impl Part for Binding {}
+
+
+/// Response message for listing notification configs.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [notification configs list organizations](struct.OrganizationNotificationConfigListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListNotificationConfigsResponse {
+    /// Token to retrieve the next page of results, or empty if there are no more
+    /// results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Notification configs belonging to the requested parent.
+    #[serde(rename="notificationConfigs")]
+    pub notification_configs: Option<Vec<NotificationConfig>>,
+}
+
+impl ResponseResult for ListNotificationConfigsResponse {}
 
 
 /// Specifies the audit configuration for a service.
@@ -1458,7 +1760,7 @@ impl Part for Binding {}
 ///         {
 ///           "log_type": "DATA_READ",
 ///           "exempted_members": [
-///             "user:foo@gmail.com"
+///             "user:jose@example.com"
 ///           ]
 ///         },
 ///         {
@@ -1470,7 +1772,7 @@ impl Part for Binding {}
 ///       ]
 ///     },
 ///     {
-///       "service": "fooservice.googleapis.com"
+///       "service": "sampleservice.googleapis.com"
 ///       "audit_log_configs": [
 ///         {
 ///           "log_type": "DATA_READ",
@@ -1478,7 +1780,7 @@ impl Part for Binding {}
 ///         {
 ///           "log_type": "DATA_WRITE",
 ///           "exempted_members": [
-///             "user:bar@gmail.com"
+///             "user:aliya@example.com"
 ///           ]
 ///         }
 ///       ]
@@ -1487,9 +1789,9 @@ impl Part for Binding {}
 /// }
 /// ````
 /// 
-/// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
-/// logging. It also exempts foo@gmail.com from DATA_READ logging, and
-/// bar@gmail.com from DATA_WRITE logging.
+/// For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
+/// logging. It also exempts jose@example.com from DATA_READ logging, and
+/// aliya@example.com from DATA_WRITE logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1506,9 +1808,10 @@ pub struct AuditConfig {
 impl Part for AuditConfig {}
 
 
-/// IAM Policy information associated with the GCP resource described by the
-/// Cloud SCC asset. This information is managed and defined by the GCP
-/// resource and cannot be modified by the user.
+/// Cloud IAM Policy information associated with the Google Cloud resource
+/// described by the Security Command Center asset. This information is managed
+/// and defined by the Google Cloud resource and cannot be modified by the
+/// user.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1634,7 +1937,7 @@ impl ResponseResult for ListSourcesResponse {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = SecurityCommandCenter::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `assets_group(...)`, `assets_list(...)`, `assets_run_discovery(...)`, `assets_update_security_marks(...)`, `get_organization_settings(...)`, `operations_cancel(...)`, `operations_delete(...)`, `operations_get(...)`, `operations_list(...)`, `sources_create(...)`, `sources_findings_create(...)`, `sources_findings_group(...)`, `sources_findings_list(...)`, `sources_findings_patch(...)`, `sources_findings_set_state(...)`, `sources_findings_update_security_marks(...)`, `sources_get(...)`, `sources_get_iam_policy(...)`, `sources_list(...)`, `sources_patch(...)`, `sources_set_iam_policy(...)`, `sources_test_iam_permissions(...)` and `update_organization_settings(...)`
+/// // like `assets_group(...)`, `assets_list(...)`, `assets_run_discovery(...)`, `assets_update_security_marks(...)`, `get_organization_settings(...)`, `notification_configs_create(...)`, `notification_configs_delete(...)`, `notification_configs_get(...)`, `notification_configs_list(...)`, `notification_configs_patch(...)`, `operations_cancel(...)`, `operations_delete(...)`, `operations_get(...)`, `operations_list(...)`, `sources_create(...)`, `sources_findings_create(...)`, `sources_findings_group(...)`, `sources_findings_list(...)`, `sources_findings_patch(...)`, `sources_findings_set_state(...)`, `sources_findings_update_security_marks(...)`, `sources_get(...)`, `sources_get_iam_policy(...)`, `sources_list(...)`, `sources_patch(...)`, `sources_set_iam_policy(...)`, `sources_test_iam_permissions(...)` and `update_organization_settings(...)`
 /// // to build up your call.
 /// let rb = hub.organizations();
 /// # }
@@ -1655,7 +1958,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Name of the organization to get organization settings for. Its format is
+    /// * `name` - Required. Name of the organization to get organization settings for. Its format is
     ///            "organizations/[organization_id]/organizationSettings".
     pub fn get_organization_settings(&self, name: &str) -> OrganizationGetOrganizationSettingCall<'a, C, A> {
         OrganizationGetOrganizationSettingCall {
@@ -1673,15 +1976,15 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// specified properties.
     /// 
     /// To group across all sources provide a `-` as the source id.
-    /// Example: /v1/organizations/123/sources/-/findings
+    /// Example: /v1/organizations/{organization_id}/sources/-/findings
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Name of the source to groupBy. Its format is
+    /// * `parent` - Required. Name of the source to groupBy. Its format is
     ///              "organizations/[organization_id]/sources/[source_id]". To groupBy across
     ///              all sources provide a source_id of `-`. For example:
-    ///              organizations/123/sources/-
+    ///              organizations/{organization_id}/sources/-
     pub fn sources_findings_group(&self, request: GroupFindingsRequest, parent: &str) -> OrganizationSourceFindingGroupCall<'a, C, A> {
         OrganizationSourceFindingGroupCall {
             hub: self.hub,
@@ -1695,11 +1998,29 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Deletes a notification config.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. Name of the notification config to delete. Its format is
+    ///            "organizations/[organization_id]/notificationConfigs/[config_id]".
+    pub fn notification_configs_delete(&self, name: &str) -> OrganizationNotificationConfigDeleteCall<'a, C, A> {
+        OrganizationNotificationConfigDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Lists all sources belonging to an organization.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Resource name of the parent of sources to list. Its format should be
+    /// * `parent` - Required. Resource name of the parent of sources to list. Its format should be
     ///              "organizations/[organization_id]".
     pub fn sources_list(&self, parent: &str) -> OrganizationSourceListCall<'a, C, A> {
         OrganizationSourceListCall {
@@ -1723,7 +2044,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// * `name` - The relative resource name of the settings. See:
     ///            https://cloud.google.com/apis/design/resource_names#relative_resource_name
     ///            Example:
-    ///            "organizations/123/organizationSettings".
+    ///            "organizations/{organization_id}/organizationSettings".
     pub fn update_organization_settings(&self, request: OrganizationSettings, name: &str) -> OrganizationUpdateOrganizationSettingCall<'a, C, A> {
         OrganizationUpdateOrganizationSettingCall {
             hub: self.hub,
@@ -1768,7 +2089,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Name of the organization to run asset discovery for. Its format is
+    /// * `parent` - Required. Name of the organization to run asset discovery for. Its format is
     ///              "organizations/[organization_id]".
     pub fn assets_run_discovery(&self, request: RunAssetDiscoveryRequest, parent: &str) -> OrganizationAssetRunDiscoveryCall<'a, C, A> {
         OrganizationAssetRunDiscoveryCall {
@@ -1803,6 +2124,30 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// 
+    /// Updates a notification config.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The relative resource name of this notification config. See:
+    ///            https://cloud.google.com/apis/design/resource_names#relative_resource_name
+    ///            Example:
+    ///            "organizations/{organization_id}/notificationConfigs/notify_public_bucket".
+    pub fn notification_configs_patch(&self, request: NotificationConfig, name: &str) -> OrganizationNotificationConfigPatchCall<'a, C, A> {
+        OrganizationNotificationConfigPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Starts asynchronous cancellation on a long-running operation.  The server
     /// makes a best effort to cancel the operation, but success is not
     /// guaranteed.  If the server doesn't support this method, it returns
@@ -1829,15 +2174,35 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Lists notification configs.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. Name of the organization to list notification configs.
+    ///              Its format is "organizations/[organization_id]".
+    pub fn notification_configs_list(&self, parent: &str) -> OrganizationNotificationConfigListCall<'a, C, A> {
+        OrganizationNotificationConfigListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Updates the state of a finding.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The relative resource name of the finding. See:
+    /// * `name` - Required. The relative resource name of the finding. See:
     ///            https://cloud.google.com/apis/design/resource_names#relative_resource_name
     ///            Example:
-    ///            "organizations/123/sources/456/finding/789".
+    ///            "organizations/{organization_id}/sources/{source_id}/finding/{finding_id}".
     pub fn sources_findings_set_state(&self, request: SetFindingStateRequest, name: &str) -> OrganizationSourceFindingSetStateCall<'a, C, A> {
         OrganizationSourceFindingSetStateCall {
             hub: self.hub,
@@ -1854,14 +2219,14 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// Lists an organization or source's findings.
     /// 
     /// To list across all sources provide a `-` as the source id.
-    /// Example: /v1/organizations/123/sources/-/findings
+    /// Example: /v1/organizations/{organization_id}/sources/-/findings
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Name of the source the findings belong to. Its format is
+    /// * `parent` - Required. Name of the source the findings belong to. Its format is
     ///              "organizations/[organization_id]/sources/[source_id]". To list across all
     ///              sources provide a source_id of `-`. For example:
-    ///              organizations/123/sources/-
+    ///              organizations/{organization_id}/sources/-
     pub fn sources_findings_list(&self, parent: &str) -> OrganizationSourceFindingListCall<'a, C, A> {
         OrganizationSourceFindingListCall {
             hub: self.hub,
@@ -1890,7 +2255,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// * `name` - The relative resource name of this finding. See:
     ///            https://cloud.google.com/apis/design/resource_names#relative_resource_name
     ///            Example:
-    ///            "organizations/123/sources/456/findings/789"
+    ///            "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}"
     pub fn sources_findings_patch(&self, request: Finding, name: &str) -> OrganizationSourceFindingPatchCall<'a, C, A> {
         OrganizationSourceFindingPatchCall {
             hub: self.hub,
@@ -1911,7 +2276,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Name of the organization to groupBy. Its format is
+    /// * `parent` - Required. Name of the organization to groupBy. Its format is
     ///              "organizations/[organization_id]".
     pub fn assets_group(&self, request: GroupAssetsRequest, parent: &str) -> OrganizationAssetGroupCall<'a, C, A> {
         OrganizationAssetGroupCall {
@@ -1934,8 +2299,8 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// * `name` - The relative resource name of the SecurityMarks. See:
     ///            https://cloud.google.com/apis/design/resource_names#relative_resource_name
     ///            Examples:
-    ///            "organizations/123/assets/456/securityMarks"
-    ///            "organizations/123/sources/456/findings/789/securityMarks".
+    ///            "organizations/{organization_id}/assets/{asset_id}/securityMarks"
+    ///            "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}/securityMarks".
     pub fn sources_findings_update_security_marks(&self, request: SecurityMarks, name: &str) -> OrganizationSourceFindingUpdateSecurityMarkCall<'a, C, A> {
         OrganizationSourceFindingUpdateSecurityMarkCall {
             hub: self.hub,
@@ -1959,7 +2324,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// * `name` - The relative resource name of this source. See:
     ///            https://cloud.google.com/apis/design/resource_names#relative_resource_name
     ///            Example:
-    ///            "organizations/123/sources/456"
+    ///            "organizations/{organization_id}/sources/{source_id}"
     pub fn sources_patch(&self, request: Source, name: &str) -> OrganizationSourcePatchCall<'a, C, A> {
         OrganizationSourcePatchCall {
             hub: self.hub,
@@ -1978,7 +2343,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Name of the organization assets should belong to. Its format is
+    /// * `parent` - Required. Name of the organization assets should belong to. Its format is
     ///              "organizations/[organization_id]".
     pub fn assets_list(&self, parent: &str) -> OrganizationAssetListCall<'a, C, A> {
         OrganizationAssetListCall {
@@ -2055,8 +2420,8 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// * `name` - The relative resource name of the SecurityMarks. See:
     ///            https://cloud.google.com/apis/design/resource_names#relative_resource_name
     ///            Examples:
-    ///            "organizations/123/assets/456/securityMarks"
-    ///            "organizations/123/sources/456/findings/789/securityMarks".
+    ///            "organizations/{organization_id}/assets/{asset_id}/securityMarks"
+    ///            "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}/securityMarks".
     pub fn assets_update_security_marks(&self, request: SecurityMarks, name: &str) -> OrganizationAssetUpdateSecurityMarkCall<'a, C, A> {
         OrganizationAssetUpdateSecurityMarkCall {
             hub: self.hub,
@@ -2092,12 +2457,33 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Creates a notification config.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. Resource name of the new notification config's parent. Its format is
+    ///              "organizations/[organization_id]".
+    pub fn notification_configs_create(&self, request: NotificationConfig, parent: &str) -> OrganizationNotificationConfigCreateCall<'a, C, A> {
+        OrganizationNotificationConfigCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _config_id: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Creates a source.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Resource name of the new source's parent. Its format should be
+    /// * `parent` - Required. Resource name of the new source's parent. Its format should be
     ///              "organizations/[organization_id]".
     pub fn sources_create(&self, request: Source, parent: &str) -> OrganizationSourceCreateCall<'a, C, A> {
         OrganizationSourceCreateCall {
@@ -2118,7 +2504,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Resource name of the new finding's parent. Its format should be
+    /// * `parent` - Required. Resource name of the new finding's parent. Its format should be
     ///              "organizations/[organization_id]/sources/[source_id]".
     pub fn sources_findings_create(&self, request: Finding, parent: &str) -> OrganizationSourceFindingCreateCall<'a, C, A> {
         OrganizationSourceFindingCreateCall {
@@ -2154,11 +2540,29 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Gets a notification config.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. Name of the notification config to get. Its format is
+    ///            "organizations/[organization_id]/notificationConfigs/[config_id]".
+    pub fn notification_configs_get(&self, name: &str) -> OrganizationNotificationConfigGetCall<'a, C, A> {
+        OrganizationNotificationConfigGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets a source.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Relative resource name of the source. Its format is
+    /// * `name` - Required. Relative resource name of the source. Its format is
     ///            "organizations/[organization_id]/source/[source_id]".
     pub fn sources_get(&self, name: &str) -> OrganizationSourceGetCall<'a, C, A> {
         OrganizationSourceGetCall {
@@ -2354,7 +2758,7 @@ impl<'a, C, A> OrganizationGetOrganizationSettingCall<'a, C, A> where C: BorrowM
     }
 
 
-    /// Name of the organization to get organization settings for. Its format is
+    /// Required. Name of the organization to get organization settings for. Its format is
     /// "organizations/[organization_id]/organizationSettings".
     ///
     /// Sets the *name* path property to the given value.
@@ -2432,7 +2836,7 @@ impl<'a, C, A> OrganizationGetOrganizationSettingCall<'a, C, A> where C: BorrowM
 /// specified properties.
 /// 
 /// To group across all sources provide a `-` as the source id.
-/// Example: /v1/organizations/123/sources/-/findings
+/// Example: /v1/organizations/{organization_id}/sources/-/findings
 ///
 /// A builder for the *sources.findings.group* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -2638,10 +3042,10 @@ impl<'a, C, A> OrganizationSourceFindingGroupCall<'a, C, A> where C: BorrowMut<h
         self._request = new_value;
         self
     }
-    /// Name of the source to groupBy. Its format is
+    /// Required. Name of the source to groupBy. Its format is
     /// "organizations/[organization_id]/sources/[source_id]". To groupBy across
     /// all sources provide a source_id of `-`. For example:
-    /// organizations/123/sources/-
+    /// organizations/{organization_id}/sources/-
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -2714,6 +3118,255 @@ impl<'a, C, A> OrganizationSourceFindingGroupCall<'a, C, A> where C: BorrowMut<h
 }
 
 
+/// Deletes a notification config.
+///
+/// A builder for the *notificationConfigs.delete* method supported by a *organization* resource.
+/// It is not used directly, but through a `OrganizationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_securitycenter1 as securitycenter1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use securitycenter1::SecurityCommandCenter;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = SecurityCommandCenter::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.organizations().notification_configs_delete("name")
+///              .doit();
+/// # }
+/// ```
+pub struct OrganizationNotificationConfigDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a SecurityCommandCenter<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OrganizationNotificationConfigDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> OrganizationNotificationConfigDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "securitycenter.organizations.notificationConfigs.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Name of the notification config to delete. Its format is
+    /// "organizations/[organization_id]/notificationConfigs/[config_id]".
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> OrganizationNotificationConfigDeleteCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationNotificationConfigDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationNotificationConfigDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationNotificationConfigDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Lists all sources belonging to an organization.
 ///
 /// A builder for the *sources.list* method supported by a *organization* resource.
@@ -2742,8 +3395,8 @@ impl<'a, C, A> OrganizationSourceFindingGroupCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().sources_list("parent")
-///              .page_token("justo")
-///              .page_size(-1)
+///              .page_token("amet.")
+///              .page_size(-81)
 ///              .doit();
 /// # }
 /// ```
@@ -2899,7 +3552,7 @@ impl<'a, C, A> OrganizationSourceListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
-    /// Resource name of the parent of sources to list. Its format should be
+    /// Required. Resource name of the parent of sources to list. Its format should be
     /// "organizations/[organization_id]".
     ///
     /// Sets the *parent* path property to the given value.
@@ -3024,7 +3677,7 @@ impl<'a, C, A> OrganizationSourceListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().update_organization_settings(req, "name")
-///              .update_mask("labore")
+///              .update_mask("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -3204,7 +3857,7 @@ impl<'a, C, A> OrganizationUpdateOrganizationSettingCall<'a, C, A> where C: Borr
     /// The relative resource name of the settings. See:
     /// https://cloud.google.com/apis/design/resource_names#relative_resource_name
     /// Example:
-    /// "organizations/123/organizationSettings".
+    /// "organizations/{organization_id}/organizationSettings".
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -3777,7 +4430,7 @@ impl<'a, C, A> OrganizationAssetRunDiscoveryCall<'a, C, A> where C: BorrowMut<hy
         self._request = new_value;
         self
     }
-    /// Name of the organization to run asset discovery for. Its format is
+    /// Required. Name of the organization to run asset discovery for. Its format is
     /// "organizations/[organization_id]".
     ///
     /// Sets the *parent* path property to the given value.
@@ -4131,6 +4784,303 @@ impl<'a, C, A> OrganizationSourceGetIamPolicyCall<'a, C, A> where C: BorrowMut<h
 }
 
 
+/// 
+/// Updates a notification config.
+///
+/// A builder for the *notificationConfigs.patch* method supported by a *organization* resource.
+/// It is not used directly, but through a `OrganizationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_securitycenter1 as securitycenter1;
+/// use securitycenter1::NotificationConfig;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use securitycenter1::SecurityCommandCenter;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = SecurityCommandCenter::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = NotificationConfig::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.organizations().notification_configs_patch(req, "name")
+///              .update_mask("aliquyam")
+///              .doit();
+/// # }
+/// ```
+pub struct OrganizationNotificationConfigPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a SecurityCommandCenter<C, A>,
+    _request: NotificationConfig,
+    _name: String,
+    _update_mask: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OrganizationNotificationConfigPatchCall<'a, C, A> {}
+
+impl<'a, C, A> OrganizationNotificationConfigPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, NotificationConfig)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "securitycenter.organizations.notificationConfigs.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: NotificationConfig) -> OrganizationNotificationConfigPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The relative resource name of this notification config. See:
+    /// https://cloud.google.com/apis/design/resource_names#relative_resource_name
+    /// Example:
+    /// "organizations/{organization_id}/notificationConfigs/notify_public_bucket".
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> OrganizationNotificationConfigPatchCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The FieldMask to use when updating the notification config.
+    /// 
+    /// If empty all mutable fields will be updated.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> OrganizationNotificationConfigPatchCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationNotificationConfigPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationNotificationConfigPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationNotificationConfigPatchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Starts asynchronous cancellation on a long-running operation.  The server
 /// makes a best effort to cancel the operation, but success is not
 /// guaranteed.  If the server doesn't support this method, it returns
@@ -4388,6 +5338,282 @@ impl<'a, C, A> OrganizationOperationCancelCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
+/// Lists notification configs.
+///
+/// A builder for the *notificationConfigs.list* method supported by a *organization* resource.
+/// It is not used directly, but through a `OrganizationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_securitycenter1 as securitycenter1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use securitycenter1::SecurityCommandCenter;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = SecurityCommandCenter::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.organizations().notification_configs_list("parent")
+///              .page_token("justo")
+///              .page_size(-21)
+///              .doit();
+/// # }
+/// ```
+pub struct OrganizationNotificationConfigListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a SecurityCommandCenter<C, A>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OrganizationNotificationConfigListCall<'a, C, A> {}
+
+impl<'a, C, A> OrganizationNotificationConfigListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListNotificationConfigsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "securitycenter.organizations.notificationConfigs.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/notificationConfigs";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Name of the organization to list notification configs.
+    /// Its format is "organizations/[organization_id]".
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> OrganizationNotificationConfigListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The value returned by the last `ListNotificationConfigsResponse`; indicates
+    /// that this is a continuation of a prior `ListNotificationConfigs` call, and
+    /// that the system should return the next page of data.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> OrganizationNotificationConfigListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of results to return in a single response. Default is
+    /// 10, minimum is 1, maximum is 1000.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> OrganizationNotificationConfigListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationNotificationConfigListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationNotificationConfigListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationNotificationConfigListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Updates the state of a finding.
 ///
 /// A builder for the *sources.findings.setState* method supported by a *organization* resource.
@@ -4594,10 +5820,10 @@ impl<'a, C, A> OrganizationSourceFindingSetStateCall<'a, C, A> where C: BorrowMu
         self._request = new_value;
         self
     }
-    /// The relative resource name of the finding. See:
+    /// Required. The relative resource name of the finding. See:
     /// https://cloud.google.com/apis/design/resource_names#relative_resource_name
     /// Example:
-    /// "organizations/123/sources/456/finding/789".
+    /// "organizations/{organization_id}/sources/{source_id}/finding/{finding_id}".
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4673,7 +5899,7 @@ impl<'a, C, A> OrganizationSourceFindingSetStateCall<'a, C, A> where C: BorrowMu
 /// Lists an organization or source's findings.
 /// 
 /// To list across all sources provide a `-` as the source id.
-/// Example: /v1/organizations/123/sources/-/findings
+/// Example: /v1/organizations/{organization_id}/sources/-/findings
 ///
 /// A builder for the *sources.findings.list* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -4701,13 +5927,13 @@ impl<'a, C, A> OrganizationSourceFindingSetStateCall<'a, C, A> where C: BorrowMu
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().sources_findings_list("parent")
-///              .read_time("ea")
-///              .page_token("no")
-///              .page_size(-21)
-///              .order_by("justo")
-///              .filter("et")
-///              .field_mask("et")
-///              .compare_duration("diam")
+///              .read_time("diam")
+///              .page_token("ipsum")
+///              .page_size(-5)
+///              .order_by("et")
+///              .filter("duo")
+///              .field_mask("aliquyam")
+///              .compare_duration("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -4883,10 +6109,10 @@ impl<'a, C, A> OrganizationSourceFindingListCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// Name of the source the findings belong to. Its format is
+    /// Required. Name of the source the findings belong to. Its format is
     /// "organizations/[organization_id]/sources/[source_id]". To list across all
     /// sources provide a source_id of `-`. For example:
-    /// organizations/123/sources/-
+    /// organizations/{organization_id}/sources/-
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -4940,7 +6166,7 @@ impl<'a, C, A> OrganizationSourceFindingListCall<'a, C, A> where C: BorrowMut<hy
     /// resource_name
     /// event_time
     /// source_properties
-    /// security_marks
+    /// security_marks.marks
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> OrganizationSourceFindingListCall<'a, C, A> {
@@ -4955,9 +6181,9 @@ impl<'a, C, A> OrganizationSourceFindingListCall<'a, C, A> where C: BorrowMut<hy
     /// Restrictions have the form `<field> <operator> <value>` and may have a `-`
     /// character in front of them to indicate negation. Examples include:
     /// 
-    ///  * name
-    ///  * source_properties.a_property
-    ///  * security_marks.marks.marka
+    /// * name
+    /// * source_properties.a_property
+    /// * security_marks.marks.marka
     /// 
     /// The supported operators are:
     /// 
@@ -4979,11 +6205,23 @@ impl<'a, C, A> OrganizationSourceFindingListCall<'a, C, A> where C: BorrowMut<hy
     /// state: `=`, `:`
     /// category: `=`, `:`
     /// external_uri: `=`, `:`
-    /// event_time: `>`, `<`, `>=`, `<=`
-    /// security_marks: `=`, `:`
+    /// event_time: `=`, `>`, `<`, `>=`, `<=`
+    /// 
+    /// Usage: This should be milliseconds since epoch or an RFC3339 string.
+    /// Examples:
+    /// "event_time = "2019-06-10T16:07:18-07:00""
+    /// "event_time = 1560208038000"
+    /// 
+    /// security_marks.marks: `=`, `:`
     /// source_properties: `=`, `:`, `>`, `<`, `>=`, `<=`
     /// 
     /// For example, `source_properties.size = 100` is a valid filter string.
+    /// 
+    /// Use a partial match on the empty string to filter based on a property
+    /// existing: "source_properties.my_property : """
+    /// 
+    /// Use a negated partial match on the empty string to filter based on a
+    /// property not existing: "-source_properties.my_property : """
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> OrganizationSourceFindingListCall<'a, C, A> {
@@ -5012,12 +6250,18 @@ impl<'a, C, A> OrganizationSourceFindingListCall<'a, C, A> where C: BorrowMut<hy
     /// 
     /// Possible "state_change" values when compare_duration is specified:
     /// 
-    /// * "CHANGED":   indicates that the finding was present at the start of
-    ///   compare_duration, but changed its state at read_time.
-    /// * "UNCHANGED": indicates that the finding was present at the start of
-    ///   compare_duration and did not change state at read_time.
-    /// * "ADDED":     indicates that the finding was not present at the start
-    ///   of compare_duration, but was present at read_time.
+    /// * "CHANGED":   indicates that the finding was present and matched the given
+    ///   filter at the start of compare_duration, but changed its
+    ///   state at read_time.
+    /// * "UNCHANGED": indicates that the finding was present and matched the given
+    ///   filter at the start of compare_duration and did not change
+    ///   state at read_time.
+    /// * "ADDED":     indicates that the finding did not match the given filter or
+    ///   was not present at the start of compare_duration, but was
+    ///   present at read_time.
+    /// * "REMOVED":   indicates that the finding was present and matched the
+    ///   filter at the start of compare_duration, but did not match
+    ///   the filter at read_time.
     /// 
     /// If compare_duration is not specified, then the only possible state_change
     /// is "UNUSED", which will be the state_change set for all findings present at
@@ -5126,7 +6370,7 @@ impl<'a, C, A> OrganizationSourceFindingListCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().sources_findings_patch(req, "name")
-///              .update_mask("Lorem")
+///              .update_mask("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -5306,7 +6550,7 @@ impl<'a, C, A> OrganizationSourceFindingPatchCall<'a, C, A> where C: BorrowMut<h
     /// The relative resource name of this finding. See:
     /// https://cloud.google.com/apis/design/resource_names#relative_resource_name
     /// Example:
-    /// "organizations/123/sources/456/findings/789"
+    /// "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}"
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -5599,7 +6843,7 @@ impl<'a, C, A> OrganizationAssetGroupCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._request = new_value;
         self
     }
-    /// Name of the organization to groupBy. Its format is
+    /// Required. Name of the organization to groupBy. Its format is
     /// "organizations/[organization_id]".
     ///
     /// Sets the *parent* path property to the given value.
@@ -5707,8 +6951,8 @@ impl<'a, C, A> OrganizationAssetGroupCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().sources_findings_update_security_marks(req, "name")
-///              .update_mask("aliquyam")
-///              .start_time("sea")
+///              .update_mask("dolor")
+///              .start_time("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -5892,8 +7136,8 @@ impl<'a, C, A> OrganizationSourceFindingUpdateSecurityMarkCall<'a, C, A> where C
     /// The relative resource name of the SecurityMarks. See:
     /// https://cloud.google.com/apis/design/resource_names#relative_resource_name
     /// Examples:
-    /// "organizations/123/assets/456/securityMarks"
-    /// "organizations/123/sources/456/findings/789/securityMarks".
+    /// "organizations/{organization_id}/assets/{asset_id}/securityMarks"
+    /// "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}/securityMarks".
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -6020,7 +7264,7 @@ impl<'a, C, A> OrganizationSourceFindingUpdateSecurityMarkCall<'a, C, A> where C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().sources_patch(req, "name")
-///              .update_mask("eos")
+///              .update_mask("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -6200,7 +7444,7 @@ impl<'a, C, A> OrganizationSourcePatchCall<'a, C, A> where C: BorrowMut<hyper::C
     /// The relative resource name of this source. See:
     /// https://cloud.google.com/apis/design/resource_names#relative_resource_name
     /// Example:
-    /// "organizations/123/sources/456"
+    /// "organizations/{organization_id}/sources/{source_id}"
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -6310,13 +7554,13 @@ impl<'a, C, A> OrganizationSourcePatchCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().assets_list("parent")
-///              .read_time("sadipscing")
-///              .page_token("dolor")
-///              .page_size(-39)
-///              .order_by("elitr")
-///              .filter("amet")
-///              .field_mask("no")
-///              .compare_duration("labore")
+///              .read_time("labore")
+///              .page_token("eirmod")
+///              .page_size(-33)
+///              .order_by("invidunt")
+///              .filter("aliquyam")
+///              .field_mask("accusam")
+///              .compare_duration("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -6492,7 +7736,7 @@ impl<'a, C, A> OrganizationAssetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// Name of the organization assets should belong to. Its format is
+    /// Required. Name of the organization assets should belong to. Its format is
     /// "organizations/[organization_id]".
     ///
     /// Sets the *parent* path property to the given value.
@@ -6543,10 +7787,13 @@ impl<'a, C, A> OrganizationAssetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// name
     /// update_time
     /// resource_properties
-    /// security_marks
+    /// security_marks.marks
     /// security_center_properties.resource_name
+    /// security_center_properties.resource_display_name
     /// security_center_properties.resource_parent
+    /// security_center_properties.resource_parent_display_name
     /// security_center_properties.resource_project
+    /// security_center_properties.resource_project_display_name
     /// security_center_properties.resource_type
     ///
     /// Sets the *order by* query property to the given value.
@@ -6583,17 +7830,50 @@ impl<'a, C, A> OrganizationAssetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// The following are the allowed field and operator combinations:
     /// 
     /// * name: `=`
-    /// * update_time: `>`, `<`, `>=`, `<=`
+    /// 
+    /// * update_time: `=`, `>`, `<`, `>=`, `<=`
+    ///   
+    ///   Usage: This should be milliseconds since epoch or an RFC3339 string.
+    ///   Examples:
+    ///   "update_time = "2019-06-10T16:07:18-07:00""
+    ///   "update_time = 1560208038000"
+    /// 
+    /// * create_time: `=`, `>`, `<`, `>=`, `<=`
+    ///   
+    ///   Usage: This should be milliseconds since epoch or an RFC3339 string.
+    ///   Examples:
+    ///   "create_time = "2019-06-10T16:07:18-07:00""
+    ///   "create_time = 1560208038000"
+    /// 
     /// * iam_policy.policy_blob: `=`, `:`
+    /// 
     /// * resource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`
-    /// * security_marks: `=`, `:`
+    /// 
+    /// * security_marks.marks: `=`, `:`
+    /// 
     /// * security_center_properties.resource_name: `=`, `:`
+    /// 
+    /// * security_center_properties.resource_display_name: `=`, `:`
+    /// 
     /// * security_center_properties.resource_type: `=`, `:`
+    /// 
     /// * security_center_properties.resource_parent: `=`, `:`
+    /// 
+    /// * security_center_properties.resource_parent_display_name: `=`, `:`
+    /// 
     /// * security_center_properties.resource_project: `=`, `:`
+    /// 
+    /// * security_center_properties.resource_project_display_name: `=`, `:`
+    /// 
     /// * security_center_properties.resource_owners: `=`, `:`
     /// 
     /// For example, `resource_properties.size = 100` is a valid filter string.
+    /// 
+    /// Use a partial match on the empty string to filter based on a property
+    /// existing: "resource_properties.my_property : """
+    /// 
+    /// Use a negated partial match on the empty string to filter based on a
+    /// property not existing: "-resource_properties.my_property : """
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> OrganizationAssetListCall<'a, C, A> {
@@ -6989,9 +8269,9 @@ impl<'a, C, A> OrganizationOperationGetCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().operations_list("name")
-///              .page_token("invidunt")
-///              .page_size(-82)
-///              .filter("accusam")
+///              .page_token("duo")
+///              .page_size(-21)
+///              .filter("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -7279,8 +8559,8 @@ impl<'a, C, A> OrganizationOperationListCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().assets_update_security_marks(req, "name")
-///              .update_mask("sea")
-///              .start_time("et")
+///              .update_mask("et")
+///              .start_time("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -7464,8 +8744,8 @@ impl<'a, C, A> OrganizationAssetUpdateSecurityMarkCall<'a, C, A> where C: Borrow
     /// The relative resource name of the SecurityMarks. See:
     /// https://cloud.google.com/apis/design/resource_names#relative_resource_name
     /// Examples:
-    /// "organizations/123/assets/456/securityMarks"
-    /// "organizations/123/sources/456/findings/789/securityMarks".
+    /// "organizations/{organization_id}/assets/{asset_id}/securityMarks"
+    /// "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}/securityMarks".
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -7838,6 +9118,301 @@ impl<'a, C, A> OrganizationSourceSetIamPolicyCall<'a, C, A> where C: BorrowMut<h
 }
 
 
+/// Creates a notification config.
+///
+/// A builder for the *notificationConfigs.create* method supported by a *organization* resource.
+/// It is not used directly, but through a `OrganizationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_securitycenter1 as securitycenter1;
+/// use securitycenter1::NotificationConfig;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use securitycenter1::SecurityCommandCenter;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = SecurityCommandCenter::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = NotificationConfig::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.organizations().notification_configs_create(req, "parent")
+///              .config_id("ut")
+///              .doit();
+/// # }
+/// ```
+pub struct OrganizationNotificationConfigCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a SecurityCommandCenter<C, A>,
+    _request: NotificationConfig,
+    _parent: String,
+    _config_id: Option<String>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OrganizationNotificationConfigCreateCall<'a, C, A> {}
+
+impl<'a, C, A> OrganizationNotificationConfigCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, NotificationConfig)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "securitycenter.organizations.notificationConfigs.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._config_id {
+            params.push(("configId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "configId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/notificationConfigs";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: NotificationConfig) -> OrganizationNotificationConfigCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Resource name of the new notification config's parent. Its format is
+    /// "organizations/[organization_id]".
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> OrganizationNotificationConfigCreateCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Required.
+    /// Unique identifier provided by the client within the parent scope.
+    /// It must be between 1 and 128 characters, and contains alphanumeric
+    /// characters, underscores or hyphens only.
+    ///
+    /// Sets the *config id* query property to the given value.
+    pub fn config_id(mut self, new_value: &str) -> OrganizationNotificationConfigCreateCall<'a, C, A> {
+        self._config_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationNotificationConfigCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationNotificationConfigCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationNotificationConfigCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Creates a source.
 ///
 /// A builder for the *sources.create* method supported by a *organization* resource.
@@ -8044,7 +9619,7 @@ impl<'a, C, A> OrganizationSourceCreateCall<'a, C, A> where C: BorrowMut<hyper::
         self._request = new_value;
         self
     }
-    /// Resource name of the new source's parent. Its format should be
+    /// Required. Resource name of the new source's parent. Its format should be
     /// "organizations/[organization_id]".
     ///
     /// Sets the *parent* path property to the given value.
@@ -8153,7 +9728,7 @@ impl<'a, C, A> OrganizationSourceCreateCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().sources_findings_create(req, "parent")
-///              .finding_id("sanctus")
+///              .finding_id("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -8330,7 +9905,7 @@ impl<'a, C, A> OrganizationSourceFindingCreateCall<'a, C, A> where C: BorrowMut<
         self._request = new_value;
         self
     }
-    /// Resource name of the new finding's parent. Its format should be
+    /// Required. Resource name of the new finding's parent. Its format should be
     /// "organizations/[organization_id]/sources/[source_id]".
     ///
     /// Sets the *parent* path property to the given value.
@@ -8341,7 +9916,7 @@ impl<'a, C, A> OrganizationSourceFindingCreateCall<'a, C, A> where C: BorrowMut<
         self._parent = new_value.to_string();
         self
     }
-    /// Unique identifier provided by the client within the parent scope.
+    /// Required. Unique identifier provided by the client within the parent scope.
     /// It must be alphanumeric and less than or equal to 32 characters and
     /// greater than 0 characters in length.
     ///
@@ -8664,6 +10239,255 @@ impl<'a, C, A> OrganizationOperationDeleteCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
+/// Gets a notification config.
+///
+/// A builder for the *notificationConfigs.get* method supported by a *organization* resource.
+/// It is not used directly, but through a `OrganizationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_securitycenter1 as securitycenter1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use securitycenter1::SecurityCommandCenter;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = SecurityCommandCenter::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.organizations().notification_configs_get("name")
+///              .doit();
+/// # }
+/// ```
+pub struct OrganizationNotificationConfigGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a SecurityCommandCenter<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OrganizationNotificationConfigGetCall<'a, C, A> {}
+
+impl<'a, C, A> OrganizationNotificationConfigGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, NotificationConfig)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "securitycenter.organizations.notificationConfigs.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Name of the notification config to get. Its format is
+    /// "organizations/[organization_id]/notificationConfigs/[config_id]".
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> OrganizationNotificationConfigGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> OrganizationNotificationConfigGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationNotificationConfigGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationNotificationConfigGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Gets a source.
 ///
 /// A builder for the *sources.get* method supported by a *organization* resource.
@@ -8839,7 +10663,7 @@ impl<'a, C, A> OrganizationSourceGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// Relative resource name of the source. Its format is
+    /// Required. Relative resource name of the source. Its format is
     /// "organizations/[organization_id]/source/[source_id]".
     ///
     /// Sets the *name* path property to the given value.

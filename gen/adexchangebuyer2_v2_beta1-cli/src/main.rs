@@ -2845,6 +2845,7 @@ impl<'n> Engine<'n> {
                     "time-series-granularity" => Some(("timeSeriesGranularity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creative-id" => Some(("creativeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "relative-date-range.duration-days" => Some(("relativeDateRange.durationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "relative-date-range.offset-days" => Some(("relativeDateRange.offsetDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "publisher-identifiers" => Some(("publisherIdentifiers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2862,7 +2863,7 @@ impl<'n> Engine<'n> {
                     "realtime-time-range.start-timestamp" => Some(("realtimeTimeRange.startTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "seller-network-ids" => Some(("sellerNetworkIds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["absolute-date-range", "breakdown-dimensions", "creative-id", "day", "deal-id", "duration-days", "end-date", "environment", "formats", "month", "name", "offset-days", "platforms", "publisher-identifiers", "realtime-time-range", "relative-date-range", "seller-network-ids", "start-date", "start-timestamp", "time-series-granularity", "year"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["absolute-date-range", "breakdown-dimensions", "creative-id", "day", "deal-id", "duration-days", "end-date", "environment", "format", "formats", "month", "name", "offset-days", "platforms", "publisher-identifiers", "realtime-time-range", "relative-date-range", "seller-network-ids", "start-date", "start-timestamp", "time-series-granularity", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3707,6 +3708,7 @@ impl<'n> Engine<'n> {
                     "time-series-granularity" => Some(("timeSeriesGranularity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creative-id" => Some(("creativeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "relative-date-range.duration-days" => Some(("relativeDateRange.durationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "relative-date-range.offset-days" => Some(("relativeDateRange.offsetDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "publisher-identifiers" => Some(("publisherIdentifiers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -3724,7 +3726,7 @@ impl<'n> Engine<'n> {
                     "realtime-time-range.start-timestamp" => Some(("realtimeTimeRange.startTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "seller-network-ids" => Some(("sellerNetworkIds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["absolute-date-range", "breakdown-dimensions", "creative-id", "day", "deal-id", "duration-days", "end-date", "environment", "formats", "month", "name", "offset-days", "platforms", "publisher-identifiers", "realtime-time-range", "relative-date-range", "seller-network-ids", "start-date", "start-timestamp", "time-series-granularity", "year"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["absolute-date-range", "breakdown-dimensions", "creative-id", "day", "deal-id", "duration-days", "end-date", "environment", "format", "formats", "month", "name", "offset-days", "platforms", "publisher-identifiers", "realtime-time-range", "relative-date-range", "seller-network-ids", "start-date", "start-timestamp", "time-series-granularity", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6743,7 +6745,7 @@ fn main() {
     
     let mut app = App::new("adexchangebuyer2-v2-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190701")
+           .version("1.0.13+20200409")
            .about("Accesses the latest features for managing Authorized Buyers accounts, Real-Time Bidding configurations and auction metrics, and Marketplace programmatic deals.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli")
            .arg(Arg::with_name("url")

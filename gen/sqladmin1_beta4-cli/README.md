@@ -3,7 +3,7 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/cli/README.md.mako'
 DO NOT EDIT !
 -->
-The `sqladmin1-beta4` command-line interface *(CLI)* allows to use most features of the *Google SQL Admin* service from the comfort of your terminal.
+The `sql1-beta4` command-line interface *(CLI)* allows to use most features of the *Google SQL Admin* service from the comfort of your terminal.
 
 By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
@@ -11,24 +11,24 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *SQL Admin* API can be found at the
-[official documentation site](https://cloud.google.com/sql/docs/reference/latest).
+[official documentation site](https://developers.google.com/cloud-sql/).
 
 # Installation and Source Code
 
 Install the command-line interface with cargo using:
 
 ```bash
-cargo install google-sqladmin1_beta4-cli
+cargo install google-sql1_beta4-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/sqladmin1_beta4-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/sql1_beta4-cli).
 
 # Usage
 
-This documentation was generated from the *SQL Admin* API at revision *20190607*. The CLI is at version *1.0.12*.
+This documentation was generated from the *SQL Admin* API at revision *20200331*. The CLI is at version *1.0.13*.
 
 ```bash
-sqladmin1-beta4 [options]
+sql1-beta4 [options]
         backup-runs
                 delete <project> <instance> <id> [-p <v>]... [-o <out>]
                 get <project> <instance> <id> [-p <v>]... [-o <out>]
@@ -67,7 +67,11 @@ sqladmin1-beta4 [options]
                 update <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
         operations
                 get <project> <operation> [-p <v>]... [-o <out>]
-                list <project> <instance> [-p <v>]... [-o <out>]
+                list <project> [-p <v>]... [-o <out>]
+        projects
+                instances-reschedule-maintenance <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-start-external-sync <project> <instance> [-p <v>]... [-o <out>]
+                instances-verify-external-sync-settings <project> <instance> [-p <v>]... [-o <out>]
         ssl-certs
                 create-ephemeral <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project> <instance> <sha1-fingerprint> [-p <v>]... [-o <out>]
@@ -77,11 +81,11 @@ sqladmin1-beta4 [options]
         tiers
                 list <project> [-p <v>]... [-o <out>]
         users
-                delete <project> <instance> <host> <name> [-p <v>]... [-o <out>]
+                delete <project> <instance> [-p <v>]... [-o <out>]
                 insert <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> <instance> [-p <v>]... [-o <out>]
-                update <project> <instance> <name> (-r <kv>)... [-p <v>]... [-o <out>]
-  sqladmin1-beta4 --help
+                update <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+  sql1-beta4 --help
 
 Configuration:
   [--scope <url>]...
@@ -103,7 +107,7 @@ Configuration:
 
 # Configuration
 
-The program will store all persistent data in the `~/.google-service-cli` directory in *JSON* files prefixed with `sqladmin1-beta4-`.  You can change the directory used to store configuration with the `--config-dir` flag on a per-invocation basis.
+The program will store all persistent data in the `~/.google-service-cli` directory in *JSON* files prefixed with `sql1-beta4-`.  You can change the directory used to store configuration with the `--config-dir` flag on a per-invocation basis.
 
 More information about the various kinds of persistent data are given in the following paragraphs.
 
@@ -121,7 +125,7 @@ The first time a scope is used, the user is asked for permission. Follow the ins
 by the CLI to grant permissions, or to decline.
 
 If a scope was authenticated by the user, the respective information will be stored as *JSON* in the configuration
-directory, e.g. `~/.google-service-cli/sqladmin1-beta4-token-<scope-hash>.json`. No manual management of these tokens
+directory, e.g. `~/.google-service-cli/sql1-beta4-token-<scope-hash>.json`. No manual management of these tokens
 is necessary.
 
 To revoke granted authentication, please refer to the [official documentation][revoke-access].
@@ -137,7 +141,7 @@ comes with a default application secret that is configured accordingly. This als
 all around the world may deplete the daily quota.
 
 You can workaround this limitation by putting your own secrets file at this location: 
-`~/.google-service-cli/sqladmin1-beta4-secret.json`, assuming that the required *sqladmin* API 
+`~/.google-service-cli/sql1-beta4-secret.json`, assuming that the required *sql* API 
 was enabled for it. Such a secret file can be downloaded in the *Google Developer Console* at 
 *APIs & auth -> Credentials -> Download JSON* and used as is.
 
@@ -155,7 +159,7 @@ will cause all communication related to authentication to standard error.
 If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
 issue at hand.
 
-You may consider redirecting standard error into a file for ease of use, e.g. `sqladmin1-beta4 --debug <resource> <method> [options] 2>debug.txt`.
+You may consider redirecting standard error into a file for ease of use, e.g. `sql1-beta4 --debug <resource> <method> [options] 2>debug.txt`.
 
 
 [scopes]: https://developers.google.com/+/api/oauth#scopes

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Publisher* crate version *1.0.12+20190702*, where *20190702* is the exact revision of the *androidpublisher:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Android Publisher* crate version *1.0.13+20200331*, where *20200331* is the exact revision of the *androidpublisher:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Android Publisher* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/android-publisher).
@@ -23,17 +23,23 @@
 //!  * [*products acknowledge*](struct.PurchaseProductAcknowledgeCall.html), [*products get*](struct.PurchaseProductGetCall.html), [*subscriptions acknowledge*](struct.PurchaseSubscriptionAcknowledgeCall.html), [*subscriptions cancel*](struct.PurchaseSubscriptionCancelCall.html), [*subscriptions defer*](struct.PurchaseSubscriptionDeferCall.html), [*subscriptions get*](struct.PurchaseSubscriptionGetCall.html), [*subscriptions refund*](struct.PurchaseSubscriptionRefundCall.html), [*subscriptions revoke*](struct.PurchaseSubscriptionRevokeCall.html) and [*voidedpurchases list*](struct.PurchaseVoidedpurchaseListCall.html)
 //! * [reviews](struct.Review.html)
 //!  * [*get*](struct.ReviewGetCall.html), [*list*](struct.ReviewListCall.html) and [*reply*](struct.ReviewReplyCall.html)
+//! * systemapks
+//!  * [*variants create*](struct.SystemapkVariantCreateCall.html), [*variants download*](struct.SystemapkVariantDownloadCall.html), [*variants get*](struct.SystemapkVariantGetCall.html) and [*variants list*](struct.SystemapkVariantListCall.html)
 //! 
 //! 
 //! Upload supported by ...
 //! 
 //! * [*deobfuscationfiles upload edits*](struct.EditDeobfuscationfileUploadCall.html)
 //! * [*images upload edits*](struct.EditImageUploadCall.html)
-//! * [*uploadbundle internalappsharingartifacts*](struct.InternalappsharingartifactUploadbundleCall.html)
 //! * [*apks upload edits*](struct.EditApkUploadCall.html)
 //! * [*expansionfiles upload edits*](struct.EditExpansionfileUploadCall.html)
 //! * [*bundles upload edits*](struct.EditBundleUploadCall.html)
 //! * [*uploadapk internalappsharingartifacts*](struct.InternalappsharingartifactUploadapkCall.html)
+//! * [*uploadbundle internalappsharingartifacts*](struct.InternalappsharingartifactUploadbundleCall.html)
+//! 
+//! Download supported by ...
+//! 
+//! * [*variants download systemapks*](struct.SystemapkVariantDownloadCall.html)
 //! 
 //! 
 //! 
@@ -354,7 +360,7 @@ impl<'a, C, A> AndroidPublisher<C, A>
         AndroidPublisher {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://www.googleapis.com/androidpublisher/v3/applications/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -378,9 +384,12 @@ impl<'a, C, A> AndroidPublisher<C, A>
     pub fn reviews(&'a self) -> ReviewMethods<'a, C, A> {
         ReviewMethods { hub: &self }
     }
+    pub fn systemapks(&'a self) -> SystemapkMethods<'a, C, A> {
+        SystemapkMethods { hub: &self }
+    }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -430,34 +439,15 @@ impl ResponseResult for BundlesListResponse {}
 
 /// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [subscriptions defer purchases](struct.PurchaseSubscriptionDeferCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SubscriptionPurchasesDeferRequest {
-    /// The information about the new desired expiry time for the subscription.
-    #[serde(rename="deferralInfo")]
-    pub deferral_info: Option<SubscriptionDeferralInfo>,
-}
-
-impl RequestValue for SubscriptionPurchasesDeferRequest {}
-
-
-/// There is no detailed description.
-/// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TrackRelease {
     /// The desired status of this release.
     pub status: Option<String>,
-    /// Fraction of users who are eligible to receive the release. 0 < fraction < 1. To be set, release status must be "inProgress" or "halted".
-    #[serde(rename="userFraction")]
-    pub user_fraction: Option<f64>,
+    /// no description provided
+    #[serde(rename="pinnedVersions")]
+    pub pinned_versions: Option<Vec<TrackReleasePin>>,
     /// The release name, used to identify this release in the Play Console UI. Not required to be unique. This is optional, if not set it will be generated from the version_name in the APKs.
     pub name: Option<String>,
     /// A list of all version codes of APKs that will be exposed to the users of this track when this release is rolled out. Note that this list should contain all versions you wish to be active, including those you wish to retain from previous releases.
@@ -467,31 +457,24 @@ pub struct TrackRelease {
     #[serde(rename="releaseNotes")]
     pub release_notes: Option<Vec<LocalizedText>>,
     /// no description provided
+    pub controls: Option<Vec<Control>>,
+    /// no description provided
     #[serde(rename="countryTargeting")]
     pub country_targeting: Option<CountryTargeting>,
+    /// Fraction of users who are eligible to receive the release. 0 < fraction < 1. To be set, release status must be "inProgress" or "halted".
+    #[serde(rename="userFraction")]
+    pub user_fraction: Option<f64>,
+    /// no description provided
+    #[serde(rename="rollbackEnabled")]
+    pub rollback_enabled: Option<bool>,
+    /// In-app update priority of the release. All newly added APKs in the release will be considered at this priority. in_app_update_priority can take values between [0, 5]. 5 is the highest priority. Default priority is 0. See https://developer.android.com/guide/playcore/in-app-updates.
+    #[serde(rename="inAppUpdatePriority")]
+    pub in_app_update_priority: Option<i32>,
+    /// no description provided
+    pub sampling: Option<Sampling>,
 }
 
 impl Part for TrackRelease {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [apks list edits](struct.EditApkListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ApksListResponse {
-    /// no description provided
-    pub apks: Option<Vec<Apk>>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#apksListResponse".
-    pub kind: Option<String>,
-}
-
-impl ResponseResult for ApksListResponse {}
 
 
 /// There is no detailed description.
@@ -519,82 +502,6 @@ pub struct Review {
 
 impl Resource for Review {}
 impl ResponseResult for Review {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list reviews](struct.ReviewListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReviewsListResponse {
-    /// no description provided
-    pub reviews: Option<Vec<Review>>,
-    /// no description provided
-    #[serde(rename="tokenPagination")]
-    pub token_pagination: Option<TokenPagination>,
-    /// no description provided
-    #[serde(rename="pageInfo")]
-    pub page_info: Option<PageInfo>,
-}
-
-impl ResponseResult for ReviewsListResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [patch inappproducts](struct.InappproductPatchCall.html) (request|response)
-/// * [insert inappproducts](struct.InappproductInsertCall.html) (request|response)
-/// * [get inappproducts](struct.InappproductGetCall.html) (response)
-/// * [update inappproducts](struct.InappproductUpdateCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InAppProduct {
-    /// The stock-keeping-unit (SKU) of the product, unique within an app.
-    pub sku: Option<String>,
-    /// no description provided
-    pub status: Option<String>,
-    /// Subscription period, specified in ISO 8601 format. Acceptable values are "P1W" (one week), "P1M" (one month), "P3M" (three months), "P6M" (six months), and "P1Y" (one year).
-    #[serde(rename="subscriptionPeriod")]
-    pub subscription_period: Option<String>,
-    /// Grace period of the subscription, specified in ISO 8601 format. It will allow developers to give their subscribers a grace period when the payment for the new recurrence period is declined. Acceptable values = "P3D" (three days) and "P7D" (seven days)
-    #[serde(rename="gracePeriod")]
-    pub grace_period: Option<String>,
-    /// Definition of a season for a seasonal subscription. Can be defined only for yearly subscriptions.
-    pub season: Option<Season>,
-    /// The package name of the parent app.
-    #[serde(rename="packageName")]
-    pub package_name: Option<String>,
-    /// List of localized title and description data.
-    pub listings: Option<HashMap<String, InAppProductListing>>,
-    /// Trial period, specified in ISO 8601 format. Acceptable values are anything between "P7D" (seven days) and "P999D" (999 days). Seasonal subscriptions cannot have a trial period.
-    #[serde(rename="trialPeriod")]
-    pub trial_period: Option<String>,
-    /// Purchase type enum value. Unmodifiable after creation.
-    #[serde(rename="purchaseType")]
-    pub purchase_type: Option<String>,
-    /// The default language of the localized data, as defined by BCP 47. e.g. "en-US", "en-GB".
-    #[serde(rename="defaultLanguage")]
-    pub default_language: Option<String>,
-    /// Prices per buyer region. None of these prices should be zero. In-app products can never be free.
-    pub prices: Option<HashMap<String, Price>>,
-    /// Default price cannot be zero. In-app products can never be free. Default price is always in the developer's Checkout merchant currency.
-    #[serde(rename="defaultPrice")]
-    pub default_price: Option<Price>,
-}
-
-impl RequestValue for InAppProduct {}
-impl Resource for InAppProduct {}
-impl ResponseResult for InAppProduct {}
 
 
 /// There is no detailed description.
@@ -682,24 +589,6 @@ impl RequestValue for Listing {}
 impl ResponseResult for Listing {}
 
 
-/// Contains the price change information for a subscription that can be used to control the user journey for the price change in the app. This can be in the form of seeking confirmation from the user or tailoring the experience for a successful conversion.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SubscriptionPriceChange {
-    /// The current state of the price change. Possible values are:  
-    /// - Outstanding: State for a pending price change waiting for the user to agree. In this state, you can optionally seek confirmation from the user using the In-App API. 
-    /// - Accepted: State for an accepted price change that the subscription will renew with unless it's canceled. The price change takes effect on a future date when the subscription renews. Note that the change might not occur when the subscription is renewed next.
-    pub state: Option<i32>,
-    /// The new price the subscription will renew with if the price change is accepted by the user.
-    #[serde(rename="newPrice")]
-    pub new_price: Option<Price>,
-}
-
-impl Part for SubscriptionPriceChange {}
-
-
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -743,21 +632,6 @@ pub struct DeviceMetadata {
 impl Part for DeviceMetadata {}
 
 
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MonthDay {
-    /// Day of a month, value in [1, 31] range. Valid range depends on the specified month.
-    pub day: Option<u32>,
-    /// Month of a year. e.g. 1 = JAN, 2 = FEB etc.
-    pub month: Option<u32>,
-}
-
-impl Part for MonthDay {}
-
-
 /// A ProductPurchase resource indicates the status of a user's inapp product purchase.
 /// 
 /// # Activities
@@ -774,6 +648,9 @@ pub struct ProductPurchase {
     pub order_id: Option<String>,
     /// This kind represents an inappPurchase object in the androidpublisher service.
     pub kind: Option<String>,
+    /// The purchase token generated to identify this purchase.
+    #[serde(rename="purchaseToken")]
+    pub purchase_token: Option<String>,
     /// The consumption state of the inapp product. Possible values are:  
     /// - Yet to be consumed 
     /// - Consumed
@@ -788,6 +665,9 @@ pub struct ProductPurchase {
     /// A developer-specified string that contains supplemental information about an order.
     #[serde(rename="developerPayload")]
     pub developer_payload: Option<String>,
+    /// The inapp product SKU.
+    #[serde(rename="productId")]
+    pub product_id: Option<String>,
     /// The time the product was purchased, in milliseconds since the epoch (Jan 1, 1970).
     #[serde(rename="purchaseTimeMillis")]
     pub purchase_time_millis: Option<String>,
@@ -802,53 +682,127 @@ pub struct ProductPurchase {
     /// - Acknowledged
     #[serde(rename="acknowledgementState")]
     pub acknowledgement_state: Option<i32>,
+    /// The quantity associated with the purchase of the inapp product.
+    pub quantity: Option<i32>,
 }
 
 impl ResponseResult for ProductPurchase {}
 
 
-/// There is no detailed description.
+/// A SubscriptionPurchase resource indicates the status of a user's subscription purchase.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [images deleteall edits](struct.EditImageDeleteallCall.html) (response)
+/// * [subscriptions get purchases](struct.PurchaseSubscriptionGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ImagesDeleteAllResponse {
-    /// no description provided
-    pub deleted: Option<Vec<Image>>,
+pub struct SubscriptionPurchase {
+    /// The order id of the latest recurring order associated with the purchase of the subscription.
+    #[serde(rename="orderId")]
+    pub order_id: Option<String>,
+    /// User account identifier in the third-party service. Only present if account linking happened as part of the subscription purchase flow.
+    #[serde(rename="externalAccountId")]
+    pub external_account_id: Option<String>,
+    /// The type of promotion applied on this purchase. This field is only set if a promotion is applied when the subscription was purchased. Possible values are:  
+    /// - One time code 
+    /// - Vanity code
+    #[serde(rename="promotionType")]
+    pub promotion_type: Option<i32>,
+    /// ISO 3166-1 alpha-2 billing country/region code of the user at the time the subscription was granted.
+    #[serde(rename="countryCode")]
+    pub country_code: Option<String>,
+    /// A developer-specified string that contains supplemental information about an order.
+    #[serde(rename="developerPayload")]
+    pub developer_payload: Option<String>,
+    /// The family name of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.
+    #[serde(rename="familyName")]
+    pub family_name: Option<String>,
+    /// Whether the subscription will automatically be renewed when it reaches its current expiry time.
+    #[serde(rename="autoRenewing")]
+    pub auto_renewing: Option<bool>,
+    /// The payment state of the subscription. Possible values are:  
+    /// - Payment pending 
+    /// - Payment received 
+    /// - Free trial 
+    /// - Pending deferred upgrade/downgrade
+    #[serde(rename="paymentState")]
+    pub payment_state: Option<i32>,
+    /// The email address of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.
+    #[serde(rename="emailAddress")]
+    pub email_address: Option<String>,
+    /// The reason why a subscription was canceled or is not auto-renewing. Possible values are:  
+    /// - User canceled the subscription 
+    /// - Subscription was canceled by the system, for example because of a billing problem 
+    /// - Subscription was replaced with a new subscription 
+    /// - Subscription was canceled by the developer
+    #[serde(rename="cancelReason")]
+    pub cancel_reason: Option<i32>,
+    /// The profile name of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.
+    #[serde(rename="profileName")]
+    pub profile_name: Option<String>,
+    /// Time at which the subscription was granted, in milliseconds since the Epoch.
+    #[serde(rename="startTimeMillis")]
+    pub start_time_millis: Option<String>,
+    /// The time at which the subscription was canceled by the user, in milliseconds since the epoch. Only present if cancelReason is 0.
+    #[serde(rename="userCancellationTimeMillis")]
+    pub user_cancellation_time_millis: Option<String>,
+    /// Price of the subscription, not including tax. Price is expressed in micro-units, where 1,000,000 micro-units represents one unit of the currency. For example, if the subscription price is €1.99, price_amount_micros is 1990000.
+    #[serde(rename="priceAmountMicros")]
+    pub price_amount_micros: Option<String>,
+    /// This kind represents a subscriptionPurchase object in the androidpublisher service.
+    pub kind: Option<String>,
+    /// The acknowledgement state of the subscription product. Possible values are:  
+    /// - Yet to be acknowledged 
+    /// - Acknowledged
+    #[serde(rename="acknowledgementState")]
+    pub acknowledgement_state: Option<i32>,
+    /// Introductory price information of the subscription. This is only present when the subscription was purchased with an introductory price.
+    /// 
+    /// This field does not indicate the subscription is currently in introductory price period.
+    #[serde(rename="introductoryPriceInfo")]
+    pub introductory_price_info: Option<IntroductoryPriceInfo>,
+    /// The latest price change information available. This is present only when there is an upcoming price change for the subscription yet to be applied.
+    /// 
+    /// Once the subscription renews with the new price or the subscription is canceled, no price change information will be returned.
+    #[serde(rename="priceChange")]
+    pub price_change: Option<SubscriptionPriceChange>,
+    /// The type of purchase of the subscription. This field is only set if this purchase was not made using the standard in-app billing flow. Possible values are:  
+    /// - Test (i.e. purchased from a license testing account) 
+    /// - Promo (i.e. purchased using a promo code)
+    #[serde(rename="purchaseType")]
+    pub purchase_type: Option<i32>,
+    /// ISO 4217 currency code for the subscription price. For example, if the price is specified in British pounds sterling, price_currency_code is "GBP".
+    #[serde(rename="priceCurrencyCode")]
+    pub price_currency_code: Option<String>,
+    /// Time at which the subscription will be automatically resumed, in milliseconds since the Epoch. Only present if the user has requested to pause the subscription.
+    #[serde(rename="autoResumeTimeMillis")]
+    pub auto_resume_time_millis: Option<String>,
+    /// Time at which the subscription will expire, in milliseconds since the Epoch.
+    #[serde(rename="expiryTimeMillis")]
+    pub expiry_time_millis: Option<String>,
+    /// Information provided by the user when they complete the subscription cancellation flow (cancellation reason survey).
+    #[serde(rename="cancelSurveyResult")]
+    pub cancel_survey_result: Option<SubscriptionCancelSurveyResult>,
+    /// The Google profile id of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.
+    #[serde(rename="profileId")]
+    pub profile_id: Option<String>,
+    /// The purchase token of the originating purchase if this subscription is one of the following:  
+    /// - Re-signup of a canceled but non-lapsed subscription 
+    /// - Upgrade/downgrade from a previous subscription  For example, suppose a user originally signs up and you receive purchase token X, then the user cancels and goes through the resignup flow (before their subscription lapses) and you receive purchase token Y, and finally the user upgrades their subscription and you receive purchase token Z. If you call this API with purchase token Z, this field will be set to Y. If you call this API with purchase token Y, this field will be set to X. If you call this API with purchase token X, this field will not be set.
+    #[serde(rename="linkedPurchaseToken")]
+    pub linked_purchase_token: Option<String>,
+    /// The given name of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.
+    #[serde(rename="givenName")]
+    pub given_name: Option<String>,
+    /// The promotion code applied on this purchase. This field is only set if a vanity code promotion is applied when the subscription was purchased.
+    #[serde(rename="promotionCode")]
+    pub promotion_code: Option<String>,
 }
 
-impl ResponseResult for ImagesDeleteAllResponse {}
-
-
-/// An artifact resource which gets created when uploading an APK or Android App Bundle through internal app sharing.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [uploadapk internalappsharingartifacts](struct.InternalappsharingartifactUploadapkCall.html) (response)
-/// * [uploadbundle internalappsharingartifacts](struct.InternalappsharingartifactUploadbundleCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InternalAppSharingArtifact {
-    /// The download URL generated for the uploaded artifact. Users that are authorized to download can follow the link to the Play Store app to install it.
-    #[serde(rename="downloadUrl")]
-    pub download_url: Option<String>,
-    /// The SHA-256 hash of the artifact represented as a lowercase hexadecimal number, matching the output of the sha256sum command.
-    pub sha256: Option<String>,
-    /// The SHA256 fingerprint of the certificate used to signed the generated artifact.
-    #[serde(rename="certificateFingerprint")]
-    pub certificate_fingerprint: Option<String>,
-}
-
-impl Resource for InternalAppSharingArtifact {}
-impl ResponseResult for InternalAppSharingArtifact {}
+impl ResponseResult for SubscriptionPurchase {}
 
 
 /// There is no detailed description.
@@ -856,16 +810,14 @@ impl ResponseResult for InternalAppSharingArtifact {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Season {
-    /// Optionally present list of prorations for the season. Each proration is a one-off discounted entry into a subscription. Each proration contains the first date on which the discount is available and the new pricing information.
-    pub prorations: Option<Vec<Prorate>>,
-    /// Inclusive end date of the recurrence period.
-    pub end: Option<MonthDay>,
-    /// Inclusive start date of the recurrence period.
-    pub start: Option<MonthDay>,
+pub struct Timestamp {
+    /// no description provided
+    pub nanos: Option<i32>,
+    /// no description provided
+    pub seconds: Option<String>,
 }
 
-impl Part for Season {}
+impl Part for Timestamp {}
 
 
 /// There is no detailed description.
@@ -873,14 +825,16 @@ impl Part for Season {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InAppProductListing {
+pub struct TrackReleasePinPinTargetingDevicePin {
     /// no description provided
-    pub description: Option<String>,
+    pub device: Option<String>,
     /// no description provided
-    pub title: Option<String>,
+    pub brand: Option<String>,
+    /// no description provided
+    pub product: Option<String>,
 }
 
-impl Part for InAppProductListing {}
+impl Part for TrackReleasePinPinTargetingDevicePin {}
 
 
 /// There is no detailed description.
@@ -900,20 +854,6 @@ pub struct ReviewsReplyRequest {
 }
 
 impl RequestValue for ReviewsReplyRequest {}
-
-
-/// Represents a deobfuscation file.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeobfuscationFile {
-    /// The type of the deobfuscation file.
-    #[serde(rename="symbolType")]
-    pub symbol_type: Option<String>,
-}
-
-impl Part for DeobfuscationFile {}
 
 
 /// There is no detailed description.
@@ -1076,6 +1016,25 @@ pub struct LocalizedText {
 impl Part for LocalizedText {}
 
 
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [variants create systemapks](struct.SystemapkVariantCreateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SystemApkVariantsCreateRequest {
+    /// no description provided
+    #[serde(rename="deviceSpec")]
+    pub device_spec: Option<DeviceSpec>,
+}
+
+impl RequestValue for SystemApkVariantsCreateRequest {}
+
+
 /// A permission used by this APK.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1090,6 +1049,21 @@ pub struct ExternallyHostedApkUsesPermission {
 }
 
 impl Part for ExternallyHostedApkUsesPermission {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InAppProductListing {
+    /// no description provided
+    pub description: Option<String>,
+    /// no description provided
+    pub title: Option<String>,
+}
+
+impl Part for InAppProductListing {}
 
 
 /// There is no detailed description.
@@ -1148,55 +1122,6 @@ pub struct SubscriptionPurchasesDeferResponse {
 }
 
 impl ResponseResult for SubscriptionPurchasesDeferResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list inappproducts](struct.InappproductListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InappproductsListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#inappproductsListResponse".
-    pub kind: Option<String>,
-    /// no description provided
-    #[serde(rename="tokenPagination")]
-    pub token_pagination: Option<TokenPagination>,
-    /// no description provided
-    #[serde(rename="pageInfo")]
-    pub page_info: Option<PageInfo>,
-    /// no description provided
-    pub inappproduct: Option<Vec<InAppProduct>>,
-}
-
-impl ResponseResult for InappproductsListResponse {}
-
-
-/// Contains the introductory price information for a subscription.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IntroductoryPriceInfo {
-    /// Introductory price period, specified in ISO 8601 format. Common values are (but not limited to) "P1W" (one week), "P1M" (one month), "P3M" (three months), "P6M" (six months), and "P1Y" (one year).
-    #[serde(rename="introductoryPricePeriod")]
-    pub introductory_price_period: Option<String>,
-    /// ISO 4217 currency code for the introductory subscription price. For example, if the price is specified in British pounds sterling, price_currency_code is "GBP".
-    #[serde(rename="introductoryPriceCurrencyCode")]
-    pub introductory_price_currency_code: Option<String>,
-    /// Introductory price of the subscription, not including tax. The currency is the same as price_currency_code. Price is expressed in micro-units, where 1,000,000 micro-units represents one unit of the currency. For example, if the subscription price is €1.99, price_amount_micros is 1990000.
-    #[serde(rename="introductoryPriceAmountMicros")]
-    pub introductory_price_amount_micros: Option<String>,
-    /// The number of billing period to offer introductory pricing.
-    #[serde(rename="introductoryPriceCycles")]
-    pub introductory_price_cycles: Option<i32>,
-}
-
-impl Part for IntroductoryPriceInfo {}
 
 
 /// Information provided by the user when they complete the subscription cancellation flow (cancellation reason survey).
@@ -1290,6 +1215,559 @@ impl Part for TokenPagination {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [testers get edits](struct.EditTesterGetCall.html) (response)
+/// * [testers patch edits](struct.EditTesterPatchCall.html) (request|response)
+/// * [testers update edits](struct.EditTesterUpdateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Testers {
+    /// A list of all Google Groups, as email addresses, that define testers for this track.
+    #[serde(rename="googleGroups")]
+    pub google_groups: Option<Vec<String>>,
+    /// no description provided
+    #[serde(rename="autoEnrolledAndroidGroups")]
+    pub auto_enrolled_android_groups: Option<Vec<String>>,
+    /// no description provided
+    #[serde(rename="autoEnrolledGoogleGroups")]
+    pub auto_enrolled_google_groups: Option<Vec<String>>,
+    /// no description provided
+    #[serde(rename="excludedGoogleGroups")]
+    pub excluded_google_groups: Option<Vec<String>>,
+}
+
+impl RequestValue for Testers {}
+impl ResponseResult for Testers {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [expansionfiles get edits](struct.EditExpansionfileGetCall.html) (response)
+/// * [expansionfiles patch edits](struct.EditExpansionfilePatchCall.html) (request|response)
+/// * [expansionfiles update edits](struct.EditExpansionfileUpdateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ExpansionFile {
+    /// If set this APK's Expansion File references another APK's Expansion File. The file_size field will not be set.
+    #[serde(rename="referencesVersion")]
+    pub references_version: Option<i32>,
+    /// If set this field indicates that this APK has an Expansion File uploaded to it: this APK does not reference another APK's Expansion File. The field's value is the size of the uploaded Expansion File in bytes.
+    #[serde(rename="fileSize")]
+    pub file_size: Option<String>,
+}
+
+impl RequestValue for ExpansionFile {}
+impl ResponseResult for ExpansionFile {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Control {
+    /// no description provided
+    #[serde(rename="stratifiedSamplings")]
+    pub stratified_samplings: Option<Vec<StratifiedSampling>>,
+    /// no description provided
+    #[serde(rename="modRanges")]
+    pub mod_ranges: Option<Vec<ModRange>>,
+    /// no description provided
+    #[serde(rename="versionCodes")]
+    pub version_codes: Option<Vec<String>>,
+}
+
+impl Part for Control {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [apks addexternallyhosted edits](struct.EditApkAddexternallyhostedCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApksAddExternallyHostedResponse {
+    /// The definition of the externally-hosted APK and where it is located.
+    #[serde(rename="externallyHostedApk")]
+    pub externally_hosted_apk: Option<ExternallyHostedApk>,
+}
+
+impl ResponseResult for ApksAddExternallyHostedResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [deobfuscationfiles upload edits](struct.EditDeobfuscationfileUploadCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeobfuscationFilesUploadResponse {
+    /// no description provided
+    #[serde(rename="deobfuscationFile")]
+    pub deobfuscation_file: Option<DeobfuscationFile>,
+}
+
+impl ResponseResult for DeobfuscationFilesUploadResponse {}
+
+
+/// Represents an edit of an app. An edit allows clients to make multiple changes before committing them in one operation.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [insert edits](struct.EditInsertCall.html) (request|response)
+/// * [commit edits](struct.EditCommitCall.html) (response)
+/// * [validate edits](struct.EditValidateCall.html) (response)
+/// * [get edits](struct.EditGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AppEdit {
+    /// The time at which the edit will expire and will be no longer valid for use in any subsequent API calls (encoded as seconds since the Epoch).
+    #[serde(rename="expiryTimeSeconds")]
+    pub expiry_time_seconds: Option<String>,
+    /// The ID of the edit that can be used in subsequent API calls.
+    pub id: Option<String>,
+}
+
+impl RequestValue for AppEdit {}
+impl ResponseResult for AppEdit {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Sampling {
+    /// no description provided
+    #[serde(rename="stratifiedSamplings")]
+    pub stratified_samplings: Option<Vec<StratifiedSampling>>,
+    /// no description provided
+    pub modulus: Option<String>,
+    /// no description provided
+    #[serde(rename="modRanges")]
+    pub mod_ranges: Option<Vec<ModRange>>,
+    /// no description provided
+    pub salt: Option<i32>,
+    /// no description provided
+    #[serde(rename="useAndroidId")]
+    pub use_android_id: Option<bool>,
+}
+
+impl Part for Sampling {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReviewReplyResult {
+    /// The reply text that was applied.
+    #[serde(rename="replyText")]
+    pub reply_text: Option<String>,
+    /// The time at which the reply took effect.
+    #[serde(rename="lastEdited")]
+    pub last_edited: Option<Timestamp>,
+}
+
+impl Part for ReviewReplyResult {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [apks addexternallyhosted edits](struct.EditApkAddexternallyhostedCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApksAddExternallyHostedRequest {
+    /// The definition of the externally-hosted APK and where it is located.
+    #[serde(rename="externallyHostedApk")]
+    pub externally_hosted_apk: Option<ExternallyHostedApk>,
+}
+
+impl RequestValue for ApksAddExternallyHostedRequest {}
+
+
+/// Represents the binary payload of an APK.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApkBinary {
+    /// A sha256 hash of the APK payload, encoded as a hex string and matching the output of the sha256sum command.
+    pub sha256: Option<String>,
+    /// A sha1 hash of the APK payload, encoded as a hex string and matching the output of the sha1sum command.
+    pub sha1: Option<String>,
+}
+
+impl Part for ApkBinary {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [listings list edits](struct.EditListingListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListingsListResponse {
+    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#listingsListResponse".
+    pub kind: Option<String>,
+    /// no description provided
+    pub listings: Option<Vec<Listing>>,
+}
+
+impl ResponseResult for ListingsListResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ModRange {
+    /// no description provided
+    pub start: Option<String>,
+    /// no description provided
+    pub end: Option<String>,
+}
+
+impl Part for ModRange {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list reviews](struct.ReviewListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReviewsListResponse {
+    /// no description provided
+    pub reviews: Option<Vec<Review>>,
+    /// no description provided
+    #[serde(rename="tokenPagination")]
+    pub token_pagination: Option<TokenPagination>,
+    /// no description provided
+    #[serde(rename="pageInfo")]
+    pub page_info: Option<PageInfo>,
+}
+
+impl ResponseResult for ReviewsListResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [patch inappproducts](struct.InappproductPatchCall.html) (request|response)
+/// * [insert inappproducts](struct.InappproductInsertCall.html) (request|response)
+/// * [get inappproducts](struct.InappproductGetCall.html) (response)
+/// * [update inappproducts](struct.InappproductUpdateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InAppProduct {
+    /// The stock-keeping-unit (SKU) of the product, unique within an app.
+    pub sku: Option<String>,
+    /// no description provided
+    pub status: Option<String>,
+    /// Subscription period, specified in ISO 8601 format. Acceptable values are "P1W" (one week), "P1M" (one month), "P3M" (three months), "P6M" (six months), and "P1Y" (one year).
+    #[serde(rename="subscriptionPeriod")]
+    pub subscription_period: Option<String>,
+    /// Grace period of the subscription, specified in ISO 8601 format. It will allow developers to give their subscribers a grace period when the payment for the new recurrence period is declined. Acceptable values = "P3D" (three days), "P7D" (seven days), "P14D" (fourteen days), and "P30D" (thirty days)
+    #[serde(rename="gracePeriod")]
+    pub grace_period: Option<String>,
+    /// The package name of the parent app.
+    #[serde(rename="packageName")]
+    pub package_name: Option<String>,
+    /// List of localized title and description data.
+    pub listings: Option<HashMap<String, InAppProductListing>>,
+    /// Trial period, specified in ISO 8601 format. Acceptable values are anything between "P7D" (seven days) and "P999D" (999 days). Seasonal subscriptions cannot have a trial period.
+    #[serde(rename="trialPeriod")]
+    pub trial_period: Option<String>,
+    /// Purchase type enum value. Unmodifiable after creation.
+    #[serde(rename="purchaseType")]
+    pub purchase_type: Option<String>,
+    /// The default language of the localized data, as defined by BCP 47. e.g. "en-US", "en-GB".
+    #[serde(rename="defaultLanguage")]
+    pub default_language: Option<String>,
+    /// Prices per buyer region. None of these prices should be zero. In-app products can never be free.
+    pub prices: Option<HashMap<String, Price>>,
+    /// Default price cannot be zero. In-app products can never be free. Default price is always in the developer's Checkout merchant currency.
+    #[serde(rename="defaultPrice")]
+    pub default_price: Option<Price>,
+}
+
+impl RequestValue for InAppProduct {}
+impl Resource for InAppProduct {}
+impl ResponseResult for InAppProduct {}
+
+
+/// Contains the price change information for a subscription that can be used to control the user journey for the price change in the app. This can be in the form of seeking confirmation from the user or tailoring the experience for a successful conversion.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SubscriptionPriceChange {
+    /// The current state of the price change. Possible values are:  
+    /// - Outstanding: State for a pending price change waiting for the user to agree. In this state, you can optionally seek confirmation from the user using the In-App API. 
+    /// - Accepted: State for an accepted price change that the subscription will renew with unless it's canceled. The price change takes effect on a future date when the subscription renews. Note that the change might not occur when the subscription is renewed next.
+    pub state: Option<i32>,
+    /// The new price the subscription will renew with if the price change is accepted by the user.
+    #[serde(rename="newPrice")]
+    pub new_price: Option<Price>,
+}
+
+impl Part for SubscriptionPriceChange {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StratifiedSampling {
+    /// no description provided
+    #[serde(rename="modRanges")]
+    pub mod_ranges: Option<Vec<ModRange>>,
+    /// no description provided
+    pub stratum: Option<Stratum>,
+}
+
+impl Part for StratifiedSampling {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [images deleteall edits](struct.EditImageDeleteallCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ImagesDeleteAllResponse {
+    /// no description provided
+    pub deleted: Option<Vec<Image>>,
+}
+
+impl ResponseResult for ImagesDeleteAllResponse {}
+
+
+/// An artifact resource which gets created when uploading an APK or Android App Bundle through internal app sharing.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [uploadapk internalappsharingartifacts](struct.InternalappsharingartifactUploadapkCall.html) (response)
+/// * [uploadbundle internalappsharingartifacts](struct.InternalappsharingartifactUploadbundleCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InternalAppSharingArtifact {
+    /// The download URL generated for the uploaded artifact. Users that are authorized to download can follow the link to the Play Store app to install it.
+    #[serde(rename="downloadUrl")]
+    pub download_url: Option<String>,
+    /// The SHA-256 hash of the artifact represented as a lowercase hexadecimal number, matching the output of the sha256sum command.
+    pub sha256: Option<String>,
+    /// The SHA256 fingerprint of the certificate used to signed the generated artifact.
+    #[serde(rename="certificateFingerprint")]
+    pub certificate_fingerprint: Option<String>,
+}
+
+impl Resource for InternalAppSharingArtifact {}
+impl ResponseResult for InternalAppSharingArtifact {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Price {
+    /// 3 letter Currency code, as defined by ISO 4217.
+    pub currency: Option<String>,
+    /// The price in millionths of the currency base unit represented as a string.
+    #[serde(rename="priceMicros")]
+    pub price_micros: Option<String>,
+}
+
+impl Part for Price {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions defer purchases](struct.PurchaseSubscriptionDeferCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SubscriptionPurchasesDeferRequest {
+    /// The information about the new desired expiry time for the subscription.
+    #[serde(rename="deferralInfo")]
+    pub deferral_info: Option<SubscriptionDeferralInfo>,
+}
+
+impl RequestValue for SubscriptionPurchasesDeferRequest {}
+
+
+/// Represents the variant of a generated system APK from an uploaded App Bundle.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [variants create systemapks](struct.SystemapkVariantCreateCall.html) (response)
+/// * [variants get systemapks](struct.SystemapkVariantGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Variant {
+    /// no description provided
+    #[serde(rename="deviceSpec")]
+    pub device_spec: Option<DeviceSpec>,
+    /// no description provided
+    #[serde(rename="variantId")]
+    pub variant_id: Option<u32>,
+}
+
+impl ResponseResult for Variant {}
+
+
+/// Represents a deobfuscation file.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeobfuscationFile {
+    /// The type of the deobfuscation file.
+    #[serde(rename="symbolType")]
+    pub symbol_type: Option<String>,
+}
+
+impl Part for DeobfuscationFile {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [variants list systemapks](struct.SystemapkVariantListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SystemApkVariantsListResponse {
+    /// no description provided
+    pub variants: Option<Vec<Variant>>,
+}
+
+impl ResponseResult for SystemApkVariantsListResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Stratum {
+    /// no description provided
+    pub brand: Option<String>,
+}
+
+impl Part for Stratum {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list inappproducts](struct.InappproductListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InappproductsListResponse {
+    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#inappproductsListResponse".
+    pub kind: Option<String>,
+    /// no description provided
+    #[serde(rename="tokenPagination")]
+    pub token_pagination: Option<TokenPagination>,
+    /// no description provided
+    #[serde(rename="pageInfo")]
+    pub page_info: Option<PageInfo>,
+    /// no description provided
+    pub inappproduct: Option<Vec<InAppProduct>>,
+}
+
+impl ResponseResult for InappproductsListResponse {}
+
+
+/// Contains the introductory price information for a subscription.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IntroductoryPriceInfo {
+    /// Introductory price period, specified in ISO 8601 format. Common values are (but not limited to) "P1W" (one week), "P1M" (one month), "P3M" (three months), "P6M" (six months), and "P1Y" (one year).
+    #[serde(rename="introductoryPricePeriod")]
+    pub introductory_price_period: Option<String>,
+    /// ISO 4217 currency code for the introductory subscription price. For example, if the price is specified in British pounds sterling, price_currency_code is "GBP".
+    #[serde(rename="introductoryPriceCurrencyCode")]
+    pub introductory_price_currency_code: Option<String>,
+    /// Introductory price of the subscription, not including tax. The currency is the same as price_currency_code. Price is expressed in micro-units, where 1,000,000 micro-units represents one unit of the currency. For example, if the subscription price is €1.99, price_amount_micros is 1990000.
+    #[serde(rename="introductoryPriceAmountMicros")]
+    pub introductory_price_amount_micros: Option<String>,
+    /// The number of billing period to offer introductory pricing.
+    #[serde(rename="introductoryPriceCycles")]
+    pub introductory_price_cycles: Option<i32>,
+}
+
+impl Part for IntroductoryPriceInfo {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
 /// * [voidedpurchases list purchases](struct.PurchaseVoidedpurchaseListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1326,27 +1804,18 @@ impl Part for DeveloperComment {}
 
 /// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [testers get edits](struct.EditTesterGetCall.html) (response)
-/// * [testers patch edits](struct.EditTesterPatchCall.html) (request|response)
-/// * [testers update edits](struct.EditTesterUpdateCall.html) (request|response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Testers {
-    /// A list of all Google Groups, as email addresses, that define testers for this track.
-    #[serde(rename="googleGroups")]
-    pub google_groups: Option<Vec<String>>,
-    /// A list of all Google+ Communities, as URLs, that define testers for this track.
-    #[serde(rename="googlePlusCommunities")]
-    pub google_plus_communities: Option<Vec<String>>,
+pub struct TrackReleasePin {
+    /// no description provided
+    pub targetings: Option<Vec<TrackReleasePinPinTargeting>>,
+    /// no description provided
+    #[serde(rename="versionCodes")]
+    pub version_codes: Option<Vec<String>>,
 }
 
-impl RequestValue for Testers {}
-impl ResponseResult for Testers {}
+impl Part for TrackReleasePin {}
 
 
 /// A VoidedPurchase resource indicates a purchase that was either canceled/refunded/charged-back.
@@ -1355,64 +1824,40 @@ impl ResponseResult for Testers {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VoidedPurchase {
+    /// The order id which uniquely identifies a one-time purchase, subscription purchase, or subscription renewal.
+    #[serde(rename="orderId")]
+    pub order_id: Option<String>,
     /// This kind represents a voided purchase object in the androidpublisher service.
     pub kind: Option<String>,
     /// The time at which the purchase was canceled/refunded/charged-back, in milliseconds since the epoch (Jan 1, 1970).
     #[serde(rename="voidedTimeMillis")]
     pub voided_time_millis: Option<String>,
-    /// The token that was generated when a purchase was made. This uniquely identifies a purchase.
+    /// The token which uniquely identifies a one-time purchase or subscription. To uniquely identify subscription renewals use order_id (available starting from version 3 of the API).
     #[serde(rename="purchaseToken")]
     pub purchase_token: Option<String>,
+    /// The initiator of voided purchase, possible values are:  
+    /// - User 
+    /// - Developer 
+    /// - Google
+    #[serde(rename="voidedSource")]
+    pub voided_source: Option<i32>,
+    /// The reason why the purchase was voided, possible values are:  
+    /// - Other 
+    /// - Remorse 
+    /// - Not_received 
+    /// - Defective 
+    /// - Accidental_purchase 
+    /// - Fraud 
+    /// - Friendly_fraud 
+    /// - Chargeback
+    #[serde(rename="voidedReason")]
+    pub voided_reason: Option<i32>,
     /// The time at which the purchase was made, in milliseconds since the epoch (Jan 1, 1970).
     #[serde(rename="purchaseTimeMillis")]
     pub purchase_time_millis: Option<String>,
 }
 
 impl Part for VoidedPurchase {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [expansionfiles get edits](struct.EditExpansionfileGetCall.html) (response)
-/// * [expansionfiles patch edits](struct.EditExpansionfilePatchCall.html) (request|response)
-/// * [expansionfiles update edits](struct.EditExpansionfileUpdateCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ExpansionFile {
-    /// If set this APK's Expansion File references another APK's Expansion File. The file_size field will not be set.
-    #[serde(rename="referencesVersion")]
-    pub references_version: Option<i32>,
-    /// If set this field indicates that this APK has an Expansion File uploaded to it: this APK does not reference another APK's Expansion File. The field's value is the size of the uploaded Expansion File in bytes.
-    #[serde(rename="fileSize")]
-    pub file_size: Option<String>,
-}
-
-impl RequestValue for ExpansionFile {}
-impl ResponseResult for ExpansionFile {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [apks addexternallyhosted edits](struct.EditApkAddexternallyhostedCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ApksAddExternallyHostedResponse {
-    /// The definition of the externally-hosted APK and where it is located.
-    #[serde(rename="externallyHostedApk")]
-    pub externally_hosted_apk: Option<ExternallyHostedApk>,
-}
-
-impl ResponseResult for ApksAddExternallyHostedResponse {}
 
 
 /// There is no detailed description.
@@ -1432,127 +1877,24 @@ pub struct Comment {
 impl Part for Comment {}
 
 
-/// A SubscriptionPurchase resource indicates the status of a user's subscription purchase.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [subscriptions get purchases](struct.PurchaseSubscriptionGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SubscriptionPurchase {
-    /// The order id of the latest recurring order associated with the purchase of the subscription.
-    #[serde(rename="orderId")]
-    pub order_id: Option<String>,
-    /// ISO 3166-1 alpha-2 billing country/region code of the user at the time the subscription was granted.
-    #[serde(rename="countryCode")]
-    pub country_code: Option<String>,
-    /// A developer-specified string that contains supplemental information about an order.
-    #[serde(rename="developerPayload")]
-    pub developer_payload: Option<String>,
-    /// The family name of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.
-    #[serde(rename="familyName")]
-    pub family_name: Option<String>,
-    /// Whether the subscription will automatically be renewed when it reaches its current expiry time.
-    #[serde(rename="autoRenewing")]
-    pub auto_renewing: Option<bool>,
-    /// The payment state of the subscription. Possible values are:  
-    /// - Payment pending 
-    /// - Payment received 
-    /// - Free trial 
-    /// - Pending deferred upgrade/downgrade
-    #[serde(rename="paymentState")]
-    pub payment_state: Option<i32>,
-    /// The email address of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.
-    #[serde(rename="emailAddress")]
-    pub email_address: Option<String>,
-    /// The reason why a subscription was canceled or is not auto-renewing. Possible values are:  
-    /// - User canceled the subscription 
-    /// - Subscription was canceled by the system, for example because of a billing problem 
-    /// - Subscription was replaced with a new subscription 
-    /// - Subscription was canceled by the developer
-    #[serde(rename="cancelReason")]
-    pub cancel_reason: Option<i32>,
-    /// The profile name of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.
-    #[serde(rename="profileName")]
-    pub profile_name: Option<String>,
-    /// Time at which the subscription was granted, in milliseconds since the Epoch.
-    #[serde(rename="startTimeMillis")]
-    pub start_time_millis: Option<String>,
-    /// The time at which the subscription was canceled by the user, in milliseconds since the epoch. Only present if cancelReason is 0.
-    #[serde(rename="userCancellationTimeMillis")]
-    pub user_cancellation_time_millis: Option<String>,
-    /// Price of the subscription, not including tax. Price is expressed in micro-units, where 1,000,000 micro-units represents one unit of the currency. For example, if the subscription price is €1.99, price_amount_micros is 1990000.
-    #[serde(rename="priceAmountMicros")]
-    pub price_amount_micros: Option<String>,
-    /// This kind represents a subscriptionPurchase object in the androidpublisher service.
-    pub kind: Option<String>,
-    /// The acknowledgement state of the subscription product. Possible values are:  
-    /// - Yet to be acknowledged 
-    /// - Acknowledged
-    #[serde(rename="acknowledgementState")]
-    pub acknowledgement_state: Option<i32>,
-    /// Introductory price information of the subscription. This is only present when the subscription was purchased with an introductory price.
-    /// 
-    /// This field does not indicate the subscription is currently in introductory price period.
-    #[serde(rename="introductoryPriceInfo")]
-    pub introductory_price_info: Option<IntroductoryPriceInfo>,
-    /// The latest price change information available. This is present only when there is an upcoming price change for the subscription yet to be applied.
-    /// 
-    /// Once the subscription renews with the new price or the subscription is canceled, no price change information will be returned.
-    #[serde(rename="priceChange")]
-    pub price_change: Option<SubscriptionPriceChange>,
-    /// The type of purchase of the subscription. This field is only set if this purchase was not made using the standard in-app billing flow. Possible values are:  
-    /// - Test (i.e. purchased from a license testing account)
-    #[serde(rename="purchaseType")]
-    pub purchase_type: Option<i32>,
-    /// ISO 4217 currency code for the subscription price. For example, if the price is specified in British pounds sterling, price_currency_code is "GBP".
-    #[serde(rename="priceCurrencyCode")]
-    pub price_currency_code: Option<String>,
-    /// Time at which the subscription will be automatically resumed, in milliseconds since the Epoch. Only present if the user has requested to pause the subscription.
-    #[serde(rename="autoResumeTimeMillis")]
-    pub auto_resume_time_millis: Option<String>,
-    /// Time at which the subscription will expire, in milliseconds since the Epoch.
-    #[serde(rename="expiryTimeMillis")]
-    pub expiry_time_millis: Option<String>,
-    /// Information provided by the user when they complete the subscription cancellation flow (cancellation reason survey).
-    #[serde(rename="cancelSurveyResult")]
-    pub cancel_survey_result: Option<SubscriptionCancelSurveyResult>,
-    /// The Google profile id of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.
-    #[serde(rename="profileId")]
-    pub profile_id: Option<String>,
-    /// The purchase token of the originating purchase if this subscription is one of the following:  
-    /// - Re-signup of a canceled but non-lapsed subscription 
-    /// - Upgrade/downgrade from a previous subscription  For example, suppose a user originally signs up and you receive purchase token X, then the user cancels and goes through the resignup flow (before their subscription lapses) and you receive purchase token Y, and finally the user upgrades their subscription and you receive purchase token Z. If you call this API with purchase token Z, this field will be set to Y. If you call this API with purchase token Y, this field will be set to X. If you call this API with purchase token X, this field will not be set.
-    #[serde(rename="linkedPurchaseToken")]
-    pub linked_purchase_token: Option<String>,
-    /// The given name of the user when the subscription was purchased. Only present for purchases made with 'Subscribe with Google'.
-    #[serde(rename="givenName")]
-    pub given_name: Option<String>,
-}
-
-impl ResponseResult for SubscriptionPurchase {}
-
-
 /// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [deobfuscationfiles upload edits](struct.EditDeobfuscationfileUploadCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeobfuscationFilesUploadResponse {
+pub struct DeviceSpec {
     /// no description provided
-    #[serde(rename="deobfuscationFile")]
-    pub deobfuscation_file: Option<DeobfuscationFile>,
+    #[serde(rename="screenDensity")]
+    pub screen_density: Option<u32>,
+    /// no description provided
+    #[serde(rename="supportedAbis")]
+    pub supported_abis: Option<Vec<String>>,
+    /// no description provided
+    #[serde(rename="supportedLocales")]
+    pub supported_locales: Option<Vec<String>>,
 }
 
-impl ResponseResult for DeobfuscationFilesUploadResponse {}
+impl Part for DeviceSpec {}
 
 
 /// There is no detailed description.
@@ -1563,10 +1905,12 @@ impl ResponseResult for DeobfuscationFilesUploadResponse {}
 pub struct Image {
     /// A URL that will serve a preview of the image.
     pub url: Option<String>,
-    /// A sha1 hash of the image that was uploaded.
-    pub sha1: Option<String>,
+    /// A sha256 hash of the image that was uploaded.
+    pub sha256: Option<String>,
     /// A unique id representing this image.
     pub id: Option<String>,
+    /// A sha1 hash of the image that was uploaded.
+    pub sha1: Option<String>,
 }
 
 impl Part for Image {}
@@ -1574,63 +1918,22 @@ impl Part for Image {}
 
 /// There is no detailed description.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Prorate {
-    /// Defines the first day on which the price takes effect.
-    pub start: Option<MonthDay>,
-    /// Default price cannot be zero and must be less than the full subscription price. Default price is always in the developer's Checkout merchant currency. Targeted countries have their prices set automatically based on the default_price.
-    #[serde(rename="defaultPrice")]
-    pub default_price: Option<Price>,
-}
-
-impl Part for Prorate {}
-
-
-/// Represents an edit of an app. An edit allows clients to make multiple changes before committing them in one operation.
-/// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [insert edits](struct.EditInsertCall.html) (request|response)
-/// * [commit edits](struct.EditCommitCall.html) (response)
-/// * [validate edits](struct.EditValidateCall.html) (response)
-/// * [get edits](struct.EditGetCall.html) (response)
+/// * [apks list edits](struct.EditApkListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AppEdit {
-    /// The time at which the edit will expire and will be no longer valid for use in any subsequent API calls (encoded as seconds since the Epoch).
-    #[serde(rename="expiryTimeSeconds")]
-    pub expiry_time_seconds: Option<String>,
-    /// The ID of the edit that can be used in subsequent API calls.
-    pub id: Option<String>,
+pub struct ApksListResponse {
+    /// no description provided
+    pub apks: Option<Vec<Apk>>,
+    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#apksListResponse".
+    pub kind: Option<String>,
 }
 
-impl RequestValue for AppEdit {}
-impl ResponseResult for AppEdit {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PageInfo {
-    /// no description provided
-    #[serde(rename="resultPerPage")]
-    pub result_per_page: Option<i32>,
-    /// no description provided
-    #[serde(rename="startIndex")]
-    pub start_index: Option<i32>,
-    /// no description provided
-    #[serde(rename="totalResults")]
-    pub total_results: Option<i32>,
-}
-
-impl Part for PageInfo {}
+impl ResponseResult for ApksListResponse {}
 
 
 /// There is no detailed description.
@@ -1667,26 +1970,12 @@ pub struct Apk {
     pub version_code: Option<i32>,
     /// Information about the binary payload of this APK.
     pub binary: Option<ApkBinary>,
+    /// no description provided
+    #[serde(rename="testBinary")]
+    pub test_binary: Option<ApkBinary>,
 }
 
 impl ResponseResult for Apk {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReviewReplyResult {
-    /// The reply text that was applied.
-    #[serde(rename="replyText")]
-    pub reply_text: Option<String>,
-    /// The time at which the reply took effect.
-    #[serde(rename="lastEdited")]
-    pub last_edited: Option<Timestamp>,
-}
-
-impl Part for ReviewReplyResult {}
 
 
 /// There is no detailed description.
@@ -1714,40 +2003,6 @@ impl ResponseResult for Track {}
 
 /// There is no detailed description.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Timestamp {
-    /// no description provided
-    pub nanos: Option<i32>,
-    /// no description provided
-    pub seconds: Option<String>,
-}
-
-impl Part for Timestamp {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [apks addexternallyhosted edits](struct.EditApkAddexternallyhostedCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ApksAddExternallyHostedRequest {
-    /// The definition of the externally-hosted APK and where it is located.
-    #[serde(rename="externallyHostedApk")]
-    pub externally_hosted_apk: Option<ExternallyHostedApk>,
-}
-
-impl RequestValue for ApksAddExternallyHostedRequest {}
-
-
-/// There is no detailed description.
-/// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
@@ -1764,55 +2019,46 @@ pub struct ReviewsReplyResponse {
 impl ResponseResult for ReviewsReplyResponse {}
 
 
-/// Represents the binary payload of an APK.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ApkBinary {
-    /// A sha256 hash of the APK payload, encoded as a hex string and matching the output of the sha256sum command.
-    pub sha256: Option<String>,
-    /// A sha1 hash of the APK payload, encoded as a hex string and matching the output of the sha1sum command.
-    pub sha1: Option<String>,
-}
-
-impl Part for ApkBinary {}
-
-
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Price {
-    /// 3 letter Currency code, as defined by ISO 4217.
-    pub currency: Option<String>,
-    /// The price in millionths of the currency base unit represented as a string.
-    #[serde(rename="priceMicros")]
-    pub price_micros: Option<String>,
-}
-
-impl Part for Price {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [listings list edits](struct.EditListingListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListingsListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#listingsListResponse".
-    pub kind: Option<String>,
+pub struct TrackReleasePinPinTargeting {
     /// no description provided
-    pub listings: Option<Vec<Listing>>,
+    #[serde(rename="countryCodes")]
+    pub country_codes: Option<Vec<String>>,
+    /// no description provided
+    #[serde(rename="phoneskyVersions")]
+    pub phonesky_versions: Option<Vec<String>>,
+    /// no description provided
+    #[serde(rename="sdkVersions")]
+    pub sdk_versions: Option<Vec<i32>>,
+    /// no description provided
+    pub devices: Option<Vec<TrackReleasePinPinTargetingDevicePin>>,
 }
 
-impl ResponseResult for ListingsListResponse {}
+impl Part for TrackReleasePinPinTargeting {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PageInfo {
+    /// no description provided
+    #[serde(rename="resultPerPage")]
+    pub result_per_page: Option<i32>,
+    /// no description provided
+    #[serde(rename="startIndex")]
+    pub start_index: Option<i32>,
+    /// no description provided
+    #[serde(rename="totalResults")]
+    pub total_results: Option<i32>,
+}
+
+impl Part for PageInfo {}
 
 
 
@@ -1933,6 +2179,7 @@ impl<'a, C, A> PurchaseMethods<'a, C, A> {
         PurchaseVoidedpurchaseListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
+            _type_: Default::default(),
             _token: Default::default(),
             _start_time: Default::default(),
             _start_index: Default::default(),
@@ -2049,6 +2296,130 @@ impl<'a, C, A> PurchaseMethods<'a, C, A> {
             _package_name: package_name.to_string(),
             _subscription_id: subscription_id.to_string(),
             _token: token.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
+/// A builder providing access to all methods supported on *systemapk* resources.
+/// It is not used directly, but through the `AndroidPublisher` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_androidpublisher3 as androidpublisher3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use androidpublisher3::AndroidPublisher;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = AndroidPublisher::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `variants_create(...)`, `variants_download(...)`, `variants_get(...)` and `variants_list(...)`
+/// // to build up your call.
+/// let rb = hub.systemapks();
+/// # }
+/// ```
+pub struct SystemapkMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidPublisher<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for SystemapkMethods<'a, C, A> {}
+
+impl<'a, C, A> SystemapkMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new variant of APK which is suitable for inclusion in a system image.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app; for example, "com.spiffygame".
+    /// * `versionCode` - The version code of the App Bundle.
+    pub fn variants_create(&self, request: SystemApkVariantsCreateRequest, package_name: &str, version_code: &str) -> SystemapkVariantCreateCall<'a, C, A> {
+        SystemapkVariantCreateCall {
+            hub: self.hub,
+            _request: request,
+            _package_name: package_name.to_string(),
+            _version_code: version_code.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns the list of previously created system APK variants.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app; for example, "com.spiffygame".
+    /// * `versionCode` - The version code of the App Bundle.
+    pub fn variants_list(&self, package_name: &str, version_code: &str) -> SystemapkVariantListCall<'a, C, A> {
+        SystemapkVariantListCall {
+            hub: self.hub,
+            _package_name: package_name.to_string(),
+            _version_code: version_code.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Download a previously created APK which is suitable for inclusion in a system image.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app; for example, "com.spiffygame".
+    /// * `versionCode` - The version code of the App Bundle.
+    /// * `variantId` - No description provided.
+    pub fn variants_download(&self, package_name: &str, version_code: &str, variant_id: u32) -> SystemapkVariantDownloadCall<'a, C, A> {
+        SystemapkVariantDownloadCall {
+            hub: self.hub,
+            _package_name: package_name.to_string(),
+            _version_code: version_code.to_string(),
+            _variant_id: variant_id,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a previously created system APK variant.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app; for example, "com.spiffygame".
+    /// * `versionCode` - The version code of the App Bundle.
+    /// * `variantId` - Unique identifier for this variant.
+    pub fn variants_get(&self, package_name: &str, version_code: &str, variant_id: u32) -> SystemapkVariantGetCall<'a, C, A> {
+        SystemapkVariantGetCall {
+            hub: self.hub,
+            _package_name: package_name.to_string(),
+            _version_code: version_code.to_string(),
+            _variant_id: variant_id,
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3199,13 +3570,13 @@ impl<'a, C, A> InternalappsharingartifactMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads an app bundle to internal app sharing. If you are using the Google API client libraries, please increase the timeout of the http request before calling this endpoint (a timeout of 2 minutes is recommended). See: https://developers.google.com/api-client-library/java/google-api-java-client/errors for an example in java.
+    /// Uploads an APK to internal app sharing. If you are using the Google API client libraries, please increase the timeout of the http request before calling this endpoint (a timeout of 2 minutes is recommended). See: https://developers.google.com/api-client-library/java/google-api-java-client/errors for an example in java.
     /// 
     /// # Arguments
     ///
     /// * `packageName` - Unique identifier for the Android app; for example, "com.spiffygame".
-    pub fn uploadbundle(&self, package_name: &str) -> InternalappsharingartifactUploadbundleCall<'a, C, A> {
-        InternalappsharingartifactUploadbundleCall {
+    pub fn uploadapk(&self, package_name: &str) -> InternalappsharingartifactUploadapkCall<'a, C, A> {
+        InternalappsharingartifactUploadapkCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
             _delegate: Default::default(),
@@ -3216,13 +3587,13 @@ impl<'a, C, A> InternalappsharingartifactMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads an APK to internal app sharing. If you are using the Google API client libraries, please increase the timeout of the http request before calling this endpoint (a timeout of 2 minutes is recommended). See: https://developers.google.com/api-client-library/java/google-api-java-client/errors for an example in java.
+    /// Uploads an app bundle to internal app sharing. If you are using the Google API client libraries, please increase the timeout of the http request before calling this endpoint (a timeout of 2 minutes is recommended). See: https://developers.google.com/api-client-library/java/google-api-java-client/errors for an example in java.
     /// 
     /// # Arguments
     ///
     /// * `packageName` - Unique identifier for the Android app; for example, "com.spiffygame".
-    pub fn uploadapk(&self, package_name: &str) -> InternalappsharingartifactUploadapkCall<'a, C, A> {
-        InternalappsharingartifactUploadapkCall {
+    pub fn uploadbundle(&self, package_name: &str) -> InternalappsharingartifactUploadbundleCall<'a, C, A> {
+        InternalappsharingartifactUploadbundleCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
             _delegate: Default::default(),
@@ -4049,10 +4420,11 @@ impl<'a, C, A> PurchaseSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.purchases().voidedpurchases_list("packageName")
-///              .token("ea")
-///              .start_time("no")
+///              .type_(-66)
+///              .token("no")
+///              .start_time("justo")
 ///              .start_index(80)
-///              .max_results(80)
+///              .max_results(67)
 ///              .end_time("et")
 ///              .doit();
 /// # }
@@ -4062,6 +4434,7 @@ pub struct PurchaseVoidedpurchaseListCall<'a, C, A>
 
     hub: &'a AndroidPublisher<C, A>,
     _package_name: String,
+    _type_: Option<i32>,
     _token: Option<String>,
     _start_time: Option<String>,
     _start_index: Option<u32>,
@@ -4088,8 +4461,11 @@ impl<'a, C, A> PurchaseVoidedpurchaseListCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "androidpublisher.purchases.voidedpurchases.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("packageName", self._package_name.to_string()));
+        if let Some(value) = self._type_ {
+            params.push(("type", value.to_string()));
+        }
         if let Some(value) = self._token {
             params.push(("token", value.to_string()));
         }
@@ -4105,7 +4481,7 @@ impl<'a, C, A> PurchaseVoidedpurchaseListCall<'a, C, A> where C: BorrowMut<hyper
         if let Some(value) = self._end_time {
             params.push(("endTime", value.to_string()));
         }
-        for &field in ["alt", "packageName", "token", "startTime", "startIndex", "maxResults", "endTime"].iter() {
+        for &field in ["alt", "packageName", "type", "token", "startTime", "startIndex", "maxResults", "endTime"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4227,13 +4603,22 @@ impl<'a, C, A> PurchaseVoidedpurchaseListCall<'a, C, A> where C: BorrowMut<hyper
         self._package_name = new_value.to_string();
         self
     }
+    /// The type of voided purchases that you want to see in the response. Possible values are:  
+    /// - 0: Only voided in-app product purchases will be returned in the response. This is the default value.
+    /// - 1: Both voided in-app purchases and voided subscription purchases will be returned in the response.  Note: Before requesting to receive voided subscription purchases, you must switch to use orderId in the response which uniquely identifies one-time purchases and subscriptions. Otherwise, you will receive multiple subscription orders with the same PurchaseToken, because subscription renewal orders share the same PurchaseToken.
+    ///
+    /// Sets the *type* query property to the given value.
+    pub fn type_(mut self, new_value: i32) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
+        self._type_ = Some(new_value);
+        self
+    }
     ///
     /// Sets the *token* query property to the given value.
     pub fn token(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
         self._token = Some(new_value.to_string());
         self
     }
-    /// The time, in milliseconds since the Epoch, of the oldest voided in-app product purchase that you want to see in the response. The value of this parameter cannot be older than 30 days and is ignored if a pagination token is set. Default value is current time minus 30 days. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.
+    /// The time, in milliseconds since the Epoch, of the oldest voided purchase that you want to see in the response. The value of this parameter cannot be older than 30 days and is ignored if a pagination token is set. Default value is current time minus 30 days. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.
     ///
     /// Sets the *start time* query property to the given value.
     pub fn start_time(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
@@ -4252,7 +4637,7 @@ impl<'a, C, A> PurchaseVoidedpurchaseListCall<'a, C, A> where C: BorrowMut<hyper
         self._max_results = Some(new_value);
         self
     }
-    /// The time, in milliseconds since the Epoch, of the newest voided in-app product purchase that you want to see in the response. The value of this parameter cannot be greater than the current time and is ignored if a pagination token is set. Default value is current time. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.
+    /// The time, in milliseconds since the Epoch, of the newest voided purchase that you want to see in the response. The value of this parameter cannot be greater than the current time and is ignored if a pagination token is set. Default value is current time. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.
     ///
     /// Sets the *end time* query property to the given value.
     pub fn end_time(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
@@ -5687,6 +6072,1060 @@ impl<'a, C, A> PurchaseSubscriptionDeferCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
+/// Creates a new variant of APK which is suitable for inclusion in a system image.
+///
+/// A builder for the *variants.create* method supported by a *systemapk* resource.
+/// It is not used directly, but through a `SystemapkMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use androidpublisher3::SystemApkVariantsCreateRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidpublisher3::AndroidPublisher;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SystemApkVariantsCreateRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.systemapks().variants_create(req, "packageName", "versionCode")
+///              .doit();
+/// # }
+/// ```
+pub struct SystemapkVariantCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidPublisher<C, A>,
+    _request: SystemApkVariantsCreateRequest,
+    _package_name: String,
+    _version_code: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for SystemapkVariantCreateCall<'a, C, A> {}
+
+impl<'a, C, A> SystemapkVariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Variant)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidpublisher.systemapks.variants.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("packageName", self._package_name.to_string()));
+        params.push(("versionCode", self._version_code.to_string()));
+        for &field in ["alt", "packageName", "versionCode"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{packageName}/systemApks/{versionCode}/variants";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{versionCode}", "versionCode")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["versionCode", "packageName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SystemApkVariantsCreateRequest) -> SystemapkVariantCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Unique identifier for the Android app; for example, "com.spiffygame".
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> SystemapkVariantCreateCall<'a, C, A> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// The version code of the App Bundle.
+    ///
+    /// Sets the *version code* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn version_code(mut self, new_value: &str) -> SystemapkVariantCreateCall<'a, C, A> {
+        self._version_code = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SystemapkVariantCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> SystemapkVariantCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> SystemapkVariantCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Returns the list of previously created system APK variants.
+///
+/// A builder for the *variants.list* method supported by a *systemapk* resource.
+/// It is not used directly, but through a `SystemapkMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidpublisher3::AndroidPublisher;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.systemapks().variants_list("packageName", "versionCode")
+///              .doit();
+/// # }
+/// ```
+pub struct SystemapkVariantListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidPublisher<C, A>,
+    _package_name: String,
+    _version_code: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for SystemapkVariantListCall<'a, C, A> {}
+
+impl<'a, C, A> SystemapkVariantListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, SystemApkVariantsListResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidpublisher.systemapks.variants.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("packageName", self._package_name.to_string()));
+        params.push(("versionCode", self._version_code.to_string()));
+        for &field in ["alt", "packageName", "versionCode"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{packageName}/systemApks/{versionCode}/variants";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{versionCode}", "versionCode")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["versionCode", "packageName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Unique identifier for the Android app; for example, "com.spiffygame".
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> SystemapkVariantListCall<'a, C, A> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// The version code of the App Bundle.
+    ///
+    /// Sets the *version code* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn version_code(mut self, new_value: &str) -> SystemapkVariantListCall<'a, C, A> {
+        self._version_code = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SystemapkVariantListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> SystemapkVariantListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> SystemapkVariantListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Download a previously created APK which is suitable for inclusion in a system image.
+///
+/// This method supports **media download**. To enable it, adjust the builder like this:
+/// `.param("alt", "media")`.
+///
+/// A builder for the *variants.download* method supported by a *systemapk* resource.
+/// It is not used directly, but through a `SystemapkMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidpublisher3::AndroidPublisher;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.systemapks().variants_download("packageName", "versionCode", 28)
+///              .doit();
+/// # }
+/// ```
+pub struct SystemapkVariantDownloadCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidPublisher<C, A>,
+    _package_name: String,
+    _version_code: String,
+    _variant_id: u32,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for SystemapkVariantDownloadCall<'a, C, A> {}
+
+impl<'a, C, A> SystemapkVariantDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidpublisher.systemapks.variants.download",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("packageName", self._package_name.to_string()));
+        params.push(("versionCode", self._version_code.to_string()));
+        params.push(("variantId", self._variant_id.to_string()));
+        for &field in ["packageName", "versionCode", "variantId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = self.hub._base_url.clone() + "{packageName}/systemApks/{versionCode}/variants/{variantId}:download";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{versionCode}", "versionCode"), ("{variantId}", "variantId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["variantId", "versionCode", "packageName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Unique identifier for the Android app; for example, "com.spiffygame".
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> SystemapkVariantDownloadCall<'a, C, A> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// The version code of the App Bundle.
+    ///
+    /// Sets the *version code* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn version_code(mut self, new_value: &str) -> SystemapkVariantDownloadCall<'a, C, A> {
+        self._version_code = new_value.to_string();
+        self
+    }
+    ///
+    /// Sets the *variant id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn variant_id(mut self, new_value: u32) -> SystemapkVariantDownloadCall<'a, C, A> {
+        self._variant_id = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SystemapkVariantDownloadCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> SystemapkVariantDownloadCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> SystemapkVariantDownloadCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Returns a previously created system APK variant.
+///
+/// A builder for the *variants.get* method supported by a *systemapk* resource.
+/// It is not used directly, but through a `SystemapkMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidpublisher3::AndroidPublisher;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.systemapks().variants_get("packageName", "versionCode", 80)
+///              .doit();
+/// # }
+/// ```
+pub struct SystemapkVariantGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidPublisher<C, A>,
+    _package_name: String,
+    _version_code: String,
+    _variant_id: u32,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for SystemapkVariantGetCall<'a, C, A> {}
+
+impl<'a, C, A> SystemapkVariantGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Variant)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidpublisher.systemapks.variants.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("packageName", self._package_name.to_string()));
+        params.push(("versionCode", self._version_code.to_string()));
+        params.push(("variantId", self._variant_id.to_string()));
+        for &field in ["alt", "packageName", "versionCode", "variantId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{packageName}/systemApks/{versionCode}/variants/{variantId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{versionCode}", "versionCode"), ("{variantId}", "variantId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["variantId", "versionCode", "packageName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Unique identifier for the Android app; for example, "com.spiffygame".
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> SystemapkVariantGetCall<'a, C, A> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// The version code of the App Bundle.
+    ///
+    /// Sets the *version code* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn version_code(mut self, new_value: &str) -> SystemapkVariantGetCall<'a, C, A> {
+        self._version_code = new_value.to_string();
+        self
+    }
+    /// Unique identifier for this variant.
+    ///
+    /// Sets the *variant id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn variant_id(mut self, new_value: u32) -> SystemapkVariantGetCall<'a, C, A> {
+        self._variant_id = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> SystemapkVariantGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> SystemapkVariantGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> SystemapkVariantGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Reply to a single review, or update an existing reply.
 ///
 /// A builder for the *reply* method supported by a *review* resource.
@@ -5997,7 +7436,7 @@ impl<'a, C, A> ReviewReplyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.reviews().get("packageName", "reviewId")
-///              .translation_language("dolore")
+///              .translation_language("et")
 ///              .doit();
 /// # }
 /// ```
@@ -6259,10 +7698,10 @@ impl<'a, C, A> ReviewGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.reviews().list("packageName")
-///              .translation_language("aliquyam")
-///              .token("accusam")
-///              .start_index(45)
-///              .max_results(92)
+///              .translation_language("et")
+///              .token("consetetur")
+///              .start_index(65)
+///              .max_results(85)
 ///              .doit();
 /// # }
 /// ```
@@ -6543,7 +7982,7 @@ impl<'a, C, A> ReviewListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().deobfuscationfiles_upload("packageName", "editId", -21, "deobfuscationFileType")
+/// let result = hub.edits().deobfuscationfiles_upload("packageName", "editId", -48, "deobfuscationFileType")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -7316,7 +8755,7 @@ impl<'a, C, A> EditImageUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_update(req, "packageName", "editId", -16, "expansionFileType")
+/// let result = hub.edits().expansionfiles_update(req, "packageName", "editId", -20, "expansionFileType")
 ///              .doit();
 /// # }
 /// ```
@@ -8945,7 +10384,7 @@ impl<'a, C, A> EditTrackGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_patch(req, "packageName", "editId", -66, "expansionFileType")
+/// let result = hub.edits().expansionfiles_patch(req, "packageName", "editId", -17, "expansionFileType")
 ///              .doit();
 /// # }
 /// ```
@@ -12003,7 +13442,7 @@ impl<'a, C, A> EditDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_upload("packageName", "editId", -85, "expansionFileType")
+/// let result = hub.edits().expansionfiles_upload("packageName", "editId", -69, "expansionFileType")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -14222,7 +15661,7 @@ impl<'a, C, A> EditValidateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.edits().bundles_upload("packageName", "editId")
-///              .ack_bundle_installation_warning(true)
+///              .ack_bundle_installation_warning(false)
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -14888,7 +16327,7 @@ impl<'a, C, A> EditListingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_get("packageName", "editId", -87, "expansionFileType")
+/// let result = hub.edits().expansionfiles_get("packageName", "editId", -41, "expansionFileType")
 ///              .doit();
 /// # }
 /// ```
@@ -16569,7 +18008,7 @@ impl<'a, C, A> EditTesterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().update(req, "packageName", "sku")
-///              .auto_convert_missing_prices(false)
+///              .auto_convert_missing_prices(true)
 ///              .doit();
 /// # }
 /// ```
@@ -16858,9 +18297,9 @@ impl<'a, C, A> InappproductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().list("packageName")
-///              .token("et")
-///              .start_index(21)
-///              .max_results(54)
+///              .token("ut")
+///              .start_index(50)
+///              .max_results(1)
 ///              .doit();
 /// # }
 /// ```
@@ -18201,7 +19640,7 @@ impl<'a, C, A> InappproductPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.orders().refund("packageName", "orderId")
-///              .revoke(false)
+///              .revoke(true)
 ///              .doit();
 /// # }
 /// ```
@@ -18415,355 +19854,6 @@ impl<'a, C, A> OrderRefundCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> OrderRefundCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Uploads an app bundle to internal app sharing. If you are using the Google API client libraries, please increase the timeout of the http request before calling this endpoint (a timeout of 2 minutes is recommended). See: https://developers.google.com/api-client-library/java/google-api-java-client/errors for an example in java.
-///
-/// A builder for the *uploadbundle* method supported by a *internalappsharingartifact* resource.
-/// It is not used directly, but through a `InternalappsharingartifactMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidpublisher3 as androidpublisher3;
-/// use std::fs;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidpublisher3::AndroidPublisher;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidPublisher::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `upload_resumable(...)`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.internalappsharingartifacts().uploadbundle("packageName")
-///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
-/// # }
-/// ```
-pub struct InternalappsharingartifactUploadbundleCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidPublisher<C, A>,
-    _package_name: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for InternalappsharingartifactUploadbundleCall<'a, C, A> {}
-
-impl<'a, C, A> InternalappsharingartifactUploadbundleCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<(hyper::client::Response, InternalAppSharingArtifact)>
-		where RS: ReadSeek {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidpublisher.internalappsharingartifacts.uploadbundle",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        params.push(("packageName", self._package_name.to_string()));
-        for &field in ["alt", "packageName"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let (mut url, upload_type) =
-            if protocol == "simple" {
-                (self.hub._root_url.clone() + "upload/androidpublisher/v3/applications/internalappsharing/{packageName}/artifacts/bundle", "multipart")
-            } else if protocol == "resumable" {
-                (self.hub._root_url.clone() + "resumable/upload/androidpublisher/v3/applications/internalappsharing/{packageName}/artifacts/bundle", "resumable")
-            } else {
-                unreachable!()
-            };
-        params.push(("uploadType", upload_type.to_string()));
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{packageName}", "packageName")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["packageName"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-
-        let mut should_ask_dlg_for_url = false;
-        let mut upload_url_from_server;
-        let mut upload_url: Option<String> = None;
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
-                    should_ask_dlg_for_url = false;
-                    upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(hyper::Url::parse(s).unwrap())).unwrap();
-                    hyper::client::Response::new(url, Box::new(cmn::DummyNetworkStream)).and_then(|mut res| {
-                        res.status = hyper::status::StatusCode::Ok;
-                        res.headers.set(Location(upload_url.as_ref().unwrap().clone()));
-                        Ok(res)
-                    })
-                } else {
-                    let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                        .header(UserAgent(self.hub._user_agent.clone()))
-                        .header(auth_header.clone());
-                    if protocol == "simple" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                    reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    if size > 2147483648 {
-                    	return Err(Error::UploadSizeLimitExceeded(size, 2147483648))
-                    }
-                        req = req.header(ContentType(reader_mime_type.clone()))
-                                 .header(ContentLength(size))
-                                 .body(&mut reader);
-                    }
-                    upload_url_from_server = true;
-                    if protocol == "resumable" {
-                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
-                    }
-    
-                    dlg.pre_request();
-                    req.send()
-                }
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    if protocol == "resumable" {
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                        reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 2147483648 {
-                        	return Err(Error::UploadSizeLimitExceeded(size, 2147483648))
-                        }
-                        let mut client = &mut *self.hub.client.borrow_mut();
-                        let upload_result = {
-                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
-                            if upload_url_from_server {
-                                dlg.store_upload_url(Some(url_str));
-                            }
-
-                            cmn::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
-                                delegate: dlg,
-                                start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
-                                user_agent: &self.hub._user_agent,
-                                auth_header: auth_header.clone(),
-                                url: url_str,
-                                reader: &mut reader,
-                                media_type: reader_mime_type.clone(),
-                                content_length: size
-                            }.upload()
-                        };
-                        match upload_result {
-                            None => {
-                                dlg.finished(false);
-                                return Err(Error::Cancelled)
-                            }
-                            Some(Err(err)) => {
-                                dlg.finished(false);
-                                return Err(Error::HttpError(err))
-                            }
-                            Some(Ok(upload_result)) => {
-                                res = upload_result;
-                                if !res.status.is_success() {
-                                    dlg.store_upload_url(None);
-                                    dlg.finished(false);
-                                    return Err(Error::Failure(res))
-                                }
-                            }
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-    /// Upload media all at once.
-    /// If the upload fails for whichever reason, all progress is lost.
-    ///
-    /// * *max size*: 2GB
-    /// * *multipart*: yes
-    /// * *valid mime types*: 'application/octet-stream'
-    pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, InternalAppSharingArtifact)>
-                where RS: ReadSeek {
-        self.doit(stream, mime_type, "simple")
-    }
-    /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a
-    /// certain amount of time as the server maintains state temporarily.
-    /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
-    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
-    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
-    /// `cancel_chunk_upload(...)`.
-    ///
-    /// * *max size*: 2GB
-    /// * *multipart*: yes
-    /// * *valid mime types*: 'application/octet-stream'
-    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, InternalAppSharingArtifact)>
-                where RS: ReadSeek {
-        self.doit(resumeable_stream, mime_type, "resumable")
-    }
-
-    /// Unique identifier for the Android app; for example, "com.spiffygame".
-    ///
-    /// Sets the *package name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> InternalappsharingartifactUploadbundleCall<'a, C, A> {
-        self._package_name = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> InternalappsharingartifactUploadbundleCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InternalappsharingartifactUploadbundleCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InternalappsharingartifactUploadbundleCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19113,6 +20203,355 @@ impl<'a, C, A> InternalappsharingartifactUploadapkCall<'a, C, A> where C: Borrow
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> InternalappsharingartifactUploadapkCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Uploads an app bundle to internal app sharing. If you are using the Google API client libraries, please increase the timeout of the http request before calling this endpoint (a timeout of 2 minutes is recommended). See: https://developers.google.com/api-client-library/java/google-api-java-client/errors for an example in java.
+///
+/// A builder for the *uploadbundle* method supported by a *internalappsharingartifact* resource.
+/// It is not used directly, but through a `InternalappsharingartifactMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidpublisher3 as androidpublisher3;
+/// use std::fs;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidpublisher3::AndroidPublisher;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `upload_resumable(...)`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.internalappsharingartifacts().uploadbundle("packageName")
+///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
+/// # }
+/// ```
+pub struct InternalappsharingartifactUploadbundleCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidPublisher<C, A>,
+    _package_name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for InternalappsharingartifactUploadbundleCall<'a, C, A> {}
+
+impl<'a, C, A> InternalappsharingartifactUploadbundleCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<(hyper::client::Response, InternalAppSharingArtifact)>
+		where RS: ReadSeek {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidpublisher.internalappsharingartifacts.uploadbundle",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("packageName", self._package_name.to_string()));
+        for &field in ["alt", "packageName"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let (mut url, upload_type) =
+            if protocol == "simple" {
+                (self.hub._root_url.clone() + "upload/androidpublisher/v3/applications/internalappsharing/{packageName}/artifacts/bundle", "multipart")
+            } else if protocol == "resumable" {
+                (self.hub._root_url.clone() + "resumable/upload/androidpublisher/v3/applications/internalappsharing/{packageName}/artifacts/bundle", "resumable")
+            } else {
+                unreachable!()
+            };
+        params.push(("uploadType", upload_type.to_string()));
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["packageName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+        let mut should_ask_dlg_for_url = false;
+        let mut upload_url_from_server;
+        let mut upload_url: Option<String> = None;
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
+                    should_ask_dlg_for_url = false;
+                    upload_url_from_server = false;
+                    let url = upload_url.as_ref().and_then(|s| Some(hyper::Url::parse(s).unwrap())).unwrap();
+                    hyper::client::Response::new(url, Box::new(cmn::DummyNetworkStream)).and_then(|mut res| {
+                        res.status = hyper::status::StatusCode::Ok;
+                        res.headers.set(Location(upload_url.as_ref().unwrap().clone()));
+                        Ok(res)
+                    })
+                } else {
+                    let mut client = &mut *self.hub.client.borrow_mut();
+                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                        .header(UserAgent(self.hub._user_agent.clone()))
+                        .header(auth_header.clone());
+                    if protocol == "simple" {
+                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                    reader.seek(io::SeekFrom::Start(0)).unwrap();
+                    if size > 2147483648 {
+                    	return Err(Error::UploadSizeLimitExceeded(size, 2147483648))
+                    }
+                        req = req.header(ContentType(reader_mime_type.clone()))
+                                 .header(ContentLength(size))
+                                 .body(&mut reader);
+                    }
+                    upload_url_from_server = true;
+                    if protocol == "resumable" {
+                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
+                    }
+    
+                    dlg.pre_request();
+                    req.send()
+                }
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    if protocol == "resumable" {
+                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                        reader.seek(io::SeekFrom::Start(0)).unwrap();
+                        if size > 2147483648 {
+                        	return Err(Error::UploadSizeLimitExceeded(size, 2147483648))
+                        }
+                        let mut client = &mut *self.hub.client.borrow_mut();
+                        let upload_result = {
+                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
+                            if upload_url_from_server {
+                                dlg.store_upload_url(Some(url_str));
+                            }
+
+                            cmn::ResumableUploadHelper {
+                                client: &mut client.borrow_mut(),
+                                delegate: dlg,
+                                start_at: if upload_url_from_server { Some(0) } else { None },
+                                auth: &mut *self.hub.auth.borrow_mut(),
+                                user_agent: &self.hub._user_agent,
+                                auth_header: auth_header.clone(),
+                                url: url_str,
+                                reader: &mut reader,
+                                media_type: reader_mime_type.clone(),
+                                content_length: size
+                            }.upload()
+                        };
+                        match upload_result {
+                            None => {
+                                dlg.finished(false);
+                                return Err(Error::Cancelled)
+                            }
+                            Some(Err(err)) => {
+                                dlg.finished(false);
+                                return Err(Error::HttpError(err))
+                            }
+                            Some(Ok(upload_result)) => {
+                                res = upload_result;
+                                if !res.status.is_success() {
+                                    dlg.store_upload_url(None);
+                                    dlg.finished(false);
+                                    return Err(Error::Failure(res))
+                                }
+                            }
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+    /// Upload media all at once.
+    /// If the upload fails for whichever reason, all progress is lost.
+    ///
+    /// * *max size*: 2GB
+    /// * *multipart*: yes
+    /// * *valid mime types*: 'application/octet-stream'
+    pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, InternalAppSharingArtifact)>
+                where RS: ReadSeek {
+        self.doit(stream, mime_type, "simple")
+    }
+    /// Upload media in a resumable fashion.
+    /// Even if the upload fails or is interrupted, it can be resumed for a
+    /// certain amount of time as the server maintains state temporarily.
+    /// 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
+    ///
+    /// * *max size*: 2GB
+    /// * *multipart*: yes
+    /// * *valid mime types*: 'application/octet-stream'
+    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, InternalAppSharingArtifact)>
+                where RS: ReadSeek {
+        self.doit(resumeable_stream, mime_type, "resumable")
+    }
+
+    /// Unique identifier for the Android app; for example, "com.spiffygame".
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> InternalappsharingartifactUploadbundleCall<'a, C, A> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> InternalappsharingartifactUploadbundleCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> InternalappsharingartifactUploadbundleCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> InternalappsharingartifactUploadbundleCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

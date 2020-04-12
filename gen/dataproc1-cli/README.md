@@ -25,14 +25,19 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Dataproc* API at revision *20190620*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Dataproc* API at revision *20200323*. The CLI is at version *1.0.13*.
 
 ```bash
 dataproc1 [options]
         projects
+                locations-autoscaling-policies-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-autoscaling-policies-delete <name> [-p <v>]... [-o <out>]
+                locations-autoscaling-policies-get <name> [-p <v>]... [-o <out>]
                 locations-autoscaling-policies-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-autoscaling-policies-list <parent> [-p <v>]... [-o <out>]
                 locations-autoscaling-policies-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-autoscaling-policies-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-autoscaling-policies-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workflow-templates-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workflow-templates-delete <name> [-p <v>]... [-o <out>]
                 locations-workflow-templates-get <name> [-p <v>]... [-o <out>]
@@ -43,9 +48,14 @@ dataproc1 [options]
                 locations-workflow-templates-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workflow-templates-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workflow-templates-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-autoscaling-policies-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-autoscaling-policies-delete <name> [-p <v>]... [-o <out>]
+                regions-autoscaling-policies-get <name> [-p <v>]... [-o <out>]
                 regions-autoscaling-policies-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-autoscaling-policies-list <parent> [-p <v>]... [-o <out>]
                 regions-autoscaling-policies-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-autoscaling-policies-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-autoscaling-policies-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-clusters-create <project-id> <region> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-clusters-delete <project-id> <region> <cluster-name> [-p <v>]... [-o <out>]
                 regions-clusters-diagnose <project-id> <region> <cluster-name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -63,6 +73,7 @@ dataproc1 [options]
                 regions-jobs-patch <project-id> <region> <job-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-jobs-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-jobs-submit <project-id> <region> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-jobs-submit-as-operation <project-id> <region> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-jobs-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-operations-cancel <name> [-p <v>]... [-o <out>]
                 regions-operations-delete <name> [-p <v>]... [-o <out>]

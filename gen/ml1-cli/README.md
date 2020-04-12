@@ -25,11 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Machine Learning Engine* API at revision *20190621*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Cloud Machine Learning Engine* API at revision *20200328*. The CLI is at version *1.0.13*.
 
 ```bash
 ml1 [options]
         projects
+                explain <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 get-config <name> [-p <v>]... [-o <out>]
                 jobs-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 jobs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -41,6 +42,21 @@ ml1 [options]
                 jobs-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-list <parent> [-p <v>]... [-o <out>]
+                locations-operations-cancel <name> [-p <v>]... [-o <out>]
+                locations-operations-get <name> [-p <v>]... [-o <out>]
+                locations-studies-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-studies-delete <name> [-p <v>]... [-o <out>]
+                locations-studies-get <name> [-p <v>]... [-o <out>]
+                locations-studies-list <parent> [-p <v>]... [-o <out>]
+                locations-studies-trials-add-measurement <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-studies-trials-check-early-stopping-state <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-studies-trials-complete <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-studies-trials-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-studies-trials-delete <name> [-p <v>]... [-o <out>]
+                locations-studies-trials-get <name> [-p <v>]... [-o <out>]
+                locations-studies-trials-list <parent> [-p <v>]... [-o <out>]
+                locations-studies-trials-stop <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-studies-trials-suggest <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 models-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 models-delete <name> [-p <v>]... [-o <out>]
                 models-get <name> [-p <v>]... [-o <out>]

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *bigquery* crate version *1.0.12+20190630*, where *20190630* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *bigquery* crate version *1.0.13+20200330*, where *20200330* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *bigquery* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/bigquery/).
@@ -270,6 +270,9 @@ pub enum Scope {
 
     /// View and manage your data in Google BigQuery
     Full,
+
+    /// View your data in Google BigQuery
+    Readonly,
 }
 
 impl AsRef<str> for Scope {
@@ -282,13 +285,14 @@ impl AsRef<str> for Scope {
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
             Scope::Insertdata => "https://www.googleapis.com/auth/bigquery.insertdata",
             Scope::Full => "https://www.googleapis.com/auth/bigquery",
+            Scope::Readonly => "https://www.googleapis.com/auth/bigquery.readonly",
         }
     }
 }
 
 impl Default for Scope {
     fn default() -> Scope {
-        Scope::Full
+        Scope::Readonly
     }
 }
 
@@ -374,7 +378,7 @@ impl<'a, C, A> Bigquery<C, A>
         Bigquery {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://bigquery.googleapis.com/bigquery/v2/".to_string(),
             _root_url: "https://bigquery.googleapis.com/".to_string(),
         }
@@ -403,7 +407,7 @@ impl<'a, C, A> Bigquery<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -474,8 +478,14 @@ pub struct MaterializedViewDefinition {
     /// [Output-only] [TrustedTester] The time when this materialized view was last modified, in milliseconds since the epoch.
     #[serde(rename="lastRefreshTime")]
     pub last_refresh_time: Option<String>,
+    /// [Optional] [TrustedTester] Enable automatic refresh of the materialized view when the base table is updated. The default value is "true".
+    #[serde(rename="enableRefresh")]
+    pub enable_refresh: Option<bool>,
     /// [Required] A query whose result is persisted.
     pub query: Option<String>,
+    /// [Optional] [TrustedTester] The maximum frequency at which this materialized view will be refreshed. The default value is "1800000" (30 minutes).
+    #[serde(rename="refreshIntervalMs")]
+    pub refresh_interval_ms: Option<String>,
 }
 
 impl Part for MaterializedViewDefinition {}
@@ -487,15 +497,18 @@ impl Part for MaterializedViewDefinition {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatistics2 {
+    /// [Output-only] Total bytes billed for the job.
+    #[serde(rename="totalBytesBilled")]
+    pub total_bytes_billed: Option<String>,
     /// [Output-only, Beta] Information about create model query job progress.
     #[serde(rename="modelTraining")]
     pub model_training: Option<BigQueryModelTraining>,
-    /// [Output-only] Slot-milliseconds for the job.
-    #[serde(rename="totalSlotMs")]
-    pub total_slot_ms: Option<String>,
+    /// [Output-only] [Preview] The DDL target row access policy. Present only for CREATE/DROP ROW ACCESS POLICY queries.
+    #[serde(rename="ddlTargetRowAccessPolicy")]
+    pub ddl_target_row_access_policy: Option<RowAccessPolicyReference>,
     /// [Output-only] [Beta] Describes a timeline of job execution.
     pub timeline: Option<Vec<QueryTimelineSample>>,
-    /// The type of query statement, if valid. Possible values (new values might be added in the future): "SELECT": SELECT query. "INSERT": INSERT query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "UPDATE": UPDATE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "DELETE": DELETE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "MERGE": MERGE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "ALTER_TABLE": ALTER TABLE query. "ALTER_VIEW": ALTER VIEW query. "CREATE_FUNCTION": CREATE FUNCTION query. "CREATE_MODEL": CREATE [OR REPLACE] MODEL ... AS SELECT ... . "CREATE_PROCEDURE": CREATE PROCEDURE query. "CREATE_TABLE": CREATE [OR REPLACE] TABLE without AS SELECT. "CREATE_TABLE_AS_SELECT": CREATE [OR REPLACE] TABLE ... AS SELECT ... . "CREATE_VIEW": CREATE [OR REPLACE] VIEW ... AS SELECT ... . "DROP_FUNCTION" : DROP FUNCTION query. "DROP_PROCEDURE": DROP PROCEDURE query. "DROP_TABLE": DROP TABLE query. "DROP_VIEW": DROP VIEW query.
+    /// The type of query statement, if valid. Possible values (new values might be added in the future): "SELECT": SELECT query. "INSERT": INSERT query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "UPDATE": UPDATE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "DELETE": DELETE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "MERGE": MERGE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language. "ALTER_TABLE": ALTER TABLE query. "ALTER_VIEW": ALTER VIEW query. "ASSERT": ASSERT condition AS 'description'. "CREATE_FUNCTION": CREATE FUNCTION query. "CREATE_MODEL": CREATE [OR REPLACE] MODEL ... AS SELECT ... . "CREATE_PROCEDURE": CREATE PROCEDURE query. "CREATE_TABLE": CREATE [OR REPLACE] TABLE without AS SELECT. "CREATE_TABLE_AS_SELECT": CREATE [OR REPLACE] TABLE ... AS SELECT ... . "CREATE_VIEW": CREATE [OR REPLACE] VIEW ... AS SELECT ... . "DROP_FUNCTION" : DROP FUNCTION query. "DROP_PROCEDURE": DROP PROCEDURE query. "DROP_TABLE": DROP TABLE query. "DROP_VIEW": DROP VIEW query.
     #[serde(rename="statementType")]
     pub statement_type: Option<String>,
     /// [Output-only] Job resource usage breakdown by reservation.
@@ -516,9 +529,12 @@ pub struct JobStatistics2 {
     /// [Output-only, Beta] Deprecated; do not use.
     #[serde(rename="modelTrainingCurrentIteration")]
     pub model_training_current_iteration: Option<i32>,
-    /// The DDL target table. Present only for CREATE/DROP TABLE/VIEW queries.
+    /// [Output-only] The DDL target table. Present only for CREATE/DROP TABLE/VIEW and DROP ALL ROW ACCESS POLICIES queries.
     #[serde(rename="ddlTargetTable")]
     pub ddl_target_table: Option<TableReference>,
+    /// [Output-only] Billing tier for the job.
+    #[serde(rename="billingTier")]
+    pub billing_tier: Option<i32>,
     /// [Output-only, Beta] Deprecated; do not use.
     #[serde(rename="modelTrainingExpectedTotalIteration")]
     pub model_training_expected_total_iteration: Option<String>,
@@ -531,9 +547,12 @@ pub struct JobStatistics2 {
     /// [Output-only] Whether the query result was fetched from the query cache.
     #[serde(rename="cacheHit")]
     pub cache_hit: Option<bool>,
-    /// [Output-only] Total bytes billed for the job.
-    #[serde(rename="totalBytesBilled")]
-    pub total_bytes_billed: Option<String>,
+    /// [Output-only] Referenced routines (persistent user-defined functions and stored procedures) for the job.
+    #[serde(rename="referencedRoutines")]
+    pub referenced_routines: Option<Vec<RoutineReference>>,
+    /// [Output-only] Slot-milliseconds for the job.
+    #[serde(rename="totalSlotMs")]
+    pub total_slot_ms: Option<String>,
     /// The DDL target routine. Present only for CREATE/DROP FUNCTION/PROCEDURE queries.
     #[serde(rename="ddlTargetRoutine")]
     pub ddl_target_routine: Option<RoutineReference>,
@@ -543,9 +562,9 @@ pub struct JobStatistics2 {
     /// [Output-only] The number of rows affected by a DML statement. Present only for DML statements INSERT, UPDATE or DELETE.
     #[serde(rename="numDmlAffectedRows")]
     pub num_dml_affected_rows: Option<String>,
-    /// [Output-only] Billing tier for the job.
-    #[serde(rename="billingTier")]
-    pub billing_tier: Option<i32>,
+    /// [Output-only] [Preview] The number of row access policies affected by a DDL statement. Present only for DROP ALL ROW ACCESS POLICIES queries.
+    #[serde(rename="ddlAffectedRowAccessPolicyCount")]
+    pub ddl_affected_row_access_policy_count: Option<String>,
     /// [Output-only] Referenced tables for the job. Queries that reference more than 50 tables will not have a complete list.
     #[serde(rename="referencedTables")]
     pub referenced_tables: Option<Vec<TableReference>>,
@@ -711,6 +730,9 @@ pub struct QueryRequest {
     pub timeout_ms: Option<u32>,
     /// The resource type of the request.
     pub kind: Option<String>,
+    /// Connection properties.
+    #[serde(rename="connectionProperties")]
+    pub connection_properties: Option<Vec<String>>,
     /// [Optional] If set to true, BigQuery doesn't run the job. Instead, if the query is valid, BigQuery returns statistics about the job such as how many bytes would be processed. If the query is invalid, an error returns. The default value is false.
     #[serde(rename="dryRun")]
     pub dry_run: Option<bool>,
@@ -772,6 +794,8 @@ pub struct ClusteringMetrics {
     /// Mean of squared distances between each sample to its cluster centroid.
     #[serde(rename="meanSquaredDistance")]
     pub mean_squared_distance: Option<f64>,
+    /// [Beta] Information for all clusters.
+    pub clusters: Option<Vec<Cluster>>,
     /// Davies-Bouldin index.
     #[serde(rename="daviesBouldinIndex")]
     pub davies_bouldin_index: Option<f64>,
@@ -806,11 +830,14 @@ impl Part for BigtableOptions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IterationResult {
+    /// no description provided
+    #[serde(rename="arimaResult")]
+    pub arima_result: Option<ArimaResult>,
     /// Index of the iteration, 0 based.
     pub index: Option<i32>,
-    /// Learn rate used for this iteration.
-    #[serde(rename="learnRate")]
-    pub learn_rate: Option<f64>,
+    /// Information about top clusters for clustering models.
+    #[serde(rename="clusterInfos")]
+    pub cluster_infos: Option<Vec<ClusterInfo>>,
     /// Loss computed on the training data at the end of iteration.
     #[serde(rename="trainingLoss")]
     pub training_loss: Option<f64>,
@@ -820,9 +847,9 @@ pub struct IterationResult {
     /// Time taken to run the iteration in milliseconds.
     #[serde(rename="durationMs")]
     pub duration_ms: Option<String>,
-    /// [Beta] Information about top clusters for clustering models.
-    #[serde(rename="clusterInfos")]
-    pub cluster_infos: Option<Vec<ClusterInfo>>,
+    /// Learn rate used for this iteration.
+    #[serde(rename="learnRate")]
+    pub learn_rate: Option<f64>,
 }
 
 impl Part for IterationResult {}
@@ -920,6 +947,9 @@ pub struct ExplainQueryStage {
     /// Milliseconds the average shard spent waiting to be scheduled.
     #[serde(rename="waitMsAvg")]
     pub wait_ms_avg: Option<String>,
+    /// Slot-milliseconds used by the stage.
+    #[serde(rename="slotMs")]
+    pub slot_ms: Option<String>,
     /// Milliseconds the average shard spent on writing output.
     #[serde(rename="writeMsAvg")]
     pub write_ms_avg: Option<String>,
@@ -1106,6 +1136,24 @@ impl NestedType for TableFieldSchemaCategories {}
 impl Part for TableFieldSchemaCategories {}
 
 
+/// ARIMA model fitting metrics.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ArimaFittingMetrics {
+    /// variance.
+    pub variance: Option<f64>,
+    /// log-likelihood
+    #[serde(rename="logLikelihood")]
+    pub log_likelihood: Option<f64>,
+    /// AIC
+    pub aic: Option<f64>,
+}
+
+impl Part for ArimaFittingMetrics {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1137,6 +1185,31 @@ impl Part for JobConfigurationTableCopy {}
 
 /// There is no detailed description.
 /// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list jobs](struct.JobListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct JobList {
+    /// A token to request the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The resource type of the response.
+    pub kind: Option<String>,
+    /// A hash of this page of results.
+    pub etag: Option<String>,
+    /// List of jobs that were requested.
+    pub jobs: Option<Vec<JobListJobs>>,
+}
+
+impl ResponseResult for JobList {}
+
+
+/// There is no detailed description.
+/// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1144,21 +1217,27 @@ pub struct JobConfigurationExtract {
     /// [Pick one] DEPRECATED: Use destinationUris instead, passing only one URI as necessary. The fully-qualified Google Cloud Storage URI where the extracted table should be written.
     #[serde(rename="destinationUri")]
     pub destination_uri: Option<String>,
-    /// [Optional] The exported file format. Possible values include CSV, NEWLINE_DELIMITED_JSON and AVRO. The default value is CSV. Tables with nested or repeated fields cannot be exported as CSV.
+    /// [Optional] If destinationFormat is set to "AVRO", this flag indicates whether to enable extracting applicable column types (such as TIMESTAMP) to their corresponding AVRO logical types (timestamp-micros), instead of only using their raw types (avro-long). Not applicable when extracting models.
+    #[serde(rename="useAvroLogicalTypes")]
+    pub use_avro_logical_types: Option<bool>,
+    /// [Optional] The compression type to use for exported files. Possible values include GZIP, DEFLATE, SNAPPY, and NONE. The default value is NONE. DEFLATE and SNAPPY are only supported for Avro. Not applicable when extracting models.
+    pub compression: Option<String>,
+    /// [Optional] Delimiter to use between fields in the exported data. Default is ','. Not applicable when extracting models.
+    #[serde(rename="fieldDelimiter")]
+    pub field_delimiter: Option<String>,
+    /// [Optional] The exported file format. Possible values include CSV, NEWLINE_DELIMITED_JSON or AVRO for tables and ML_TF_SAVED_MODEL or ML_XGBOOST_BOOSTER for models. The default value for tables is CSV. Tables with nested or repeated fields cannot be exported as CSV. The default value for models is ML_TF_SAVED_MODEL.
     #[serde(rename="destinationFormat")]
     pub destination_format: Option<String>,
-    /// [Optional] The compression type to use for exported files. Possible values include GZIP, DEFLATE, SNAPPY, and NONE. The default value is NONE. DEFLATE and SNAPPY are only supported for Avro.
-    pub compression: Option<String>,
+    /// [Optional] Whether to print out a header row in the results. Default is true. Not applicable when extracting models.
+    #[serde(rename="printHeader")]
+    pub print_header: Option<bool>,
+    /// A reference to the model being exported.
+    #[serde(rename="sourceModel")]
+    pub source_model: Option<ModelReference>,
     /// [Pick one] A list of fully-qualified Google Cloud Storage URIs where the extracted table should be written.
     #[serde(rename="destinationUris")]
     pub destination_uris: Option<Vec<String>>,
-    /// [Optional] Whether to print out a header row in the results. Default is true.
-    #[serde(rename="printHeader")]
-    pub print_header: Option<bool>,
-    /// [Optional] Delimiter to use between fields in the exported data. Default is ','
-    #[serde(rename="fieldDelimiter")]
-    pub field_delimiter: Option<String>,
-    /// [Required] A reference to the table being exported.
+    /// A reference to the table being exported.
     #[serde(rename="sourceTable")]
     pub source_table: Option<TableReference>,
 }
@@ -1166,7 +1245,8 @@ pub struct JobConfigurationExtract {
 impl Part for JobConfigurationExtract {}
 
 
-/// Evaluation metrics for regression models.
+/// Evaluation metrics for regression and explicit feedback type matrix
+/// factorization models.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1264,6 +1344,68 @@ pub struct BqmlIterationResult {
 impl Part for BqmlIterationResult {}
 
 
+/// [Output-only, Beta] Training options used by this training run. These options are mutable for subsequent training runs. Default values are explicitly stored for options not specified in the input query of the first training run. For subsequent training runs, any option not explicitly specified in the input query will be copied from the previous training run.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BqmlTrainingRunTrainingOptions {
+    /// no description provided
+    #[serde(rename="learnRateStrategy")]
+    pub learn_rate_strategy: Option<String>,
+    /// no description provided
+    #[serde(rename="l1Reg")]
+    pub l1_reg: Option<f64>,
+    /// no description provided
+    #[serde(rename="lineSearchInitLearnRate")]
+    pub line_search_init_learn_rate: Option<f64>,
+    /// no description provided
+    #[serde(rename="warmStart")]
+    pub warm_start: Option<bool>,
+    /// no description provided
+    #[serde(rename="maxIteration")]
+    pub max_iteration: Option<String>,
+    /// no description provided
+    #[serde(rename="learnRate")]
+    pub learn_rate: Option<f64>,
+    /// no description provided
+    #[serde(rename="earlyStop")]
+    pub early_stop: Option<bool>,
+    /// no description provided
+    #[serde(rename="minRelProgress")]
+    pub min_rel_progress: Option<f64>,
+    /// no description provided
+    #[serde(rename="l2Reg")]
+    pub l2_reg: Option<f64>,
+}
+
+impl NestedType for BqmlTrainingRunTrainingOptions {}
+impl Part for BqmlTrainingRunTrainingOptions {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RowAccessPolicyReference {
+    /// [Required] The ID of the project containing this row access policy.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// [Required] The ID of the table containing this row access policy.
+    #[serde(rename="tableId")]
+    pub table_id: Option<String>,
+    /// [Required] The ID of the row access policy. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 256 characters.
+    #[serde(rename="policyId")]
+    pub policy_id: Option<String>,
+    /// [Required] The ID of the dataset containing this row access policy.
+    #[serde(rename="datasetId")]
+    pub dataset_id: Option<String>,
+}
+
+impl Part for RowAccessPolicyReference {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1273,7 +1415,7 @@ pub struct CsvOptions {
     /// [Optional] Indicates if BigQuery should accept rows that are missing trailing optional columns. If true, BigQuery treats missing trailing columns as null values. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false.
     #[serde(rename="allowJaggedRows")]
     pub allow_jagged_rows: Option<bool>,
-    /// [Optional] The number of rows at the top of a CSV file that BigQuery will skip when reading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped.
+    /// [Optional] The number of rows at the top of a CSV file that BigQuery will skip when reading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped. When autodetect is on, the behavior is the following: * skipLeadingRows unspecified - Autodetect tries to detect headers in the first row. If they are not detected, the row is read as data. Otherwise data is read starting from the second row. * skipLeadingRows is 0 - Instructs autodetect that there are no headers and data should be read starting from the first row. * skipLeadingRows = N > 0 - Autodetect skips N-1 rows and tries to detect headers in row N. If headers are not detected, row N is just skipped. Otherwise row N is used to extract column names for the detected schema.
     #[serde(rename="skipLeadingRows")]
     pub skip_leading_rows: Option<String>,
     /// [Optional] The separator for fields in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. BigQuery also supports the escape sequence "\t" to specify a tab separator. The default value is a comma (',').
@@ -1291,21 +1433,38 @@ pub struct CsvOptions {
 impl Part for CsvOptions {}
 
 
-/// [Output-only] Job resource usage breakdown by reservation.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JobStatistics2ReservationUsage {
-    /// [Output-only] Reservation name or "unreserved" for on-demand resources usage.
-    pub name: Option<String>,
-    /// [Output-only] Slot-milliseconds the job spent in the given reservation.
-    #[serde(rename="slotMs")]
-    pub slot_ms: Option<String>,
+pub struct TableFieldSchemaPolicyTags {
+    /// A list of category resource names. For example, "projects/1/location/eu/taxonomies/2/policyTags/3". At most 1 policy tag is allowed.
+    pub names: Option<Vec<String>>,
 }
 
-impl NestedType for JobStatistics2ReservationUsage {}
-impl Part for JobStatistics2ReservationUsage {}
+impl NestedType for TableFieldSchemaPolicyTags {}
+impl Part for TableFieldSchemaPolicyTags {}
+
+
+/// Arima coefficients.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ArimaCoefficients {
+    /// Moving-average coefficients, an array of double.
+    #[serde(rename="movingAverageCoefficients")]
+    pub moving_average_coefficients: Option<Vec<f64>>,
+    /// Auto-regressive coefficients, an array of double.
+    #[serde(rename="autoRegressiveCoefficients")]
+    pub auto_regressive_coefficients: Option<Vec<f64>>,
+    /// Intercept coefficient, just a double not an array.
+    #[serde(rename="interceptCoefficient")]
+    pub intercept_coefficient: Option<f64>,
+}
+
+impl Part for ArimaCoefficients {}
 
 
 /// There is no detailed description.
@@ -1421,6 +1580,81 @@ pub struct StandardSqlDataType {
 impl Part for StandardSqlDataType {}
 
 
+/// Arima model information.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ArimaModelInfo {
+    /// Arima coefficients.
+    #[serde(rename="arimaCoefficients")]
+    pub arima_coefficients: Option<ArimaCoefficients>,
+    /// Arima fitting metrics.
+    #[serde(rename="arimaFittingMetrics")]
+    pub arima_fitting_metrics: Option<ArimaFittingMetrics>,
+    /// Non-seasonal order.
+    #[serde(rename="nonSeasonalOrder")]
+    pub non_seasonal_order: Option<ArimaOrder>,
+}
+
+impl Part for ArimaModelInfo {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct JobStatistics {
+    /// [Output-only] Statistics for a load job.
+    pub load: Option<JobStatistics3>,
+    /// [Output-only] Number of child jobs executed.
+    #[serde(rename="numChildJobs")]
+    pub num_child_jobs: Option<String>,
+    /// [Output-only] [Preview] Statistics for row-level security. Present only for query and extract jobs.
+    #[serde(rename="rowLevelSecurityStatistics")]
+    pub row_level_security_statistics: Option<RowLevelSecurityStatistics>,
+    /// [TrustedTester] [Output-only] Job progress (0.0 -> 1.0) for LOAD and EXTRACT jobs.
+    #[serde(rename="completionRatio")]
+    pub completion_ratio: Option<f64>,
+    /// [Output-only] Job resource usage breakdown by reservation.
+    #[serde(rename="reservationUsage")]
+    pub reservation_usage: Option<Vec<JobStatisticsReservationUsage>>,
+    /// [Output-only] [Deprecated] Use the bytes processed in the query statistics instead.
+    #[serde(rename="totalBytesProcessed")]
+    pub total_bytes_processed: Option<String>,
+    /// [Output-only] Quotas which delayed this job's start time.
+    #[serde(rename="quotaDeferments")]
+    pub quota_deferments: Option<Vec<String>>,
+    /// [Output-only] Start time of this job, in milliseconds since the epoch. This field will be present when the job transitions from the PENDING state to either RUNNING or DONE.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+    /// [Output-only] Statistics for a query job.
+    pub query: Option<JobStatistics2>,
+    /// [Output-only] Statistics for an extract job.
+    pub extract: Option<JobStatistics4>,
+    /// [Output-only] If this is a child job, the id of the parent.
+    #[serde(rename="parentJobId")]
+    pub parent_job_id: Option<String>,
+    /// [Output-only] Name of the primary reservation assigned to this job. Note that this could be different than reservations reported in the reservation usage field if parent reservations were used to execute this job.
+    pub reservation_id: Option<String>,
+    /// [Output-only] Slot-milliseconds for the job.
+    #[serde(rename="totalSlotMs")]
+    pub total_slot_ms: Option<String>,
+    /// [Output-only] Creation time of this job, in milliseconds since the epoch. This field will be present on all jobs.
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
+    /// [Output-only] Statistics for a child job of a script.
+    #[serde(rename="scriptStatistics")]
+    pub script_statistics: Option<ScriptStatistics>,
+    /// [Output-only] End time of this job, in milliseconds since the epoch. This field will be present whenever a job is in the DONE state.
+    #[serde(rename="endTime")]
+    pub end_time: Option<String>,
+}
+
+impl Part for JobStatistics {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1487,48 +1721,110 @@ impl RequestValue for TableDataInsertAllRequest {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JobStatistics {
-    /// [Output-only] Statistics for a load job.
-    pub load: Option<JobStatistics3>,
-    /// [Output-only] If this is a child job, the id of the parent.
-    #[serde(rename="parentJobId")]
-    pub parent_job_id: Option<String>,
-    /// [Output-only] Number of child jobs executed.
-    #[serde(rename="numChildJobs")]
-    pub num_child_jobs: Option<String>,
-    /// [Output-only] Slot-milliseconds for the job.
-    #[serde(rename="totalSlotMs")]
-    pub total_slot_ms: Option<String>,
-    /// [TrustedTester] [Output-only] Job progress (0.0 -> 1.0) for LOAD and EXTRACT jobs.
-    #[serde(rename="completionRatio")]
-    pub completion_ratio: Option<f64>,
-    /// [Output-only] Statistics for an extract job.
-    pub extract: Option<JobStatistics4>,
-    /// [Output-only] Job resource usage breakdown by reservation.
-    #[serde(rename="reservationUsage")]
-    pub reservation_usage: Option<Vec<JobStatisticsReservationUsage>>,
-    /// [Output-only] Creation time of this job, in milliseconds since the epoch. This field will be present on all jobs.
-    #[serde(rename="creationTime")]
-    pub creation_time: Option<String>,
-    /// [Output-only] [Deprecated] Use the bytes processed in the query statistics instead.
-    #[serde(rename="totalBytesProcessed")]
-    pub total_bytes_processed: Option<String>,
-    /// [Output-only] Quotas which delayed this job's start time.
-    #[serde(rename="quotaDeferments")]
-    pub quota_deferments: Option<Vec<String>>,
-    /// [Output-only] Start time of this job, in milliseconds since the epoch. This field will be present when the job transitions from the PENDING state to either RUNNING or DONE.
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
-    /// [Output-only] Statistics for a query job.
-    pub query: Option<JobStatistics2>,
-    /// [Output-only] End time of this job, in milliseconds since the epoch. This field will be present whenever a job is in the DONE state.
-    #[serde(rename="endTime")]
-    pub end_time: Option<String>,
-    /// [Output-only] Name of the primary reservation assigned to this job. Note that this could be different than reservations reported in the reservation usage field if parent reservations were used to execute this job.
-    pub reservation_id: Option<String>,
+pub struct JobConfigurationQuery {
+    /// [Optional] If true and query uses legacy SQL dialect, flattens all nested and repeated fields in the query results. allowLargeResults must be true if this is set to false. For standard SQL queries, this flag is ignored and results are never flattened.
+    #[serde(rename="flattenResults")]
+    pub flatten_results: Option<bool>,
+    /// Custom encryption configuration (e.g., Cloud KMS keys).
+    #[serde(rename="destinationEncryptionConfiguration")]
+    pub destination_encryption_configuration: Option<EncryptionConfiguration>,
+    /// [Optional] Whether to look for the result in the query cache. The query cache is a best-effort cache that will be flushed whenever tables in the query are modified. Moreover, the query cache is only available when a query does not have a destination table specified. The default value is true.
+    #[serde(rename="useQueryCache")]
+    pub use_query_cache: Option<bool>,
+    /// Standard SQL only. Set to POSITIONAL to use positional (?) query parameters or to NAMED to use named (@myparam) query parameters in this query.
+    #[serde(rename="parameterMode")]
+    pub parameter_mode: Option<String>,
+    /// Query parameters for standard SQL queries.
+    #[serde(rename="queryParameters")]
+    pub query_parameters: Option<Vec<QueryParameter>>,
+    /// [Optional] Describes the table where the query results should be stored. If not present, a new table will be created to store the results. This property must be set for large results that exceed the maximum response size.
+    #[serde(rename="destinationTable")]
+    pub destination_table: Option<TableReference>,
+    /// Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the value of flattenResults is ignored; query will be run as if flattenResults is false.
+    #[serde(rename="useLegacySql")]
+    pub use_legacy_sql: Option<bool>,
+    /// [Required] SQL query text to execute. The useLegacySql field can be used to indicate whether the query uses legacy SQL or standard SQL.
+    pub query: Option<String>,
+    /// Time-based partitioning specification for the destination table. Only one of timePartitioning and rangePartitioning should be specified.
+    #[serde(rename="timePartitioning")]
+    pub time_partitioning: Option<TimePartitioning>,
+    /// Connection properties.
+    #[serde(rename="connectionProperties")]
+    pub connection_properties: Option<Vec<String>>,
+    /// [Optional] Limits the bytes billed for this job. Queries that will have bytes billed beyond this limit will fail (without incurring a charge). If unspecified, this will be set to your project default.
+    #[serde(rename="maximumBytesBilled")]
+    pub maximum_bytes_billed: Option<String>,
+    /// Describes user-defined function resources used in the query.
+    #[serde(rename="userDefinedFunctionResources")]
+    pub user_defined_function_resources: Option<Vec<UserDefinedFunctionResource>>,
+    /// [Beta] Clustering specification for the destination table. Must be specified with time-based partitioning, data in the table will be first partitioned and subsequently clustered.
+    pub clustering: Option<Clustering>,
+    /// [Deprecated] This property is deprecated.
+    #[serde(rename="preserveNulls")]
+    pub preserve_nulls: Option<bool>,
+    /// [Optional] Limits the billing tier for this job. Queries that have resource usage beyond this tier will fail (without incurring a charge). If unspecified, this will be set to your project default.
+    #[serde(rename="maximumBillingTier")]
+    pub maximum_billing_tier: Option<i32>,
+    /// [Optional] Specifies the default dataset to use for unqualified table names in the query. Note that this does not alter behavior of unqualified dataset names.
+    #[serde(rename="defaultDataset")]
+    pub default_dataset: Option<DatasetReference>,
+    /// [TrustedTester] Range partitioning specification for this table. Only one of timePartitioning and rangePartitioning should be specified.
+    #[serde(rename="rangePartitioning")]
+    pub range_partitioning: Option<RangePartitioning>,
+    /// Allows the schema of the destination table to be updated as a side effect of the query job. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
+    #[serde(rename="schemaUpdateOptions")]
+    pub schema_update_options: Option<Vec<String>>,
+    /// [Optional] Specifies a priority for the query. Possible values include INTERACTIVE and BATCH. The default value is INTERACTIVE.
+    pub priority: Option<String>,
+    /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data and uses the schema from the query result. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
+    #[serde(rename="writeDisposition")]
+    pub write_disposition: Option<String>,
+    /// [Optional] If true and query uses legacy SQL dialect, allows the query to produce arbitrarily large result tables at a slight cost in performance. Requires destinationTable to be set. For standard SQL queries, this flag is ignored and large results are always allowed. However, you must still set destinationTable when result size exceeds the allowed maximum response size.
+    #[serde(rename="allowLargeResults")]
+    pub allow_large_results: Option<bool>,
+    /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
+    #[serde(rename="createDisposition")]
+    pub create_disposition: Option<String>,
+    /// [Optional] If querying an external data source outside of BigQuery, describes the data format, location and other properties of the data source. By defining these properties, the data source can then be queried as if it were a standard BigQuery table.
+    #[serde(rename="tableDefinitions")]
+    pub table_definitions: Option<HashMap<String, ExternalDataConfiguration>>,
 }
 
-impl Part for JobStatistics {}
+impl Part for JobConfigurationQuery {}
+
+
+/// Representative value of a categorical feature.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CategoricalValue {
+    /// Counts of all categories for the categorical feature. If there are
+    /// more than ten categories, we return top ten (by count) and return
+    /// one more CategoryCount with category "_OTHER_" and count as
+    /// aggregate counts of remaining categories.
+    #[serde(rename="categoryCounts")]
+    pub category_counts: Option<Vec<CategoryCount>>,
+}
+
+impl Part for CategoricalValue {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ScriptStatistics {
+    /// [Output-only] Whether this child job was a statement or expression.
+    #[serde(rename="evaluationKind")]
+    pub evaluation_kind: Option<String>,
+    /// Stack trace showing the line/column/procedure name of each frame on the stack at the point where the current evaluation happened. The leaf frame is first, the primary script is last. Never empty.
+    #[serde(rename="stackFrames")]
+    pub stack_frames: Option<Vec<ScriptStackFrame>>,
+}
+
+impl Part for ScriptStatistics {}
 
 
 /// List of jobs that were requested.
@@ -1619,68 +1915,23 @@ pub struct TableReference {
 impl Part for TableReference {}
 
 
-/// [Output-only, Beta] Training options used by this training run. These options are mutable for subsequent training runs. Default values are explicitly stored for options not specified in the input query of the first training run. For subsequent training runs, any option not explicitly specified in the input query will be copied from the previous training run.
+/// Message containing the information about one cluster.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BqmlTrainingRunTrainingOptions {
-    /// no description provided
-    #[serde(rename="learnRateStrategy")]
-    pub learn_rate_strategy: Option<String>,
-    /// no description provided
-    #[serde(rename="l1Reg")]
-    pub l1_reg: Option<f64>,
-    /// no description provided
-    #[serde(rename="lineSearchInitLearnRate")]
-    pub line_search_init_learn_rate: Option<f64>,
-    /// no description provided
-    #[serde(rename="warmStart")]
-    pub warm_start: Option<bool>,
-    /// no description provided
-    #[serde(rename="maxIteration")]
-    pub max_iteration: Option<String>,
-    /// no description provided
-    #[serde(rename="learnRate")]
-    pub learn_rate: Option<f64>,
-    /// no description provided
-    #[serde(rename="earlyStop")]
-    pub early_stop: Option<bool>,
-    /// no description provided
-    #[serde(rename="minRelProgress")]
-    pub min_rel_progress: Option<f64>,
-    /// no description provided
-    #[serde(rename="l2Reg")]
-    pub l2_reg: Option<f64>,
+pub struct Cluster {
+    /// Count of training data rows that were assigned to this cluster.
+    pub count: Option<String>,
+    /// Centroid id.
+    #[serde(rename="centroidId")]
+    pub centroid_id: Option<String>,
+    /// Values of highly variant features for this cluster.
+    #[serde(rename="featureValues")]
+    pub feature_values: Option<Vec<FeatureValue>>,
 }
 
-impl NestedType for BqmlTrainingRunTrainingOptions {}
-impl Part for BqmlTrainingRunTrainingOptions {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list jobs](struct.JobListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JobList {
-    /// A token to request the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The resource type of the response.
-    pub kind: Option<String>,
-    /// A hash of this page of results.
-    pub etag: Option<String>,
-    /// List of jobs that were requested.
-    pub jobs: Option<Vec<JobListJobs>>,
-}
-
-impl ResponseResult for JobList {}
+impl Part for Cluster {}
 
 
 /// There is no detailed description.
@@ -1798,7 +2049,7 @@ impl NestedType for TableDataInsertAllResponseInsertErrors {}
 impl Part for TableDataInsertAllResponseInsertErrors {}
 
 
-/// Id path of a model.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1810,14 +2061,33 @@ pub struct ModelReference {
     /// [Required] The ID of the dataset containing this model.
     #[serde(rename="datasetId")]
     pub dataset_id: Option<String>,
-    /// [Required] The ID of the model. The ID must contain only
-    /// letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum
-    /// length is 1,024 characters.
+    /// [Required] The ID of the model. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.
     #[serde(rename="modelId")]
     pub model_id: Option<String>,
 }
 
 impl Part for ModelReference {}
+
+
+/// Representative value of a single feature within the cluster.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FeatureValue {
+    /// The feature column name.
+    #[serde(rename="featureColumn")]
+    pub feature_column: Option<String>,
+    /// The numerical feature value. This is the centroid value for this
+    /// feature.
+    #[serde(rename="numericalValue")]
+    pub numerical_value: Option<f64>,
+    /// The categorical feature value.
+    #[serde(rename="categoricalValue")]
+    pub categorical_value: Option<CategoricalValue>,
+}
+
+impl Part for FeatureValue {}
 
 
 /// There is no detailed description.
@@ -1834,9 +2104,10 @@ pub struct ListRoutinesResponse {
     /// A token to request the next page of results.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// Routines in the requested dataset. Only the following fields are populated:
+    /// Routines in the requested dataset. Unless read_mask is set in the request,
+    /// only the following fields are populated:
     /// etag, project_id, dataset_id, routine_id, routine_type, creation_time,
-    /// last_modified_time, language.
+    /// last_modified_time, and language.
     pub routines: Option<Vec<Routine>>,
 }
 
@@ -1902,6 +2173,9 @@ pub struct TableFieldSchema {
     pub fields: Option<Vec<TableFieldSchema>>,
     /// [Optional] The field description. The maximum length is 1,024 characters.
     pub description: Option<String>,
+    /// no description provided
+    #[serde(rename="policyTags")]
+    pub policy_tags: Option<TableFieldSchemaPolicyTags>,
     /// [Required] The field data type. Possible values include STRING, BYTES, INTEGER, INT64 (same as INTEGER), FLOAT, FLOAT64 (same as FLOAT), BOOLEAN, BOOL (same as BOOLEAN), TIMESTAMP, DATE, TIME, DATETIME, RECORD (where RECORD indicates that the field contains a nested schema) or STRUCT (same as RECORD).
     #[serde(rename="type")]
     pub type_: Option<String>,
@@ -1982,7 +2256,7 @@ pub struct JobConfigurationLoad {
     /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_APPEND. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(rename="writeDisposition")]
     pub write_disposition: Option<String>,
-    /// [Optional, Trusted Tester] If hive partitioning is enabled, which mode to use. Two modes are supported: - AUTO: automatically infer partition key name(s) and type(s). - STRINGS: automatic infer partition key name(s). All types are strings. Not all storage formats support hive partitioning -- requesting hive partitioning on an unsupported format will lead to an error.
+    /// [Optional, Trusted Tester] Deprecated, do not use. Please set hivePartitioningOptions instead.
     #[serde(rename="hivePartitioningMode")]
     pub hive_partitioning_mode: Option<String>,
     /// [Optional, Trusted Tester] Options to configure hive partitioning support.
@@ -2019,9 +2293,11 @@ impl Part for JobConfigurationLoad {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Routine {
-    /// Required.
+    /// Required. The type of routine.
     #[serde(rename="routineType")]
     pub routine_type: Option<String>,
+    /// Optional. [Experimental] The description of the routine if defined.
+    pub description: Option<String>,
     /// Optional. Defaults to "SQL".
     pub language: Option<String>,
     /// Output only. The time when this routine was created, in milliseconds since
@@ -2216,10 +2492,15 @@ impl Part for QueryParameterType {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EvaluationMetrics {
-    /// [Beta] Populated for clustering models.
+    /// Populated for clustering models.
     #[serde(rename="clusteringMetrics")]
     pub clustering_metrics: Option<ClusteringMetrics>,
-    /// Populated for regression models.
+    /// [Alpha] Populated for implicit feedback type matrix factorization
+    /// models.
+    #[serde(rename="rankingMetrics")]
+    pub ranking_metrics: Option<RankingMetrics>,
+    /// Populated for regression models and explicit feedback type matrix
+    /// factorization models.
     #[serde(rename="regressionMetrics")]
     pub regression_metrics: Option<RegressionMetrics>,
     /// Populated for binary classification/classifier models.
@@ -2259,6 +2540,20 @@ impl Part for ClusterInfo {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RowLevelSecurityStatistics {
+    /// [Output-only] [Preview] Whether any accessed data was protected by row access policies.
+    #[serde(rename="rowLevelSecurityApplied")]
+    pub row_level_security_applied: Option<bool>,
+}
+
+impl Part for RowLevelSecurityStatistics {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Streamingbuffer {
     /// [Output-only] A lower-bound estimate of the number of bytes currently in the streaming buffer.
     #[serde(rename="estimatedBytes")]
@@ -2284,11 +2579,14 @@ pub struct TableListTables {
     pub clustering: Option<Clustering>,
     /// The resource type.
     pub kind: Option<String>,
-    /// The labels associated with this table. You can use these to organize and group your tables.
-    pub labels: Option<HashMap<String, String>>,
     /// The time when this table was created, in milliseconds since the epoch.
     #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
+    /// The labels associated with this table. You can use these to organize and group your tables.
+    pub labels: Option<HashMap<String, String>>,
+    /// The range partitioning specification for this table, if configured.
+    #[serde(rename="rangePartitioning")]
+    pub range_partitioning: Option<RangePartitioning>,
     /// An opaque ID of the table
     pub id: Option<String>,
     /// The user-friendly name for this table.
@@ -2337,6 +2635,42 @@ pub struct TrainingOptions {
     /// Optimization strategy for training linear regression models.
     #[serde(rename="optimizationStrategy")]
     pub optimization_strategy: Option<String>,
+    /// Item column specified for matrix factorization models.
+    #[serde(rename="itemColumn")]
+    pub item_column: Option<String>,
+    /// User column specified for matrix factorization models.
+    #[serde(rename="userColumn")]
+    pub user_column: Option<String>,
+    /// Num factors specified for matrix factorization models.
+    #[serde(rename="numFactors")]
+    pub num_factors: Option<String>,
+    /// Name of input label columns in training data.
+    #[serde(rename="inputLabelColumns")]
+    pub input_label_columns: Option<Vec<String>>,
+    /// Batch size for dnn models.
+    #[serde(rename="batchSize")]
+    pub batch_size: Option<String>,
+    /// Distance type for clustering models.
+    #[serde(rename="distanceType")]
+    pub distance_type: Option<String>,
+    /// The column used to provide the initial centroids for kmeans algorithm
+    /// when kmeans_initialization_method is CUSTOM.
+    #[serde(rename="kmeansInitializationColumn")]
+    pub kmeans_initialization_column: Option<String>,
+    /// L2 regularization coefficient.
+    #[serde(rename="l2Regularization")]
+    pub l2_regularization: Option<f64>,
+    /// Number of clusters for clustering models.
+    #[serde(rename="numClusters")]
+    pub num_clusters: Option<String>,
+    /// When early_stop is true, stops training when accuracy improvement is
+    /// less than 'min_relative_progress'. Used only for iterative training
+    /// algorithms.
+    #[serde(rename="minRelativeProgress")]
+    pub min_relative_progress: Option<f64>,
+    /// L1 regularization coefficient.
+    #[serde(rename="l1Regularization")]
+    pub l1_regularization: Option<f64>,
     /// The maximum number of iterations in training. Used only for iterative
     /// training algorithms.
     #[serde(rename="maxIterations")]
@@ -2362,18 +2696,24 @@ pub struct TrainingOptions {
     /// https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#data-type-properties
     #[serde(rename="dataSplitColumn")]
     pub data_split_column: Option<String>,
-    /// [Beta] Number of clusters for clustering models.
-    #[serde(rename="numClusters")]
-    pub num_clusters: Option<String>,
+    /// Dropout probability for dnn models.
+    pub dropout: Option<f64>,
     /// Whether to train a model from the last checkpoint.
     #[serde(rename="warmStart")]
     pub warm_start: Option<bool>,
-    /// Name of input label columns in training data.
-    #[serde(rename="inputLabelColumns")]
-    pub input_label_columns: Option<Vec<String>>,
-    /// Type of loss function used during training run.
-    #[serde(rename="lossType")]
-    pub loss_type: Option<String>,
+    /// Hidden units for dnn models.
+    #[serde(rename="hiddenUnits")]
+    pub hidden_units: Option<Vec<String>>,
+    /// Maximum depth of a tree for boosted tree models.
+    #[serde(rename="maxTreeDepth")]
+    pub max_tree_depth: Option<String>,
+    /// Feedback type that specifies which algorithm to run for matrix
+    /// factorization.
+    #[serde(rename="feedbackType")]
+    pub feedback_type: Option<String>,
+    /// The method used to initialize the centroids for kmeans algorithm.
+    #[serde(rename="kmeansInitializationMethod")]
+    pub kmeans_initialization_method: Option<String>,
     /// The strategy to determine learn rate for the current iteration.
     #[serde(rename="learnRateStrategy")]
     pub learn_rate_strategy: Option<String>,
@@ -2386,31 +2726,30 @@ pub struct TrainingOptions {
     /// The data split type for training and evaluation, e.g. RANDOM.
     #[serde(rename="dataSplitMethod")]
     pub data_split_method: Option<String>,
-    /// [Beta] Distance type for clustering models.
-    #[serde(rename="distanceType")]
-    pub distance_type: Option<String>,
+    /// Subsample fraction of the training data to grow tree to prevent
+    /// overfitting for boosted tree models.
+    pub subsample: Option<f64>,
     /// Weights associated with each label class, for rebalancing the
     /// training data. Only applicable for classification models.
     #[serde(rename="labelClassWeights")]
     pub label_class_weights: Option<HashMap<String, f64>>,
-    /// L1 regularization coefficient.
-    #[serde(rename="l1Regularization")]
-    pub l1_regularization: Option<f64>,
-    /// L2 regularization coefficient.
-    #[serde(rename="l2Regularization")]
-    pub l2_regularization: Option<f64>,
+    /// Learning rate in training. Used only for iterative training algorithms.
+    #[serde(rename="learnRate")]
+    pub learn_rate: Option<f64>,
     /// [Beta] Google Cloud Storage URI from which the model was imported. Only
     /// applicable for imported models.
     #[serde(rename="modelUri")]
     pub model_uri: Option<String>,
-    /// When early_stop is true, stops training when accuracy improvement is
-    /// less than 'min_relative_progress'. Used only for iterative training
-    /// algorithms.
-    #[serde(rename="minRelativeProgress")]
-    pub min_relative_progress: Option<f64>,
-    /// Learning rate in training. Used only for iterative training algorithms.
-    #[serde(rename="learnRate")]
-    pub learn_rate: Option<f64>,
+    /// Hyperparameter for matrix factoration when implicit feedback type is
+    /// specified.
+    #[serde(rename="walsAlpha")]
+    pub wals_alpha: Option<f64>,
+    /// Minimum split loss for boosted tree models.
+    #[serde(rename="minSplitLoss")]
+    pub min_split_loss: Option<f64>,
+    /// Type of loss function used during training run.
+    #[serde(rename="lossType")]
+    pub loss_type: Option<String>,
 }
 
 impl Part for TrainingOptions {}
@@ -2526,6 +2865,43 @@ pub struct BigQueryModelTraining {
 impl Part for BigQueryModelTraining {}
 
 
+/// (Auto-)arima fitting result. Wrap everything in ArimaResult for easier
+/// refactoring if we want to use model-specific iteration results.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ArimaResult {
+    /// This message is repeated because there are multiple arima models
+    /// fitted in auto-arima. For non-auto-arima model, its size is one.
+    #[serde(rename="arimaModelInfo")]
+    pub arima_model_info: Option<Vec<ArimaModelInfo>>,
+    /// Seasonal periods. Repeated because multiple periods are supported for
+    /// one time series.
+    #[serde(rename="seasonalPeriods")]
+    pub seasonal_periods: Option<Vec<String>>,
+}
+
+impl Part for ArimaResult {}
+
+
+/// [Output-only] Job resource usage breakdown by reservation.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct JobStatistics2ReservationUsage {
+    /// [Output-only] Reservation name or "unreserved" for on-demand resources usage.
+    pub name: Option<String>,
+    /// [Output-only] Slot-milliseconds the job spent in the given reservation.
+    #[serde(rename="slotMs")]
+    pub slot_ms: Option<String>,
+}
+
+impl NestedType for JobStatistics2ReservationUsage {}
+impl Part for JobStatistics2ReservationUsage {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2561,7 +2937,7 @@ pub struct ExternalDataConfiguration {
     /// Additional properties to set if sourceFormat is set to CSV.
     #[serde(rename="csvOptions")]
     pub csv_options: Option<CsvOptions>,
-    /// [Optional, Trusted Tester] If hive partitioning is enabled, which mode to use. Two modes are supported: - AUTO: automatically infer partition key name(s) and type(s). - STRINGS: automatic infer partition key name(s). All types are strings. Not all storage formats support hive partitioning -- requesting hive partitioning on an unsupported format will lead to an error. Note: this setting is in the process of being deprecated in favor of hivePartitioningOptions.
+    /// [Optional, Trusted Tester] Deprecated, do not use. Please set hivePartitioningOptions instead.
     #[serde(rename="hivePartitioningMode")]
     pub hive_partitioning_mode: Option<String>,
     /// Try to detect schema and format options automatically. Any option specified explicitly will be honored.
@@ -2592,6 +2968,37 @@ pub struct ExternalDataConfiguration {
 }
 
 impl Part for ExternalDataConfiguration {}
+
+
+/// Evaluation metrics used by weighted-ALS models specified by
+/// feedback_type=implicit.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RankingMetrics {
+    /// Calculates a precision per user for all the items by ranking them and
+    /// then averages all the precisions across all the users.
+    #[serde(rename="meanAveragePrecision")]
+    pub mean_average_precision: Option<f64>,
+    /// Similar to the mean squared error computed in regression and explicit
+    /// recommendation models except instead of computing the rating directly,
+    /// the output from evaluate is computed against a preference which is 1 or 0
+    /// depending on if the rating exists or not.
+    #[serde(rename="meanSquaredError")]
+    pub mean_squared_error: Option<f64>,
+    /// Determines the goodness of a ranking by computing the percentile rank
+    /// from the predicted confidence and dividing it by the original rank.
+    #[serde(rename="averageRank")]
+    pub average_rank: Option<f64>,
+    /// A metric to determine the goodness of a ranking calculated from the
+    /// predicted confidence by comparing it to an ideal rank measured by the
+    /// original ratings.
+    #[serde(rename="normalizedDiscountedCumulativeGain")]
+    pub normalized_discounted_cumulative_gain: Option<f64>,
+}
+
+impl Part for RankingMetrics {}
 
 
 /// There is no detailed description.
@@ -2627,34 +3034,16 @@ pub struct JobStatus {
 impl Part for JobStatus {}
 
 
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BqmlTrainingRun {
-    /// [Output-only, Beta] Different state applicable for a training run. IN PROGRESS: Training run is in progress. FAILED: Training run ended due to a non-retryable failure. SUCCEEDED: Training run successfully completed. CANCELLED: Training run cancelled by the user.
-    pub state: Option<String>,
-    /// [Output-only, Beta] List of each iteration results.
-    #[serde(rename="iterationResults")]
-    pub iteration_results: Option<Vec<BqmlIterationResult>>,
-    /// [Output-only, Beta] Training run start time in milliseconds since the epoch.
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
-    /// [Output-only, Beta] Training options used by this training run. These options are mutable for subsequent training runs. Default values are explicitly stored for options not specified in the input query of the first training run. For subsequent training runs, any option not explicitly specified in the input query will be copied from the previous training run.
-    #[serde(rename="trainingOptions")]
-    pub training_options: Option<BqmlTrainingRunTrainingOptions>,
-}
-
-impl Part for BqmlTrainingRun {}
-
-
 /// Information about a single training query run for the model.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TrainingRun {
+    /// Data split result of the training run. Only set when the input data is
+    /// actually split.
+    #[serde(rename="dataSplitResult")]
+    pub data_split_result: Option<DataSplitResult>,
     /// The evaluation metrics over training/eval data that were computed at the
     /// end of training.
     #[serde(rename="evaluationMetrics")]
@@ -2723,14 +3112,14 @@ impl Part for JobReference {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Model {
-    /// [Optional] The labels associated with this model. You can use these to
-    /// organize and group your models. Label keys and values can be no longer
+    /// The labels associated with this model. You can use these to organize
+    /// and group your models. Label keys and values can be no longer
     /// than 63 characters, can only contain lowercase letters, numeric
     /// characters, underscores and dashes. International characters are allowed.
     /// Label values are optional. Label keys must start with a letter and each
     /// label in the list must have a different key.
     pub labels: Option<HashMap<String, String>>,
-    /// [Optional] A user-friendly description of this model.
+    /// Optional. A user-friendly description of this model.
     pub description: Option<String>,
     /// Required. Unique identifier for this model.
     #[serde(rename="modelReference")]
@@ -2742,15 +3131,19 @@ pub struct Model {
     /// The output of the model will have a "predicted_" prefix to these columns.
     #[serde(rename="labelColumns")]
     pub label_columns: Option<Vec<StandardSqlField>>,
-    /// Output only. The time when this model was created, in millisecs since the
-    /// epoch.
+    /// Output only. The time when this model was created, in millisecs since the epoch.
     #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
     /// Output only. Type of the model resource.
     #[serde(rename="modelType")]
     pub model_type: Option<String>,
-    /// Output only. Information for all training runs in increasing order of
-    /// start_time.
+    /// Custom encryption configuration (e.g., Cloud KMS keys). This shows the
+    /// encryption configuration of the model data while stored in BigQuery
+    /// storage. This field can be used with PatchModel to update encryption key
+    /// for an already encrypted model.
+    #[serde(rename="encryptionConfiguration")]
+    pub encryption_configuration: Option<EncryptionConfiguration>,
+    /// Output only. Information for all training runs in increasing order of start_time.
     #[serde(rename="trainingRuns")]
     pub training_runs: Option<Vec<TrainingRun>>,
     /// Output only. A hash of this resource.
@@ -2758,18 +3151,17 @@ pub struct Model {
     /// Output only. The geographic location where the model resides. This value
     /// is inherited from the dataset.
     pub location: Option<String>,
-    /// [Optional] A descriptive name for this model.
+    /// Optional. A descriptive name for this model.
     #[serde(rename="friendlyName")]
     pub friendly_name: Option<String>,
-    /// [Optional] The time when this model expires, in milliseconds since the
-    /// epoch. If not present, the model will persist indefinitely. Expired models
+    /// Optional. The time when this model expires, in milliseconds since the epoch.
+    /// If not present, the model will persist indefinitely. Expired models
     /// will be deleted and their storage reclaimed.  The defaultTableExpirationMs
     /// property of the encapsulating dataset can be used to set a default
     /// expirationTime on newly created models.
     #[serde(rename="expirationTime")]
     pub expiration_time: Option<String>,
-    /// Output only. The time when this model was last modified, in millisecs
-    /// since the epoch.
+    /// Output only. The time when this model was last modified, in millisecs since the epoch.
     #[serde(rename="lastModifiedTime")]
     pub last_modified_time: Option<String>,
 }
@@ -2856,73 +3248,21 @@ impl ResponseResult for ListModelsResponse {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JobConfigurationQuery {
-    /// [Optional] If true and query uses legacy SQL dialect, flattens all nested and repeated fields in the query results. allowLargeResults must be true if this is set to false. For standard SQL queries, this flag is ignored and results are never flattened.
-    #[serde(rename="flattenResults")]
-    pub flatten_results: Option<bool>,
-    /// Custom encryption configuration (e.g., Cloud KMS keys).
-    #[serde(rename="destinationEncryptionConfiguration")]
-    pub destination_encryption_configuration: Option<EncryptionConfiguration>,
-    /// [Optional] Whether to look for the result in the query cache. The query cache is a best-effort cache that will be flushed whenever tables in the query are modified. Moreover, the query cache is only available when a query does not have a destination table specified. The default value is true.
-    #[serde(rename="useQueryCache")]
-    pub use_query_cache: Option<bool>,
-    /// Standard SQL only. Set to POSITIONAL to use positional (?) query parameters or to NAMED to use named (@myparam) query parameters in this query.
-    #[serde(rename="parameterMode")]
-    pub parameter_mode: Option<String>,
-    /// Query parameters for standard SQL queries.
-    #[serde(rename="queryParameters")]
-    pub query_parameters: Option<Vec<QueryParameter>>,
-    /// [Optional] Describes the table where the query results should be stored. If not present, a new table will be created to store the results. This property must be set for large results that exceed the maximum response size.
-    #[serde(rename="destinationTable")]
-    pub destination_table: Option<TableReference>,
-    /// Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the value of flattenResults is ignored; query will be run as if flattenResults is false.
-    #[serde(rename="useLegacySql")]
-    pub use_legacy_sql: Option<bool>,
-    /// [Required] SQL query text to execute. The useLegacySql field can be used to indicate whether the query uses legacy SQL or standard SQL.
-    pub query: Option<String>,
-    /// Time-based partitioning specification for the destination table. Only one of timePartitioning and rangePartitioning should be specified.
-    #[serde(rename="timePartitioning")]
-    pub time_partitioning: Option<TimePartitioning>,
-    /// [Deprecated] This property is deprecated.
-    #[serde(rename="preserveNulls")]
-    pub preserve_nulls: Option<bool>,
-    /// [Optional] Limits the bytes billed for this job. Queries that will have bytes billed beyond this limit will fail (without incurring a charge). If unspecified, this will be set to your project default.
-    #[serde(rename="maximumBytesBilled")]
-    pub maximum_bytes_billed: Option<String>,
-    /// Describes user-defined function resources used in the query.
-    #[serde(rename="userDefinedFunctionResources")]
-    pub user_defined_function_resources: Option<Vec<UserDefinedFunctionResource>>,
-    /// [Beta] Clustering specification for the destination table. Must be specified with time-based partitioning, data in the table will be first partitioned and subsequently clustered.
-    pub clustering: Option<Clustering>,
-    /// [Optional] Limits the billing tier for this job. Queries that have resource usage beyond this tier will fail (without incurring a charge). If unspecified, this will be set to your project default.
-    #[serde(rename="maximumBillingTier")]
-    pub maximum_billing_tier: Option<i32>,
-    /// [Optional] Specifies the default dataset to use for unqualified table names in the query. Note that this does not alter behavior of unqualified dataset names.
-    #[serde(rename="defaultDataset")]
-    pub default_dataset: Option<DatasetReference>,
-    /// [TrustedTester] Range partitioning specification for this table. Only one of timePartitioning and rangePartitioning should be specified.
-    #[serde(rename="rangePartitioning")]
-    pub range_partitioning: Option<RangePartitioning>,
-    /// Allows the schema of the destination table to be updated as a side effect of the query job. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
-    #[serde(rename="schemaUpdateOptions")]
-    pub schema_update_options: Option<Vec<String>>,
-    /// [Optional] Specifies a priority for the query. Possible values include INTERACTIVE and BATCH. The default value is INTERACTIVE.
-    pub priority: Option<String>,
-    /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data and uses the schema from the query result. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
-    #[serde(rename="writeDisposition")]
-    pub write_disposition: Option<String>,
-    /// [Optional] If true and query uses legacy SQL dialect, allows the query to produce arbitrarily large result tables at a slight cost in performance. Requires destinationTable to be set. For standard SQL queries, this flag is ignored and large results are always allowed. However, you must still set destinationTable when result size exceeds the allowed maximum response size.
-    #[serde(rename="allowLargeResults")]
-    pub allow_large_results: Option<bool>,
-    /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
-    #[serde(rename="createDisposition")]
-    pub create_disposition: Option<String>,
-    /// [Optional] If querying an external data source outside of BigQuery, describes the data format, location and other properties of the data source. By defining these properties, the data source can then be queried as if it were a standard BigQuery table.
-    #[serde(rename="tableDefinitions")]
-    pub table_definitions: Option<HashMap<String, ExternalDataConfiguration>>,
+pub struct BqmlTrainingRun {
+    /// [Output-only, Beta] Different state applicable for a training run. IN PROGRESS: Training run is in progress. FAILED: Training run ended due to a non-retryable failure. SUCCEEDED: Training run successfully completed. CANCELLED: Training run cancelled by the user.
+    pub state: Option<String>,
+    /// [Output-only, Beta] List of each iteration results.
+    #[serde(rename="iterationResults")]
+    pub iteration_results: Option<Vec<BqmlIterationResult>>,
+    /// [Output-only, Beta] Training run start time in milliseconds since the epoch.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+    /// [Output-only, Beta] Training options used by this training run. These options are mutable for subsequent training runs. Default values are explicitly stored for options not specified in the input query of the first training run. For subsequent training runs, any option not explicitly specified in the input query will be copied from the previous training run.
+    #[serde(rename="trainingOptions")]
+    pub training_options: Option<BqmlTrainingRunTrainingOptions>,
 }
 
-impl Part for JobConfigurationQuery {}
+impl Part for BqmlTrainingRun {}
 
 
 /// There is no detailed description.
@@ -2985,6 +3325,23 @@ pub struct JobConfiguration {
 impl Part for JobConfiguration {}
 
 
+/// Arima order, can be used for both non-seasonal and seasonal parts.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ArimaOrder {
+    /// Order of the moving-average part.
+    pub q: Option<String>,
+    /// Order of the autoregressive part.
+    pub p: Option<String>,
+    /// Order of the differencing part.
+    pub d: Option<String>,
+}
+
+impl Part for ArimaOrder {}
+
+
 /// Represents a single JSON object.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3010,8 +3367,7 @@ pub struct Argument {
     /// Optional. Specifies whether the argument is input or output.
     /// Can be set for procedures only.
     pub mode: Option<String>,
-    /// Optional. The name of this argument. Can be absent for function return
-    /// argument.
+    /// Optional. The name of this argument. Can be absent for function return argument.
     pub name: Option<String>,
 }
 
@@ -3079,6 +3435,68 @@ impl Resource for Dataset {}
 impl ResponseResult for Dataset {}
 
 
+/// Represents the count of a single category within the cluster.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CategoryCount {
+    /// The name of category.
+    pub category: Option<String>,
+    /// The count of training samples matching the category within the
+    /// cluster.
+    pub count: Option<String>,
+}
+
+impl Part for CategoryCount {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ScriptStackFrame {
+    /// [Output-only] One-based start column.
+    #[serde(rename="startColumn")]
+    pub start_column: Option<i32>,
+    /// [Output-only] One-based start line.
+    #[serde(rename="startLine")]
+    pub start_line: Option<i32>,
+    /// [Output-only] One-based end column.
+    #[serde(rename="endColumn")]
+    pub end_column: Option<i32>,
+    /// [Output-only] Text of the current statement/expression.
+    pub text: Option<String>,
+    /// [Output-only] One-based end line.
+    #[serde(rename="endLine")]
+    pub end_line: Option<i32>,
+    /// [Output-only] Name of the active procedure, empty if in a top-level script.
+    #[serde(rename="procedureId")]
+    pub procedure_id: Option<String>,
+}
+
+impl Part for ScriptStackFrame {}
+
+
+/// Data split result. This contains references to the training and evaluation
+/// data tables that were used to train the model.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DataSplitResult {
+    /// Table reference of the training data after split.
+    #[serde(rename="trainingTable")]
+    pub training_table: Option<TableReference>,
+    /// Table reference of the evaluation data after split.
+    #[serde(rename="evaluationTable")]
+    pub evaluation_table: Option<TableReference>,
+}
+
+impl Part for DataSplitResult {}
+
+
 /// There is no detailed description.
 /// 
 /// # Activities
@@ -3116,7 +3534,7 @@ pub struct Table {
     /// Time-based partitioning specification for this table. Only one of timePartitioning and rangePartitioning should be specified.
     #[serde(rename="timePartitioning")]
     pub time_partitioning: Option<TimePartitioning>,
-    /// [Beta] [Optional] If set to true, queries over this table require a partition filter that can be used for partition elimination to be specified.
+    /// [Optional] If set to true, queries over this table require a partition filter that can be used for partition elimination to be specified.
     #[serde(rename="requirePartitionFilter")]
     pub require_partition_filter: Option<bool>,
     /// [Output-only] The time when this table was last modified, in milliseconds since the epoch.
@@ -3278,7 +3696,7 @@ pub struct GoogleSheetsOptions {
     /// [Optional] The number of rows at the top of a sheet that BigQuery will skip when reading the data. The default value is 0. This property is useful if you have header rows that should be skipped. When autodetect is on, behavior is the following: * skipLeadingRows unspecified - Autodetect tries to detect headers in the first row. If they are not detected, the row is read as data. Otherwise data is read starting from the second row. * skipLeadingRows is 0 - Instructs autodetect that there are no headers and data should be read starting from the first row. * skipLeadingRows = N > 0 - Autodetect skips N-1 rows and tries to detect headers in row N. If headers are not detected, row N is just skipped. Otherwise row N is used to extract column names for the detected schema.
     #[serde(rename="skipLeadingRows")]
     pub skip_leading_rows: Option<String>,
-    /// [Beta] [Optional] Range of a sheet to query from. Only used when non-empty. Typical format: sheet_name!top_left_cell_id:bottom_right_cell_id For example: sheet1!A1:B20
+    /// [Optional] Range of a sheet to query from. Only used when non-empty. Typical format: sheet_name!top_left_cell_id:bottom_right_cell_id For example: sheet1!A1:B20
     pub range: Option<String>,
 }
 
@@ -3772,6 +4190,7 @@ impl<'a, C, A> JobMethods<'a, C, A> {
             _project_id: project_id.to_string(),
             _state_filter: Default::default(),
             _projection: Default::default(),
+            _parent_job_id: Default::default(),
             _page_token: Default::default(),
             _min_creation_time: Default::default(),
             _max_results: Default::default(),
@@ -3855,9 +4274,9 @@ impl<'a, C, A> ModelMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - Project ID of the model to delete.
-    /// * `datasetId` - Dataset ID of the model to delete.
-    /// * `modelId` - Model ID of the model to delete.
+    /// * `projectId` - Required. Project ID of the model to delete.
+    /// * `datasetId` - Required. Dataset ID of the model to delete.
+    /// * `modelId` - Required. Model ID of the model to delete.
     pub fn delete(&self, project_id: &str, dataset_id: &str, model_id: &str) -> ModelDeleteCall<'a, C, A> {
         ModelDeleteCall {
             hub: self.hub,
@@ -3877,8 +4296,8 @@ impl<'a, C, A> ModelMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - Project ID of the models to list.
-    /// * `datasetId` - Dataset ID of the models to list.
+    /// * `projectId` - Required. Project ID of the models to list.
+    /// * `datasetId` - Required. Dataset ID of the models to list.
     pub fn list(&self, project_id: &str, dataset_id: &str) -> ModelListCall<'a, C, A> {
         ModelListCall {
             hub: self.hub,
@@ -3899,9 +4318,9 @@ impl<'a, C, A> ModelMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - Project ID of the model to patch.
-    /// * `datasetId` - Dataset ID of the model to patch.
-    /// * `modelId` - Model ID of the model to patch.
+    /// * `projectId` - Required. Project ID of the model to patch.
+    /// * `datasetId` - Required. Dataset ID of the model to patch.
+    /// * `modelId` - Required. Model ID of the model to patch.
     pub fn patch(&self, request: Model, project_id: &str, dataset_id: &str, model_id: &str) -> ModelPatchCall<'a, C, A> {
         ModelPatchCall {
             hub: self.hub,
@@ -3921,9 +4340,9 @@ impl<'a, C, A> ModelMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - Project ID of the requested model.
-    /// * `datasetId` - Dataset ID of the requested model.
-    /// * `modelId` - Model ID of the requested model.
+    /// * `projectId` - Required. Project ID of the requested model.
+    /// * `datasetId` - Required. Dataset ID of the requested model.
+    /// * `modelId` - Required. Model ID of the requested model.
     pub fn get(&self, project_id: &str, dataset_id: &str, model_id: &str) -> ModelGetCall<'a, C, A> {
         ModelGetCall {
             hub: self.hub,
@@ -3986,9 +4405,9 @@ impl<'a, C, A> RoutineMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - Project ID of the routine to update
-    /// * `datasetId` - Dataset ID of the routine to update
-    /// * `routineId` - Routine ID of the routine to update
+    /// * `projectId` - Required. Project ID of the routine to update
+    /// * `datasetId` - Required. Dataset ID of the routine to update
+    /// * `routineId` - Required. Routine ID of the routine to update
     pub fn update(&self, request: Routine, project_id: &str, dataset_id: &str, routine_id: &str) -> RoutineUpdateCall<'a, C, A> {
         RoutineUpdateCall {
             hub: self.hub,
@@ -4009,15 +4428,17 @@ impl<'a, C, A> RoutineMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - Project ID of the routines to list
-    /// * `datasetId` - Dataset ID of the routines to list
+    /// * `projectId` - Required. Project ID of the routines to list
+    /// * `datasetId` - Required. Dataset ID of the routines to list
     pub fn list(&self, project_id: &str, dataset_id: &str) -> RoutineListCall<'a, C, A> {
         RoutineListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
             _dataset_id: dataset_id.to_string(),
+            _read_mask: Default::default(),
             _page_token: Default::default(),
             _max_results: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4031,8 +4452,8 @@ impl<'a, C, A> RoutineMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `projectId` - Project ID of the new routine
-    /// * `datasetId` - Dataset ID of the new routine
+    /// * `projectId` - Required. Project ID of the new routine
+    /// * `datasetId` - Required. Dataset ID of the new routine
     pub fn insert(&self, request: Routine, project_id: &str, dataset_id: &str) -> RoutineInsertCall<'a, C, A> {
         RoutineInsertCall {
             hub: self.hub,
@@ -4051,9 +4472,9 @@ impl<'a, C, A> RoutineMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - Project ID of the routine to delete
-    /// * `datasetId` - Dataset ID of the routine to delete
-    /// * `routineId` - Routine ID of the routine to delete
+    /// * `projectId` - Required. Project ID of the routine to delete
+    /// * `datasetId` - Required. Dataset ID of the routine to delete
+    /// * `routineId` - Required. Routine ID of the routine to delete
     pub fn delete(&self, project_id: &str, dataset_id: &str, routine_id: &str) -> RoutineDeleteCall<'a, C, A> {
         RoutineDeleteCall {
             hub: self.hub,
@@ -4072,16 +4493,16 @@ impl<'a, C, A> RoutineMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - Project ID of the requested routine
-    /// * `datasetId` - Dataset ID of the requested routine
-    /// * `routineId` - Routine ID of the requested routine
+    /// * `projectId` - Required. Project ID of the requested routine
+    /// * `datasetId` - Required. Dataset ID of the requested routine
+    /// * `routineId` - Required. Routine ID of the requested routine
     pub fn get(&self, project_id: &str, dataset_id: &str, routine_id: &str) -> RoutineGetCall<'a, C, A> {
         RoutineGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
             _dataset_id: dataset_id.to_string(),
             _routine_id: routine_id.to_string(),
-            _field_mask: Default::default(),
+            _read_mask: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4342,7 +4763,7 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets/{datasetId}/tables/{tableId}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{datasetId}", "datasetId"), ("{tableId}", "tableId")].iter() {
@@ -4513,7 +4934,7 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5211,7 +5632,7 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets/{datasetId}/tables";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{datasetId}", "datasetId")].iter() {
@@ -5379,7 +5800,7 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6031,7 +6452,7 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
@@ -6203,7 +6624,7 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6301,7 +6722,7 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets/{datasetId}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{datasetId}", "datasetId")].iter() {
@@ -6455,7 +6876,7 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7648,7 +8069,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 
         let mut url = self.hub._base_url.clone() + "projects/{projectId}/jobs/{jobId}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{jobId}", "jobId")].iter() {
@@ -7809,7 +8230,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8778,10 +9199,11 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// let result = hub.jobs().list("projectId")
 ///              .add_state_filter("eirmod")
 ///              .projection("sanctus")
-///              .page_token("et")
-///              .min_creation_time("amet")
-///              .max_results(78)
-///              .max_creation_time("consetetur")
+///              .parent_job_id("et")
+///              .page_token("amet")
+///              .min_creation_time("et")
+///              .max_results(56)
+///              .max_creation_time("ut")
 ///              .all_users(true)
 ///              .doit();
 /// # }
@@ -8793,6 +9215,7 @@ pub struct JobListCall<'a, C, A>
     _project_id: String,
     _state_filter: Vec<String>,
     _projection: Option<String>,
+    _parent_job_id: Option<String>,
     _page_token: Option<String>,
     _min_creation_time: Option<String>,
     _max_results: Option<u32>,
@@ -8819,7 +9242,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         if self._state_filter.len() > 0 {
             for f in self._state_filter.iter() {
@@ -8828,6 +9251,9 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         }
         if let Some(value) = self._projection {
             params.push(("projection", value.to_string()));
+        }
+        if let Some(value) = self._parent_job_id {
+            params.push(("parentJobId", value.to_string()));
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -8844,7 +9270,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         if let Some(value) = self._all_users {
             params.push(("allUsers", value.to_string()));
         }
-        for &field in ["alt", "projectId", "stateFilter", "projection", "pageToken", "minCreationTime", "maxResults", "maxCreationTime", "allUsers"].iter() {
+        for &field in ["alt", "projectId", "stateFilter", "projection", "parentJobId", "pageToken", "minCreationTime", "maxResults", "maxCreationTime", "allUsers"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8858,7 +9284,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 
         let mut url = self.hub._base_url.clone() + "projects/{projectId}/jobs";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
@@ -8981,6 +9407,13 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         self._projection = Some(new_value.to_string());
         self
     }
+    /// If set, retrieves only jobs whose parent is this job. Otherwise, retrieves only jobs which have no parent
+    ///
+    /// Sets the *parent job id* query property to the given value.
+    pub fn parent_job_id(mut self, new_value: &str) -> JobListCall<'a, C, A> {
+        self._parent_job_id = Some(new_value.to_string());
+        self
+    }
     /// Page token, returned by a previous call, to request the next page of results
     ///
     /// Sets the *page token* query property to the given value.
@@ -9052,7 +9485,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9103,11 +9536,11 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().get_query_results("projectId", "jobId")
-///              .timeout_ms(98)
+///              .timeout_ms(53)
 ///              .start_index("dolor")
-///              .page_token("dolor")
-///              .max_results(78)
-///              .location("consetetur")
+///              .page_token("et")
+///              .max_results(5)
+///              .location("amet.")
 ///              .doit();
 /// # }
 /// ```
@@ -9175,7 +9608,7 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         let mut url = self.hub._base_url.clone() + "projects/{projectId}/queries/{jobId}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{jobId}", "jobId")].iter() {
@@ -9364,7 +9797,7 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9555,7 +9988,7 @@ impl<'a, C, A> ModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// Project ID of the model to delete.
+    /// Required. Project ID of the model to delete.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -9565,7 +9998,7 @@ impl<'a, C, A> ModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._project_id = new_value.to_string();
         self
     }
-    /// Dataset ID of the model to delete.
+    /// Required. Dataset ID of the model to delete.
     ///
     /// Sets the *dataset id* path property to the given value.
     ///
@@ -9575,7 +10008,7 @@ impl<'a, C, A> ModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Model ID of the model to delete.
+    /// Required. Model ID of the model to delete.
     ///
     /// Sets the *model id* path property to the given value.
     ///
@@ -9673,8 +10106,8 @@ impl<'a, C, A> ModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.models().list("projectId", "datasetId")
-///              .page_token("sit")
-///              .max_results(75)
+///              .page_token("vero")
+///              .max_results(73)
 ///              .doit();
 /// # }
 /// ```
@@ -9731,7 +10164,7 @@ impl<'a, C, A> ModelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}/models";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+projectId}", "projectId"), ("{+datasetId}", "datasetId")].iter() {
@@ -9832,7 +10265,7 @@ impl<'a, C, A> ModelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// Project ID of the models to list.
+    /// Required. Project ID of the models to list.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -9842,7 +10275,7 @@ impl<'a, C, A> ModelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._project_id = new_value.to_string();
         self
     }
-    /// Dataset ID of the models to list.
+    /// Required. Dataset ID of the models to list.
     ///
     /// Sets the *dataset id* path property to the given value.
     ///
@@ -9904,7 +10337,7 @@ impl<'a, C, A> ModelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10137,7 +10570,7 @@ impl<'a, C, A> ModelPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._request = new_value;
         self
     }
-    /// Project ID of the model to patch.
+    /// Required. Project ID of the model to patch.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -10147,7 +10580,7 @@ impl<'a, C, A> ModelPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._project_id = new_value.to_string();
         self
     }
-    /// Dataset ID of the model to patch.
+    /// Required. Dataset ID of the model to patch.
     ///
     /// Sets the *dataset id* path property to the given value.
     ///
@@ -10157,7 +10590,7 @@ impl<'a, C, A> ModelPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Model ID of the model to patch.
+    /// Required. Model ID of the model to patch.
     ///
     /// Sets the *model id* path property to the given value.
     ///
@@ -10304,7 +10737,7 @@ impl<'a, C, A> ModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}/models/{+modelId}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+projectId}", "projectId"), ("{+datasetId}", "datasetId"), ("{+modelId}", "modelId")].iter() {
@@ -10405,7 +10838,7 @@ impl<'a, C, A> ModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
-    /// Project ID of the requested model.
+    /// Required. Project ID of the requested model.
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -10415,7 +10848,7 @@ impl<'a, C, A> ModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._project_id = new_value.to_string();
         self
     }
-    /// Dataset ID of the requested model.
+    /// Required. Dataset ID of the requested model.
     ///
     /// Sets the *dataset id* path property to the given value.
     ///
@@ -10425,7 +10858,7 @@ impl<'a, C, A> ModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Model ID of the requested model.
+    /// Required. Model ID of the requested model.
     ///
     /// Sets the *model id* path property to the given value.
     ///
@@ -10471,7 +10904,7 @@ impl<'a, C, A> ModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10705,7 +11138,7 @@ impl<'a, C, A> RoutineUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
-    /// Project ID of the routine to update
+    /// Required. Project ID of the routine to update
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -10715,7 +11148,7 @@ impl<'a, C, A> RoutineUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._project_id = new_value.to_string();
         self
     }
-    /// Dataset ID of the routine to update
+    /// Required. Dataset ID of the routine to update
     ///
     /// Sets the *dataset id* path property to the given value.
     ///
@@ -10725,7 +11158,7 @@ impl<'a, C, A> RoutineUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Routine ID of the routine to update
+    /// Required. Routine ID of the routine to update
     ///
     /// Sets the *routine id* path property to the given value.
     ///
@@ -10823,8 +11256,10 @@ impl<'a, C, A> RoutineUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.routines().list("projectId", "datasetId")
-///              .page_token("Lorem")
-///              .max_results(84)
+///              .read_mask("et")
+///              .page_token("clita")
+///              .max_results(56)
+///              .filter("takimata")
 ///              .doit();
 /// # }
 /// ```
@@ -10834,8 +11269,10 @@ pub struct RoutineListCall<'a, C, A>
     hub: &'a Bigquery<C, A>,
     _project_id: String,
     _dataset_id: String,
+    _read_mask: Option<String>,
     _page_token: Option<String>,
     _max_results: Option<u32>,
+    _filter: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -10858,16 +11295,22 @@ impl<'a, C, A> RoutineListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "bigquery.routines.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
+        if let Some(value) = self._read_mask {
+            params.push(("readMask", value.to_string()));
+        }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
         }
-        for &field in ["alt", "projectId", "datasetId", "pageToken", "maxResults"].iter() {
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "projectId", "datasetId", "readMask", "pageToken", "maxResults", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10881,7 +11324,7 @@ impl<'a, C, A> RoutineListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}/routines";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+projectId}", "projectId"), ("{+datasetId}", "datasetId")].iter() {
@@ -10982,7 +11425,7 @@ impl<'a, C, A> RoutineListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// Project ID of the routines to list
+    /// Required. Project ID of the routines to list
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -10992,7 +11435,7 @@ impl<'a, C, A> RoutineListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._project_id = new_value.to_string();
         self
     }
-    /// Dataset ID of the routines to list
+    /// Required. Dataset ID of the routines to list
     ///
     /// Sets the *dataset id* path property to the given value.
     ///
@@ -11000,6 +11443,17 @@ impl<'a, C, A> RoutineListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// we provide this method for API completeness.
     pub fn dataset_id(mut self, new_value: &str) -> RoutineListCall<'a, C, A> {
         self._dataset_id = new_value.to_string();
+        self
+    }
+    /// If set, then only the Routine fields in the field mask, as well as
+    /// project_id, dataset_id and routine_id, are returned in the response.
+    /// If unset, then the following Routine fields are returned:
+    /// etag, project_id, dataset_id, routine_id, routine_type, creation_time,
+    /// last_modified_time, and language.
+    ///
+    /// Sets the *read mask* query property to the given value.
+    pub fn read_mask(mut self, new_value: &str) -> RoutineListCall<'a, C, A> {
+        self._read_mask = Some(new_value.to_string());
         self
     }
     /// Page token, returned by a previous call, to request the next page of
@@ -11016,6 +11470,16 @@ impl<'a, C, A> RoutineListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> RoutineListCall<'a, C, A> {
         self._max_results = Some(new_value);
+        self
+    }
+    /// If set, then only the Routines matching this filter are returned.
+    /// The current supported form is either "routine_type:<RoutineType>" or
+    /// "routineType:<RoutineType>", where <RoutineType> is a RoutineType enum.
+    /// Example: "routineType:SCALAR_FUNCTION".
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> RoutineListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -11054,7 +11518,7 @@ impl<'a, C, A> RoutineListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11285,7 +11749,7 @@ impl<'a, C, A> RoutineInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
-    /// Project ID of the new routine
+    /// Required. Project ID of the new routine
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -11295,7 +11759,7 @@ impl<'a, C, A> RoutineInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._project_id = new_value.to_string();
         self
     }
-    /// Dataset ID of the new routine
+    /// Required. Dataset ID of the new routine
     ///
     /// Sets the *dataset id* path property to the given value.
     ///
@@ -11532,7 +11996,7 @@ impl<'a, C, A> RoutineDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Project ID of the routine to delete
+    /// Required. Project ID of the routine to delete
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -11542,7 +12006,7 @@ impl<'a, C, A> RoutineDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._project_id = new_value.to_string();
         self
     }
-    /// Dataset ID of the routine to delete
+    /// Required. Dataset ID of the routine to delete
     ///
     /// Sets the *dataset id* path property to the given value.
     ///
@@ -11552,7 +12016,7 @@ impl<'a, C, A> RoutineDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Routine ID of the routine to delete
+    /// Required. Routine ID of the routine to delete
     ///
     /// Sets the *routine id* path property to the given value.
     ///
@@ -11649,7 +12113,7 @@ impl<'a, C, A> RoutineDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.routines().get("projectId", "datasetId", "routineId")
-///              .field_mask("labore")
+///              .read_mask("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -11660,7 +12124,7 @@ pub struct RoutineGetCall<'a, C, A>
     _project_id: String,
     _dataset_id: String,
     _routine_id: String,
-    _field_mask: Option<String>,
+    _read_mask: Option<String>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -11687,10 +12151,10 @@ impl<'a, C, A> RoutineGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         params.push(("routineId", self._routine_id.to_string()));
-        if let Some(value) = self._field_mask {
-            params.push(("fieldMask", value.to_string()));
+        if let Some(value) = self._read_mask {
+            params.push(("readMask", value.to_string()));
         }
-        for &field in ["alt", "projectId", "datasetId", "routineId", "fieldMask"].iter() {
+        for &field in ["alt", "projectId", "datasetId", "routineId", "readMask"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11704,7 +12168,7 @@ impl<'a, C, A> RoutineGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}/routines/{+routineId}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+projectId}", "projectId"), ("{+datasetId}", "datasetId"), ("{+routineId}", "routineId")].iter() {
@@ -11805,7 +12269,7 @@ impl<'a, C, A> RoutineGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// Project ID of the requested routine
+    /// Required. Project ID of the requested routine
     ///
     /// Sets the *project id* path property to the given value.
     ///
@@ -11815,7 +12279,7 @@ impl<'a, C, A> RoutineGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._project_id = new_value.to_string();
         self
     }
-    /// Dataset ID of the requested routine
+    /// Required. Dataset ID of the requested routine
     ///
     /// Sets the *dataset id* path property to the given value.
     ///
@@ -11825,7 +12289,7 @@ impl<'a, C, A> RoutineGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._dataset_id = new_value.to_string();
         self
     }
-    /// Routine ID of the requested routine
+    /// Required. Routine ID of the requested routine
     ///
     /// Sets the *routine id* path property to the given value.
     ///
@@ -11838,9 +12302,9 @@ impl<'a, C, A> RoutineGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// If set, only the Routine fields in the field mask are returned in the
     /// response. If unset, all Routine fields are returned.
     ///
-    /// Sets the *field mask* query property to the given value.
-    pub fn field_mask(mut self, new_value: &str) -> RoutineGetCall<'a, C, A> {
-        self._field_mask = Some(new_value.to_string());
+    /// Sets the *read mask* query property to the given value.
+    pub fn read_mask(mut self, new_value: &str) -> RoutineGetCall<'a, C, A> {
+        self._read_mask = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -11879,7 +12343,7 @@ impl<'a, C, A> RoutineGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11930,10 +12394,10 @@ impl<'a, C, A> RoutineGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tabledata().list("projectId", "datasetId", "tableId")
-///              .start_index("rebum.")
-///              .selected_fields("dolore")
-///              .page_token("nonumy")
-///              .max_results(72)
+///              .start_index("sed")
+///              .selected_fields("aliquyam")
+///              .page_token("sit")
+///              .max_results(61)
 ///              .doit();
 /// # }
 /// ```
@@ -11999,7 +12463,7 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = self.hub._base_url.clone() + "projects/{projectId}/datasets/{datasetId}/tables/{tableId}/data";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{datasetId}", "datasetId"), ("{tableId}", "tableId")].iter() {
@@ -12191,7 +12655,7 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12582,7 +13046,7 @@ impl<'a, C, A> ProjectGetServiceAccountCall<'a, C, A> where C: BorrowMut<hyper::
 
         let mut url = self.hub._base_url.clone() + "projects/{projectId}/serviceAccount";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
@@ -12726,7 +13190,7 @@ impl<'a, C, A> ProjectGetServiceAccountCall<'a, C, A> where C: BorrowMut<hyper::
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12777,8 +13241,8 @@ impl<'a, C, A> ProjectGetServiceAccountCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().list()
-///              .page_token("labore")
-///              .max_results(71)
+///              .page_token("gubergren")
+///              .max_results(19)
 ///              .doit();
 /// # }
 /// ```
@@ -12830,7 +13294,7 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         let mut url = self.hub._base_url.clone() + "projects";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
 
@@ -12957,7 +13421,7 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
+    /// `Scope::Readonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

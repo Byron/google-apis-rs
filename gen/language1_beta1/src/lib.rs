@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Natural Language* crate version *1.0.12+20190623*, where *20190623* is the exact revision of the *language:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Cloud Natural Language* crate version *1.0.13+20200406*, where *20200406* is the exact revision of the *language:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Cloud Natural Language* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/natural-language/).
@@ -336,7 +336,7 @@ impl<'a, C, A> CloudNaturalLanguage<C, A>
         CloudNaturalLanguage {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://language.googleapis.com/".to_string(),
             _root_url: "https://language.googleapis.com/".to_string(),
         }
@@ -347,7 +347,7 @@ impl<'a, C, A> CloudNaturalLanguage<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -515,11 +515,11 @@ pub struct Document {
     /// The language of the document (if not specified, the language is
     /// automatically detected). Both ISO and BCP-47 language codes are
     /// accepted.<br>
-    /// [Language Support](/natural-language/docs/languages)
-    /// lists currently supported languages for each API method.
-    /// If the language (either specified by the caller or automatically detected)
-    /// is not supported by the called API method, an `INVALID_ARGUMENT` error
-    /// is returned.
+    /// [Language
+    /// Support](https://cloud.google.com/natural-language/docs/languages) lists
+    /// currently supported languages for each API method. If the language (either
+    /// specified by the caller or automatically detected) is not supported by the
+    /// called API method, an `INVALID_ARGUMENT` error is returned.
     pub language: Option<String>,
     /// The Google Cloud Storage URI where the file content is located.
     /// This URI must be of the form: gs://bucket_name/object_name. For more

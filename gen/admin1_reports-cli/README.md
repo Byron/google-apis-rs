@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *reports* API can be found at the
-[official documentation site](https://developers.google.com/admin-sdk/reports/).
+[official documentation site](/admin-sdk/reports/).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *reports* API at revision *20190521*. The CLI is at version *1.0.12*.
+This documentation was generated from the *reports* API at revision *20191014*. The CLI is at version *1.0.13*.
 
 ```bash
 admin1-reports [options]

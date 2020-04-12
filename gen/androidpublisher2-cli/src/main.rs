@@ -2187,9 +2187,8 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "google-groups" => Some(("googleGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "google-plus-communities" => Some(("googlePlusCommunities", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["google-groups", "google-plus-communities"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["google-groups"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2273,9 +2272,8 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "google-groups" => Some(("googleGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "google-plus-communities" => Some(("googlePlusCommunities", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["google-groups", "google-plus-communities"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["google-groups"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2788,10 +2786,6 @@ impl<'n> Engine<'n> {
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription-period" => Some(("subscriptionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "grace-period" => Some(("gracePeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "season.start.day" => Some(("season.start.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "season.start.month" => Some(("season.start.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "season.end.day" => Some(("season.end.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "season.end.month" => Some(("season.end.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trial-period" => Some(("trialPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purchase-type" => Some(("purchaseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2799,7 +2793,7 @@ impl<'n> Engine<'n> {
                     "default-price.currency" => Some(("defaultPrice.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-price.price-micros" => Some(("defaultPrice.priceMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "day", "default-language", "default-price", "end", "grace-period", "month", "package-name", "price-micros", "purchase-type", "season", "sku", "start", "status", "subscription-period", "trial-period"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "default-language", "default-price", "grace-period", "package-name", "price-micros", "purchase-type", "sku", "status", "subscription-period", "trial-period"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2952,10 +2946,6 @@ impl<'n> Engine<'n> {
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription-period" => Some(("subscriptionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "grace-period" => Some(("gracePeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "season.start.day" => Some(("season.start.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "season.start.month" => Some(("season.start.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "season.end.day" => Some(("season.end.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "season.end.month" => Some(("season.end.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trial-period" => Some(("trialPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purchase-type" => Some(("purchaseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2963,7 +2953,7 @@ impl<'n> Engine<'n> {
                     "default-price.currency" => Some(("defaultPrice.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-price.price-micros" => Some(("defaultPrice.priceMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "day", "default-language", "default-price", "end", "grace-period", "month", "package-name", "price-micros", "purchase-type", "season", "sku", "start", "status", "subscription-period", "trial-period"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "default-language", "default-price", "grace-period", "package-name", "price-micros", "purchase-type", "sku", "status", "subscription-period", "trial-period"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3054,10 +3044,6 @@ impl<'n> Engine<'n> {
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription-period" => Some(("subscriptionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "grace-period" => Some(("gracePeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "season.start.day" => Some(("season.start.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "season.start.month" => Some(("season.start.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "season.end.day" => Some(("season.end.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "season.end.month" => Some(("season.end.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trial-period" => Some(("trialPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purchase-type" => Some(("purchaseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3065,7 +3051,7 @@ impl<'n> Engine<'n> {
                     "default-price.currency" => Some(("defaultPrice.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-price.price-micros" => Some(("defaultPrice.priceMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "day", "default-language", "default-price", "end", "grace-period", "month", "package-name", "price-micros", "purchase-type", "season", "sku", "start", "status", "subscription-period", "trial-period"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "default-language", "default-price", "grace-period", "package-name", "price-micros", "purchase-type", "sku", "status", "subscription-period", "trial-period"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6036,7 +6022,7 @@ fn main() {
     
     let mut app = App::new("androidpublisher2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190702")
+           .version("1.0.13+20200331")
            .about("Accesses Android application developers' Google Play accounts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli")
            .arg(Arg::with_name("url")

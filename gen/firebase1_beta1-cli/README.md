@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firebase Management* API at revision *20190703*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Firebase Management* API at revision *20200407*. The CLI is at version *1.0.13*.
 
 ```bash
 firebase1-beta1 [options]
@@ -35,6 +35,7 @@ firebase1-beta1 [options]
                 get <name> [-p <v>]... [-o <out>]
         projects
                 add-firebase <project> (-r <kv>)... [-p <v>]... [-o <out>]
+                add-google-analytics <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 android-apps-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 android-apps-get <name> [-p <v>]... [-o <out>]
                 android-apps-get-config <name> [-p <v>]... [-o <out>]
@@ -47,6 +48,7 @@ firebase1-beta1 [options]
                 default-location-finalize <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
                 get-admin-sdk-config <name> [-p <v>]... [-o <out>]
+                get-analytics-details <name> [-p <v>]... [-o <out>]
                 ios-apps-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 ios-apps-get <name> [-p <v>]... [-o <out>]
                 ios-apps-get-config <name> [-p <v>]... [-o <out>]
@@ -54,6 +56,7 @@ firebase1-beta1 [options]
                 ios-apps-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                remove-analytics <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 search-apps <parent> [-p <v>]... [-o <out>]
                 web-apps-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 web-apps-get <name> [-p <v>]... [-o <out>]

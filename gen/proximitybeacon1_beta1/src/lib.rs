@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *proximitybeacon* crate version *1.0.12+20190323*, where *20190323* is the exact revision of the *proximitybeacon:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *proximitybeacon* crate version *1.0.13+20200127*, where *20200127* is the exact revision of the *proximitybeacon:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *proximitybeacon* *v1_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/beacons/proximity/).
@@ -344,7 +344,7 @@ impl<'a, C, A> Proximitybeacon<C, A>
         Proximitybeacon {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://proximitybeacon.googleapis.com/".to_string(),
             _root_url: "https://proximitybeacon.googleapis.com/".to_string(),
         }
@@ -364,7 +364,7 @@ impl<'a, C, A> Proximitybeacon<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -776,7 +776,9 @@ impl ResponseResult for Empty {}
 /// Information a client needs to provision and register beacons that
 /// broadcast Eddystone-EID format beacon IDs, using Elliptic curve
 /// Diffie-Hellman key exchange. See
-/// [the Eddystone specification](https://github.com/google/eddystone/tree/master/eddystone-eid) at GitHub.
+/// [the Eddystone
+/// specification](https://github.com/google/eddystone/tree/master/eddystone-eid)
+/// at GitHub.
 /// 
 /// # Activities
 /// 
@@ -788,11 +790,13 @@ impl ResponseResult for Empty {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EphemeralIdRegistrationParams {
     /// Indicates the minimum rotation period supported by the service.
-    /// See EddystoneEidRegistration.rotation_period_exponent
+    /// See
+    /// EddystoneEidRegistration.rotation_period_exponent
     #[serde(rename="minRotationPeriodExponent")]
     pub min_rotation_period_exponent: Option<u32>,
     /// Indicates the maximum rotation period supported by the service.
-    /// See EddystoneEidRegistration.rotation_period_exponent
+    /// See
+    /// EddystoneEidRegistration.rotation_period_exponent
     #[serde(rename="maxRotationPeriodExponent")]
     pub max_rotation_period_exponent: Option<u32>,
     /// The beacon service's public key for use by a beacon to derive its
@@ -1103,9 +1107,10 @@ impl<'a, C, A> BeaconMethods<'a, C, A> {
     /// `*/*`, to return all attachments, or the namespace must be one of
     /// the ones returned from the  `namespaces` endpoint.
     /// 
-    /// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-    /// from a signed-in user with **viewer**, **Is owner** or **Can edit**
-    /// permissions in the Google Developers Console project.
+    /// Authenticate using an [OAuth access
+    /// token](https://developers.google.com/identity/protocols/OAuth2) from a
+    /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
+    /// the Google Developers Console project.
     /// 
     /// # Arguments
     ///
@@ -1132,9 +1137,10 @@ impl<'a, C, A> BeaconMethods<'a, C, A> {
     ///
     /// Returns detailed information about the specified beacon.
     /// 
-    /// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-    /// from a signed-in user with **viewer**, **Is owner** or **Can edit**
-    /// permissions in the Google Developers Console project.
+    /// Authenticate using an [OAuth access
+    /// token](https://developers.google.com/identity/protocols/OAuth2) from a
+    /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
+    /// the Google Developers Console project.
     /// 
     /// Requests may supply an Eddystone-EID beacon name in the form:
     /// `beacons/4!beaconId` where the `beaconId` is the base16 ephemeral ID
@@ -1177,9 +1183,10 @@ impl<'a, C, A> BeaconMethods<'a, C, A> {
     /// 
     /// Attachment data can be up to 1024 bytes long.
     /// 
-    /// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-    /// from a signed-in user with **Is owner** or **Can edit** permissions in the
-    /// Google Developers Console project.
+    /// Authenticate using an [OAuth access
+    /// token](https://developers.google.com/identity/protocols/OAuth2) from a
+    /// signed-in user with **Is owner** or **Can edit** permissions in the Google
+    /// Developers Console project.
     /// 
     /// # Arguments
     ///
@@ -1210,9 +1217,10 @@ impl<'a, C, A> BeaconMethods<'a, C, A> {
     /// permanent -- you will not be able to re-register a beacon with this ID
     /// again.
     /// 
-    /// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-    /// from a signed-in user with **Is owner** or **Can edit** permissions in the
-    /// Google Developers Console project.
+    /// Authenticate using an [OAuth access
+    /// token](https://developers.google.com/identity/protocols/OAuth2) from a
+    /// signed-in user with **Is owner** or **Can edit** permissions in the Google
+    /// Developers Console project.
     /// 
     /// # Arguments
     ///
@@ -1241,9 +1249,10 @@ impl<'a, C, A> BeaconMethods<'a, C, A> {
     /// Calling this method on an already active beacon will do nothing (but
     /// will return a successful response code).
     /// 
-    /// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-    /// from a signed-in user with **Is owner** or **Can edit** permissions in the
-    /// Google Developers Console project.
+    /// Authenticate using an [OAuth access
+    /// token](https://developers.google.com/identity/protocols/OAuth2) from a
+    /// signed-in user with **Is owner** or **Can edit** permissions in the Google
+    /// Developers Console project.
     /// 
     /// # Arguments
     ///
@@ -1271,9 +1280,10 @@ impl<'a, C, A> BeaconMethods<'a, C, A> {
     /// criteria. Only those beacons that the client has permission to list
     /// will be returned.
     /// 
-    /// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-    /// from a signed-in user with **viewer**, **Is owner** or **Can edit**
-    /// permissions in the Google Developers Console project.
+    /// Authenticate using an [OAuth access
+    /// token](https://developers.google.com/identity/protocols/OAuth2) from a
+    /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
+    /// the Google Developers Console project.
     pub fn list(&self) -> BeaconListCall<'a, C, A> {
         BeaconListCall {
             hub: self.hub,
@@ -1297,9 +1307,10 @@ impl<'a, C, A> BeaconMethods<'a, C, A> {
     /// Changes to the beacon status via this method will be  silently ignored.
     /// To update beacon status, use the separate methods on this API for
     /// activation, deactivation, and decommissioning.
-    /// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-    /// from a signed-in user with **Is owner** or **Can edit** permissions in the
-    /// Google Developers Console project.
+    /// Authenticate using an [OAuth access
+    /// token](https://developers.google.com/identity/protocols/OAuth2) from a
+    /// signed-in user with **Is owner** or **Can edit** permissions in the Google
+    /// Developers Console project.
     /// 
     /// # Arguments
     ///
@@ -1330,9 +1341,10 @@ impl<'a, C, A> BeaconMethods<'a, C, A> {
     /// request to control which attachment is removed. This operation cannot be
     /// undone.
     /// 
-    /// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-    /// from a signed-in user with **Is owner** or **Can edit** permissions in the
-    /// Google Developers Console project.
+    /// Authenticate using an [OAuth access
+    /// token](https://developers.google.com/identity/protocols/OAuth2) from a
+    /// signed-in user with **Is owner** or **Can edit** permissions in the Google
+    /// Developers Console project.
     /// 
     /// # Arguments
     ///
@@ -1360,9 +1372,10 @@ impl<'a, C, A> BeaconMethods<'a, C, A> {
     /// `beaconinfo.getforobserved`. Calling this method on an already inactive
     /// beacon will do nothing (but will return a successful response code).
     /// 
-    /// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-    /// from a signed-in user with **Is owner** or **Can edit** permissions in the
-    /// Google Developers Console project.
+    /// Authenticate using an [OAuth access
+    /// token](https://developers.google.com/identity/protocols/OAuth2) from a
+    /// signed-in user with **Is owner** or **Can edit** permissions in the Google
+    /// Developers Console project.
     /// 
     /// # Arguments
     ///
@@ -1389,9 +1402,10 @@ impl<'a, C, A> BeaconMethods<'a, C, A> {
     /// Registers a previously unregistered beacon given its `advertisedId`.
     /// These IDs are unique within the system. An ID can be registered only once.
     /// 
-    /// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-    /// from a signed-in user with **Is owner** or **Can edit** permissions in the
-    /// Google Developers Console project.
+    /// Authenticate using an [OAuth access
+    /// token](https://developers.google.com/identity/protocols/OAuth2) from a
+    /// signed-in user with **Is owner** or **Can edit** permissions in the Google
+    /// Developers Console project.
     /// 
     /// # Arguments
     ///
@@ -1413,9 +1427,10 @@ impl<'a, C, A> BeaconMethods<'a, C, A> {
     /// as well as any attachments on the beacon (including those belonging to
     /// other projects). This operation cannot be undone.
     /// 
-    /// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-    /// from a signed-in user with **Is owner** or **Can edit** permissions in the
-    /// Google Developers Console project.
+    /// Authenticate using an [OAuth access
+    /// token](https://developers.google.com/identity/protocols/OAuth2) from a
+    /// signed-in user with **Is owner** or **Can edit** permissions in the Google
+    /// Developers Console project.
     /// 
     /// # Arguments
     ///
@@ -1443,9 +1458,10 @@ impl<'a, C, A> BeaconMethods<'a, C, A> {
     /// all the beacons owned by your Google Developers Console project by using
     /// the beacon name `beacons/-`.
     /// 
-    /// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-    /// from a signed-in user with **viewer**, **Is owner** or **Can edit**
-    /// permissions in the Google Developers Console project.
+    /// Authenticate using an [OAuth access
+    /// token](https://developers.google.com/identity/protocols/OAuth2) from a
+    /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
+    /// the Google Developers Console project.
     /// 
     /// # Arguments
     ///
@@ -1474,9 +1490,10 @@ impl<'a, C, A> BeaconMethods<'a, C, A> {
     /// attachments on the given beacon will be deleted. You also may explicitly
     /// specify `*/*` to delete all.
     /// 
-    /// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-    /// from a signed-in user with **Is owner** or **Can edit** permissions in the
-    /// Google Developers Console project.
+    /// Authenticate using an [OAuth access
+    /// token](https://developers.google.com/identity/protocols/OAuth2) from a
+    /// signed-in user with **Is owner** or **Can edit** permissions in the Google
+    /// Developers Console project.
     /// 
     /// # Arguments
     ///
@@ -1545,7 +1562,8 @@ impl<'a, C, A> BeaconinfoMethods<'a, C, A> {
     ///
     /// Given one or more beacon observations, returns any beacon information
     /// and attachments accessible to your application. Authorize by using the
-    /// [API key](https://developers.google.com/beacons/proximity/get-started#request_a_browser_api_key)
+    /// [API
+    /// key](https://developers.google.com/beacons/proximity/get-started#request_a_browser_api_key)
     /// for the application.
     /// 
     /// # Arguments
@@ -1668,9 +1686,10 @@ impl<'a, C, A> NamespaceMethods<'a, C, A> {
     /// project. Attachment data associated with a beacon must include a
     /// namespaced type, and the namespace must be owned by your project.
     /// 
-    /// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-    /// from a signed-in user with **viewer**, **Is owner** or **Can edit**
-    /// permissions in the Google Developers Console project.
+    /// Authenticate using an [OAuth access
+    /// token](https://developers.google.com/identity/protocols/OAuth2) from a
+    /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
+    /// the Google Developers Console project.
     pub fn list(&self) -> NamespaceListCall<'a, C, A> {
         NamespaceListCall {
             hub: self.hub,
@@ -1720,9 +1739,10 @@ impl<'a, C, A> NamespaceMethods<'a, C, A> {
 /// `*/*`, to return all attachments, or the namespace must be one of
 /// the ones returned from the  `namespaces` endpoint.
 /// 
-/// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-/// from a signed-in user with **viewer**, **Is owner** or **Can edit**
-/// permissions in the Google Developers Console project.
+/// Authenticate using an [OAuth access
+/// token](https://developers.google.com/identity/protocols/OAuth2) from a
+/// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
+/// the Google Developers Console project.
 ///
 /// A builder for the *attachments.list* method supported by a *beacon* resource.
 /// It is not used directly, but through a `BeaconMethods` instance.
@@ -2009,9 +2029,10 @@ impl<'a, C, A> BeaconAttachmentListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 /// Returns detailed information about the specified beacon.
 /// 
-/// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-/// from a signed-in user with **viewer**, **Is owner** or **Can edit**
-/// permissions in the Google Developers Console project.
+/// Authenticate using an [OAuth access
+/// token](https://developers.google.com/identity/protocols/OAuth2) from a
+/// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
+/// the Google Developers Console project.
 /// 
 /// Requests may supply an Eddystone-EID beacon name in the form:
 /// `beacons/4!beaconId` where the `beaconId` is the base16 ephemeral ID
@@ -2299,9 +2320,10 @@ impl<'a, C, A> BeaconGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// 
 /// Attachment data can be up to 1024 bytes long.
 /// 
-/// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-/// from a signed-in user with **Is owner** or **Can edit** permissions in the
-/// Google Developers Console project.
+/// Authenticate using an [OAuth access
+/// token](https://developers.google.com/identity/protocols/OAuth2) from a
+/// signed-in user with **Is owner** or **Can edit** permissions in the Google
+/// Developers Console project.
 ///
 /// A builder for the *attachments.create* method supported by a *beacon* resource.
 /// It is not used directly, but through a `BeaconMethods` instance.
@@ -2606,9 +2628,10 @@ impl<'a, C, A> BeaconAttachmentCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// permanent -- you will not be able to re-register a beacon with this ID
 /// again.
 /// 
-/// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-/// from a signed-in user with **Is owner** or **Can edit** permissions in the
-/// Google Developers Console project.
+/// Authenticate using an [OAuth access
+/// token](https://developers.google.com/identity/protocols/OAuth2) from a
+/// signed-in user with **Is owner** or **Can edit** permissions in the Google
+/// Developers Console project.
 ///
 /// A builder for the *decommission* method supported by a *beacon* resource.
 /// It is not used directly, but through a `BeaconMethods` instance.
@@ -2882,9 +2905,10 @@ impl<'a, C, A> BeaconDecommissionCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// Calling this method on an already active beacon will do nothing (but
 /// will return a successful response code).
 /// 
-/// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-/// from a signed-in user with **Is owner** or **Can edit** permissions in the
-/// Google Developers Console project.
+/// Authenticate using an [OAuth access
+/// token](https://developers.google.com/identity/protocols/OAuth2) from a
+/// signed-in user with **Is owner** or **Can edit** permissions in the Google
+/// Developers Console project.
 ///
 /// A builder for the *activate* method supported by a *beacon* resource.
 /// It is not used directly, but through a `BeaconMethods` instance.
@@ -3157,9 +3181,10 @@ impl<'a, C, A> BeaconActivateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// criteria. Only those beacons that the client has permission to list
 /// will be returned.
 /// 
-/// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-/// from a signed-in user with **viewer**, **Is owner** or **Can edit**
-/// permissions in the Google Developers Console project.
+/// Authenticate using an [OAuth access
+/// token](https://developers.google.com/identity/protocols/OAuth2) from a
+/// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
+/// the Google Developers Console project.
 ///
 /// A builder for the *list* method supported by a *beacon* resource.
 /// It is not used directly, but through a `BeaconMethods` instance.
@@ -3393,7 +3418,8 @@ impl<'a, C, A> BeaconListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// be URL-encoded.
     /// 
     /// Example REST request:
-    /// `GET /v1beta1/beacons?q=status:active%20lat:51.123%20lng:-1.095%20radius:1000`
+    /// `GET
+    /// /v1beta1/beacons?q=status:active%20lat:51.123%20lng:-1.095%20radius:1000`
     ///
     /// Sets the *q* query property to the given value.
     pub fn q(mut self, new_value: &str) -> BeaconListCall<'a, C, A> {
@@ -3495,9 +3521,10 @@ impl<'a, C, A> BeaconListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// Changes to the beacon status via this method will be  silently ignored.
 /// To update beacon status, use the separate methods on this API for
 /// activation, deactivation, and decommissioning.
-/// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-/// from a signed-in user with **Is owner** or **Can edit** permissions in the
-/// Google Developers Console project.
+/// Authenticate using an [OAuth access
+/// token](https://developers.google.com/identity/protocols/OAuth2) from a
+/// signed-in user with **Is owner** or **Can edit** permissions in the Google
+/// Developers Console project.
 ///
 /// A builder for the *update* method supported by a *beacon* resource.
 /// It is not used directly, but through a `BeaconMethods` instance.
@@ -3803,9 +3830,10 @@ impl<'a, C, A> BeaconUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// request to control which attachment is removed. This operation cannot be
 /// undone.
 /// 
-/// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-/// from a signed-in user with **Is owner** or **Can edit** permissions in the
-/// Google Developers Console project.
+/// Authenticate using an [OAuth access
+/// token](https://developers.google.com/identity/protocols/OAuth2) from a
+/// signed-in user with **Is owner** or **Can edit** permissions in the Google
+/// Developers Console project.
 ///
 /// A builder for the *attachments.delete* method supported by a *beacon* resource.
 /// It is not used directly, but through a `BeaconMethods` instance.
@@ -4077,9 +4105,10 @@ impl<'a, C, A> BeaconAttachmentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// `beaconinfo.getforobserved`. Calling this method on an already inactive
 /// beacon will do nothing (but will return a successful response code).
 /// 
-/// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-/// from a signed-in user with **Is owner** or **Can edit** permissions in the
-/// Google Developers Console project.
+/// Authenticate using an [OAuth access
+/// token](https://developers.google.com/identity/protocols/OAuth2) from a
+/// signed-in user with **Is owner** or **Can edit** permissions in the Google
+/// Developers Console project.
 ///
 /// A builder for the *deactivate* method supported by a *beacon* resource.
 /// It is not used directly, but through a `BeaconMethods` instance.
@@ -4351,9 +4380,10 @@ impl<'a, C, A> BeaconDeactivateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// Registers a previously unregistered beacon given its `advertisedId`.
 /// These IDs are unique within the system. An ID can be registered only once.
 /// 
-/// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-/// from a signed-in user with **Is owner** or **Can edit** permissions in the
-/// Google Developers Console project.
+/// Authenticate using an [OAuth access
+/// token](https://developers.google.com/identity/protocols/OAuth2) from a
+/// signed-in user with **Is owner** or **Can edit** permissions in the Google
+/// Developers Console project.
 ///
 /// A builder for the *register* method supported by a *beacon* resource.
 /// It is not used directly, but through a `BeaconMethods` instance.
@@ -4614,9 +4644,10 @@ impl<'a, C, A> BeaconRegisterCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// as well as any attachments on the beacon (including those belonging to
 /// other projects). This operation cannot be undone.
 /// 
-/// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-/// from a signed-in user with **Is owner** or **Can edit** permissions in the
-/// Google Developers Console project.
+/// Authenticate using an [OAuth access
+/// token](https://developers.google.com/identity/protocols/OAuth2) from a
+/// signed-in user with **Is owner** or **Can edit** permissions in the Google
+/// Developers Console project.
 ///
 /// A builder for the *delete* method supported by a *beacon* resource.
 /// It is not used directly, but through a `BeaconMethods` instance.
@@ -4888,9 +4919,10 @@ impl<'a, C, A> BeaconDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// all the beacons owned by your Google Developers Console project by using
 /// the beacon name `beacons/-`.
 /// 
-/// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-/// from a signed-in user with **viewer**, **Is owner** or **Can edit**
-/// permissions in the Google Developers Console project.
+/// Authenticate using an [OAuth access
+/// token](https://developers.google.com/identity/protocols/OAuth2) from a
+/// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
+/// the Google Developers Console project.
 ///
 /// A builder for the *diagnostics.list* method supported by a *beacon* resource.
 /// It is not used directly, but through a `BeaconMethods` instance.
@@ -5199,9 +5231,10 @@ impl<'a, C, A> BeaconDiagnosticListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// attachments on the given beacon will be deleted. You also may explicitly
 /// specify `*/*` to delete all.
 /// 
-/// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-/// from a signed-in user with **Is owner** or **Can edit** permissions in the
-/// Google Developers Console project.
+/// Authenticate using an [OAuth access
+/// token](https://developers.google.com/identity/protocols/OAuth2) from a
+/// signed-in user with **Is owner** or **Can edit** permissions in the Google
+/// Developers Console project.
 ///
 /// A builder for the *attachments.batchDelete* method supported by a *beacon* resource.
 /// It is not used directly, but through a `BeaconMethods` instance.
@@ -5489,7 +5522,8 @@ impl<'a, C, A> BeaconAttachmentBatchDeleteCall<'a, C, A> where C: BorrowMut<hype
 
 /// Given one or more beacon observations, returns any beacon information
 /// and attachments accessible to your application. Authorize by using the
-/// [API key](https://developers.google.com/beacons/proximity/get-started#request_a_browser_api_key)
+/// [API
+/// key](https://developers.google.com/beacons/proximity/get-started#request_a_browser_api_key)
 /// for the application.
 ///
 /// A builder for the *getforobserved* method supported by a *beaconinfo* resource.
@@ -5924,9 +5958,10 @@ impl<'a, C, A> MethodGetEidparamCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// project. Attachment data associated with a beacon must include a
 /// namespaced type, and the namespace must be owned by your project.
 /// 
-/// Authenticate using an [OAuth access token](https://developers.google.com/identity/protocols/OAuth2)
-/// from a signed-in user with **viewer**, **Is owner** or **Can edit**
-/// permissions in the Google Developers Console project.
+/// Authenticate using an [OAuth access
+/// token](https://developers.google.com/identity/protocols/OAuth2) from a
+/// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
+/// the Google Developers Console project.
 ///
 /// A builder for the *list* method supported by a *namespace* resource.
 /// It is not used directly, but through a `NamespaceMethods` instance.

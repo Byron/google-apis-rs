@@ -1171,7 +1171,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"the resource name of the Folder to be deleted.
+                     Some(r##"Required. the resource name of the Folder to be deleted.
         Must be of the form `folders/{folder_id}`."##),
                      Some(true),
                      Some(false)),
@@ -1198,7 +1198,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the Folder to retrieve.
+                     Some(r##"Required. The resource name of the Folder to retrieve.
         Must be of the form `folders/{folder_id}`."##),
                      Some(true),
                      Some(false)),
@@ -1292,7 +1292,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the Folder to move.
+                     Some(r##"Required. The resource name of the Folder to move.
         Must be of the form folders/{folder_id}"##),
                      Some(true),
                      Some(false)),
@@ -1466,7 +1466,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the Folder to undelete.
+                     Some(r##"Required. The resource name of the Folder to undelete.
         Must be of the form `folders/{folder_id}`."##),
                      Some(true),
                      Some(false)),
@@ -1522,7 +1522,7 @@ fn main() {
     
     let mut app = App::new("cloudresourcemanager2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190701")
+           .version("1.0.13+20200408")
            .about("Creates, reads, and updates metadata for Google Cloud Platform resource containers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager2_cli")
            .arg(Arg::with_name("url")

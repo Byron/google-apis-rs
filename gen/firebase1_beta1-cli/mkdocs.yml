@@ -1,4 +1,4 @@
-site_name: Firebase Management v1.0.12+20190703
+site_name: Firebase Management v1.0.13+20200407
 site_url: http://byron.github.io/google-apis-rs/google-firebase1_beta1-cli
 site_description: A complete library to interact with Firebase Management (protocol v1beta1)
 
@@ -12,6 +12,7 @@ pages:
 - ['available-projects_list.md', 'Available Projects', 'List']
 - ['operations_get.md', 'Operations', 'Get']
 - ['projects_add-firebase.md', 'Projects', 'Add Firebase']
+- ['projects_add-google-analytics.md', 'Projects', 'Add Google Analytics']
 - ['projects_android-apps-create.md', 'Projects', 'Android Apps Create']
 - ['projects_android-apps-get.md', 'Projects', 'Android Apps Get']
 - ['projects_android-apps-get-config.md', 'Projects', 'Android Apps Get Config']
@@ -24,6 +25,7 @@ pages:
 - ['projects_default-location-finalize.md', 'Projects', 'Default Location Finalize']
 - ['projects_get.md', 'Projects', 'Get']
 - ['projects_get-admin-sdk-config.md', 'Projects', 'Get Admin Sdk Config']
+- ['projects_get-analytics-details.md', 'Projects', 'Get Analytics Details']
 - ['projects_ios-apps-create.md', 'Projects', 'Ios Apps Create']
 - ['projects_ios-apps-get.md', 'Projects', 'Ios Apps Get']
 - ['projects_ios-apps-get-config.md', 'Projects', 'Ios Apps Get Config']
@@ -31,6 +33,7 @@ pages:
 - ['projects_ios-apps-patch.md', 'Projects', 'Ios Apps Patch']
 - ['projects_list.md', 'Projects', 'List']
 - ['projects_patch.md', 'Projects', 'Patch']
+- ['projects_remove-analytics.md', 'Projects', 'Remove Analytics']
 - ['projects_search-apps.md', 'Projects', 'Search Apps']
 - ['projects_web-apps-create.md', 'Projects', 'Web Apps Create']
 - ['projects_web-apps-get.md', 'Projects', 'Web Apps Get']

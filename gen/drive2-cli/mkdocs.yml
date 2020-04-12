@@ -1,4 +1,4 @@
-site_name: drive v1.0.12+20190620
+site_name: drive v1.0.13+20200326
 site_url: http://byron.github.io/google-apis-rs/google-drive2-cli
 site_description: A complete library to interact with drive (protocol v2)
 
@@ -65,8 +65,6 @@ pages:
 - ['properties_list.md', 'Properties', 'List']
 - ['properties_patch.md', 'Properties', 'Patch']
 - ['properties_update.md', 'Properties', 'Update']
-- ['realtime_get.md', 'Realtime', 'Get']
-- ['realtime_update.md', 'Realtime', 'Update']
 - ['replies_delete.md', 'Replies', 'Delete']
 - ['replies_get.md', 'Replies', 'Get']
 - ['replies_insert.md', 'Replies', 'Insert']

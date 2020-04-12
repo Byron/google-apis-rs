@@ -1038,8 +1038,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "options.requested-policy-version" => Some(("options.requestedPolicyVersion", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["options", "requested-policy-version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1199,8 +1200,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "options.requested-policy-version" => Some(("options.requestedPolicyVersion", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["options", "requested-policy-version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2015,7 +2017,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the registry. For example,
+                     Some(r##"Required. The name of the registry. For example,
         `projects/example-project/locations/us-central1/registries/my-registry`."##),
                      Some(true),
                      Some(false)),
@@ -2044,7 +2046,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The project and cloud region where this device registry must be created.
+                     Some(r##"Required. The project and cloud region where this device registry must be created.
         For example, `projects/example-project/locations/us-central1`."##),
                      Some(true),
                      Some(false)),
@@ -2073,7 +2075,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the device registry. For example,
+                     Some(r##"Required. The name of the device registry. For example,
         `projects/example-project/locations/us-central1/registries/my-registry`."##),
                      Some(true),
                      Some(false)),
@@ -2097,7 +2099,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the device. For example,
+                     Some(r##"Required. The name of the device. For example,
         `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
         `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
                      Some(true),
@@ -2121,7 +2123,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the device registry where this device should be created.
+                     Some(r##"Required. The name of the device registry where this device should be created.
         For example,
         `projects/example-project/locations/us-central1/registries/my-registry`."##),
                      Some(true),
@@ -2151,7 +2153,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the device. For example,
+                     Some(r##"Required. The name of the device. For example,
         `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
         `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
                      Some(true),
@@ -2175,7 +2177,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the device. For example,
+                     Some(r##"Required. The name of the device. For example,
         `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
         `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
                      Some(true),
@@ -2199,7 +2201,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The device registry path. Required. For example,
+                     Some(r##"Required. The device registry path. Required. For example,
         `projects/my-project/locations/us-central1/registries/my-registry`."##),
                      Some(true),
                      Some(false)),
@@ -2224,7 +2226,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the device. For example,
+                     Some(r##"Required. The name of the device. For example,
         `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
         `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
                      Some(true),
@@ -2298,7 +2300,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the device. For example,
+                     Some(r##"Required. The name of the device. For example,
         `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
         `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
                      Some(true),
@@ -2329,7 +2331,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the device. For example,
+                     Some(r##"Required. The name of the device. For example,
         `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
         `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
                      Some(true),
@@ -2353,7 +2355,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the device registry. For example,
+                     Some(r##"Required. The name of the device registry. For example,
         `projects/example-project/locations/us-central1/registries/my-registry`."##),
                      Some(true),
                      Some(false)),
@@ -2407,7 +2409,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The device registry path. Required. For example,
+                     Some(r##"Required. The device registry path. Required. For example,
         `projects/my-project/locations/us-central1/registries/my-registry`."##),
                      Some(true),
                      Some(false)),
@@ -2522,7 +2524,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The project and cloud region path. For example,
+                     Some(r##"Required. The project and cloud region path. For example,
         `projects/example-project/locations/us-central1`."##),
                      Some(true),
                      Some(false)),
@@ -2635,7 +2637,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the registry. For example,
+                     Some(r##"Required. The name of the registry. For example,
         `projects/example-project/locations/us-central1/registries/my-registry`."##),
                      Some(true),
                      Some(false)),
@@ -2664,7 +2666,7 @@ fn main() {
     
     let mut app = App::new("cloudiot1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190618")
+           .version("1.0.13+20200331")
            .about("Registers and manages IoT (Internet of Things) devices that connect to the Google Cloud Platform.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudiot1_cli")

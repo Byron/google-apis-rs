@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *fitness* crate version *1.0.12+20190701*, where *20190701* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *fitness* crate version *1.0.13+20200407*, where *20200407* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *fitness* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/fit/rest/).
@@ -232,58 +232,58 @@ pub use cmn::*;
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// View body sensor information in Google Fit
+    /// See info about your body measurements and heart rate in Google Fit
     BodyRead,
 
-    /// View and store reproductive health data in Google Fit
+    /// See and add info about your reproductive health in Google Fit. I consent to Google sharing my reporductive health information with this app.
     ReproductiveHealthWrite,
 
-    /// View blood pressure data in Google Fit
+    /// See info about your blood pressure in Google Fit. I consent to Google sharing my blood pressure information with this app.
     BloodPressureRead,
 
-    /// View and store nutrition information in Google Fit
+    /// See and add to info about your nutrition in Google Fit
     NutritionWrite,
 
-    /// View and store blood glucose data in Google Fit
+    /// See and add info about your blood glucose to Google Fit. I consent to Google sharing my blood glucose information with this app.
     BloodGlucoseWrite,
 
-    /// View and store oxygen saturation data in Google Fit
+    /// See and add info about your oxygen saturation in Google Fit. I consent to Google sharing my oxygen saturation information with this app.
     OxygenSaturationWrite,
 
-    /// View and store your location data in Google Fit
+    /// See and add to your Google Fit location data
     LocationWrite,
 
-    /// View reproductive health data in Google Fit
+    /// See info about your reproductive health in Google Fit. I consent to Google sharing my reporductive health information with this app.
     ReproductiveHealthRead,
 
-    /// View and store body temperature data in Google Fit
+    /// See and add to info about your body temperature in Google Fit. I consent to Google sharing my body temperature information with this app.
     BodyTemperatureWrite,
 
-    /// View and store body sensor data in Google Fit
+    /// See and add info about your body measurements and heart rate to Google Fit
     BodyWrite,
 
-    /// View your activity information in Google Fit
+    /// Use Google Fit to see and store your physical activity data
     ActivityRead,
 
-    /// View your stored location data in Google Fit
+    /// See your Google Fit speed and distance data
     LocationRead,
 
-    /// View and store blood pressure data in Google Fit
+    /// See and add info about your blood pressure in Google Fit. I consent to Google sharing my blood pressure information with this app.
     BloodPressureWrite,
 
-    /// View body temperature data in Google Fit
+    /// See info about your body temperature in Google Fit. I consent to Google sharing my body temperature information with this app.
     BodyTemperatureRead,
 
-    /// View and store your activity information in Google Fit
+    /// See and add to your Google Fit physical activity data
     ActivityWrite,
 
-    /// View nutrition information in Google Fit
+    /// See info about your nutrition in Google Fit
     NutritionRead,
 
-    /// View blood glucose data in Google Fit
+    /// See info about your blood glucose in Google Fit. I consent to Google sharing my blood glucose information with this app.
     BloodGlucoseRead,
 
-    /// View oxygen saturation data in Google Fit
+    /// See info about your oxygen saturation in Google Fit. I consent to Google sharing my oxygen saturation information with this app.
     OxygenSaturationRead,
 }
 
@@ -400,7 +400,7 @@ impl<'a, C, A> Fitness<C, A>
         Fitness {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://www.googleapis.com/fitness/v1/users/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -411,7 +411,7 @@ impl<'a, C, A> Fitness<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -445,10 +445,10 @@ impl<'a, C, A> Fitness<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AggregateBy {
-    /// A data source ID to aggregate. Mutually exclusive of dataTypeName. Only data from the specified data source ID will be included in the aggregation. The dataset in the response will have the same data source ID.
+    /// A data source ID to aggregate. Only data from the specified data source ID will be included in the aggregation. If specified, this data source must exist; the OAuth scopes in the supplied credentials must grant read access to this data type. The dataset in the response will have the same data source ID. Note: Data can be aggregated by either the dataTypeName or the dataSourceId, not both.
     #[serde(rename="dataSourceId")]
     pub data_source_id: Option<String>,
-    /// The data type to aggregate. All data sources providing this data type will contribute data to the aggregation. The response will contain a single dataset for this data type name. The dataset will have a data source ID of derived:com.google.:com.google.android.gms:aggregated
+    /// The data type to aggregate. All data sources providing this data type will contribute data to the aggregation. The response will contain a single dataset for this data type name. The dataset will have a data source ID of derived::com.google.android.gms:aggregated. If the user has no data for this data type, an empty data set will be returned. Note: Data can be aggregated by either the dataTypeName or the dataSourceId, not both.
     #[serde(rename="dataTypeName")]
     pub data_type_name: Option<String>,
 }
@@ -567,7 +567,7 @@ impl Part for DataPoint {}
 
 /// Holder object for the value of a single field in a data point.
 /// 
-/// A field value has a particular format and is only ever set to one of an integer or a floating point value. LINT.IfChange
+/// A field value has a particular format and is only ever set to one of an integer or a floating point value.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -862,6 +862,8 @@ pub struct Device {
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// The serial number or other unique ID for the hardware. This field is obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the uid field in clear and normal form.
+    /// 
+    /// The obfuscation preserves equality; that is, given two IDs, if id1 == id2, obfuscated(id1) == obfuscated(id2).
     pub uid: Option<String>,
     /// Manufacturer of the product/hardware.
     pub manufacturer: Option<String>,
@@ -980,7 +982,7 @@ pub struct DataSource {
     /// 
     /// When any of the optional fields that make up the data stream ID are absent, they will be omitted from the data stream ID. The minimum viable data stream ID would be: type:dataType.name:developer project number
     /// 
-    /// Finally, the developer project number is obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the developer project number in clear and normal form.
+    /// Finally, the developer project number and device UID are obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the developer project number in clear and normal form. This means a client will see a different set of data_stream_ids than another client with different credentials.
     #[serde(rename="dataStreamId")]
     pub data_stream_id: Option<String>,
     /// A constant describing the type of this data source. Indicates whether this data source produces raw or derived data.
@@ -1038,7 +1040,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Aggregates data of a certain type or stream into buckets divided by a given type of boundary. Multiple data sets of multiple types and from multiple sources can be aggreated into exactly one bucket type per request.
+    /// Aggregates data of a certain type or stream into buckets divided by a given type of boundary. Multiple data sets of multiple types and from multiple sources can be aggregated into exactly one bucket type per request.
     /// 
     /// # Arguments
     ///
@@ -1099,7 +1101,17 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new data source that is unique across all data sources belonging to this user. The data stream ID field can be omitted and will be generated by the server with the correct format. The data stream ID is an ordered combination of some fields from the data source. In addition to the data source fields reflected into the data source ID, the developer project number that is authenticated when creating the data source is included. This developer project number is obfuscated when read by any other developer reading public data types.
+    /// Creates a new data source that is unique across all data sources belonging to this user.
+    /// 
+    /// A data source is a unique source of sensor data. Data sources can expose raw data coming from hardware sensors on local or companion devices. They can also expose derived data, created by transforming or merging other data sources. Multiple data sources can exist for the same data type. Every data point in every dataset inserted into or read from the Fitness API has an associated data source.
+    /// 
+    /// Each data source produces a unique stream of dataset updates, with a unique data source identifier. Not all changes to data source affect the data stream ID, so that data collected by updated versions of the same application/device can still be considered to belong to the same data source.
+    /// 
+    /// Data sources are identified using a string generated by the server, based on the contents of the source being created. The dataStreamId field should not be set when invoking this method. It will be automatically generated by the server with the correct format. If a dataStreamId is set, it must match the format that the server would generate. This format is a combination of some fields from the data source, and has a specific order. If it doesn't match, the request will fail with an error.
+    /// 
+    /// Specifying a DataType which is not a known type (beginning with "com.google.") will create a DataSource with a custom data type. Custom data types are only readable by the application that created them. Custom data types are deprecated; use standard data types instead.
+    /// 
+    /// In addition to the data source fields included in the data source ID, the developer project number that is authenticated when creating the data source is included. This developer project number is obfuscated when read by any other developer reading public data types.
     /// 
     /// # Arguments
     ///
@@ -1240,6 +1252,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
             _page_token: Default::default(),
             _include_deleted: Default::default(),
             _end_time: Default::default(),
+            _activity_type: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1316,7 +1329,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Aggregates data of a certain type or stream into buckets divided by a given type of boundary. Multiple data sets of multiple types and from multiple sources can be aggreated into exactly one bucket type per request.
+/// Aggregates data of a certain type or stream into buckets divided by a given type of boundary. Multiple data sets of multiple types and from multiple sources can be aggregated into exactly one bucket type per request.
 ///
 /// A builder for the *dataset.aggregate* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -2127,7 +2140,17 @@ impl<'a, C, A> UserDataSourceDatasetGetCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Creates a new data source that is unique across all data sources belonging to this user. The data stream ID field can be omitted and will be generated by the server with the correct format. The data stream ID is an ordered combination of some fields from the data source. In addition to the data source fields reflected into the data source ID, the developer project number that is authenticated when creating the data source is included. This developer project number is obfuscated when read by any other developer reading public data types.
+/// Creates a new data source that is unique across all data sources belonging to this user.
+/// 
+/// A data source is a unique source of sensor data. Data sources can expose raw data coming from hardware sensors on local or companion devices. They can also expose derived data, created by transforming or merging other data sources. Multiple data sources can exist for the same data type. Every data point in every dataset inserted into or read from the Fitness API has an associated data source.
+/// 
+/// Each data source produces a unique stream of dataset updates, with a unique data source identifier. Not all changes to data source affect the data stream ID, so that data collected by updated versions of the same application/device can still be considered to belong to the same data source.
+/// 
+/// Data sources are identified using a string generated by the server, based on the contents of the source being created. The dataStreamId field should not be set when invoking this method. It will be automatically generated by the server with the correct format. If a dataStreamId is set, it must match the format that the server would generate. This format is a combination of some fields from the data source, and has a specific order. If it doesn't match, the request will fail with an error.
+/// 
+/// Specifying a DataType which is not a known type (beginning with "com.google.") will create a DataSource with a custom data type. Custom data types are only readable by the application that created them. Custom data types are deprecated; use standard data types instead.
+/// 
+/// In addition to the data source fields included in the data source ID, the developer project number that is authenticated when creating the data source is included. This developer project number is obfuscated when read by any other developer reading public data types.
 ///
 /// A builder for the *dataSources.create* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -3804,6 +3827,7 @@ impl<'a, C, A> UserDataSourceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 ///              .page_token("eos")
 ///              .include_deleted(false)
 ///              .end_time("sadipscing")
+///              .add_activity_type(-48)
 ///              .doit();
 /// # }
 /// ```
@@ -3816,6 +3840,7 @@ pub struct UserSessionListCall<'a, C, A>
     _page_token: Option<String>,
     _include_deleted: Option<bool>,
     _end_time: Option<String>,
+    _activity_type: Vec<i32>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -3837,7 +3862,7 @@ impl<'a, C, A> UserSessionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "fitness.users.sessions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("userId", self._user_id.to_string()));
         if let Some(value) = self._start_time {
             params.push(("startTime", value.to_string()));
@@ -3851,7 +3876,12 @@ impl<'a, C, A> UserSessionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         if let Some(value) = self._end_time {
             params.push(("endTime", value.to_string()));
         }
-        for &field in ["alt", "userId", "startTime", "pageToken", "includeDeleted", "endTime"].iter() {
+        if self._activity_type.len() > 0 {
+            for f in self._activity_type.iter() {
+                params.push(("activityType", f.to_string()));
+            }
+        }
+        for &field in ["alt", "userId", "startTime", "pageToken", "includeDeleted", "endTime", "activityType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4001,6 +4031,14 @@ impl<'a, C, A> UserSessionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._end_time = Some(new_value.to_string());
         self
     }
+    /// If non-empty, only sessions with these activity types should be returned.
+    ///
+    /// Append the given value to the *activity type* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_activity_type(mut self, new_value: i32) -> UserSessionListCall<'a, C, A> {
+        self._activity_type.push(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -4094,7 +4132,7 @@ impl<'a, C, A> UserSessionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().sessions_update(req, "userId", "sessionId")
-///              .current_time_millis("elitr")
+///              .current_time_millis("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -4383,8 +4421,8 @@ impl<'a, C, A> UserSessionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().data_sources_data_point_changes_list("userId", "dataSourceId")
-///              .page_token("labore")
-///              .limit(-39)
+///              .page_token("eirmod")
+///              .limit(-33)
 ///              .doit();
 /// # }
 /// ```
@@ -4659,7 +4697,7 @@ impl<'a, C, A> UserDataSourceDataPointChangeListCall<'a, C, A> where C: BorrowMu
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().data_sources_list("userId")
-///              .add_data_type_name("invidunt")
+///              .add_data_type_name("aliquyam")
 ///              .doit();
 /// # }
 /// ```

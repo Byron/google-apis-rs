@@ -1,4 +1,4 @@
-site_name: Cloud Filestore v1.0.12+20190627
+site_name: Cloud Filestore v1.0.13+20200406
 site_url: http://byron.github.io/google-apis-rs/google-file1-cli
 site_description: A complete library to interact with Cloud Filestore (protocol v1)
 

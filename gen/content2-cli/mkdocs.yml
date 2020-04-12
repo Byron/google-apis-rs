@@ -1,4 +1,4 @@
-site_name: Shopping Content v1.0.12+20190702
+site_name: Shopping Content v1.0.13+20200310
 site_url: http://byron.github.io/google-apis-rs/google-content2-cli
 site_description: A complete library to interact with Shopping Content (protocol v2)
 
@@ -17,7 +17,6 @@ pages:
 - ['accounts_insert.md', 'Accounts', 'Insert']
 - ['accounts_link.md', 'Accounts', 'Link']
 - ['accounts_list.md', 'Accounts', 'List']
-- ['accounts_patch.md', 'Accounts', 'Patch']
 - ['accounts_update.md', 'Accounts', 'Update']
 - ['accountstatuses_custombatch.md', 'Accountstatuses', 'Custombatch']
 - ['accountstatuses_get.md', 'Accountstatuses', 'Get']
@@ -25,7 +24,6 @@ pages:
 - ['accounttax_custombatch.md', 'Accounttax', 'Custombatch']
 - ['accounttax_get.md', 'Accounttax', 'Get']
 - ['accounttax_list.md', 'Accounttax', 'List']
-- ['accounttax_patch.md', 'Accounttax', 'Patch']
 - ['accounttax_update.md', 'Accounttax', 'Update']
 - ['datafeeds_custombatch.md', 'Datafeeds', 'Custombatch']
 - ['datafeeds_delete.md', 'Datafeeds', 'Delete']
@@ -33,7 +31,6 @@ pages:
 - ['datafeeds_get.md', 'Datafeeds', 'Get']
 - ['datafeeds_insert.md', 'Datafeeds', 'Insert']
 - ['datafeeds_list.md', 'Datafeeds', 'List']
-- ['datafeeds_patch.md', 'Datafeeds', 'Patch']
 - ['datafeeds_update.md', 'Datafeeds', 'Update']
 - ['datafeedstatuses_custombatch.md', 'Datafeedstatuses', 'Custombatch']
 - ['datafeedstatuses_get.md', 'Datafeedstatuses', 'Get']
@@ -45,7 +42,6 @@ pages:
 - ['liasettings_getaccessiblegmbaccounts.md', 'Liasettings', 'Getaccessiblegmbaccounts']
 - ['liasettings_list.md', 'Liasettings', 'List']
 - ['liasettings_listposdataproviders.md', 'Liasettings', 'Listposdataproviders']
-- ['liasettings_patch.md', 'Liasettings', 'Patch']
 - ['liasettings_requestgmbaccess.md', 'Liasettings', 'Requestgmbaccess']
 - ['liasettings_requestinventoryverification.md', 'Liasettings', 'Requestinventoryverification']
 - ['liasettings_setinventoryverificationcontact.md', 'Liasettings', 'Setinventoryverificationcontact']
@@ -53,10 +49,6 @@ pages:
 - ['liasettings_update.md', 'Liasettings', 'Update']
 - ['orderinvoices_createchargeinvoice.md', 'Orderinvoices', 'Createchargeinvoice']
 - ['orderinvoices_createrefundinvoice.md', 'Orderinvoices', 'Createrefundinvoice']
-- ['orderpayments_notifyauthapproved.md', 'Orderpayments', 'Notifyauthapproved']
-- ['orderpayments_notifyauthdeclined.md', 'Orderpayments', 'Notifyauthdeclined']
-- ['orderpayments_notifycharge.md', 'Orderpayments', 'Notifycharge']
-- ['orderpayments_notifyrefund.md', 'Orderpayments', 'Notifyrefund']
 - ['orderreports_listdisbursements.md', 'Orderreports', 'Listdisbursements']
 - ['orderreports_listtransactions.md', 'Orderreports', 'Listtransactions']
 - ['orderreturns_get.md', 'Orderreturns', 'Get']
@@ -102,8 +94,8 @@ pages:
 - ['shippingsettings_get.md', 'Shippingsettings', 'Get']
 - ['shippingsettings_getsupportedcarriers.md', 'Shippingsettings', 'Getsupportedcarriers']
 - ['shippingsettings_getsupportedholidays.md', 'Shippingsettings', 'Getsupportedholidays']
+- ['shippingsettings_getsupportedpickupservices.md', 'Shippingsettings', 'Getsupportedpickupservices']
 - ['shippingsettings_list.md', 'Shippingsettings', 'List']
-- ['shippingsettings_patch.md', 'Shippingsettings', 'Patch']
 - ['shippingsettings_update.md', 'Shippingsettings', 'Update']
 
 theme: readthedocs

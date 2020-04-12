@@ -4,12 +4,12 @@
 [package]
 
 name = "google-libraryagent1"
-version = "1.0.12+20190703"
+version = "1.0.13+20200409"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Libraryagent (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/libraryagent1"
 homepage = "https://cloud.google.com/docs/quota"
-documentation = "https://docs.rs/google-libraryagent1/1.0.12+20190703"
+documentation = "https://docs.rs/google-libraryagent1/1.0.13+20200409"
 license = "MIT"
 keywords = ["libraryagent", "google", "protocol", "web", "api"]
 autobins = false

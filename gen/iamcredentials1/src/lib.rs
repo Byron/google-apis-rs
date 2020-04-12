@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *IAM Credentials* crate version *1.0.12+20190620*, where *20190620* is the exact revision of the *iamcredentials:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *IAM Credentials* crate version *1.0.13+20200327*, where *20200327* is the exact revision of the *iamcredentials:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *IAM Credentials* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iam/docs/creating-short-lived-service-account-credentials).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.IAMCredentials.html) ... 
 //! 
 //! * projects
-//!  * [*service accounts generate access token*](struct.ProjectServiceAccountGenerateAccessTokenCall.html), [*service accounts generate id token*](struct.ProjectServiceAccountGenerateIdTokenCall.html), [*service accounts generate identity binding access token*](struct.ProjectServiceAccountGenerateIdentityBindingAccessTokenCall.html), [*service accounts sign blob*](struct.ProjectServiceAccountSignBlobCall.html) and [*service accounts sign jwt*](struct.ProjectServiceAccountSignJwtCall.html)
+//!  * [*service accounts generate access token*](struct.ProjectServiceAccountGenerateAccessTokenCall.html), [*service accounts generate id token*](struct.ProjectServiceAccountGenerateIdTokenCall.html), [*service accounts sign blob*](struct.ProjectServiceAccountSignBlobCall.html) and [*service accounts sign jwt*](struct.ProjectServiceAccountSignJwtCall.html)
 //! 
 //! 
 //! 
@@ -329,7 +329,7 @@ impl<'a, C, A> IAMCredentials<C, A>
         IAMCredentials {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://iamcredentials.googleapis.com/".to_string(),
             _root_url: "https://iamcredentials.googleapis.com/".to_string(),
         }
@@ -340,7 +340,7 @@ impl<'a, C, A> IAMCredentials<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -435,103 +435,11 @@ pub struct SignJwtRequest {
     /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
     /// character is required; replacing it with a project ID is invalid.
     pub delegates: Option<Vec<String>>,
-    /// The JWT payload to sign: a JSON object that contains a JWT Claims Set.
+    /// Required. The JWT payload to sign: a JSON object that contains a JWT Claims Set.
     pub payload: Option<String>,
 }
 
 impl RequestValue for SignJwtRequest {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [service accounts generate identity binding access token projects](struct.ProjectServiceAccountGenerateIdentityBindingAccessTokenCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GenerateIdentityBindingAccessTokenRequest {
-    /// Code to identify the scopes to be included in the OAuth 2.0 access token.
-    /// See https://developers.google.com/identity/protocols/googlescopes for more
-    /// information.
-    /// At least one value required.
-    pub scope: Option<Vec<String>>,
-    /// Required. Input token.
-    /// Must be in JWT format according to
-    /// RFC7523 (https://tools.ietf.org/html/rfc7523)
-    /// and must have 'kid' field in the header.
-    /// Supported signing algorithms: RS256 (RS512, ES256, ES512 coming soon).
-    /// Mandatory payload fields (along the lines of RFC 7523, section 3):
-    /// 
-    /// * iss: issuer of the token. Must provide a discovery document at
-    ///   $iss/.well-known/openid-configuration . The document needs to be
-    ///   formatted according to section 4.2 of the OpenID Connect Discovery
-    ///   1.0 specification.
-    /// * iat: Issue time in seconds since epoch. Must be in the past.
-    /// * exp: Expiration time in seconds since epoch. Must be less than 48 hours
-    ///   after iat. We recommend to create tokens that last shorter than 6
-    ///   hours to improve security unless business reasons mandate longer
-    ///   expiration times. Shorter token lifetimes are generally more secure
-    ///   since tokens that have been exfiltrated by attackers can be used for
-    ///   a shorter time. you can configure the maximum lifetime of the
-    ///   incoming token in the configuration of the mapper.
-    ///   The resulting Google token will expire within an hour or at "exp",
-    ///   whichever is earlier.
-    /// * sub: JWT subject, identity asserted in the JWT.
-    /// * aud: Configured in the mapper policy. By default the service account
-    ///   email.
-    /// 
-    /// Claims from the incoming token can be transferred into the output token
-    /// accoding to the mapper configuration. The outgoing claim size is limited.
-    /// Outgoing claims size must be less than 4kB serialized as JSON without
-    /// whitespace.
-    /// 
-    /// Example header:
-    /// {
-    /// "alg": "RS256",
-    /// "kid": "92a4265e14ab04d4d228a48d10d4ca31610936f8"
-    /// }
-    /// Example payload:
-    /// {
-    /// "iss": "https://accounts.google.com",
-    /// "iat": 1517963104,
-    /// "exp": 1517966704,
-    /// "aud":
-    /// "https://iamcredentials.googleapis.com/google.iam.credentials.v1.CloudGaia",
-    /// "sub": "113475438248934895348",
-    /// "my_claims": {
-    /// "additional_claim": "value"
-    /// }
-    /// }
-    pub jwt: Option<String>,
-}
-
-impl RequestValue for GenerateIdentityBindingAccessTokenRequest {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [service accounts generate identity binding access token projects](struct.ProjectServiceAccountGenerateIdentityBindingAccessTokenCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GenerateIdentityBindingAccessTokenResponse {
-    /// Token expiration time.
-    /// The expiration time is always set.
-    #[serde(rename="expireTime")]
-    pub expire_time: Option<String>,
-    /// The OAuth 2.0 access token.
-    #[serde(rename="accessToken")]
-    pub access_token: Option<String>,
-}
-
-impl ResponseResult for GenerateIdentityBindingAccessTokenResponse {}
 
 
 /// There is no detailed description.
@@ -578,7 +486,7 @@ pub struct SignBlobRequest {
     /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
     /// character is required; replacing it with a project ID is invalid.
     pub delegates: Option<Vec<String>>,
-    /// The bytes to sign.
+    /// Required. The bytes to sign.
     pub payload: Option<String>,
 }
 
@@ -612,7 +520,7 @@ pub struct GenerateAccessTokenRequest {
     /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
     /// character is required; replacing it with a project ID is invalid.
     pub delegates: Option<Vec<String>>,
-    /// Code to identify the scopes to be included in the OAuth 2.0 access token.
+    /// Required. Code to identify the scopes to be included in the OAuth 2.0 access token.
     /// See https://developers.google.com/identity/protocols/googlescopes for more
     /// information.
     /// At least one value required.
@@ -655,7 +563,7 @@ pub struct GenerateIdTokenRequest {
     /// token will contain `email` and `email_verified` claims.
     #[serde(rename="includeEmail")]
     pub include_email: Option<bool>,
-    /// The audience for the token, such as the API or account that this token
+    /// Required. The audience for the token, such as the API or account that this token
     /// grants access to.
     pub audience: Option<String>,
     /// The sequence of service accounts in a delegation chain. Each service
@@ -703,7 +611,7 @@ impl RequestValue for GenerateIdTokenRequest {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = IAMCredentials::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `service_accounts_generate_access_token(...)`, `service_accounts_generate_id_token(...)`, `service_accounts_generate_identity_binding_access_token(...)`, `service_accounts_sign_blob(...)` and `service_accounts_sign_jwt(...)`
+/// // like `service_accounts_generate_access_token(...)`, `service_accounts_generate_id_token(...)`, `service_accounts_sign_blob(...)` and `service_accounts_sign_jwt(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -720,21 +628,22 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// 
+    /// Generates an OAuth 2.0 access token for a service account.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the service account for which the credentials
+    /// * `name` - Required. The resource name of the service account for which the credentials
     ///            are requested, in the following format:
     ///            `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
     ///            character is required; replacing it with a project ID is invalid.
-    pub fn service_accounts_generate_identity_binding_access_token(&self, request: GenerateIdentityBindingAccessTokenRequest, name: &str) -> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C, A> {
-        ProjectServiceAccountGenerateIdentityBindingAccessTokenCall {
+    pub fn service_accounts_generate_access_token(&self, request: GenerateAccessTokenRequest, name: &str) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> {
+        ProjectServiceAccountGenerateAccessTokenCall {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -746,7 +655,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the service account for which the credentials
+    /// * `name` - Required. The resource name of the service account for which the credentials
     ///            are requested, in the following format:
     ///            `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
     ///            character is required; replacing it with a project ID is invalid.
@@ -768,7 +677,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the service account for which the credentials
+    /// * `name` - Required. The resource name of the service account for which the credentials
     ///            are requested, in the following format:
     ///            `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
     ///            character is required; replacing it with a project ID is invalid.
@@ -790,34 +699,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The resource name of the service account for which the credentials
+    /// * `name` - Required. The resource name of the service account for which the credentials
     ///            are requested, in the following format:
     ///            `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
     ///            character is required; replacing it with a project ID is invalid.
     pub fn service_accounts_generate_id_token(&self, request: GenerateIdTokenRequest, name: &str) -> ProjectServiceAccountGenerateIdTokenCall<'a, C, A> {
         ProjectServiceAccountGenerateIdTokenCall {
-            hub: self.hub,
-            _request: request,
-            _name: name.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Generates an OAuth 2.0 access token for a service account.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `name` - The resource name of the service account for which the credentials
-    ///            are requested, in the following format:
-    ///            `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
-    ///            character is required; replacing it with a project ID is invalid.
-    pub fn service_accounts_generate_access_token(&self, request: GenerateAccessTokenRequest, name: &str) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> {
-        ProjectServiceAccountGenerateAccessTokenCall {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
@@ -836,9 +723,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// 
+/// Generates an OAuth 2.0 access token for a service account.
 ///
-/// A builder for the *serviceAccounts.generateIdentityBindingAccessToken* method supported by a *project* resource.
+/// A builder for the *serviceAccounts.generateAccessToken* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -850,7 +737,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_iamcredentials1 as iamcredentials1;
-/// use iamcredentials1::GenerateIdentityBindingAccessTokenRequest;
+/// use iamcredentials1::GenerateAccessTokenRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -864,32 +751,33 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = GenerateIdentityBindingAccessTokenRequest::default();
+/// let mut req = GenerateAccessTokenRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().service_accounts_generate_identity_binding_access_token(req, "name")
+/// let result = hub.projects().service_accounts_generate_access_token(req, "name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C, A>
+pub struct ProjectServiceAccountGenerateAccessTokenCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a IAMCredentials<C, A>,
-    _request: GenerateIdentityBindingAccessTokenRequest,
+    _request: GenerateAccessTokenRequest,
     _name: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, GenerateIdentityBindingAccessTokenResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GenerateAccessTokenResponse)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -898,7 +786,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "iamcredentials.projects.serviceAccounts.generateIdentityBindingAccessToken",
+        dlg.begin(MethodInfo { id: "iamcredentials.projects.serviceAccounts.generateAccessToken",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
@@ -914,18 +802,9 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+name}:generateIdentityBindingAccessToken";
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:generateAccessToken";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -969,11 +848,25 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(&mut request_value_reader);
@@ -1032,11 +925,11 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GenerateIdentityBindingAccessTokenRequest) -> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C, A> {
+    pub fn request(mut self, new_value: GenerateAccessTokenRequest) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// The resource name of the service account for which the credentials
+    /// Required. The resource name of the service account for which the credentials
     /// are requested, in the following format:
     /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
     /// character is required; replacing it with a project ID is invalid.
@@ -1045,7 +938,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -1055,7 +948,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1080,12 +973,35 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
 }
 
 
@@ -1295,7 +1211,7 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
         self._request = new_value;
         self
     }
-    /// The resource name of the service account for which the credentials
+    /// Required. The resource name of the service account for which the credentials
     /// are requested, in the following format:
     /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
     /// character is required; replacing it with a project ID is invalid.
@@ -1577,7 +1493,7 @@ impl<'a, C, A> ProjectServiceAccountSignJwtCall<'a, C, A> where C: BorrowMut<hyp
         self._request = new_value;
         self
     }
-    /// The resource name of the service account for which the credentials
+    /// Required. The resource name of the service account for which the credentials
     /// are requested, in the following format:
     /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
     /// character is required; replacing it with a project ID is invalid.
@@ -1859,7 +1775,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdTokenCall<'a, C, A> where C: Borro
         self._request = new_value;
         self
     }
-    /// The resource name of the service account for which the credentials
+    /// Required. The resource name of the service account for which the credentials
     /// are requested, in the following format:
     /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
     /// character is required; replacing it with a project ID is invalid.
@@ -1924,288 +1840,6 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdTokenCall<'a, C, A> where C: Borro
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectServiceAccountGenerateIdTokenCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Generates an OAuth 2.0 access token for a service account.
-///
-/// A builder for the *serviceAccounts.generateAccessToken* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_iamcredentials1 as iamcredentials1;
-/// use iamcredentials1::GenerateAccessTokenRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use iamcredentials1::IAMCredentials;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = IAMCredentials::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = GenerateAccessTokenRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().service_accounts_generate_access_token(req, "name")
-///              .doit();
-/// # }
-/// ```
-pub struct ProjectServiceAccountGenerateAccessTokenCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a IAMCredentials<C, A>,
-    _request: GenerateAccessTokenRequest,
-    _name: String,
-    _delegate: Option<&'a mut dyn Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> {}
-
-impl<'a, C, A> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, GenerateAccessTokenResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut dyn Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "iamcredentials.projects.serviceAccounts.generateAccessToken",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/{+name}:generateAccessToken";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        let url = hyper::Url::parse_with_params(&url, params).unwrap();
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GenerateAccessTokenRequest) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The resource name of the service account for which the credentials
-    /// are requested, in the following format:
-    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
-    /// character is required; replacing it with a project ID is invalid.
-    ///
-    /// Sets the *name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

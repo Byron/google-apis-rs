@@ -25,16 +25,19 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Logging* API at revision *20190629*. The CLI is at version *1.0.12*.
+This documentation was generated from the *Logging* API at revision *20200407*. The CLI is at version *1.0.13*.
 
 ```bash
 logging2 [options]
         billing-accounts
+                buckets-get <name> [-p <v>]... [-o <out>]
                 exclusions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 exclusions-delete <name> [-p <v>]... [-o <out>]
                 exclusions-get <name> [-p <v>]... [-o <out>]
                 exclusions-list <parent> [-p <v>]... [-o <out>]
                 exclusions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-list <parent> [-p <v>]... [-o <out>]
+                locations-buckets-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 logs-delete <log-name> [-p <v>]... [-o <out>]
                 logs-list <parent> [-p <v>]... [-o <out>]
                 sinks-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -58,6 +61,9 @@ logging2 [options]
                 exclusions-get <name> [-p <v>]... [-o <out>]
                 exclusions-list <parent> [-p <v>]... [-o <out>]
                 exclusions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-get <name> [-p <v>]... [-o <out>]
+                locations-buckets-list <parent> [-p <v>]... [-o <out>]
+                locations-buckets-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 logs-delete <log-name> [-p <v>]... [-o <out>]
                 logs-list <parent> [-p <v>]... [-o <out>]
                 sinks-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -66,9 +72,16 @@ logging2 [options]
                 sinks-list <parent> [-p <v>]... [-o <out>]
                 sinks-patch <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 sinks-update <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
+        locations
+                buckets-get <name> [-p <v>]... [-o <out>]
+                buckets-list <parent> [-p <v>]... [-o <out>]
+                buckets-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
         logs
                 delete <log-name> [-p <v>]... [-o <out>]
                 list <parent> [-p <v>]... [-o <out>]
+        methods
+                get-cmek-settings <name> [-p <v>]... [-o <out>]
+                update-cmek-settings <name> (-r <kv>)... [-p <v>]... [-o <out>]
         monitored-resource-descriptors
                 list [-p <v>]... [-o <out>]
         organizations
@@ -77,6 +90,10 @@ logging2 [options]
                 exclusions-get <name> [-p <v>]... [-o <out>]
                 exclusions-list <parent> [-p <v>]... [-o <out>]
                 exclusions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                get-cmek-settings <name> [-p <v>]... [-o <out>]
+                locations-buckets-get <name> [-p <v>]... [-o <out>]
+                locations-buckets-list <parent> [-p <v>]... [-o <out>]
+                locations-buckets-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 logs-delete <log-name> [-p <v>]... [-o <out>]
                 logs-list <parent> [-p <v>]... [-o <out>]
                 sinks-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -85,12 +102,16 @@ logging2 [options]
                 sinks-list <parent> [-p <v>]... [-o <out>]
                 sinks-patch <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 sinks-update <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
+                update-cmek-settings <name> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
                 exclusions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 exclusions-delete <name> [-p <v>]... [-o <out>]
                 exclusions-get <name> [-p <v>]... [-o <out>]
                 exclusions-list <parent> [-p <v>]... [-o <out>]
                 exclusions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-buckets-get <name> [-p <v>]... [-o <out>]
+                locations-buckets-list <parent> [-p <v>]... [-o <out>]
+                locations-buckets-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 logs-delete <log-name> [-p <v>]... [-o <out>]
                 logs-list <parent> [-p <v>]... [-o <out>]
                 metrics-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]

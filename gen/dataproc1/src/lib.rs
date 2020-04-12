@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Dataproc* crate version *1.0.12+20190620*, where *20190620* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Dataproc* crate version *1.0.13+20200323*, where *20200323* is the exact revision of the *dataproc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Dataproc* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/dataproc/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Dataproc.html) ... 
 //! 
 //! * projects
-//!  * [*locations autoscaling policies get iam policy*](struct.ProjectLocationAutoscalingPolicyGetIamPolicyCall.html), [*locations autoscaling policies set iam policy*](struct.ProjectLocationAutoscalingPolicySetIamPolicyCall.html), [*locations autoscaling policies test iam permissions*](struct.ProjectLocationAutoscalingPolicyTestIamPermissionCall.html), [*locations workflow templates create*](struct.ProjectLocationWorkflowTemplateCreateCall.html), [*locations workflow templates delete*](struct.ProjectLocationWorkflowTemplateDeleteCall.html), [*locations workflow templates get*](struct.ProjectLocationWorkflowTemplateGetCall.html), [*locations workflow templates get iam policy*](struct.ProjectLocationWorkflowTemplateGetIamPolicyCall.html), [*locations workflow templates instantiate*](struct.ProjectLocationWorkflowTemplateInstantiateCall.html), [*locations workflow templates instantiate inline*](struct.ProjectLocationWorkflowTemplateInstantiateInlineCall.html), [*locations workflow templates list*](struct.ProjectLocationWorkflowTemplateListCall.html), [*locations workflow templates set iam policy*](struct.ProjectLocationWorkflowTemplateSetIamPolicyCall.html), [*locations workflow templates test iam permissions*](struct.ProjectLocationWorkflowTemplateTestIamPermissionCall.html), [*locations workflow templates update*](struct.ProjectLocationWorkflowTemplateUpdateCall.html), [*regions autoscaling policies get iam policy*](struct.ProjectRegionAutoscalingPolicyGetIamPolicyCall.html), [*regions autoscaling policies set iam policy*](struct.ProjectRegionAutoscalingPolicySetIamPolicyCall.html), [*regions autoscaling policies test iam permissions*](struct.ProjectRegionAutoscalingPolicyTestIamPermissionCall.html), [*regions clusters create*](struct.ProjectRegionClusterCreateCall.html), [*regions clusters delete*](struct.ProjectRegionClusterDeleteCall.html), [*regions clusters diagnose*](struct.ProjectRegionClusterDiagnoseCall.html), [*regions clusters get*](struct.ProjectRegionClusterGetCall.html), [*regions clusters get iam policy*](struct.ProjectRegionClusterGetIamPolicyCall.html), [*regions clusters list*](struct.ProjectRegionClusterListCall.html), [*regions clusters patch*](struct.ProjectRegionClusterPatchCall.html), [*regions clusters set iam policy*](struct.ProjectRegionClusterSetIamPolicyCall.html), [*regions clusters test iam permissions*](struct.ProjectRegionClusterTestIamPermissionCall.html), [*regions jobs cancel*](struct.ProjectRegionJobCancelCall.html), [*regions jobs delete*](struct.ProjectRegionJobDeleteCall.html), [*regions jobs get*](struct.ProjectRegionJobGetCall.html), [*regions jobs get iam policy*](struct.ProjectRegionJobGetIamPolicyCall.html), [*regions jobs list*](struct.ProjectRegionJobListCall.html), [*regions jobs patch*](struct.ProjectRegionJobPatchCall.html), [*regions jobs set iam policy*](struct.ProjectRegionJobSetIamPolicyCall.html), [*regions jobs submit*](struct.ProjectRegionJobSubmitCall.html), [*regions jobs test iam permissions*](struct.ProjectRegionJobTestIamPermissionCall.html), [*regions operations cancel*](struct.ProjectRegionOperationCancelCall.html), [*regions operations delete*](struct.ProjectRegionOperationDeleteCall.html), [*regions operations get*](struct.ProjectRegionOperationGetCall.html), [*regions operations get iam policy*](struct.ProjectRegionOperationGetIamPolicyCall.html), [*regions operations list*](struct.ProjectRegionOperationListCall.html), [*regions operations set iam policy*](struct.ProjectRegionOperationSetIamPolicyCall.html), [*regions operations test iam permissions*](struct.ProjectRegionOperationTestIamPermissionCall.html), [*regions workflow templates create*](struct.ProjectRegionWorkflowTemplateCreateCall.html), [*regions workflow templates delete*](struct.ProjectRegionWorkflowTemplateDeleteCall.html), [*regions workflow templates get*](struct.ProjectRegionWorkflowTemplateGetCall.html), [*regions workflow templates get iam policy*](struct.ProjectRegionWorkflowTemplateGetIamPolicyCall.html), [*regions workflow templates instantiate*](struct.ProjectRegionWorkflowTemplateInstantiateCall.html), [*regions workflow templates instantiate inline*](struct.ProjectRegionWorkflowTemplateInstantiateInlineCall.html), [*regions workflow templates list*](struct.ProjectRegionWorkflowTemplateListCall.html), [*regions workflow templates set iam policy*](struct.ProjectRegionWorkflowTemplateSetIamPolicyCall.html), [*regions workflow templates test iam permissions*](struct.ProjectRegionWorkflowTemplateTestIamPermissionCall.html) and [*regions workflow templates update*](struct.ProjectRegionWorkflowTemplateUpdateCall.html)
+//!  * [*locations autoscaling policies create*](struct.ProjectLocationAutoscalingPolicyCreateCall.html), [*locations autoscaling policies delete*](struct.ProjectLocationAutoscalingPolicyDeleteCall.html), [*locations autoscaling policies get*](struct.ProjectLocationAutoscalingPolicyGetCall.html), [*locations autoscaling policies get iam policy*](struct.ProjectLocationAutoscalingPolicyGetIamPolicyCall.html), [*locations autoscaling policies list*](struct.ProjectLocationAutoscalingPolicyListCall.html), [*locations autoscaling policies set iam policy*](struct.ProjectLocationAutoscalingPolicySetIamPolicyCall.html), [*locations autoscaling policies test iam permissions*](struct.ProjectLocationAutoscalingPolicyTestIamPermissionCall.html), [*locations autoscaling policies update*](struct.ProjectLocationAutoscalingPolicyUpdateCall.html), [*locations workflow templates create*](struct.ProjectLocationWorkflowTemplateCreateCall.html), [*locations workflow templates delete*](struct.ProjectLocationWorkflowTemplateDeleteCall.html), [*locations workflow templates get*](struct.ProjectLocationWorkflowTemplateGetCall.html), [*locations workflow templates get iam policy*](struct.ProjectLocationWorkflowTemplateGetIamPolicyCall.html), [*locations workflow templates instantiate*](struct.ProjectLocationWorkflowTemplateInstantiateCall.html), [*locations workflow templates instantiate inline*](struct.ProjectLocationWorkflowTemplateInstantiateInlineCall.html), [*locations workflow templates list*](struct.ProjectLocationWorkflowTemplateListCall.html), [*locations workflow templates set iam policy*](struct.ProjectLocationWorkflowTemplateSetIamPolicyCall.html), [*locations workflow templates test iam permissions*](struct.ProjectLocationWorkflowTemplateTestIamPermissionCall.html), [*locations workflow templates update*](struct.ProjectLocationWorkflowTemplateUpdateCall.html), [*regions autoscaling policies create*](struct.ProjectRegionAutoscalingPolicyCreateCall.html), [*regions autoscaling policies delete*](struct.ProjectRegionAutoscalingPolicyDeleteCall.html), [*regions autoscaling policies get*](struct.ProjectRegionAutoscalingPolicyGetCall.html), [*regions autoscaling policies get iam policy*](struct.ProjectRegionAutoscalingPolicyGetIamPolicyCall.html), [*regions autoscaling policies list*](struct.ProjectRegionAutoscalingPolicyListCall.html), [*regions autoscaling policies set iam policy*](struct.ProjectRegionAutoscalingPolicySetIamPolicyCall.html), [*regions autoscaling policies test iam permissions*](struct.ProjectRegionAutoscalingPolicyTestIamPermissionCall.html), [*regions autoscaling policies update*](struct.ProjectRegionAutoscalingPolicyUpdateCall.html), [*regions clusters create*](struct.ProjectRegionClusterCreateCall.html), [*regions clusters delete*](struct.ProjectRegionClusterDeleteCall.html), [*regions clusters diagnose*](struct.ProjectRegionClusterDiagnoseCall.html), [*regions clusters get*](struct.ProjectRegionClusterGetCall.html), [*regions clusters get iam policy*](struct.ProjectRegionClusterGetIamPolicyCall.html), [*regions clusters list*](struct.ProjectRegionClusterListCall.html), [*regions clusters patch*](struct.ProjectRegionClusterPatchCall.html), [*regions clusters set iam policy*](struct.ProjectRegionClusterSetIamPolicyCall.html), [*regions clusters test iam permissions*](struct.ProjectRegionClusterTestIamPermissionCall.html), [*regions jobs cancel*](struct.ProjectRegionJobCancelCall.html), [*regions jobs delete*](struct.ProjectRegionJobDeleteCall.html), [*regions jobs get*](struct.ProjectRegionJobGetCall.html), [*regions jobs get iam policy*](struct.ProjectRegionJobGetIamPolicyCall.html), [*regions jobs list*](struct.ProjectRegionJobListCall.html), [*regions jobs patch*](struct.ProjectRegionJobPatchCall.html), [*regions jobs set iam policy*](struct.ProjectRegionJobSetIamPolicyCall.html), [*regions jobs submit*](struct.ProjectRegionJobSubmitCall.html), [*regions jobs submit as operation*](struct.ProjectRegionJobSubmitAsOperationCall.html), [*regions jobs test iam permissions*](struct.ProjectRegionJobTestIamPermissionCall.html), [*regions operations cancel*](struct.ProjectRegionOperationCancelCall.html), [*regions operations delete*](struct.ProjectRegionOperationDeleteCall.html), [*regions operations get*](struct.ProjectRegionOperationGetCall.html), [*regions operations get iam policy*](struct.ProjectRegionOperationGetIamPolicyCall.html), [*regions operations list*](struct.ProjectRegionOperationListCall.html), [*regions operations set iam policy*](struct.ProjectRegionOperationSetIamPolicyCall.html), [*regions operations test iam permissions*](struct.ProjectRegionOperationTestIamPermissionCall.html), [*regions workflow templates create*](struct.ProjectRegionWorkflowTemplateCreateCall.html), [*regions workflow templates delete*](struct.ProjectRegionWorkflowTemplateDeleteCall.html), [*regions workflow templates get*](struct.ProjectRegionWorkflowTemplateGetCall.html), [*regions workflow templates get iam policy*](struct.ProjectRegionWorkflowTemplateGetIamPolicyCall.html), [*regions workflow templates instantiate*](struct.ProjectRegionWorkflowTemplateInstantiateCall.html), [*regions workflow templates instantiate inline*](struct.ProjectRegionWorkflowTemplateInstantiateInlineCall.html), [*regions workflow templates list*](struct.ProjectRegionWorkflowTemplateListCall.html), [*regions workflow templates set iam policy*](struct.ProjectRegionWorkflowTemplateSetIamPolicyCall.html), [*regions workflow templates test iam permissions*](struct.ProjectRegionWorkflowTemplateTestIamPermissionCall.html) and [*regions workflow templates update*](struct.ProjectRegionWorkflowTemplateUpdateCall.html)
 //! 
 //! 
 //! 
@@ -342,7 +342,7 @@ impl<'a, C, A> Dataproc<C, A>
         Dataproc {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://dataproc.googleapis.com/".to_string(),
             _root_url: "https://dataproc.googleapis.com/".to_string(),
         }
@@ -353,7 +353,7 @@ impl<'a, C, A> Dataproc<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -381,7 +381,7 @@ impl<'a, C, A> Dataproc<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// A Cloud Dataproc job for running Apache Spark SQL (http://spark.apache.org/sql/) queries.
+/// A Dataproc job for running Apache Spark SQL (http://spark.apache.org/sql/) queries.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -402,203 +402,86 @@ pub struct SparkSqlJob {
     /// A list of queries.
     #[serde(rename="queryList")]
     pub query_list: Option<QueryList>,
-    /// Optional. A mapping of property names to values, used to configure Spark SQL's SparkConf. Properties that conflict with values set by the Cloud Dataproc API may be overwritten.
+    /// Optional. A mapping of property names to values, used to configure Spark SQL's SparkConf. Properties that conflict with values set by the Dataproc API may be overwritten.
     pub properties: Option<HashMap<String, String>>,
 }
 
 impl Part for SparkSqlJob {}
 
 
-/// Job scheduling options.
+/// A Dataproc job for running Apache Hadoop MapReduce (https://hadoop.apache.org/docs/current/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html) jobs on Apache Hadoop YARN (https://hadoop.apache.org/docs/r2.7.1/hadoop-yarn/hadoop-yarn-site/YARN.html).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JobScheduling {
-    /// Optional. Maximum number of times per hour a driver may be restarted as a result of driver terminating with non-zero code before job is reported failed.A job may be reported as thrashing if driver exits with non-zero code 4 times within 10 minute window.Maximum value is 10.
-    #[serde(rename="maxFailuresPerHour")]
-    pub max_failures_per_hour: Option<i32>,
+pub struct HadoopJob {
+    /// Optional. Jar file URIs to add to the CLASSPATHs of the Hadoop driver and tasks.
+    #[serde(rename="jarFileUris")]
+    pub jar_file_uris: Option<Vec<String>>,
+    /// Optional. The runtime log config for job execution.
+    #[serde(rename="loggingConfig")]
+    pub logging_config: Option<LoggingConfig>,
+    /// Optional. The arguments to pass to the driver. Do not include arguments, such as -libjars or -Dfoo=bar, that can be set as job properties, since a collision may occur that causes an incorrect job submission.
+    pub args: Option<Vec<String>>,
+    /// Optional. HCFS (Hadoop Compatible Filesystem) URIs of files to be copied to the working directory of Hadoop drivers and distributed tasks. Useful for naively parallel tasks.
+    #[serde(rename="fileUris")]
+    pub file_uris: Option<Vec<String>>,
+    /// The name of the driver's main class. The jar file containing the class must be in the default CLASSPATH or specified in jar_file_uris.
+    #[serde(rename="mainClass")]
+    pub main_class: Option<String>,
+    /// Optional. HCFS URIs of archives to be extracted in the working directory of Hadoop drivers and tasks. Supported file types: .jar, .tar, .tar.gz, .tgz, or .zip.
+    #[serde(rename="archiveUris")]
+    pub archive_uris: Option<Vec<String>>,
+    /// The HCFS URI of the jar file containing the main class. Examples:  'gs://foo-bucket/analytics-binaries/extract-useful-metrics-mr.jar'  'hdfs:/tmp/test-samples/custom-wordcount.jar'  'file:///home/usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar'
+    #[serde(rename="mainJarFileUri")]
+    pub main_jar_file_uri: Option<String>,
+    /// Optional. A mapping of property names to values, used to configure Hadoop. Properties that conflict with values set by the Dataproc API may be overwritten. Can include properties set in /etc/hadoop/conf/*-site and classes in user code.
+    pub properties: Option<HashMap<String, String>>,
 }
 
-impl Part for JobScheduling {}
+impl Part for HadoopJob {}
 
 
-/// Optional. The config settings for Compute Engine resources in an instance group, such as a master or worker group.
+/// Basic algorithm for autoscaling.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InstanceGroupConfig {
-    /// Optional. Specifies that this instance group contains preemptible instances.
-    #[serde(rename="isPreemptible")]
-    pub is_preemptible: Option<bool>,
-    /// Optional. The Compute Engine machine type used for cluster instances.A full URL, partial URI, or short name are valid. Examples:
-    /// https://www.googleapis.com/compute/v1/projects/[project_id]/zones/us-east1-a/machineTypes/n1-standard-2
-    /// projects/[project_id]/zones/us-east1-a/machineTypes/n1-standard-2
-    /// n1-standard-2Auto Zone Exception: If you are using the Cloud Dataproc Auto Zone Placement feature, you must use the short name of the machine type resource, for example, n1-standard-2.
-    #[serde(rename="machineTypeUri")]
-    pub machine_type_uri: Option<String>,
-    /// Output only. The list of instance names. Cloud Dataproc derives the names from cluster_name, num_instances, and the instance group.
-    #[serde(rename="instanceNames")]
-    pub instance_names: Option<Vec<String>>,
-    /// Optional. The Compute Engine image resource used for cluster instances. It can be specified or may be inferred from SoftwareConfig.image_version.
-    #[serde(rename="imageUri")]
-    pub image_uri: Option<String>,
-    /// Optional. The Compute Engine accelerator configuration for these instances.Beta Feature: This feature is still under development. It may be changed before final release.
-    pub accelerators: Option<Vec<AcceleratorConfig>>,
-    /// Output only. The config for Compute Engine Instance Group Manager that manages this group. This is only used for preemptible instance groups.
-    #[serde(rename="managedGroupConfig")]
-    pub managed_group_config: Option<ManagedGroupConfig>,
-    /// Optional. The number of VM instances in the instance group. For master instance groups, must be set to 1.
-    #[serde(rename="numInstances")]
-    pub num_instances: Option<i32>,
-    /// Optional. Disk option config settings.
-    #[serde(rename="diskConfig")]
-    pub disk_config: Option<DiskConfig>,
+pub struct BasicAutoscalingAlgorithm {
+    /// Required. YARN autoscaling configuration.
+    #[serde(rename="yarnConfig")]
+    pub yarn_config: Option<BasicYarnAutoscalingConfig>,
+    /// Optional. Duration between scaling events. A scaling period starts after the update operation from the previous event has completed.Bounds: 2m, 1d. Default: 2m.
+    #[serde(rename="cooldownPeriod")]
+    pub cooldown_period: Option<String>,
 }
 
-impl Part for InstanceGroupConfig {}
+impl Part for BasicAutoscalingAlgorithm {}
 
 
-/// A configurable parameter that replaces one or more fields in the template. Parameterizable fields: - Labels - File uris - Job properties - Job arguments - Script variables - Main class (in HadoopJob and SparkJob) - Zone (in ClusterSelector)
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TemplateParameter {
-    /// Required. Paths to all fields that the parameter replaces. A field is allowed to appear in at most one parameter's list of field paths.A field path is similar in syntax to a google.protobuf.FieldMask. For example, a field path that references the zone field of a workflow template's cluster selector would be specified as placement.clusterSelector.zone.Also, field paths can reference fields using the following syntax:
-    /// Values in maps can be referenced by key:
-    /// labels'key'
-    /// placement.clusterSelector.clusterLabels'key'
-    /// placement.managedCluster.labels'key'
-    /// placement.clusterSelector.clusterLabels'key'
-    /// jobs'step-id'.labels'key'
-    /// Jobs in the jobs list can be referenced by step-id:
-    /// jobs'step-id'.hadoopJob.mainJarFileUri
-    /// jobs'step-id'.hiveJob.queryFileUri
-    /// jobs'step-id'.pySparkJob.mainPythonFileUri
-    /// jobs'step-id'.hadoopJob.jarFileUris0
-    /// jobs'step-id'.hadoopJob.archiveUris0
-    /// jobs'step-id'.hadoopJob.fileUris0
-    /// jobs'step-id'.pySparkJob.pythonFileUris0
-    /// Items in repeated fields can be referenced by a zero-based index:
-    /// jobs'step-id'.sparkJob.args0
-    /// Other examples:
-    /// jobs'step-id'.hadoopJob.properties'key'
-    /// jobs'step-id'.hadoopJob.args0
-    /// jobs'step-id'.hiveJob.scriptVariables'key'
-    /// jobs'step-id'.hadoopJob.mainJarFileUri
-    /// placement.clusterSelector.zoneIt may not be possible to parameterize maps and repeated fields in their entirety since only individual map values and individual items in repeated fields can be referenced. For example, the following field paths are invalid:
-    /// placement.clusterSelector.clusterLabels
-    /// jobs'step-id'.sparkJob.args
-    pub fields: Option<Vec<String>>,
-    /// Optional. Validation rules to be applied to this parameter's value.
-    pub validation: Option<ParameterValidation>,
-    /// Optional. Brief description of the parameter. Must not exceed 1024 characters.
-    pub description: Option<String>,
-    /// Required. Parameter name. The parameter name is used as the key, and paired with the parameter value, which are passed to the template when the template is instantiated. The name must contain only capital letters (A-Z), numbers (0-9), and underscores (_), and must not start with a number. The maximum length is 40 characters.
-    pub name: Option<String>,
-}
-
-impl Part for TemplateParameter {}
-
-
-/// A YARN application created by a job. Application information is a subset of <code>org.apache.hadoop.yarn.proto.YarnProtos.ApplicationReportProto</code>.Beta Feature: This report is available for testing purposes only. It may be changed before final release.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct YarnApplication {
-    /// Required. The numerical progress of the application, from 1 to 100.
-    pub progress: Option<f32>,
-    /// Required. The application state.
-    pub state: Option<String>,
-    /// Required. The application name.
-    pub name: Option<String>,
-    /// Optional. The HTTP URL of the ApplicationMaster, HistoryServer, or TimelineServer that provides application-specific information. The URL uses the internal hostname, and requires a proxy server for resolution and, possibly, access.
-    #[serde(rename="trackingUrl")]
-    pub tracking_url: Option<String>,
-}
-
-impl Part for YarnApplication {}
-
-
-/// Defines an Identity and Access Management (IAM) policy. It is used to specify access control policies for Cloud Platform resources.A Policy consists of a list of bindings. A binding binds a list of members to a role, where the members can be user accounts, Google groups, Google domains, and service accounts. A role is a named list of permissions defined by IAM.JSON Example
-/// {
-/// "bindings": [
-/// {
-/// "role": "roles/owner",
-/// "members": [
-/// "user:mike@example.com",
-/// "group:admins@example.com",
-/// "domain:google.com",
-/// "serviceAccount:my-other-app@appspot.gserviceaccount.com"
-/// ]
-/// },
-/// {
-/// "role": "roles/viewer",
-/// "members": ["user:sean@example.com"]
+/// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance:
+/// service Foo {
+///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
 /// }
-/// ]
-/// }
-/// YAML Example
-/// bindings:
-/// 
-/// * members:
-///   * user:mike@example.com
-///   * group:admins@example.com
-///   * domain:google.com
-///   * serviceAccount:my-other-app@appspot.gserviceaccount.com
-///     role: roles/owner
-/// * members:
-///   * user:sean@example.com
-///     role: roles/viewer
-///     For a description of IAM and its features, see the IAM developer's guide (https://cloud.google.com/iam/docs).
+/// The JSON representation for Empty is empty JSON object {}.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [regions clusters get iam policy projects](struct.ProjectRegionClusterGetIamPolicyCall.html) (response)
-/// * [regions workflow templates set iam policy projects](struct.ProjectRegionWorkflowTemplateSetIamPolicyCall.html) (response)
-/// * [regions clusters set iam policy projects](struct.ProjectRegionClusterSetIamPolicyCall.html) (response)
-/// * [regions workflow templates get iam policy projects](struct.ProjectRegionWorkflowTemplateGetIamPolicyCall.html) (response)
-/// * [regions jobs get iam policy projects](struct.ProjectRegionJobGetIamPolicyCall.html) (response)
-/// * [locations autoscaling policies set iam policy projects](struct.ProjectLocationAutoscalingPolicySetIamPolicyCall.html) (response)
-/// * [locations autoscaling policies get iam policy projects](struct.ProjectLocationAutoscalingPolicyGetIamPolicyCall.html) (response)
-/// * [regions autoscaling policies get iam policy projects](struct.ProjectRegionAutoscalingPolicyGetIamPolicyCall.html) (response)
-/// * [regions operations get iam policy projects](struct.ProjectRegionOperationGetIamPolicyCall.html) (response)
-/// * [regions operations set iam policy projects](struct.ProjectRegionOperationSetIamPolicyCall.html) (response)
-/// * [locations workflow templates set iam policy projects](struct.ProjectLocationWorkflowTemplateSetIamPolicyCall.html) (response)
-/// * [regions jobs set iam policy projects](struct.ProjectRegionJobSetIamPolicyCall.html) (response)
-/// * [locations workflow templates get iam policy projects](struct.ProjectLocationWorkflowTemplateGetIamPolicyCall.html) (response)
-/// * [regions autoscaling policies set iam policy projects](struct.ProjectRegionAutoscalingPolicySetIamPolicyCall.html) (response)
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Policy {
-    /// Associates a list of members to a role. bindings with no members will result in an error.
-    pub bindings: Option<Vec<Binding>>,
-    /// etag is used for optimistic concurrency control as a way to help prevent simultaneous updates of a policy from overwriting each other. It is strongly suggested that systems make use of the etag in the read-modify-write cycle to perform policy updates in order to avoid race conditions: An etag is returned in the response to getIamPolicy, and systems are expected to put that etag in the request to setIamPolicy to ensure that their change will be applied to the same version of the policy.If no etag is provided in the call to setIamPolicy, then the existing policy is overwritten blindly.
-    pub etag: Option<String>,
-    /// Deprecated.
-    pub version: Option<i32>,
-}
-
-impl ResponseResult for Policy {}
-
-
-/// Security related configuration, including Kerberos.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// * [locations autoscaling policies delete projects](struct.ProjectLocationAutoscalingPolicyDeleteCall.html) (response)
+/// * [regions operations cancel projects](struct.ProjectRegionOperationCancelCall.html) (response)
+/// * [regions autoscaling policies delete projects](struct.ProjectRegionAutoscalingPolicyDeleteCall.html) (response)
+/// * [regions operations delete projects](struct.ProjectRegionOperationDeleteCall.html) (response)
+/// * [regions workflow templates delete projects](struct.ProjectRegionWorkflowTemplateDeleteCall.html) (response)
+/// * [regions jobs delete projects](struct.ProjectRegionJobDeleteCall.html) (response)
+/// * [locations workflow templates delete projects](struct.ProjectLocationWorkflowTemplateDeleteCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SecurityConfig {
-    /// Kerberos related configuration.
-    #[serde(rename="kerberosConfig")]
-    pub kerberos_config: Option<KerberosConfig>,
-}
+pub struct Empty { _never_set: Option<bool> }
 
-impl Part for SecurityConfig {}
+impl ResponseResult for Empty {}
 
 
 /// The Status type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by gRPC (https://github.com/grpc). Each Status message contains three pieces of data: error code, error message, and error details.You can find out more about this error model and how to work with it in the API Design Guide (https://cloud.google.com/apis/design/errors).
@@ -668,6 +551,9 @@ pub struct GceClusterConfig {
     /// Optional. If true, all instances in the cluster will only have internal IP addresses. By default, clusters are not restricted to internal IP addresses, and will have ephemeral external IP addresses assigned to each instance. This internal_ip_only restriction can only be enabled for subnetwork enabled networks, and all off-cluster dependencies must be configured to be accessible without external IP addresses.
     #[serde(rename="internalIpOnly")]
     pub internal_ip_only: Option<bool>,
+    /// Optional. Reservation Affinity for consuming Zonal reservation.
+    #[serde(rename="reservationAffinity")]
+    pub reservation_affinity: Option<ReservationAffinity>,
     /// Optional. The Compute Engine network to be used for machine communications. Cannot be specified with subnetwork_uri. If neither network_uri nor subnetwork_uri is specified, the "default" network of the project is used, if it exists. Cannot be a "Custom Subnet Network" (see Using Subnetworks for more information).A full URL, partial URI, or short name are valid. Examples:
     /// https://www.googleapis.com/compute/v1/projects/[project_id]/regions/global/default
     /// projects/[project_id]/regions/global/default
@@ -676,12 +562,10 @@ pub struct GceClusterConfig {
     pub network_uri: Option<String>,
     /// The Compute Engine tags to add to all instances (see Tagging instances).
     pub tags: Option<Vec<String>>,
-    /// Optional. The service account of the instances. Defaults to the default Compute Engine service account. Custom service accounts need permissions equivalent to the following IAM roles:
-    /// roles/logging.logWriter
-    /// roles/storage.objectAdmin(see https://cloud.google.com/compute/docs/access/service-accounts#custom_service_accounts for more information). Example: [account_id]@[project_id].iam.gserviceaccount.com
+    /// Optional. The Dataproc service account (also see VM Data Plane identity) used by Dataproc cluster VM instances to access Google Cloud Platform services.If not specified, the Compute Engine default service account is used.
     #[serde(rename="serviceAccount")]
     pub service_account: Option<String>,
-    /// Optional. The zone where the Compute Engine cluster will be located. On a create request, it is required in the "global" region. If omitted in a non-global Cloud Dataproc region, the service will pick a zone in the corresponding Compute Engine region. On a get request, zone will always be present.A full URL, partial URI, or short name are valid. Examples:
+    /// Optional. The zone where the Compute Engine cluster will be located. On a create request, it is required in the "global" region. If omitted in a non-global Dataproc region, the service will pick a zone in the corresponding Compute Engine region. On a get request, zone will always be present.A full URL, partial URI, or short name are valid. Examples:
     /// https://www.googleapis.com/compute/v1/projects/[project_id]/zones/[zone]
     /// projects/[project_id]/zones/[zone]
     /// us-central1-f
@@ -710,41 +594,27 @@ pub struct GceClusterConfig {
 impl Part for GceClusterConfig {}
 
 
-/// Specifies the type and number of accelerator cards attached to the instances of an instance. See GPUs on Compute Engine.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AcceleratorConfig {
-    /// The number of the accelerator cards of this type exposed to this instance.
-    #[serde(rename="acceleratorCount")]
-    pub accelerator_count: Option<i32>,
-    /// Full URL, partial URI, or short name of the accelerator type resource to expose to this instance. See Compute Engine AcceleratorTypes.Examples:
-    /// https://www.googleapis.com/compute/beta/projects/[project_id]/zones/us-east1-a/acceleratorTypes/nvidia-tesla-k80
-    /// projects/[project_id]/zones/us-east1-a/acceleratorTypes/nvidia-tesla-k80
-    /// nvidia-tesla-k80Auto Zone Exception: If you are using the Cloud Dataproc Auto Zone Placement feature, you must use the short name of the accelerator type resource, for example, nvidia-tesla-k80.
-    #[serde(rename="acceleratorTypeUri")]
-    pub accelerator_type_uri: Option<String>,
-}
-
-impl Part for AcceleratorConfig {}
-
-
 /// The cluster config.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ClusterConfig {
+    /// Optional. Lifecycle setting for the cluster.
+    #[serde(rename="lifecycleConfig")]
+    pub lifecycle_config: Option<LifecycleConfig>,
     /// Optional. The config settings for software inside the cluster.
     #[serde(rename="softwareConfig")]
     pub software_config: Option<SoftwareConfig>,
-    /// Optional. A Google Cloud Storage bucket used to stage job dependencies, config files, and job driver console output. If you do not specify a staging bucket, Cloud Dataproc will determine a Cloud Storage location (US, ASIA, or EU) for your cluster's staging bucket according to the Google Compute Engine zone where your cluster is deployed, and then create and manage this project-level, per-location bucket (see Cloud Dataproc staging bucket).
+    /// Optional. A Cloud Storage bucket used to stage job dependencies, config files, and job driver console output. If you do not specify a staging bucket, Cloud Dataproc will determine a Cloud Storage location (US, ASIA, or EU) for your cluster's staging bucket according to the Compute Engine zone where your cluster is deployed, and then create and manage this project-level, per-location bucket (see Dataproc staging bucket).
     #[serde(rename="configBucket")]
     pub config_bucket: Option<String>,
     /// Optional. The shared Compute Engine config settings for all instances in a cluster.
     #[serde(rename="gceClusterConfig")]
     pub gce_cluster_config: Option<GceClusterConfig>,
+    /// Optional. Autoscaling config for the policy associated with the cluster. Cluster does not autoscale if this field is unset.
+    #[serde(rename="autoscalingConfig")]
+    pub autoscaling_config: Option<AutoscalingConfig>,
     /// Optional. The Compute Engine config settings for worker instances in a cluster.
     #[serde(rename="workerConfig")]
     pub worker_config: Option<InstanceGroupConfig>,
@@ -776,25 +646,46 @@ pub struct ClusterConfig {
 impl Part for ClusterConfig {}
 
 
-/// A request to submit a job.
+/// The config settings for Compute Engine resources in an instance group, such as a master or worker group.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [regions jobs submit projects](struct.ProjectRegionJobSubmitCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SubmitJobRequest {
-    /// Required. The job resource.
-    pub job: Option<Job>,
-    /// Optional. A unique id used to identify the request. If the server receives two SubmitJobRequest requests with the same id, then the second request will be ignored and the first Job created and stored in the backend is returned.It is recommended to always set this value to a UUID (https://en.wikipedia.org/wiki/Universally_unique_identifier).The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
-    #[serde(rename="requestId")]
-    pub request_id: Option<String>,
+pub struct InstanceGroupConfig {
+    /// Output only. Specifies that this instance group contains preemptible instances.
+    #[serde(rename="isPreemptible")]
+    pub is_preemptible: Option<bool>,
+    /// Optional. Specifies the preemptibility of the instance group.The default value for master and worker groups is NON_PREEMPTIBLE. This default cannot be changed.The default value for secondary instances is PREEMPTIBLE.
+    pub preemptibility: Option<String>,
+    /// Optional. The Compute Engine machine type used for cluster instances.A full URL, partial URI, or short name are valid. Examples:
+    /// https://www.googleapis.com/compute/v1/projects/[project_id]/zones/us-east1-a/machineTypes/n1-standard-2
+    /// projects/[project_id]/zones/us-east1-a/machineTypes/n1-standard-2
+    /// n1-standard-2Auto Zone Exception: If you are using the Dataproc Auto Zone Placement feature, you must use the short name of the machine type resource, for example, n1-standard-2.
+    #[serde(rename="machineTypeUri")]
+    pub machine_type_uri: Option<String>,
+    /// Output only. The list of instance names. Dataproc derives the names from cluster_name, num_instances, and the instance group.
+    #[serde(rename="instanceNames")]
+    pub instance_names: Option<Vec<String>>,
+    /// Optional. The Compute Engine image resource used for cluster instances. It can be specified or may be inferred from SoftwareConfig.image_version.
+    #[serde(rename="imageUri")]
+    pub image_uri: Option<String>,
+    /// Optional. The Compute Engine accelerator configuration for these instances.
+    pub accelerators: Option<Vec<AcceleratorConfig>>,
+    /// Output only. The config for Compute Engine Instance Group Manager that manages this group. This is only used for preemptible instance groups.
+    #[serde(rename="managedGroupConfig")]
+    pub managed_group_config: Option<ManagedGroupConfig>,
+    /// Optional. Specifies the minimum cpu platform for the Instance Group. See Dataproc&rarr;Minimum CPU Platform.
+    #[serde(rename="minCpuPlatform")]
+    pub min_cpu_platform: Option<String>,
+    /// Optional. Disk option config settings.
+    #[serde(rename="diskConfig")]
+    pub disk_config: Option<DiskConfig>,
+    /// Optional. The number of VM instances in the instance group. For master instance groups, must be set to 1.
+    #[serde(rename="numInstances")]
+    pub num_instances: Option<i32>,
 }
 
-impl RequestValue for SubmitJobRequest {}
+impl Part for InstanceGroupConfig {}
 
 
 /// A list of queries to run on a cluster.
@@ -839,151 +730,35 @@ pub struct DiskConfig {
 impl Part for DiskConfig {}
 
 
-/// A Cloud Dataproc workflow template resource.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations workflow templates create projects](struct.ProjectLocationWorkflowTemplateCreateCall.html) (request|response)
-/// * [regions workflow templates create projects](struct.ProjectRegionWorkflowTemplateCreateCall.html) (request|response)
-/// * [regions workflow templates instantiate inline projects](struct.ProjectRegionWorkflowTemplateInstantiateInlineCall.html) (request)
-/// * [regions workflow templates update projects](struct.ProjectRegionWorkflowTemplateUpdateCall.html) (request|response)
-/// * [locations workflow templates instantiate inline projects](struct.ProjectLocationWorkflowTemplateInstantiateInlineCall.html) (request)
-/// * [locations workflow templates get projects](struct.ProjectLocationWorkflowTemplateGetCall.html) (response)
-/// * [locations workflow templates update projects](struct.ProjectLocationWorkflowTemplateUpdateCall.html) (request|response)
-/// * [regions workflow templates get projects](struct.ProjectRegionWorkflowTemplateGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct WorkflowTemplate {
-    /// Output only. The time template was last updated.
-    #[serde(rename="updateTime")]
-    pub update_time: Option<String>,
-    /// Required. The Directed Acyclic Graph of Jobs to submit.
-    pub jobs: Option<Vec<OrderedJob>>,
-    /// Output only. The "resource name" of the template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
-    pub name: Option<String>,
-    /// Optional. Template parameters whose values are substituted into the template. Values for parameters must be provided when the template is instantiated.
-    pub parameters: Option<Vec<TemplateParameter>>,
-    /// Optional. The labels to associate with this template. These labels will be propagated to all jobs and clusters created by the workflow instance.Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt).Label values may be empty, but, if present, must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt).No more than 32 labels can be associated with a template.
-    pub labels: Option<HashMap<String, String>>,
-    /// Output only. The time template was created.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
-    /// Optional. Used to perform a consistent read-modify-write.This field should be left blank for a CreateWorkflowTemplate request. It is required for an UpdateWorkflowTemplate request, and must match the current server version. A typical update template flow would fetch the current template with a GetWorkflowTemplate request, which will return the current template with the version field filled in with the current server version. The user updates other fields in the template, then returns it as part of the UpdateWorkflowTemplate request.
-    pub version: Option<i32>,
-    /// Required. WorkflowTemplate scheduling information.
-    pub placement: Option<WorkflowTemplatePlacement>,
-    /// Required. The template id.The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). Cannot begin or end with underscore or hyphen. Must consist of between 3 and 50 characters.
-    pub id: Option<String>,
-}
-
-impl RequestValue for WorkflowTemplate {}
-impl ResponseResult for WorkflowTemplate {}
-
-
-/// A Cloud Dataproc job resource.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [regions jobs submit projects](struct.ProjectRegionJobSubmitCall.html) (response)
-/// * [regions jobs get projects](struct.ProjectRegionJobGetCall.html) (response)
-/// * [regions jobs patch projects](struct.ProjectRegionJobPatchCall.html) (request|response)
-/// * [regions jobs cancel projects](struct.ProjectRegionJobCancelCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Job {
-    /// Output only. The job status. Additional application-specific status information may be contained in the <code>type_job</code> and <code>yarn_applications</code> fields.
-    pub status: Option<JobStatus>,
-    /// Job is a Hadoop job.
-    #[serde(rename="hadoopJob")]
-    pub hadoop_job: Option<HadoopJob>,
-    /// Optional. The labels to associate with this job. Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values may be empty, but, if present, must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be associated with a job.
-    pub labels: Option<HashMap<String, String>>,
-    /// Output only. The collection of YARN applications spun up by this job.Beta Feature: This report is available for testing purposes only. It may be changed before final release.
-    #[serde(rename="yarnApplications")]
-    pub yarn_applications: Option<Vec<YarnApplication>>,
-    /// Optional. The fully qualified reference to the job, which can be used to obtain the equivalent REST path of the job resource. If this property is not specified when a job is created, the server generates a <code>job_id</code>.
-    pub reference: Option<JobReference>,
-    /// Job is a Pig job.
-    #[serde(rename="pigJob")]
-    pub pig_job: Option<PigJob>,
-    /// Output only. A URI pointing to the location of the stdout of the job's driver program.
-    #[serde(rename="driverOutputResourceUri")]
-    pub driver_output_resource_uri: Option<String>,
-    /// Job is a Spark job.
-    #[serde(rename="sparkJob")]
-    pub spark_job: Option<SparkJob>,
-    /// Output only. A UUID that uniquely identifies a job within the project over time. This is in contrast to a user-settable reference.job_id that may be reused over time.
-    #[serde(rename="jobUuid")]
-    pub job_uuid: Option<String>,
-    /// Optional. Job scheduling configuration.
-    pub scheduling: Option<JobScheduling>,
-    /// Output only. The previous job status.
-    #[serde(rename="statusHistory")]
-    pub status_history: Option<Vec<JobStatus>>,
-    /// Job is a SparkSql job.
-    #[serde(rename="sparkSqlJob")]
-    pub spark_sql_job: Option<SparkSqlJob>,
-    /// Required. Job information, including how, when, and where to run the job.
-    pub placement: Option<JobPlacement>,
-    /// Output only. If present, the location of miscellaneous control files which may be used as part of job setup and handling. If not present, control files may be placed in the same location as driver_output_uri.
-    #[serde(rename="driverControlFilesUri")]
-    pub driver_control_files_uri: Option<String>,
-    /// Job is a Pyspark job.
-    #[serde(rename="pysparkJob")]
-    pub pyspark_job: Option<PySparkJob>,
-    /// Job is a Hive job.
-    #[serde(rename="hiveJob")]
-    pub hive_job: Option<HiveJob>,
-}
-
-impl RequestValue for Job {}
-impl ResponseResult for Job {}
-
-
-/// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance:
-/// service Foo {
-///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-/// }
-/// The JSON representation for Empty is empty JSON object {}.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [regions workflow templates delete projects](struct.ProjectRegionWorkflowTemplateDeleteCall.html) (response)
-/// * [regions jobs delete projects](struct.ProjectRegionJobDeleteCall.html) (response)
-/// * [regions operations cancel projects](struct.ProjectRegionOperationCancelCall.html) (response)
-/// * [locations workflow templates delete projects](struct.ProjectLocationWorkflowTemplateDeleteCall.html) (response)
-/// * [regions operations delete projects](struct.ProjectRegionOperationDeleteCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty { _never_set: Option<bool> }
-
-impl ResponseResult for Empty {}
-
-
-/// Specifies workflow execution target.Either managed_cluster or cluster_selector is required.
+/// A Dataproc job for running Presto (https://prestosql.io/) queries
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct WorkflowTemplatePlacement {
-    /// Optional. A selector that chooses target cluster for jobs based on metadata.The selector is evaluated at the time each job is submitted.
-    #[serde(rename="clusterSelector")]
-    pub cluster_selector: Option<ClusterSelector>,
-    /// Optional. A cluster that is managed by the workflow.
-    #[serde(rename="managedCluster")]
-    pub managed_cluster: Option<ManagedCluster>,
+pub struct PrestoJob {
+    /// The HCFS URI of the script that contains SQL queries.
+    #[serde(rename="queryFileUri")]
+    pub query_file_uri: Option<String>,
+    /// Optional. The format in which query output will be displayed. See the Presto documentation for supported output formats
+    #[serde(rename="outputFormat")]
+    pub output_format: Option<String>,
+    /// Optional. Whether to continue executing queries if a query fails. The default value is false. Setting to true can be useful when executing independent parallel queries.
+    #[serde(rename="continueOnFailure")]
+    pub continue_on_failure: Option<bool>,
+    /// Optional. The runtime log config for job execution.
+    #[serde(rename="loggingConfig")]
+    pub logging_config: Option<LoggingConfig>,
+    /// Optional. Presto client tags to attach to this query
+    #[serde(rename="clientTags")]
+    pub client_tags: Option<Vec<String>>,
+    /// A list of queries.
+    #[serde(rename="queryList")]
+    pub query_list: Option<QueryList>,
+    /// Optional. A mapping of property names to values. Used to set Presto session properties (https://prestodb.io/docs/current/sql/set-session.html) Equivalent to using the --session flag in the Presto CLI
+    pub properties: Option<HashMap<String, String>>,
 }
 
-impl Part for WorkflowTemplatePlacement {}
+impl Part for PrestoJob {}
 
 
 /// Specifies the resources used to actively manage an instance group.
@@ -1003,85 +778,13 @@ pub struct ManagedGroupConfig {
 impl Part for ManagedGroupConfig {}
 
 
-/// A job executed by the workflow.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrderedJob {
-    /// Job is a Hadoop job.
-    #[serde(rename="hadoopJob")]
-    pub hadoop_job: Option<HadoopJob>,
-    /// Required. The step id. The id must be unique among all jobs within the template.The step id is used as prefix for job id, as job goog-dataproc-workflow-step-id label, and in prerequisiteStepIds field from other steps.The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). Cannot begin or end with underscore or hyphen. Must consist of between 3 and 50 characters.
-    #[serde(rename="stepId")]
-    pub step_id: Option<String>,
-    /// Job is a SparkSql job.
-    #[serde(rename="sparkSqlJob")]
-    pub spark_sql_job: Option<SparkSqlJob>,
-    /// Optional. The optional list of prerequisite job step_ids. If not specified, the job will start at the beginning of workflow.
-    #[serde(rename="prerequisiteStepIds")]
-    pub prerequisite_step_ids: Option<Vec<String>>,
-    /// Job is a Pig job.
-    #[serde(rename="pigJob")]
-    pub pig_job: Option<PigJob>,
-    /// Optional. The labels to associate with this job.Label keys must be between 1 and 63 characters long, and must conform to the following regular expression: \p{Ll}\p{Lo}{0,62}Label values must be between 1 and 63 characters long, and must conform to the following regular expression: \p{Ll}\p{Lo}\p{N}_-{0,63}No more than 32 labels can be associated with a given job.
-    pub labels: Option<HashMap<String, String>>,
-    /// Job is a Spark job.
-    #[serde(rename="sparkJob")]
-    pub spark_job: Option<SparkJob>,
-    /// Optional. Job scheduling configuration.
-    pub scheduling: Option<JobScheduling>,
-    /// Job is a Pyspark job.
-    #[serde(rename="pysparkJob")]
-    pub pyspark_job: Option<PySparkJob>,
-    /// Job is a Hive job.
-    #[serde(rename="hiveJob")]
-    pub hive_job: Option<HiveJob>,
-}
-
-impl Part for OrderedJob {}
-
-
-/// A Cloud Dataproc job for running Apache PySpark (https://spark.apache.org/docs/0.9.0/python-programming-guide.html) applications on YARN.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PySparkJob {
-    /// Required. The HCFS URI of the main Python file to use as the driver. Must be a .py file.
-    #[serde(rename="mainPythonFileUri")]
-    pub main_python_file_uri: Option<String>,
-    /// Optional. HCFS URIs of jar files to add to the CLASSPATHs of the Python driver and tasks.
-    #[serde(rename="jarFileUris")]
-    pub jar_file_uris: Option<Vec<String>>,
-    /// Optional. The runtime log config for job execution.
-    #[serde(rename="loggingConfig")]
-    pub logging_config: Option<LoggingConfig>,
-    /// Optional. The arguments to pass to the driver. Do not include arguments, such as --conf, that can be set as job properties, since a collision may occur that causes an incorrect job submission.
-    pub args: Option<Vec<String>>,
-    /// Optional. HCFS URIs of files to be copied to the working directory of Python drivers and distributed tasks. Useful for naively parallel tasks.
-    #[serde(rename="fileUris")]
-    pub file_uris: Option<Vec<String>>,
-    /// Optional. HCFS URIs of archives to be extracted in the working directory of .jar, .tar, .tar.gz, .tgz, and .zip.
-    #[serde(rename="archiveUris")]
-    pub archive_uris: Option<Vec<String>>,
-    /// Optional. HCFS file URIs of Python files to pass to the PySpark framework. Supported file types: .py, .egg, and .zip.
-    #[serde(rename="pythonFileUris")]
-    pub python_file_uris: Option<Vec<String>>,
-    /// Optional. A mapping of property names to values, used to configure PySpark. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/spark/conf/spark-defaults.conf and classes in user code.
-    pub properties: Option<HashMap<String, String>>,
-}
-
-impl Part for PySparkJob {}
-
-
 /// Specifies an executable to run on a fully configured node and a timeout period for executable completion.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NodeInitializationAction {
-    /// Optional. Amount of time executable has to complete. Default is 10 minutes. Cluster creation fails with an explanatory error message (the name of the executable that caused the error and the exceeded timeout period) if the executable is not completed at end of the timeout period.
+    /// Optional. Amount of time executable has to complete. Default is 10 minutes (see JSON representation of Duration (https://developers.google.com/protocol-buffers/docs/proto3#json)).Cluster creation fails with an explanatory error message (the name of the executable that caused the error and the exceeded timeout period) if the executable is not completed at end of the timeout period.
     #[serde(rename="executionTimeout")]
     pub execution_timeout: Option<String>,
     /// Required. Cloud Storage URI of executable file.
@@ -1090,28 +793,6 @@ pub struct NodeInitializationAction {
 }
 
 impl Part for NodeInitializationAction {}
-
-
-/// A response to a request to list workflow templates in a project.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations workflow templates list projects](struct.ProjectLocationWorkflowTemplateListCall.html) (response)
-/// * [regions workflow templates list projects](struct.ProjectRegionWorkflowTemplateListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListWorkflowTemplatesResponse {
-    /// Output only. This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent <code>ListWorkflowTemplatesRequest</code>.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// Output only. WorkflowTemplates list.
-    pub templates: Option<Vec<WorkflowTemplate>>,
-}
-
-impl ResponseResult for ListWorkflowTemplatesResponse {}
 
 
 /// Request message for GetIamPolicy method.
@@ -1130,57 +811,39 @@ impl ResponseResult for ListWorkflowTemplatesResponse {}
 /// * [locations workflow templates get iam policy projects](struct.ProjectLocationWorkflowTemplateGetIamPolicyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetIamPolicyRequest { _never_set: Option<bool> }
+pub struct GetIamPolicyRequest {
+    /// OPTIONAL: A GetPolicyOptions object for specifying options to GetIamPolicy. This field is only used by Cloud IAM.
+    pub options: Option<GetPolicyOptions>,
+}
 
 impl RequestValue for GetIamPolicyRequest {}
 
 
-/// Request message for SetIamPolicy method.
+/// A Dataproc job for running Apache SparkR (https://spark.apache.org/docs/latest/sparkr.html) applications on YARN.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [regions workflow templates set iam policy projects](struct.ProjectRegionWorkflowTemplateSetIamPolicyCall.html) (request)
-/// * [regions clusters set iam policy projects](struct.ProjectRegionClusterSetIamPolicyCall.html) (request)
-/// * [locations autoscaling policies set iam policy projects](struct.ProjectLocationAutoscalingPolicySetIamPolicyCall.html) (request)
-/// * [regions operations set iam policy projects](struct.ProjectRegionOperationSetIamPolicyCall.html) (request)
-/// * [locations workflow templates set iam policy projects](struct.ProjectLocationWorkflowTemplateSetIamPolicyCall.html) (request)
-/// * [regions jobs set iam policy projects](struct.ProjectRegionJobSetIamPolicyCall.html) (request)
-/// * [regions autoscaling policies set iam policy projects](struct.ProjectRegionAutoscalingPolicySetIamPolicyCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SetIamPolicyRequest {
-    /// REQUIRED: The complete policy to be applied to the resource. The size of the policy is limited to a few 10s of KB. An empty policy is a valid policy but certain Cloud Platform services (such as Projects) might reject them.
-    pub policy: Option<Policy>,
+pub struct SparkRJob {
+    /// Optional. HCFS URIs of files to be copied to the working directory of R drivers and distributed tasks. Useful for naively parallel tasks.
+    #[serde(rename="fileUris")]
+    pub file_uris: Option<Vec<String>>,
+    /// Optional. The runtime log config for job execution.
+    #[serde(rename="loggingConfig")]
+    pub logging_config: Option<LoggingConfig>,
+    /// Optional. HCFS URIs of archives to be extracted in the working directory of Spark drivers and tasks. Supported file types: .jar, .tar, .tar.gz, .tgz, and .zip.
+    #[serde(rename="archiveUris")]
+    pub archive_uris: Option<Vec<String>>,
+    /// Optional. The arguments to pass to the driver. Do not include arguments, such as --conf, that can be set as job properties, since a collision may occur that causes an incorrect job submission.
+    pub args: Option<Vec<String>>,
+    /// Required. The HCFS URI of the main R file to use as the driver. Must be a .R file.
+    #[serde(rename="mainRFileUri")]
+    pub main_r_file_uri: Option<String>,
+    /// Optional. A mapping of property names to values, used to configure SparkR. Properties that conflict with values set by the Dataproc API may be overwritten. Can include properties set in /etc/spark/conf/spark-defaults.conf and classes in user code.
+    pub properties: Option<HashMap<String, String>>,
 }
 
-impl RequestValue for SetIamPolicyRequest {}
-
-
-/// Request message for TestIamPermissions method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [regions workflow templates test iam permissions projects](struct.ProjectRegionWorkflowTemplateTestIamPermissionCall.html) (request)
-/// * [regions operations test iam permissions projects](struct.ProjectRegionOperationTestIamPermissionCall.html) (request)
-/// * [regions clusters test iam permissions projects](struct.ProjectRegionClusterTestIamPermissionCall.html) (request)
-/// * [locations autoscaling policies test iam permissions projects](struct.ProjectLocationAutoscalingPolicyTestIamPermissionCall.html) (request)
-/// * [regions autoscaling policies test iam permissions projects](struct.ProjectRegionAutoscalingPolicyTestIamPermissionCall.html) (request)
-/// * [locations workflow templates test iam permissions projects](struct.ProjectLocationWorkflowTemplateTestIamPermissionCall.html) (request)
-/// * [regions jobs test iam permissions projects](struct.ProjectRegionJobTestIamPermissionCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TestIamPermissionsRequest {
-    /// The set of permissions to check for the resource. Permissions with wildcards (such as '*' or 'storage.*') are not allowed. For more information see IAM Overview (https://cloud.google.com/iam/docs/overview#permissions).
-    pub permissions: Option<Vec<String>>,
-}
-
-impl RequestValue for TestIamPermissionsRequest {}
+impl Part for SparkRJob {}
 
 
 /// A request to instantiate a workflow template.
@@ -1207,6 +870,912 @@ pub struct InstantiateWorkflowTemplateRequest {
 impl RequestValue for InstantiateWorkflowTemplateRequest {}
 
 
+/// Specifies the cluster auto-delete schedule configuration.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LifecycleConfig {
+    /// Optional. The time when cluster will be auto-deleted (see JSON representation of Timestamp (https://developers.google.com/protocol-buffers/docs/proto3#json)).
+    #[serde(rename="autoDeleteTime")]
+    pub auto_delete_time: Option<String>,
+    /// Optional. The duration to keep the cluster alive while idling (when no jobs are running). Passing this threshold will cause the cluster to be deleted. Minimum value is 10 minutes; maximum value is 14 days (see JSON representation of Duration (https://developers.google.com/protocol-buffers/docs/proto3#json).
+    #[serde(rename="idleDeleteTtl")]
+    pub idle_delete_ttl: Option<String>,
+    /// Optional. The lifetime duration of cluster. The cluster will be auto-deleted at the end of this period. Minimum value is 10 minutes; maximum value is 14 days (see JSON representation of Duration (https://developers.google.com/protocol-buffers/docs/proto3#json)).
+    #[serde(rename="autoDeleteTtl")]
+    pub auto_delete_ttl: Option<String>,
+    /// Output only. The time when cluster became idle (most recent job finished) and became eligible for deletion due to idleness (see JSON representation of Timestamp (https://developers.google.com/protocol-buffers/docs/proto3#json)).
+    #[serde(rename="idleStartTime")]
+    pub idle_start_time: Option<String>,
+}
+
+impl Part for LifecycleConfig {}
+
+
+/// Specifies workflow execution target.Either managed_cluster or cluster_selector is required.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WorkflowTemplatePlacement {
+    /// Optional. A selector that chooses target cluster for jobs based on metadata.The selector is evaluated at the time each job is submitted.
+    #[serde(rename="clusterSelector")]
+    pub cluster_selector: Option<ClusterSelector>,
+    /// A cluster that is managed by the workflow.
+    #[serde(rename="managedCluster")]
+    pub managed_cluster: Option<ManagedCluster>,
+}
+
+impl Part for WorkflowTemplatePlacement {}
+
+
+/// A list of jobs in a project.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [regions jobs list projects](struct.ProjectRegionJobListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListJobsResponse {
+    /// Optional. This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent <code>ListJobsRequest</code>.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Output only. Jobs list.
+    pub jobs: Option<Vec<Job>>,
+}
+
+impl ResponseResult for ListJobsResponse {}
+
+
+/// A response to a request to list autoscaling policies in a project.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations autoscaling policies list projects](struct.ProjectLocationAutoscalingPolicyListCall.html) (response)
+/// * [regions autoscaling policies list projects](struct.ProjectRegionAutoscalingPolicyListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListAutoscalingPoliciesResponse {
+    /// Output only. This token is included in the response if there are more results to fetch.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Output only. Autoscaling policies list.
+    pub policies: Option<Vec<AutoscalingPolicy>>,
+}
+
+impl ResponseResult for ListAutoscalingPoliciesResponse {}
+
+
+/// Dataproc job config.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct JobPlacement {
+    /// Required. The name of the cluster where the job will be submitted.
+    #[serde(rename="clusterName")]
+    pub cluster_name: Option<String>,
+    /// Output only. A cluster UUID generated by the Dataproc service when the job is submitted.
+    #[serde(rename="clusterUuid")]
+    pub cluster_uuid: Option<String>,
+}
+
+impl Part for JobPlacement {}
+
+
+/// A Dataproc job for running Apache Hive (https://hive.apache.org/) queries on YARN.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct HiveJob {
+    /// The HCFS URI of the script that contains Hive queries.
+    #[serde(rename="queryFileUri")]
+    pub query_file_uri: Option<String>,
+    /// Optional. Mapping of query variable names to values (equivalent to the Hive command: SET name="value";).
+    #[serde(rename="scriptVariables")]
+    pub script_variables: Option<HashMap<String, String>>,
+    /// Optional. Whether to continue executing queries if a query fails. The default value is false. Setting to true can be useful when executing independent parallel queries.
+    #[serde(rename="continueOnFailure")]
+    pub continue_on_failure: Option<bool>,
+    /// Optional. HCFS URIs of jar files to add to the CLASSPATH of the Hive server and Hadoop MapReduce (MR) tasks. Can contain Hive SerDes and UDFs.
+    #[serde(rename="jarFileUris")]
+    pub jar_file_uris: Option<Vec<String>>,
+    /// A list of queries.
+    #[serde(rename="queryList")]
+    pub query_list: Option<QueryList>,
+    /// Optional. A mapping of property names and values, used to configure Hive. Properties that conflict with values set by the Dataproc API may be overwritten. Can include properties set in /etc/hadoop/conf/*-site.xml, /etc/hive/conf/hive-site.xml, and classes in user code.
+    pub properties: Option<HashMap<String, String>>,
+}
+
+impl Part for HiveJob {}
+
+
+/// A selector that chooses target cluster for jobs based on metadata.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ClusterSelector {
+    /// Required. The cluster labels. Cluster must have all labels to match.
+    #[serde(rename="clusterLabels")]
+    pub cluster_labels: Option<HashMap<String, String>>,
+    /// Optional. The zone where workflow process executes. This parameter does not affect the selection of the cluster.If unspecified, the zone of the first cluster matching the selector is used.
+    pub zone: Option<String>,
+}
+
+impl Part for ClusterSelector {}
+
+
+/// Specifies the selection and config of software inside the cluster.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SoftwareConfig {
+    /// Optional. The version of software inside the cluster. It must be one of the supported Dataproc Versions, such as "1.2" (including a subminor version, such as "1.2.29"), or the "preview" version. If unspecified, it defaults to the latest Debian version.
+    #[serde(rename="imageVersion")]
+    pub image_version: Option<String>,
+    /// Optional. The set of components to activate on the cluster.
+    #[serde(rename="optionalComponents")]
+    pub optional_components: Option<Vec<String>>,
+    /// Optional. The properties to set on daemon config files.Property keys are specified in prefix:property format, for example core:hadoop.tmp.dir. The following are supported prefixes and their mappings:
+    /// capacity-scheduler: capacity-scheduler.xml
+    /// core: core-site.xml
+    /// distcp: distcp-default.xml
+    /// hdfs: hdfs-site.xml
+    /// hive: hive-site.xml
+    /// mapred: mapred-site.xml
+    /// pig: pig.properties
+    /// spark: spark-defaults.conf
+    /// yarn: yarn-site.xmlFor more information, see Cluster properties.
+    pub properties: Option<HashMap<String, String>>,
+}
+
+impl Part for SoftwareConfig {}
+
+
+/// Configuration for the size bounds of an instance group, including its proportional size to other groups.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InstanceGroupAutoscalingPolicyConfig {
+    /// Optional. Minimum number of instances for this group.Primary workers - Bounds: 2, max_instances. Default: 2. Secondary workers - Bounds: 0, max_instances. Default: 0.
+    #[serde(rename="minInstances")]
+    pub min_instances: Option<i32>,
+    /// Required. Maximum number of instances for this group. Required for primary workers. Note that by default, clusters will not use secondary workers. Required for secondary workers if the minimum secondary instances is set.Primary workers - Bounds: [min_instances, ). Secondary workers - Bounds: [min_instances, ). Default: 0.
+    #[serde(rename="maxInstances")]
+    pub max_instances: Option<i32>,
+    /// Optional. Weight for the instance group, which is used to determine the fraction of total workers in the cluster from this instance group. For example, if primary workers have weight 2, and secondary workers have weight 1, the cluster will have approximately 2 primary workers for each secondary worker.The cluster may not reach the specified balance if constrained by min/max bounds or other autoscaling settings. For example, if max_instances for secondary workers is 0, then only primary workers will be added. The cluster can also be out of balance when created.If weight is not set on any instance group, the cluster will default to equal weight for all groups: the cluster will attempt to maintain an equal number of workers in each group within the configured size bounds for each group. If weight is set for one group only, the cluster will default to zero weight on the unset group. For example if weight is set only on primary workers, the cluster will use primary workers only and no secondary workers.
+    pub weight: Option<i32>,
+}
+
+impl Part for InstanceGroupAutoscalingPolicyConfig {}
+
+
+/// Associates members with a role.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Binding {
+    /// Role that is assigned to members. For example, roles/viewer, roles/editor, or roles/owner.
+    pub role: Option<String>,
+    /// The condition that is associated with this binding. NOTE: An unsatisfied condition will not allow user access via current binding. Different bindings, including their conditions, are examined independently.
+    pub condition: Option<Expr>,
+    /// Specifies the identities requesting access for a Cloud Platform resource. members can have the following values:
+    /// allUsers: A special identifier that represents anyone who is  on the internet; with or without a Google account.
+    /// allAuthenticatedUsers: A special identifier that represents anyone  who is authenticated with a Google account or a service account.
+    /// user:{emailid}: An email address that represents a specific Google  account. For example, alice@example.com .
+    /// serviceAccount:{emailid}: An email address that represents a service  account. For example, my-other-app@appspot.gserviceaccount.com.
+    /// group:{emailid}: An email address that represents a Google group.  For example, admins@example.com.
+    /// deleted:user:{emailid}?uid={uniqueid}: An email address (plus unique  identifier) representing a user that has been recently deleted. For  example, alice@example.com?uid=123456789012345678901. If the user is  recovered, this value reverts to user:{emailid} and the recovered user  retains the role in the binding.
+    /// deleted:serviceAccount:{emailid}?uid={uniqueid}: An email address (plus  unique identifier) representing a service account that has been recently  deleted. For example,  my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901.  If the service account is undeleted, this value reverts to  serviceAccount:{emailid} and the undeleted service account retains the  role in the binding.
+    /// deleted:group:{emailid}?uid={uniqueid}: An email address (plus unique  identifier) representing a Google group that has been recently  deleted. For example, admins@example.com?uid=123456789012345678901. If  the group is recovered, this value reverts to group:{emailid} and the  recovered group retains the role in the binding.
+    /// domain:{domain}: The G Suite domain (primary) that represents all the  users of that domain. For example, google.com or example.com.
+    pub members: Option<Vec<String>>,
+}
+
+impl Part for Binding {}
+
+
+/// Cluster that is managed by the workflow.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ManagedCluster {
+    /// Required. The cluster name prefix. A unique cluster name will be formed by appending a random suffix.The name must contain only lower-case letters (a-z), numbers (0-9), and hyphens (-). Must begin with a letter. Cannot begin or end with hyphen. Must consist of between 2 and 35 characters.
+    #[serde(rename="clusterName")]
+    pub cluster_name: Option<String>,
+    /// Optional. The labels to associate with this cluster.Label keys must be between 1 and 63 characters long, and must conform to the following PCRE regular expression: \p{Ll}\p{Lo}{0,62}Label values must be between 1 and 63 characters long, and must conform to the following PCRE regular expression: \p{Ll}\p{Lo}\p{N}_-{0,63}No more than 32 labels can be associated with a given cluster.
+    pub labels: Option<HashMap<String, String>>,
+    /// Required. The cluster configuration.
+    pub config: Option<ClusterConfig>,
+}
+
+impl Part for ManagedCluster {}
+
+
+/// Describes the identifying information, config, and status of a cluster of Compute Engine instances.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [regions clusters patch projects](struct.ProjectRegionClusterPatchCall.html) (request)
+/// * [regions clusters create projects](struct.ProjectRegionClusterCreateCall.html) (request)
+/// * [regions clusters get projects](struct.ProjectRegionClusterGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Cluster {
+    /// Output only. Cluster status.
+    pub status: Option<ClusterStatus>,
+    /// Output only. A cluster UUID (Unique Universal Identifier). Dataproc generates this value when it creates the cluster.
+    #[serde(rename="clusterUuid")]
+    pub cluster_uuid: Option<String>,
+    /// Required. The cluster name. Cluster names within a project must be unique. Names of deleted clusters can be reused.
+    #[serde(rename="clusterName")]
+    pub cluster_name: Option<String>,
+    /// Required. The Google Cloud Platform project ID that the cluster belongs to.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Optional. The labels to associate with this cluster. Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values may be empty, but, if present, must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be associated with a cluster.
+    pub labels: Option<HashMap<String, String>>,
+    /// Contains cluster daemon metrics such as HDFS and YARN stats.Beta Feature: This report is available for testing purposes only. It may be changed before final release.
+    pub metrics: Option<ClusterMetrics>,
+    /// Output only. The previous cluster status.
+    #[serde(rename="statusHistory")]
+    pub status_history: Option<Vec<ClusterStatus>>,
+    /// Required. The cluster config. Note that Dataproc may set default values, and values may change when clusters are updated.
+    pub config: Option<ClusterConfig>,
+}
+
+impl RequestValue for Cluster {}
+impl ResponseResult for Cluster {}
+
+
+/// Configuration for parameter validation.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ParameterValidation {
+    /// Validation based on regular expressions.
+    pub regex: Option<RegexValidation>,
+    /// Validation based on a list of allowed values.
+    pub values: Option<ValueValidation>,
+}
+
+impl Part for ParameterValidation {}
+
+
+/// A Dataproc job for running Apache Spark (http://spark.apache.org/) applications on YARN.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SparkJob {
+    /// Optional. HCFS URIs of jar files to add to the CLASSPATHs of the Spark driver and tasks.
+    #[serde(rename="jarFileUris")]
+    pub jar_file_uris: Option<Vec<String>>,
+    /// Optional. The runtime log config for job execution.
+    #[serde(rename="loggingConfig")]
+    pub logging_config: Option<LoggingConfig>,
+    /// Optional. The arguments to pass to the driver. Do not include arguments, such as --conf, that can be set as job properties, since a collision may occur that causes an incorrect job submission.
+    pub args: Option<Vec<String>>,
+    /// Optional. HCFS URIs of files to be copied to the working directory of Spark drivers and distributed tasks. Useful for naively parallel tasks.
+    #[serde(rename="fileUris")]
+    pub file_uris: Option<Vec<String>>,
+    /// The name of the driver's main class. The jar file that contains the class must be in the default CLASSPATH or specified in jar_file_uris.
+    #[serde(rename="mainClass")]
+    pub main_class: Option<String>,
+    /// Optional. HCFS URIs of archives to be extracted in the working directory of Spark drivers and tasks. Supported file types: .jar, .tar, .tar.gz, .tgz, and .zip.
+    #[serde(rename="archiveUris")]
+    pub archive_uris: Option<Vec<String>>,
+    /// The HCFS URI of the jar file that contains the main class.
+    #[serde(rename="mainJarFileUri")]
+    pub main_jar_file_uri: Option<String>,
+    /// Optional. A mapping of property names to values, used to configure Spark. Properties that conflict with values set by the Dataproc API may be overwritten. Can include properties set in /etc/spark/conf/spark-defaults.conf and classes in user code.
+    pub properties: Option<HashMap<String, String>>,
+}
+
+impl Part for SparkJob {}
+
+
+/// Encryption settings for the cluster.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EncryptionConfig {
+    /// Optional. The Cloud KMS key name to use for PD disk encryption for all instances in the cluster.
+    #[serde(rename="gcePdKmsKeyName")]
+    pub gce_pd_kms_key_name: Option<String>,
+}
+
+impl Part for EncryptionConfig {}
+
+
+/// This resource represents a long-running operation that is the result of a network API call.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [regions workflow templates instantiate projects](struct.ProjectRegionWorkflowTemplateInstantiateCall.html) (response)
+/// * [regions clusters patch projects](struct.ProjectRegionClusterPatchCall.html) (response)
+/// * [regions operations get projects](struct.ProjectRegionOperationGetCall.html) (response)
+/// * [regions clusters delete projects](struct.ProjectRegionClusterDeleteCall.html) (response)
+/// * [regions clusters diagnose projects](struct.ProjectRegionClusterDiagnoseCall.html) (response)
+/// * [regions clusters create projects](struct.ProjectRegionClusterCreateCall.html) (response)
+/// * [regions jobs submit as operation projects](struct.ProjectRegionJobSubmitAsOperationCall.html) (response)
+/// * [locations workflow templates instantiate inline projects](struct.ProjectLocationWorkflowTemplateInstantiateInlineCall.html) (response)
+/// * [regions workflow templates instantiate inline projects](struct.ProjectRegionWorkflowTemplateInstantiateInlineCall.html) (response)
+/// * [locations workflow templates instantiate projects](struct.ProjectLocationWorkflowTemplateInstantiateCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Operation {
+    /// The error result of the operation in case of failure or cancellation.
+    pub error: Option<Status>,
+    /// If the value is false, it means the operation is still in progress. If true, the operation is completed, and either error or response is available.
+    pub done: Option<bool>,
+    /// The normal response of the operation in case of success. If the original method returns no data on success, such as Delete, the response is google.protobuf.Empty. If the original method is standard Get/Create/Update, the response should be the resource. For other methods, the response should have the type XxxResponse, where Xxx is the original method name. For example, if the original method name is TakeSnapshot(), the inferred response type is TakeSnapshotResponse.
+    pub response: Option<HashMap<String, String>>,
+    /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the name should be a resource name ending with operations/{unique_id}.
+    pub name: Option<String>,
+    /// Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.
+    pub metadata: Option<HashMap<String, String>>,
+}
+
+impl ResponseResult for Operation {}
+
+
+/// Job scheduling options.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct JobScheduling {
+    /// Optional. Maximum number of times per hour a driver may be restarted as a result of driver terminating with non-zero code before job is reported failed.A job may be reported as thrashing if driver exits with non-zero code 4 times within 10 minute window.Maximum value is 10.
+    #[serde(rename="maxFailuresPerHour")]
+    pub max_failures_per_hour: Option<i32>,
+}
+
+impl Part for JobScheduling {}
+
+
+/// Autoscaling Policy config associated with the cluster.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AutoscalingConfig {
+    /// Optional. The autoscaling policy used by the cluster.Only resource names including projectid and location (region) are valid. Examples:
+    /// https://www.googleapis.com/compute/v1/projects/[project_id]/locations/[dataproc_region]/autoscalingPolicies/[policy_id]
+    /// projects/[project_id]/locations/[dataproc_region]/autoscalingPolicies/[policy_id]Note that the policy must be in the same project and Dataproc region.
+    #[serde(rename="policyUri")]
+    pub policy_uri: Option<String>,
+}
+
+impl Part for AutoscalingConfig {}
+
+
+/// Basic autoscaling configurations for YARN.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BasicYarnAutoscalingConfig {
+    /// Required. Fraction of average pending memory in the last cooldown period for which to remove workers. A scale-down factor of 1 will result in scaling down so that there is no available memory remaining after the update (more aggressive scaling). A scale-down factor of 0 disables removing workers, which can be beneficial for autoscaling a single job.Bounds: 0.0, 1.0.
+    #[serde(rename="scaleDownFactor")]
+    pub scale_down_factor: Option<f64>,
+    /// Required. Timeout for YARN graceful decommissioning of Node Managers. Specifies the duration to wait for jobs to complete before forcefully removing workers (and potentially interrupting jobs). Only applicable to downscaling operations.Bounds: 0s, 1d.
+    #[serde(rename="gracefulDecommissionTimeout")]
+    pub graceful_decommission_timeout: Option<String>,
+    /// Optional. Minimum scale-down threshold as a fraction of total cluster size before scaling occurs. For example, in a 20-worker cluster, a threshold of 0.1 means the autoscaler must recommend at least a 2 worker scale-down for the cluster to scale. A threshold of 0 means the autoscaler will scale down on any recommended change.Bounds: 0.0, 1.0. Default: 0.0.
+    #[serde(rename="scaleDownMinWorkerFraction")]
+    pub scale_down_min_worker_fraction: Option<f64>,
+    /// Required. Fraction of average pending memory in the last cooldown period for which to add workers. A scale-up factor of 1.0 will result in scaling up so that there is no pending memory remaining after the update (more aggressive scaling). A scale-up factor closer to 0 will result in a smaller magnitude of scaling up (less aggressive scaling).Bounds: 0.0, 1.0.
+    #[serde(rename="scaleUpFactor")]
+    pub scale_up_factor: Option<f64>,
+    /// Optional. Minimum scale-up threshold as a fraction of total cluster size before scaling occurs. For example, in a 20-worker cluster, a threshold of 0.1 means the autoscaler must recommend at least a 2-worker scale-up for the cluster to scale. A threshold of 0 means the autoscaler will scale up on any recommended change.Bounds: 0.0, 1.0. Default: 0.0.
+    #[serde(rename="scaleUpMinWorkerFraction")]
+    pub scale_up_min_worker_fraction: Option<f64>,
+}
+
+impl Part for BasicYarnAutoscalingConfig {}
+
+
+/// Request message for SetIamPolicy method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [regions workflow templates set iam policy projects](struct.ProjectRegionWorkflowTemplateSetIamPolicyCall.html) (request)
+/// * [regions clusters set iam policy projects](struct.ProjectRegionClusterSetIamPolicyCall.html) (request)
+/// * [locations autoscaling policies set iam policy projects](struct.ProjectLocationAutoscalingPolicySetIamPolicyCall.html) (request)
+/// * [regions operations set iam policy projects](struct.ProjectRegionOperationSetIamPolicyCall.html) (request)
+/// * [locations workflow templates set iam policy projects](struct.ProjectLocationWorkflowTemplateSetIamPolicyCall.html) (request)
+/// * [regions jobs set iam policy projects](struct.ProjectRegionJobSetIamPolicyCall.html) (request)
+/// * [regions autoscaling policies set iam policy projects](struct.ProjectRegionAutoscalingPolicySetIamPolicyCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SetIamPolicyRequest {
+    /// REQUIRED: The complete policy to be applied to the resource. The size of the policy is limited to a few 10s of KB. An empty policy is a valid policy but certain Cloud Platform services (such as Projects) might reject them.
+    pub policy: Option<Policy>,
+}
+
+impl RequestValue for SetIamPolicyRequest {}
+
+
+/// A configurable parameter that replaces one or more fields in the template. Parameterizable fields: - Labels - File uris - Job properties - Job arguments - Script variables - Main class (in HadoopJob and SparkJob) - Zone (in ClusterSelector)
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TemplateParameter {
+    /// Required. Paths to all fields that the parameter replaces. A field is allowed to appear in at most one parameter's list of field paths.A field path is similar in syntax to a google.protobuf.FieldMask. For example, a field path that references the zone field of a workflow template's cluster selector would be specified as placement.clusterSelector.zone.Also, field paths can reference fields using the following syntax:
+    /// Values in maps can be referenced by key:
+    /// labels'key'
+    /// placement.clusterSelector.clusterLabels'key'
+    /// placement.managedCluster.labels'key'
+    /// placement.clusterSelector.clusterLabels'key'
+    /// jobs'step-id'.labels'key'
+    /// Jobs in the jobs list can be referenced by step-id:
+    /// jobs'step-id'.hadoopJob.mainJarFileUri
+    /// jobs'step-id'.hiveJob.queryFileUri
+    /// jobs'step-id'.pySparkJob.mainPythonFileUri
+    /// jobs'step-id'.hadoopJob.jarFileUris0
+    /// jobs'step-id'.hadoopJob.archiveUris0
+    /// jobs'step-id'.hadoopJob.fileUris0
+    /// jobs'step-id'.pySparkJob.pythonFileUris0
+    /// Items in repeated fields can be referenced by a zero-based index:
+    /// jobs'step-id'.sparkJob.args0
+    /// Other examples:
+    /// jobs'step-id'.hadoopJob.properties'key'
+    /// jobs'step-id'.hadoopJob.args0
+    /// jobs'step-id'.hiveJob.scriptVariables'key'
+    /// jobs'step-id'.hadoopJob.mainJarFileUri
+    /// placement.clusterSelector.zoneIt may not be possible to parameterize maps and repeated fields in their entirety since only individual map values and individual items in repeated fields can be referenced. For example, the following field paths are invalid:
+    /// placement.clusterSelector.clusterLabels
+    /// jobs'step-id'.sparkJob.args
+    pub fields: Option<Vec<String>>,
+    /// Optional. Validation rules to be applied to this parameter's value.
+    pub validation: Option<ParameterValidation>,
+    /// Optional. Brief description of the parameter. Must not exceed 1024 characters.
+    pub description: Option<String>,
+    /// Required. Parameter name. The parameter name is used as the key, and paired with the parameter value, which are passed to the template when the template is instantiated. The name must contain only capital letters (A-Z), numbers (0-9), and underscores (_), and must not start with a number. The maximum length is 40 characters.
+    pub name: Option<String>,
+}
+
+impl Part for TemplateParameter {}
+
+
+/// A YARN application created by a job. Application information is a subset of <code>org.apache.hadoop.yarn.proto.YarnProtos.ApplicationReportProto</code>.Beta Feature: This report is available for testing purposes only. It may be changed before final release.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct YarnApplication {
+    /// Required. The numerical progress of the application, from 1 to 100.
+    pub progress: Option<f32>,
+    /// Required. The application state.
+    pub state: Option<String>,
+    /// Required. The application name.
+    pub name: Option<String>,
+    /// Optional. The HTTP URL of the ApplicationMaster, HistoryServer, or TimelineServer that provides application-specific information. The URL uses the internal hostname, and requires a proxy server for resolution and, possibly, access.
+    #[serde(rename="trackingUrl")]
+    pub tracking_url: Option<String>,
+}
+
+impl Part for YarnApplication {}
+
+
+/// An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources.A Policy is a collection of bindings. A binding binds one or more members to a single role. Members can be user accounts, service accounts, Google groups, and domains (such as G Suite). A role is a named list of permissions; each role can be an IAM predefined role or a user-created custom role.Optionally, a binding can specify a condition, which is a logical expression that allows access to a resource only if the expression evaluates to true. A condition can add constraints based on attributes of the request, the resource, or both.JSON example:
+/// {
+/// "bindings": [
+/// {
+/// "role": "roles/resourcemanager.organizationAdmin",
+/// "members": [
+/// "user:mike@example.com",
+/// "group:admins@example.com",
+/// "domain:google.com",
+/// "serviceAccount:my-project-id@appspot.gserviceaccount.com"
+/// ]
+/// },
+/// {
+/// "role": "roles/resourcemanager.organizationViewer",
+/// "members": ["user:eve@example.com"],
+/// "condition": {
+/// "title": "expirable access",
+/// "description": "Does not grant access after Sep 2020",
+/// "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')",
+/// }
+/// }
+/// ],
+/// "etag": "BwWWja0YfJA=",
+/// "version": 3
+/// }
+/// YAML example:
+/// bindings:
+/// 
+/// * members:
+///   * user:mike@example.com
+///   * group:admins@example.com
+///   * domain:google.com
+///   * serviceAccount:my-project-id@appspot.gserviceaccount.com
+///     role: roles/resourcemanager.organizationAdmin
+/// * members:
+///   * user:eve@example.com
+///     role: roles/resourcemanager.organizationViewer
+///     condition:
+///     title: expirable access
+///     description: Does not grant access after Sep 2020
+///     expression: request.time < timestamp('2020-10-01T00:00:00.000Z')
+/// * etag: BwWWja0YfJA=
+/// * version: 3
+///   For a description of IAM and its features, see the IAM documentation (https://cloud.google.com/iam/docs/).
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [regions clusters get iam policy projects](struct.ProjectRegionClusterGetIamPolicyCall.html) (response)
+/// * [regions workflow templates set iam policy projects](struct.ProjectRegionWorkflowTemplateSetIamPolicyCall.html) (response)
+/// * [regions clusters set iam policy projects](struct.ProjectRegionClusterSetIamPolicyCall.html) (response)
+/// * [regions workflow templates get iam policy projects](struct.ProjectRegionWorkflowTemplateGetIamPolicyCall.html) (response)
+/// * [regions jobs get iam policy projects](struct.ProjectRegionJobGetIamPolicyCall.html) (response)
+/// * [locations autoscaling policies set iam policy projects](struct.ProjectLocationAutoscalingPolicySetIamPolicyCall.html) (response)
+/// * [locations autoscaling policies get iam policy projects](struct.ProjectLocationAutoscalingPolicyGetIamPolicyCall.html) (response)
+/// * [regions autoscaling policies get iam policy projects](struct.ProjectRegionAutoscalingPolicyGetIamPolicyCall.html) (response)
+/// * [regions operations get iam policy projects](struct.ProjectRegionOperationGetIamPolicyCall.html) (response)
+/// * [regions operations set iam policy projects](struct.ProjectRegionOperationSetIamPolicyCall.html) (response)
+/// * [locations workflow templates set iam policy projects](struct.ProjectLocationWorkflowTemplateSetIamPolicyCall.html) (response)
+/// * [regions jobs set iam policy projects](struct.ProjectRegionJobSetIamPolicyCall.html) (response)
+/// * [locations workflow templates get iam policy projects](struct.ProjectLocationWorkflowTemplateGetIamPolicyCall.html) (response)
+/// * [regions autoscaling policies set iam policy projects](struct.ProjectRegionAutoscalingPolicySetIamPolicyCall.html) (response)
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Policy {
+    /// Associates a list of members to a role. Optionally, may specify a condition that determines how and when the bindings are applied. Each of the bindings must contain at least one member.
+    pub bindings: Option<Vec<Binding>>,
+    /// etag is used for optimistic concurrency control as a way to help prevent simultaneous updates of a policy from overwriting each other. It is strongly suggested that systems make use of the etag in the read-modify-write cycle to perform policy updates in order to avoid race conditions: An etag is returned in the response to getIamPolicy, and systems are expected to put that etag in the request to setIamPolicy to ensure that their change will be applied to the same version of the policy.Important: If you use IAM Conditions, you must include the etag field whenever you call setIamPolicy. If you omit this field, then IAM allows you to overwrite a version 3 policy with a version 1 policy, and all of the conditions in the version 3 policy are lost.
+    pub etag: Option<String>,
+    /// Specifies the format of the policy.Valid values are 0, 1, and 3. Requests that specify an invalid value are rejected.Any operation that affects conditional role bindings must specify version 3. This requirement applies to the following operations:
+    /// Getting a policy that includes a conditional role binding
+    /// Adding a conditional role binding to a policy
+    /// Changing a conditional role binding in a policy
+    /// Removing any role binding, with or without a condition, from a policy  that includes conditionsImportant: If you use IAM Conditions, you must include the etag field whenever you call setIamPolicy. If you omit this field, then IAM allows you to overwrite a version 3 policy with a version 1 policy, and all of the conditions in the version 3 policy are lost.If a policy does not include any conditions, operations on that policy may specify any valid version or leave the field unset.
+    pub version: Option<i32>,
+}
+
+impl ResponseResult for Policy {}
+
+
+/// Security related configuration, including Kerberos.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SecurityConfig {
+    /// Kerberos related configuration.
+    #[serde(rename="kerberosConfig")]
+    pub kerberos_config: Option<KerberosConfig>,
+}
+
+impl Part for SecurityConfig {}
+
+
+/// The runtime logging config of the job.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LoggingConfig {
+    /// The per-package log levels for the driver. This may include "root" package name to configure rootLogger. Examples:  'com.google = FATAL', 'root = INFO', 'org.apache = DEBUG'
+    #[serde(rename="driverLogLevels")]
+    pub driver_log_levels: Option<HashMap<String, String>>,
+}
+
+impl Part for LoggingConfig {}
+
+
+/// Specifies the type and number of accelerator cards attached to the instances of an instance. See GPUs on Compute Engine.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AcceleratorConfig {
+    /// The number of the accelerator cards of this type exposed to this instance.
+    #[serde(rename="acceleratorCount")]
+    pub accelerator_count: Option<i32>,
+    /// Full URL, partial URI, or short name of the accelerator type resource to expose to this instance. See Compute Engine AcceleratorTypes.Examples:
+    /// https://www.googleapis.com/compute/beta/projects/[project_id]/zones/us-east1-a/acceleratorTypes/nvidia-tesla-k80
+    /// projects/[project_id]/zones/us-east1-a/acceleratorTypes/nvidia-tesla-k80
+    /// nvidia-tesla-k80Auto Zone Exception: If you are using the Dataproc Auto Zone Placement feature, you must use the short name of the accelerator type resource, for example, nvidia-tesla-k80.
+    #[serde(rename="acceleratorTypeUri")]
+    pub accelerator_type_uri: Option<String>,
+}
+
+impl Part for AcceleratorConfig {}
+
+
+/// A request to submit a job.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [regions jobs submit as operation projects](struct.ProjectRegionJobSubmitAsOperationCall.html) (request)
+/// * [regions jobs submit projects](struct.ProjectRegionJobSubmitCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SubmitJobRequest {
+    /// Required. The job resource.
+    pub job: Option<Job>,
+    /// Optional. A unique id used to identify the request. If the server receives two SubmitJobRequest requests with the same id, then the second request will be ignored and the first Job created and stored in the backend is returned.It is recommended to always set this value to a UUID (https://en.wikipedia.org/wiki/Universally_unique_identifier).The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
+    #[serde(rename="requestId")]
+    pub request_id: Option<String>,
+}
+
+impl RequestValue for SubmitJobRequest {}
+
+
+/// A Dataproc workflow template resource.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations workflow templates create projects](struct.ProjectLocationWorkflowTemplateCreateCall.html) (request|response)
+/// * [regions workflow templates create projects](struct.ProjectRegionWorkflowTemplateCreateCall.html) (request|response)
+/// * [regions workflow templates instantiate inline projects](struct.ProjectRegionWorkflowTemplateInstantiateInlineCall.html) (request)
+/// * [regions workflow templates update projects](struct.ProjectRegionWorkflowTemplateUpdateCall.html) (request|response)
+/// * [locations workflow templates instantiate inline projects](struct.ProjectLocationWorkflowTemplateInstantiateInlineCall.html) (request)
+/// * [locations workflow templates get projects](struct.ProjectLocationWorkflowTemplateGetCall.html) (response)
+/// * [locations workflow templates update projects](struct.ProjectLocationWorkflowTemplateUpdateCall.html) (request|response)
+/// * [regions workflow templates get projects](struct.ProjectRegionWorkflowTemplateGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WorkflowTemplate {
+    /// Output only. The time template was last updated.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
+    /// Required. The Directed Acyclic Graph of Jobs to submit.
+    pub jobs: Option<Vec<OrderedJob>>,
+    /// Output only. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.workflowTemplates, the resource name of the  template has the following format:  projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// For projects.locations.workflowTemplates, the resource name of the  template has the following format:  projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
+    pub name: Option<String>,
+    /// Optional. emplate parameters whose values are substituted into the template. Values for parameters must be provided when the template is instantiated.
+    pub parameters: Option<Vec<TemplateParameter>>,
+    /// Optional. The labels to associate with this template. These labels will be propagated to all jobs and clusters created by the workflow instance.Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt).Label values may be empty, but, if present, must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt).No more than 32 labels can be associated with a template.
+    pub labels: Option<HashMap<String, String>>,
+    /// Output only. The time template was created.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+    /// Optional. Used to perform a consistent read-modify-write.This field should be left blank for a CreateWorkflowTemplate request. It is required for an UpdateWorkflowTemplate request, and must match the current server version. A typical update template flow would fetch the current template with a GetWorkflowTemplate request, which will return the current template with the version field filled in with the current server version. The user updates other fields in the template, then returns it as part of the UpdateWorkflowTemplate request.
+    pub version: Option<i32>,
+    /// Required. WorkflowTemplate scheduling information.
+    pub placement: Option<WorkflowTemplatePlacement>,
+    /// no description provided
+    pub id: Option<String>,
+}
+
+impl RequestValue for WorkflowTemplate {}
+impl ResponseResult for WorkflowTemplate {}
+
+
+/// A Dataproc job resource.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [regions jobs submit projects](struct.ProjectRegionJobSubmitCall.html) (response)
+/// * [regions jobs get projects](struct.ProjectRegionJobGetCall.html) (response)
+/// * [regions jobs patch projects](struct.ProjectRegionJobPatchCall.html) (request|response)
+/// * [regions jobs cancel projects](struct.ProjectRegionJobCancelCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Job {
+    /// Output only. The job status. Additional application-specific status information may be contained in the <code>type_job</code> and <code>yarn_applications</code> fields.
+    pub status: Option<JobStatus>,
+    /// Optional. Job is a Hadoop job.
+    #[serde(rename="hadoopJob")]
+    pub hadoop_job: Option<HadoopJob>,
+    /// Optional. The labels to associate with this job. Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values may be empty, but, if present, must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be associated with a job.
+    pub labels: Option<HashMap<String, String>>,
+    /// Optional. The fully qualified reference to the job, which can be used to obtain the equivalent REST path of the job resource. If this property is not specified when a job is created, the server generates a <code>job_id</code>.
+    pub reference: Option<JobReference>,
+    /// Optional. Job is a Pig job.
+    #[serde(rename="pigJob")]
+    pub pig_job: Option<PigJob>,
+    /// Optional. Job is a Presto job.
+    #[serde(rename="prestoJob")]
+    pub presto_job: Option<PrestoJob>,
+    /// Output only. A URI pointing to the location of the stdout of the job's driver program.
+    #[serde(rename="driverOutputResourceUri")]
+    pub driver_output_resource_uri: Option<String>,
+    /// Output only. Indicates whether the job is completed. If the value is false, the job is still in progress. If true, the job is completed, and status.state field will indicate if it was successful, failed, or cancelled.
+    pub done: Option<bool>,
+    /// Output only. The collection of YARN applications spun up by this job.Beta Feature: This report is available for testing purposes only. It may be changed before final release.
+    #[serde(rename="yarnApplications")]
+    pub yarn_applications: Option<Vec<YarnApplication>>,
+    /// Optional. Job scheduling configuration.
+    pub scheduling: Option<JobScheduling>,
+    /// Required. Job information, including how, when, and where to run the job.
+    pub placement: Option<JobPlacement>,
+    /// Output only. The previous job status.
+    #[serde(rename="statusHistory")]
+    pub status_history: Option<Vec<JobStatus>>,
+    /// Optional. Job is a SparkSql job.
+    #[serde(rename="sparkSqlJob")]
+    pub spark_sql_job: Option<SparkSqlJob>,
+    /// Output only. A UUID that uniquely identifies a job within the project over time. This is in contrast to a user-settable reference.job_id that may be reused over time.
+    #[serde(rename="jobUuid")]
+    pub job_uuid: Option<String>,
+    /// Optional. Job is a SparkR job.
+    #[serde(rename="sparkRJob")]
+    pub spark_r_job: Option<SparkRJob>,
+    /// Output only. If present, the location of miscellaneous control files which may be used as part of job setup and handling. If not present, control files may be placed in the same location as driver_output_uri.
+    #[serde(rename="driverControlFilesUri")]
+    pub driver_control_files_uri: Option<String>,
+    /// Optional. Job is a Spark job.
+    #[serde(rename="sparkJob")]
+    pub spark_job: Option<SparkJob>,
+    /// Optional. Job is a PySpark job.
+    #[serde(rename="pysparkJob")]
+    pub pyspark_job: Option<PySparkJob>,
+    /// Optional. Job is a Hive job.
+    #[serde(rename="hiveJob")]
+    pub hive_job: Option<HiveJob>,
+}
+
+impl RequestValue for Job {}
+impl ResponseResult for Job {}
+
+
+/// A job executed by the workflow.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OrderedJob {
+    /// no description provided
+    #[serde(rename="hadoopJob")]
+    pub hadoop_job: Option<HadoopJob>,
+    /// Optional. The labels to associate with this job.Label keys must be between 1 and 63 characters long, and must conform to the following regular expression: \p{Ll}\p{Lo}{0,62}Label values must be between 1 and 63 characters long, and must conform to the following regular expression: \p{Ll}\p{Lo}\p{N}_-{0,63}No more than 32 labels can be associated with a given job.
+    pub labels: Option<HashMap<String, String>>,
+    /// Spark R job
+    #[serde(rename="sparkRJob")]
+    pub spark_r_job: Option<SparkRJob>,
+    /// no description provided
+    #[serde(rename="sparkSqlJob")]
+    pub spark_sql_job: Option<SparkSqlJob>,
+    /// Optional. The optional list of prerequisite job step_ids. If not specified, the job will start at the beginning of workflow.
+    #[serde(rename="prerequisiteStepIds")]
+    pub prerequisite_step_ids: Option<Vec<String>>,
+    /// no description provided
+    #[serde(rename="pigJob")]
+    pub pig_job: Option<PigJob>,
+    /// Required. The step id. The id must be unique among all jobs within the template.The step id is used as prefix for job id, as job goog-dataproc-workflow-step-id label, and in prerequisiteStepIds field from other steps.The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). Cannot begin or end with underscore or hyphen. Must consist of between 3 and 50 characters.
+    #[serde(rename="stepId")]
+    pub step_id: Option<String>,
+    /// no description provided
+    #[serde(rename="sparkJob")]
+    pub spark_job: Option<SparkJob>,
+    /// Presto job
+    #[serde(rename="prestoJob")]
+    pub presto_job: Option<PrestoJob>,
+    /// Optional. Job scheduling configuration.
+    pub scheduling: Option<JobScheduling>,
+    /// no description provided
+    #[serde(rename="pysparkJob")]
+    pub pyspark_job: Option<PySparkJob>,
+    /// no description provided
+    #[serde(rename="hiveJob")]
+    pub hive_job: Option<HiveJob>,
+}
+
+impl Part for OrderedJob {}
+
+
+/// A Dataproc job for running Apache PySpark (https://spark.apache.org/docs/0.9.0/python-programming-guide.html) applications on YARN.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PySparkJob {
+    /// Required. The HCFS URI of the main Python file to use as the driver. Must be a .py file.
+    #[serde(rename="mainPythonFileUri")]
+    pub main_python_file_uri: Option<String>,
+    /// Optional. HCFS URIs of jar files to add to the CLASSPATHs of the Python driver and tasks.
+    #[serde(rename="jarFileUris")]
+    pub jar_file_uris: Option<Vec<String>>,
+    /// Optional. The runtime log config for job execution.
+    #[serde(rename="loggingConfig")]
+    pub logging_config: Option<LoggingConfig>,
+    /// Optional. The arguments to pass to the driver. Do not include arguments, such as --conf, that can be set as job properties, since a collision may occur that causes an incorrect job submission.
+    pub args: Option<Vec<String>>,
+    /// Optional. HCFS URIs of files to be copied to the working directory of Python drivers and distributed tasks. Useful for naively parallel tasks.
+    #[serde(rename="fileUris")]
+    pub file_uris: Option<Vec<String>>,
+    /// Optional. HCFS URIs of archives to be extracted in the working directory of .jar, .tar, .tar.gz, .tgz, and .zip.
+    #[serde(rename="archiveUris")]
+    pub archive_uris: Option<Vec<String>>,
+    /// Optional. HCFS file URIs of Python files to pass to the PySpark framework. Supported file types: .py, .egg, and .zip.
+    #[serde(rename="pythonFileUris")]
+    pub python_file_uris: Option<Vec<String>>,
+    /// Optional. A mapping of property names to values, used to configure PySpark. Properties that conflict with values set by the Dataproc API may be overwritten. Can include properties set in /etc/spark/conf/spark-defaults.conf and classes in user code.
+    pub properties: Option<HashMap<String, String>>,
+}
+
+impl Part for PySparkJob {}
+
+
+/// A response to a request to list workflow templates in a project.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations workflow templates list projects](struct.ProjectLocationWorkflowTemplateListCall.html) (response)
+/// * [regions workflow templates list projects](struct.ProjectRegionWorkflowTemplateListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListWorkflowTemplatesResponse {
+    /// Output only. This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent <code>ListWorkflowTemplatesRequest</code>.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Output only. WorkflowTemplates list.
+    pub templates: Option<Vec<WorkflowTemplate>>,
+}
+
+impl ResponseResult for ListWorkflowTemplatesResponse {}
+
+
+/// Request message for TestIamPermissions method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [regions workflow templates test iam permissions projects](struct.ProjectRegionWorkflowTemplateTestIamPermissionCall.html) (request)
+/// * [regions operations test iam permissions projects](struct.ProjectRegionOperationTestIamPermissionCall.html) (request)
+/// * [regions clusters test iam permissions projects](struct.ProjectRegionClusterTestIamPermissionCall.html) (request)
+/// * [locations autoscaling policies test iam permissions projects](struct.ProjectLocationAutoscalingPolicyTestIamPermissionCall.html) (request)
+/// * [regions autoscaling policies test iam permissions projects](struct.ProjectRegionAutoscalingPolicyTestIamPermissionCall.html) (request)
+/// * [locations workflow templates test iam permissions projects](struct.ProjectLocationWorkflowTemplateTestIamPermissionCall.html) (request)
+/// * [regions jobs test iam permissions projects](struct.ProjectRegionJobTestIamPermissionCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TestIamPermissionsRequest {
+    /// The set of permissions to check for the resource. Permissions with wildcards (such as '*' or 'storage.*') are not allowed. For more information see IAM Overview (https://cloud.google.com/iam/docs/overview#permissions).
+    pub permissions: Option<Vec<String>>,
+}
+
+impl RequestValue for TestIamPermissionsRequest {}
+
+
 /// Specifies Kerberos related configuration.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1222,6 +1791,8 @@ pub struct KerberosConfig {
     /// Optional. The remote realm the Dataproc on-cluster KDC will trust, should the user enable cross realm trust.
     #[serde(rename="crossRealmTrustRealm")]
     pub cross_realm_trust_realm: Option<String>,
+    /// Optional. The name of the on-cluster Kerberos realm. If not specified, the uppercased domain of hostnames will be the realm.
+    pub realm: Option<String>,
     /// Optional. The Cloud Storage URI of a KMS encrypted file containing the password to the user provided key. For the self-signed certificate, this password is generated by Dataproc.
     #[serde(rename="keyPasswordUri")]
     pub key_password_uri: Option<String>,
@@ -1260,23 +1831,35 @@ pub struct KerberosConfig {
 impl Part for KerberosConfig {}
 
 
-/// Represents an expression text. Example:
-/// title: "User account presence"
-/// description: "Determines whether the request has a user account"
-/// expression: "size(request.user) > 0"
-/// 
+/// Represents a textual expression in the Common Expression Language (CEL) syntax. CEL is a C-like expression language. The syntax and semantics of CEL are documented at https://github.com/google/cel-spec.Example (Comparison):
+/// title: "Summary size limit"
+/// description: "Determines if a summary is less than 100 chars"
+/// expression: "document.summary.size() < 100"
+/// Example (Equality):
+/// title: "Requestor is owner"
+/// description: "Determines if requestor is the document owner"
+/// expression: "document.owner == request.auth.claims.email"
+/// Example (Logic):
+/// title: "Public documents"
+/// description: "Determine whether the document should be publicly visible"
+/// expression: "document.type != 'private' && document.type != 'internal'"
+/// Example (Data Manipulation):
+/// title: "Notification string"
+/// description: "Create a notification string with a timestamp."
+/// expression: "'New message received at ' + string(document.create_time)"
+/// The exact variables and functions that may be referenced within an expression are determined by the service that evaluates it. See the service documentation for additional information.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
-    /// An optional description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI.
+    /// Optional. Description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI.
     pub description: Option<String>,
-    /// Textual representation of an expression in Common Expression Language syntax.The application context of the containing message determines which well-known feature set of CEL is supported.
+    /// Textual representation of an expression in Common Expression Language syntax.
     pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error reporting, e.g. a file name and a position in the file.
+    /// Optional. String indicating the location of the expression for error reporting, e.g. a file name and a position in the file.
     pub location: Option<String>,
-    /// An optional title for the expression, i.e. a short string describing its purpose. This can be used e.g. in UIs which allow to enter the expression.
+    /// Optional. Title for the expression, i.e. a short string describing its purpose. This can be used e.g. in UIs which allow to enter the expression.
     pub title: Option<String>,
 }
 
@@ -1319,28 +1902,7 @@ pub struct ListClustersResponse {
 impl ResponseResult for ListClustersResponse {}
 
 
-/// A list of jobs in a project.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [regions jobs list projects](struct.ProjectRegionJobListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListJobsResponse {
-    /// Optional. This token is included in the response if there are more results to fetch. To fetch additional results, provide this value as the page_token in a subsequent <code>ListJobsRequest</code>.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// Output only. Jobs list.
-    pub jobs: Option<Vec<Job>>,
-}
-
-impl ResponseResult for ListJobsResponse {}
-
-
-/// Cloud Dataproc job status.
+/// Dataproc job status.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1351,7 +1913,7 @@ pub struct JobStatus {
     /// Output only. The time when this state was entered.
     #[serde(rename="stateStartTime")]
     pub state_start_time: Option<String>,
-    /// Output only. Optional job state details, such as an error description if the state is <code>ERROR</code>.
+    /// Optional. Output only. Job state details, such as an error description if the state is <code>ERROR</code>.
     pub details: Option<String>,
     /// Output only. Additional state information, which includes status reported by the agent.
     pub substate: Option<String>,
@@ -1360,49 +1922,24 @@ pub struct JobStatus {
 impl Part for JobStatus {}
 
 
-/// Cloud Dataproc job config.
+/// The status of a cluster and its instances.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JobPlacement {
-    /// Required. The name of the cluster where the job will be submitted.
-    #[serde(rename="clusterName")]
-    pub cluster_name: Option<String>,
-    /// Output only. A cluster UUID generated by the Cloud Dataproc service when the job is submitted.
-    #[serde(rename="clusterUuid")]
-    pub cluster_uuid: Option<String>,
+pub struct ClusterStatus {
+    /// Output only. The cluster's state.
+    pub state: Option<String>,
+    /// Output only. Time when this state was entered (see JSON representation of Timestamp (https://developers.google.com/protocol-buffers/docs/proto3#json)).
+    #[serde(rename="stateStartTime")]
+    pub state_start_time: Option<String>,
+    /// Optional. Output only. Details of cluster's state.
+    pub detail: Option<String>,
+    /// Output only. Additional state information that includes status reported by the agent.
+    pub substate: Option<String>,
 }
 
-impl Part for JobPlacement {}
-
-
-/// Encryption settings for the cluster.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EncryptionConfig {
-    /// Optional. The Cloud KMS key name to use for PD disk encryption for all instances in the cluster.
-    #[serde(rename="gcePdKmsKeyName")]
-    pub gce_pd_kms_key_name: Option<String>,
-}
-
-impl Part for EncryptionConfig {}
-
-
-/// The runtime logging config of the job.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LoggingConfig {
-    /// The per-package log levels for the driver. This may include "root" package name to configure rootLogger. Examples:  'com.google = FATAL', 'root = INFO', 'org.apache = DEBUG'
-    #[serde(rename="driverLogLevels")]
-    pub driver_log_levels: Option<HashMap<String, String>>,
-}
-
-impl Part for LoggingConfig {}
+impl Part for ClusterStatus {}
 
 
 /// Contains cluster daemon metrics, such as HDFS and YARN stats.Beta Feature: This report is available for testing purposes only. It may be changed before final release.
@@ -1422,34 +1959,6 @@ pub struct ClusterMetrics {
 impl Part for ClusterMetrics {}
 
 
-/// A Cloud Dataproc job for running Apache Hive (https://hive.apache.org/) queries on YARN.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct HiveJob {
-    /// The HCFS URI of the script that contains Hive queries.
-    #[serde(rename="queryFileUri")]
-    pub query_file_uri: Option<String>,
-    /// Optional. Mapping of query variable names to values (equivalent to the Hive command: SET name="value";).
-    #[serde(rename="scriptVariables")]
-    pub script_variables: Option<HashMap<String, String>>,
-    /// Optional. Whether to continue executing queries if a query fails. The default value is false. Setting to true can be useful when executing independent parallel queries.
-    #[serde(rename="continueOnFailure")]
-    pub continue_on_failure: Option<bool>,
-    /// Optional. HCFS URIs of jar files to add to the CLASSPATH of the Hive server and Hadoop MapReduce (MR) tasks. Can contain Hive SerDes and UDFs.
-    #[serde(rename="jarFileUris")]
-    pub jar_file_uris: Option<Vec<String>>,
-    /// A list of queries.
-    #[serde(rename="queryList")]
-    pub query_list: Option<QueryList>,
-    /// Optional. A mapping of property names and values, used to configure Hive. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/hadoop/conf/*-site.xml, /etc/hive/conf/hive-site.xml, and classes in user code.
-    pub properties: Option<HashMap<String, String>>,
-}
-
-impl Part for HiveJob {}
-
-
 /// Validation based on regular expressions.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1463,81 +1972,22 @@ pub struct RegexValidation {
 impl Part for RegexValidation {}
 
 
-/// A Cloud Dataproc job for running Apache Hadoop MapReduce (https://hadoop.apache.org/docs/current/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html) jobs on Apache Hadoop YARN (https://hadoop.apache.org/docs/r2.7.1/hadoop-yarn/hadoop-yarn-site/YARN.html).
+/// Reservation Affinity for consuming Zonal reservation.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct HadoopJob {
-    /// Optional. Jar file URIs to add to the CLASSPATHs of the Hadoop driver and tasks.
-    #[serde(rename="jarFileUris")]
-    pub jar_file_uris: Option<Vec<String>>,
-    /// Optional. The runtime log config for job execution.
-    #[serde(rename="loggingConfig")]
-    pub logging_config: Option<LoggingConfig>,
-    /// Optional. The arguments to pass to the driver. Do not include arguments, such as -libjars or -Dfoo=bar, that can be set as job properties, since a collision may occur that causes an incorrect job submission.
-    pub args: Option<Vec<String>>,
-    /// Optional. HCFS (Hadoop Compatible Filesystem) URIs of files to be copied to the working directory of Hadoop drivers and distributed tasks. Useful for naively parallel tasks.
-    #[serde(rename="fileUris")]
-    pub file_uris: Option<Vec<String>>,
-    /// The name of the driver's main class. The jar file containing the class must be in the default CLASSPATH or specified in jar_file_uris.
-    #[serde(rename="mainClass")]
-    pub main_class: Option<String>,
-    /// Optional. HCFS URIs of archives to be extracted in the working directory of Hadoop drivers and tasks. Supported file types: .jar, .tar, .tar.gz, .tgz, or .zip.
-    #[serde(rename="archiveUris")]
-    pub archive_uris: Option<Vec<String>>,
-    /// The HCFS URI of the jar file containing the main class. Examples:  'gs://foo-bucket/analytics-binaries/extract-useful-metrics-mr.jar'  'hdfs:/tmp/test-samples/custom-wordcount.jar'  'file:///home/usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar'
-    #[serde(rename="mainJarFileUri")]
-    pub main_jar_file_uri: Option<String>,
-    /// Optional. A mapping of property names to values, used to configure Hadoop. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/hadoop/conf/*-site and classes in user code.
-    pub properties: Option<HashMap<String, String>>,
+pub struct ReservationAffinity {
+    /// Optional. Corresponds to the label values of reservation resource.
+    pub values: Option<Vec<String>>,
+    /// Optional. Type of reservation to consume
+    #[serde(rename="consumeReservationType")]
+    pub consume_reservation_type: Option<String>,
+    /// Optional. Corresponds to the label key of reservation resource.
+    pub key: Option<String>,
 }
 
-impl Part for HadoopJob {}
-
-
-/// A selector that chooses target cluster for jobs based on metadata.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ClusterSelector {
-    /// Required. The cluster labels. Cluster must have all labels to match.
-    #[serde(rename="clusterLabels")]
-    pub cluster_labels: Option<HashMap<String, String>>,
-    /// Optional. The zone where workflow process executes. This parameter does not affect the selection of the cluster.If unspecified, the zone of the first cluster matching the selector is used.
-    pub zone: Option<String>,
-}
-
-impl Part for ClusterSelector {}
-
-
-/// Specifies the selection and config of software inside the cluster.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SoftwareConfig {
-    /// Optional. The version of software inside the cluster. It must be one of the supported Cloud Dataproc Versions, such as "1.2" (including a subminor version, such as "1.2.29"), or the "preview" version. If unspecified, it defaults to the latest Debian version.
-    #[serde(rename="imageVersion")]
-    pub image_version: Option<String>,
-    /// The set of optional components to activate on the cluster.
-    #[serde(rename="optionalComponents")]
-    pub optional_components: Option<Vec<String>>,
-    /// Optional. The properties to set on daemon config files.Property keys are specified in prefix:property format, for example core:hadoop.tmp.dir. The following are supported prefixes and their mappings:
-    /// capacity-scheduler: capacity-scheduler.xml
-    /// core: core-site.xml
-    /// distcp: distcp-default.xml
-    /// hdfs: hdfs-site.xml
-    /// hive: hive-site.xml
-    /// mapred: mapred-site.xml
-    /// pig: pig.properties
-    /// spark: spark-defaults.conf
-    /// yarn: yarn-site.xmlFor more information, see Cluster properties.
-    pub properties: Option<HashMap<String, String>>,
-}
-
-impl Part for SoftwareConfig {}
+impl Part for ReservationAffinity {}
 
 
 /// The response message for Operations.ListOperations.
@@ -1561,7 +2011,21 @@ pub struct ListOperationsResponse {
 impl ResponseResult for ListOperationsResponse {}
 
 
-/// A Cloud Dataproc job for running Apache Pig (https://pig.apache.org/) queries on YARN.
+/// Encapsulates settings provided to GetIamPolicy.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetPolicyOptions {
+    /// Optional. The policy format version to be returned.Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected.Requests for policies with any conditional bindings must specify version 3. Policies without any conditional bindings may specify any valid value or leave the field unset.
+    #[serde(rename="requestedPolicyVersion")]
+    pub requested_policy_version: Option<i32>,
+}
+
+impl Part for GetPolicyOptions {}
+
+
+/// A Dataproc job for running Apache Pig (https://pig.apache.org/) queries on YARN.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1585,193 +2049,48 @@ pub struct PigJob {
     /// A list of queries.
     #[serde(rename="queryList")]
     pub query_list: Option<QueryList>,
-    /// Optional. A mapping of property names to values, used to configure Pig. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/hadoop/conf/*-site.xml, /etc/pig/conf/pig.properties, and classes in user code.
+    /// Optional. A mapping of property names to values, used to configure Pig. Properties that conflict with values set by the Dataproc API may be overwritten. Can include properties set in /etc/hadoop/conf/*-site.xml, /etc/pig/conf/pig.properties, and classes in user code.
     pub properties: Option<HashMap<String, String>>,
 }
 
 impl Part for PigJob {}
 
 
-/// Associates members with a role.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Binding {
-    /// Role that is assigned to members. For example, roles/viewer, roles/editor, or roles/owner.
-    pub role: Option<String>,
-    /// The condition that is associated with this binding. NOTE: An unsatisfied condition will not allow user access via current binding. Different bindings, including their conditions, are examined independently.
-    pub condition: Option<Expr>,
-    /// Specifies the identities requesting access for a Cloud Platform resource. members can have the following values:
-    /// allUsers: A special identifier that represents anyone who is  on the internet; with or without a Google account.
-    /// allAuthenticatedUsers: A special identifier that represents anyone  who is authenticated with a Google account or a service account.
-    /// user:{emailid}: An email address that represents a specific Google  account. For example, alice@gmail.com .
-    /// serviceAccount:{emailid}: An email address that represents a service  account. For example, my-other-app@appspot.gserviceaccount.com.
-    /// group:{emailid}: An email address that represents a Google group.  For example, admins@example.com.
-    /// domain:{domain}: The G Suite domain (primary) that represents all the  users of that domain. For example, google.com or example.com.
-    pub members: Option<Vec<String>>,
-}
-
-impl Part for Binding {}
-
-
-/// Cluster that is managed by the workflow.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedCluster {
-    /// Required. The cluster name prefix. A unique cluster name will be formed by appending a random suffix.The name must contain only lower-case letters (a-z), numbers (0-9), and hyphens (-). Must begin with a letter. Cannot begin or end with hyphen. Must consist of between 2 and 35 characters.
-    #[serde(rename="clusterName")]
-    pub cluster_name: Option<String>,
-    /// Optional. The labels to associate with this cluster.Label keys must be between 1 and 63 characters long, and must conform to the following PCRE regular expression: \p{Ll}\p{Lo}{0,62}Label values must be between 1 and 63 characters long, and must conform to the following PCRE regular expression: \p{Ll}\p{Lo}\p{N}_-{0,63}No more than 32 labels can be associated with a given cluster.
-    pub labels: Option<HashMap<String, String>>,
-    /// Required. The cluster configuration.
-    pub config: Option<ClusterConfig>,
-}
-
-impl Part for ManagedCluster {}
-
-
-/// Describes the identifying information, config, and status of a cluster of Compute Engine instances.
+/// Describes an autoscaling policy for Dataproc cluster autoscaler.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [regions clusters patch projects](struct.ProjectRegionClusterPatchCall.html) (request)
-/// * [regions clusters create projects](struct.ProjectRegionClusterCreateCall.html) (request)
-/// * [regions clusters get projects](struct.ProjectRegionClusterGetCall.html) (response)
+/// * [locations autoscaling policies update projects](struct.ProjectLocationAutoscalingPolicyUpdateCall.html) (request|response)
+/// * [locations autoscaling policies get projects](struct.ProjectLocationAutoscalingPolicyGetCall.html) (response)
+/// * [regions autoscaling policies get projects](struct.ProjectRegionAutoscalingPolicyGetCall.html) (response)
+/// * [locations autoscaling policies create projects](struct.ProjectLocationAutoscalingPolicyCreateCall.html) (request|response)
+/// * [regions autoscaling policies update projects](struct.ProjectRegionAutoscalingPolicyUpdateCall.html) (request|response)
+/// * [regions autoscaling policies create projects](struct.ProjectRegionAutoscalingPolicyCreateCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Cluster {
-    /// Output only. Cluster status.
-    pub status: Option<ClusterStatus>,
-    /// Output only. A cluster UUID (Unique Universal Identifier). Cloud Dataproc generates this value when it creates the cluster.
-    #[serde(rename="clusterUuid")]
-    pub cluster_uuid: Option<String>,
-    /// Required. The cluster name. Cluster names within a project must be unique. Names of deleted clusters can be reused.
-    #[serde(rename="clusterName")]
-    pub cluster_name: Option<String>,
-    /// Required. The Google Cloud Platform project ID that the cluster belongs to.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// Optional. The labels to associate with this cluster. Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values may be empty, but, if present, must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be associated with a cluster.
-    pub labels: Option<HashMap<String, String>>,
-    /// Contains cluster daemon metrics such as HDFS and YARN stats.Beta Feature: This report is available for testing purposes only. It may be changed before final release.
-    pub metrics: Option<ClusterMetrics>,
-    /// Output only. The previous cluster status.
-    #[serde(rename="statusHistory")]
-    pub status_history: Option<Vec<ClusterStatus>>,
-    /// Required. The cluster config. Note that Cloud Dataproc may set default values, and values may change when clusters are updated.
-    pub config: Option<ClusterConfig>,
-}
-
-impl RequestValue for Cluster {}
-impl ResponseResult for Cluster {}
-
-
-/// Configuration for parameter validation.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ParameterValidation {
-    /// Validation based on regular expressions.
-    pub regex: Option<RegexValidation>,
-    /// Validation based on a list of allowed values.
-    pub values: Option<ValueValidation>,
-}
-
-impl Part for ParameterValidation {}
-
-
-/// A Cloud Dataproc job for running Apache Spark (http://spark.apache.org/) applications on YARN.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SparkJob {
-    /// Optional. HCFS URIs of jar files to add to the CLASSPATHs of the Spark driver and tasks.
-    #[serde(rename="jarFileUris")]
-    pub jar_file_uris: Option<Vec<String>>,
-    /// Optional. The runtime log config for job execution.
-    #[serde(rename="loggingConfig")]
-    pub logging_config: Option<LoggingConfig>,
-    /// Optional. The arguments to pass to the driver. Do not include arguments, such as --conf, that can be set as job properties, since a collision may occur that causes an incorrect job submission.
-    pub args: Option<Vec<String>>,
-    /// Optional. HCFS URIs of files to be copied to the working directory of Spark drivers and distributed tasks. Useful for naively parallel tasks.
-    #[serde(rename="fileUris")]
-    pub file_uris: Option<Vec<String>>,
-    /// The name of the driver's main class. The jar file that contains the class must be in the default CLASSPATH or specified in jar_file_uris.
-    #[serde(rename="mainClass")]
-    pub main_class: Option<String>,
-    /// Optional. HCFS URIs of archives to be extracted in the working directory of Spark drivers and tasks. Supported file types: .jar, .tar, .tar.gz, .tgz, and .zip.
-    #[serde(rename="archiveUris")]
-    pub archive_uris: Option<Vec<String>>,
-    /// The HCFS URI of the jar file that contains the main class.
-    #[serde(rename="mainJarFileUri")]
-    pub main_jar_file_uri: Option<String>,
-    /// Optional. A mapping of property names to values, used to configure Spark. Properties that conflict with values set by the Cloud Dataproc API may be overwritten. Can include properties set in /etc/spark/conf/spark-defaults.conf and classes in user code.
-    pub properties: Option<HashMap<String, String>>,
-}
-
-impl Part for SparkJob {}
-
-
-/// The status of a cluster and its instances.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ClusterStatus {
-    /// Output only. The cluster's state.
-    pub state: Option<String>,
-    /// Output only. Time when this state was entered.
-    #[serde(rename="stateStartTime")]
-    pub state_start_time: Option<String>,
-    /// Output only. Optional details of cluster's state.
-    pub detail: Option<String>,
-    /// Output only. Additional state information that includes status reported by the agent.
-    pub substate: Option<String>,
-}
-
-impl Part for ClusterStatus {}
-
-
-/// This resource represents a long-running operation that is the result of a network API call.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [regions workflow templates instantiate projects](struct.ProjectRegionWorkflowTemplateInstantiateCall.html) (response)
-/// * [regions clusters patch projects](struct.ProjectRegionClusterPatchCall.html) (response)
-/// * [regions operations get projects](struct.ProjectRegionOperationGetCall.html) (response)
-/// * [regions clusters delete projects](struct.ProjectRegionClusterDeleteCall.html) (response)
-/// * [regions clusters diagnose projects](struct.ProjectRegionClusterDiagnoseCall.html) (response)
-/// * [regions clusters create projects](struct.ProjectRegionClusterCreateCall.html) (response)
-/// * [locations workflow templates instantiate inline projects](struct.ProjectLocationWorkflowTemplateInstantiateInlineCall.html) (response)
-/// * [regions workflow templates instantiate inline projects](struct.ProjectRegionWorkflowTemplateInstantiateInlineCall.html) (response)
-/// * [locations workflow templates instantiate projects](struct.ProjectLocationWorkflowTemplateInstantiateCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Operation {
-    /// The error result of the operation in case of failure or cancellation.
-    pub error: Option<Status>,
-    /// If the value is false, it means the operation is still in progress. If true, the operation is completed, and either error or response is available.
-    pub done: Option<bool>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as Delete, the response is google.protobuf.Empty. If the original method is standard Get/Create/Update, the response should be the resource. For other methods, the response should have the type XxxResponse, where Xxx is the original method name. For example, if the original method name is TakeSnapshot(), the inferred response type is TakeSnapshotResponse.
-    pub response: Option<HashMap<String, String>>,
-    /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the name should be a resource name ending with operations/{unique_id}.
+pub struct AutoscalingPolicy {
+    /// no description provided
+    #[serde(rename="basicAlgorithm")]
+    pub basic_algorithm: Option<BasicAutoscalingAlgorithm>,
+    /// Optional. Describes how the autoscaler will operate for secondary workers.
+    #[serde(rename="secondaryWorkerConfig")]
+    pub secondary_worker_config: Option<InstanceGroupAutoscalingPolicyConfig>,
+    /// Required. Describes how the autoscaler will operate for primary workers.
+    #[serde(rename="workerConfig")]
+    pub worker_config: Option<InstanceGroupAutoscalingPolicyConfig>,
+    /// Required. The policy id.The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). Cannot begin or end with underscore or hyphen. Must consist of between 3 and 50 characters.
+    pub id: Option<String>,
+    /// Output only. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.autoscalingPolicies, the resource name of the  policy has the following format:  projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}
+    /// For projects.locations.autoscalingPolicies, the resource name of the  policy has the following format:  projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
     pub name: Option<String>,
-    /// Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.
-    pub metadata: Option<HashMap<String, String>>,
 }
 
-impl ResponseResult for Operation {}
+impl RequestValue for AutoscalingPolicy {}
+impl ResponseResult for AutoscalingPolicy {}
 
 
 /// Validation based on a list of allowed values.
@@ -1831,7 +2150,7 @@ impl RequestValue for CancelJobRequest {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Dataproc::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_autoscaling_policies_get_iam_policy(...)`, `locations_autoscaling_policies_set_iam_policy(...)`, `locations_autoscaling_policies_test_iam_permissions(...)`, `locations_workflow_templates_create(...)`, `locations_workflow_templates_delete(...)`, `locations_workflow_templates_get(...)`, `locations_workflow_templates_get_iam_policy(...)`, `locations_workflow_templates_instantiate(...)`, `locations_workflow_templates_instantiate_inline(...)`, `locations_workflow_templates_list(...)`, `locations_workflow_templates_set_iam_policy(...)`, `locations_workflow_templates_test_iam_permissions(...)`, `locations_workflow_templates_update(...)`, `regions_autoscaling_policies_get_iam_policy(...)`, `regions_autoscaling_policies_set_iam_policy(...)`, `regions_autoscaling_policies_test_iam_permissions(...)`, `regions_clusters_create(...)`, `regions_clusters_delete(...)`, `regions_clusters_diagnose(...)`, `regions_clusters_get(...)`, `regions_clusters_get_iam_policy(...)`, `regions_clusters_list(...)`, `regions_clusters_patch(...)`, `regions_clusters_set_iam_policy(...)`, `regions_clusters_test_iam_permissions(...)`, `regions_jobs_cancel(...)`, `regions_jobs_delete(...)`, `regions_jobs_get(...)`, `regions_jobs_get_iam_policy(...)`, `regions_jobs_list(...)`, `regions_jobs_patch(...)`, `regions_jobs_set_iam_policy(...)`, `regions_jobs_submit(...)`, `regions_jobs_test_iam_permissions(...)`, `regions_operations_cancel(...)`, `regions_operations_delete(...)`, `regions_operations_get(...)`, `regions_operations_get_iam_policy(...)`, `regions_operations_list(...)`, `regions_operations_set_iam_policy(...)`, `regions_operations_test_iam_permissions(...)`, `regions_workflow_templates_create(...)`, `regions_workflow_templates_delete(...)`, `regions_workflow_templates_get(...)`, `regions_workflow_templates_get_iam_policy(...)`, `regions_workflow_templates_instantiate(...)`, `regions_workflow_templates_instantiate_inline(...)`, `regions_workflow_templates_list(...)`, `regions_workflow_templates_set_iam_policy(...)`, `regions_workflow_templates_test_iam_permissions(...)` and `regions_workflow_templates_update(...)`
+/// // like `locations_autoscaling_policies_create(...)`, `locations_autoscaling_policies_delete(...)`, `locations_autoscaling_policies_get(...)`, `locations_autoscaling_policies_get_iam_policy(...)`, `locations_autoscaling_policies_list(...)`, `locations_autoscaling_policies_set_iam_policy(...)`, `locations_autoscaling_policies_test_iam_permissions(...)`, `locations_autoscaling_policies_update(...)`, `locations_workflow_templates_create(...)`, `locations_workflow_templates_delete(...)`, `locations_workflow_templates_get(...)`, `locations_workflow_templates_get_iam_policy(...)`, `locations_workflow_templates_instantiate(...)`, `locations_workflow_templates_instantiate_inline(...)`, `locations_workflow_templates_list(...)`, `locations_workflow_templates_set_iam_policy(...)`, `locations_workflow_templates_test_iam_permissions(...)`, `locations_workflow_templates_update(...)`, `regions_autoscaling_policies_create(...)`, `regions_autoscaling_policies_delete(...)`, `regions_autoscaling_policies_get(...)`, `regions_autoscaling_policies_get_iam_policy(...)`, `regions_autoscaling_policies_list(...)`, `regions_autoscaling_policies_set_iam_policy(...)`, `regions_autoscaling_policies_test_iam_permissions(...)`, `regions_autoscaling_policies_update(...)`, `regions_clusters_create(...)`, `regions_clusters_delete(...)`, `regions_clusters_diagnose(...)`, `regions_clusters_get(...)`, `regions_clusters_get_iam_policy(...)`, `regions_clusters_list(...)`, `regions_clusters_patch(...)`, `regions_clusters_set_iam_policy(...)`, `regions_clusters_test_iam_permissions(...)`, `regions_jobs_cancel(...)`, `regions_jobs_delete(...)`, `regions_jobs_get(...)`, `regions_jobs_get_iam_policy(...)`, `regions_jobs_list(...)`, `regions_jobs_patch(...)`, `regions_jobs_set_iam_policy(...)`, `regions_jobs_submit(...)`, `regions_jobs_submit_as_operation(...)`, `regions_jobs_test_iam_permissions(...)`, `regions_operations_cancel(...)`, `regions_operations_delete(...)`, `regions_operations_get(...)`, `regions_operations_get_iam_policy(...)`, `regions_operations_list(...)`, `regions_operations_set_iam_policy(...)`, `regions_operations_test_iam_permissions(...)`, `regions_workflow_templates_create(...)`, `regions_workflow_templates_delete(...)`, `regions_workflow_templates_get(...)`, `regions_workflow_templates_get_iam_policy(...)`, `regions_workflow_templates_instantiate(...)`, `regions_workflow_templates_instantiate_inline(...)`, `regions_workflow_templates_list(...)`, `regions_workflow_templates_set_iam_policy(...)`, `regions_workflow_templates_test_iam_permissions(...)` and `regions_workflow_templates_update(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1867,12 +2186,54 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Lists autoscaling policies in the project.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The "resource name" of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    ///              For projects.regions.autoscalingPolicies.list, the resource name  of the region has the following format:  projects/{project_id}/regions/{region}
+    ///              For projects.locations.autoscalingPolicies.list, the resource name  of the location has the following format:  projects/{project_id}/locations/{location}
+    pub fn locations_autoscaling_policies_list(&self, parent: &str) -> ProjectLocationAutoscalingPolicyListCall<'a, C, A> {
+        ProjectLocationAutoscalingPolicyListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates new autoscaling policy.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The "resource name" of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    ///              For projects.regions.autoscalingPolicies.create, the resource name  of the region has the following format:  projects/{project_id}/regions/{region}
+    ///              For projects.locations.autoscalingPolicies.create, the resource name  of the location has the following format:  projects/{project_id}/locations/{location}
+    pub fn locations_autoscaling_policies_create(&self, request: AutoscalingPolicy, parent: &str) -> ProjectLocationAutoscalingPolicyCreateCall<'a, C, A> {
+        ProjectLocationAutoscalingPolicyCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets the resource representation for a cluster in a project.
     /// 
     /// # Arguments
     ///
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the cluster belongs to.
-    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `clusterName` - Required. The cluster name.
     pub fn regions_clusters_get(&self, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterGetCall<'a, C, A> {
         ProjectRegionClusterGetCall {
@@ -1911,7 +2272,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The "resource name" of the region, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}
+    /// * `parent` - Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    ///              For projects.regions.workflowTemplates,list, the resource  name of the region has the following format:  projects/{project_id}/regions/{region}
+    ///              For projects.locations.workflowTemplates.list, the  resource name of the location has the following format:  projects/{project_id}/locations/{location}
     pub fn locations_workflow_templates_list(&self, parent: &str) -> ProjectLocationWorkflowTemplateListCall<'a, C, A> {
         ProjectLocationWorkflowTemplateListCall {
             hub: self.hub,
@@ -1947,7 +2310,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The "resource name" of the region, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}
+    /// * `parent` - Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    ///              For projects.regions.workflowTemplates,list, the resource  name of the region has the following format:  projects/{project_id}/regions/{region}
+    ///              For projects.locations.workflowTemplates.list, the  resource name of the location has the following format:  projects/{project_id}/locations/{location}
     pub fn regions_workflow_templates_list(&self, parent: &str) -> ProjectRegionWorkflowTemplateListCall<'a, C, A> {
         ProjectRegionWorkflowTemplateListCall {
             hub: self.hub,
@@ -1962,7 +2327,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy.
+    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
     /// 
     /// # Arguments
     ///
@@ -1985,7 +2350,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The "resource name" of the workflow template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// * `name` - Required. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names.
+    ///            For projects.regions.workflowTemplates.get, the resource name of the  template has the following format:  projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    ///            For projects.locations.workflowTemplates.get, the resource name of the  template has the following format:  projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
     pub fn locations_workflow_templates_get(&self, name: &str) -> ProjectLocationWorkflowTemplateGetCall<'a, C, A> {
         ProjectLocationWorkflowTemplateGetCall {
             hub: self.hub,
@@ -2005,7 +2372,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
-    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `jobId` - Required. The job ID.
     pub fn regions_jobs_patch(&self, request: Job, project_id: &str, region: &str, job_id: &str) -> ProjectRegionJobPatchCall<'a, C, A> {
         ProjectRegionJobPatchCall {
@@ -2046,7 +2413,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The "resource name" of the workflow template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// * `name` - Required. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names.
+    ///            For projects.regions.workflowTemplates.delete, the resource name of the template has the following format:  projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    ///            For projects.locations.workflowTemplates.instantiate, the resource name  of the template has the following format:  projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
     pub fn regions_workflow_templates_delete(&self, name: &str) -> ProjectRegionWorkflowTemplateDeleteCall<'a, C, A> {
         ProjectRegionWorkflowTemplateDeleteCall {
             hub: self.hub,
@@ -2060,12 +2429,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Instantiates a template and begins execution.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata.On successful completion, Operation.response will be Empty.
+    /// Instantiates a template and begins execution.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#workflowmetadata). Also see Using WorkflowMetadata (https://cloud.google.com/dataproc/docs/concepts/workflows/debugging#using_workflowmetadata).On successful completion, Operation.response will be Empty.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. The "resource name" of the workflow template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// * `name` - Required. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names.
+    ///            For projects.regions.workflowTemplates.instantiate, the resource name of the template has the following format:  projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    ///            For projects.locations.workflowTemplates.instantiate, the resource name  of the template has the following format:  projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
     pub fn regions_workflow_templates_instantiate(&self, request: InstantiateWorkflowTemplateRequest, name: &str) -> ProjectRegionWorkflowTemplateInstantiateCall<'a, C, A> {
         ProjectRegionWorkflowTemplateInstantiateCall {
             hub: self.hub,
@@ -2098,7 +2469,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy.
+    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
     /// 
     /// # Arguments
     ///
@@ -2122,7 +2493,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The "resource name" of the region, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}
+    /// * `parent` - Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    ///              For projects.regions.workflowTemplates,create, the resource name of the  region has the following format:  projects/{project_id}/regions/{region}
+    ///              For projects.locations.workflowTemplates.create, the resource name of  the location has the following format:  projects/{project_id}/locations/{location}
     pub fn locations_workflow_templates_create(&self, request: WorkflowTemplate, parent: &str) -> ProjectLocationWorkflowTemplateCreateCall<'a, C, A> {
         ProjectLocationWorkflowTemplateCreateCall {
             hub: self.hub,
@@ -2155,13 +2528,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a cluster in a project.
+    /// Updates a cluster in a project. The returned Operation.metadata will be ClusterOperationMetadata (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#clusteroperationmetadata).
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. The ID of the Google Cloud Platform project the cluster belongs to.
-    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `clusterName` - Required. The cluster name.
     pub fn regions_clusters_patch(&self, request: Cluster, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterPatchCall<'a, C, A> {
         ProjectRegionClusterPatchCall {
@@ -2198,17 +2571,19 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
+    /// Creates new autoscaling policy.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_autoscaling_policies_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> {
-        ProjectLocationAutoscalingPolicyGetIamPolicyCall {
+    /// * `parent` - Required. The "resource name" of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    ///              For projects.regions.autoscalingPolicies.create, the resource name  of the region has the following format:  projects/{project_id}/regions/{region}
+    ///              For projects.locations.autoscalingPolicies.create, the resource name  of the location has the following format:  projects/{project_id}/locations/{location}
+    pub fn regions_autoscaling_policies_create(&self, request: AutoscalingPolicy, parent: &str) -> ProjectRegionAutoscalingPolicyCreateCall<'a, C, A> {
+        ProjectRegionAutoscalingPolicyCreateCall {
             hub: self.hub,
             _request: request,
-            _resource: resource.to_string(),
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2223,7 +2598,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
-    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `region` - Required. The Dataproc region in which to handle the request.
     pub fn regions_jobs_submit(&self, request: SubmitJobRequest, project_id: &str, region: &str) -> ProjectRegionJobSubmitCall<'a, C, A> {
         ProjectRegionJobSubmitCall {
             hub: self.hub,
@@ -2238,13 +2613,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a cluster in a project.
+    /// Creates a cluster in a project. The returned Operation.metadata will be ClusterOperationMetadata (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#clusteroperationmetadata).
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the cluster belongs to.
-    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `region` - Required. The Dataproc region in which to handle the request.
     pub fn regions_clusters_create(&self, request: Cluster, project_id: &str, region: &str) -> ProjectRegionClusterCreateCall<'a, C, A> {
         ProjectRegionClusterCreateCall {
             hub: self.hub,
@@ -2260,7 +2635,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy.
+    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
     /// 
     /// # Arguments
     ///
@@ -2279,12 +2654,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Instantiates a template and begins execution.This method is equivalent to executing the sequence CreateWorkflowTemplate, InstantiateWorkflowTemplate, DeleteWorkflowTemplate.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata.On successful completion, Operation.response will be Empty.
+    /// Instantiates a template and begins execution.This method is equivalent to executing the sequence CreateWorkflowTemplate, InstantiateWorkflowTemplate, DeleteWorkflowTemplate.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#workflowmetadata). Also see Using WorkflowMetadata (https://cloud.google.com/dataproc/docs/concepts/workflows/debugging#using_workflowmetadata).On successful completion, Operation.response will be Empty.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The "resource name" of the workflow template region, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}
+    /// * `parent` - Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    ///              For projects.regions.workflowTemplates,instantiateinline, the resource  name of the region has the following format:  projects/{project_id}/regions/{region}
+    ///              For projects.locations.workflowTemplates.instantiateinline, the  resource name of the location has the following format:  projects/{project_id}/locations/{location}
     pub fn locations_workflow_templates_instantiate_inline(&self, request: WorkflowTemplate, parent: &str) -> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a, C, A> {
         ProjectLocationWorkflowTemplateInstantiateInlineCall {
             hub: self.hub,
@@ -2304,7 +2681,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Output only. The "resource name" of the template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// * `name` - Output only. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names.
+    ///            For projects.regions.workflowTemplates, the resource name of the  template has the following format:  projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    ///            For projects.locations.workflowTemplates, the resource name of the  template has the following format:  projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
     pub fn locations_workflow_templates_update(&self, request: WorkflowTemplate, name: &str) -> ProjectLocationWorkflowTemplateUpdateCall<'a, C, A> {
         ProjectLocationWorkflowTemplateUpdateCall {
             hub: self.hub,
@@ -2318,7 +2697,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy.
+    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
     /// 
     /// # Arguments
     ///
@@ -2337,12 +2716,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Instantiates a template and begins execution.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata.On successful completion, Operation.response will be Empty.
+    /// Instantiates a template and begins execution.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#workflowmetadata). Also see Using WorkflowMetadata (https://cloud.google.com/dataproc/docs/concepts/workflows/debugging#using_workflowmetadata).On successful completion, Operation.response will be Empty.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. The "resource name" of the workflow template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// * `name` - Required. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names.
+    ///            For projects.regions.workflowTemplates.instantiate, the resource name of the template has the following format:  projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    ///            For projects.locations.workflowTemplates.instantiate, the resource name  of the template has the following format:  projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
     pub fn locations_workflow_templates_instantiate(&self, request: InstantiateWorkflowTemplateRequest, name: &str) -> ProjectLocationWorkflowTemplateInstantiateCall<'a, C, A> {
         ProjectLocationWorkflowTemplateInstantiateCall {
             hub: self.hub,
@@ -2375,12 +2756,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all regions/{region}/clusters in a project.
+    /// Lists all regions/{region}/clusters in a project alphabetically.
     /// 
     /// # Arguments
     ///
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the cluster belongs to.
-    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `region` - Required. The Dataproc region in which to handle the request.
     pub fn regions_clusters_list(&self, project_id: &str, region: &str) -> ProjectRegionClusterListCall<'a, C, A> {
         ProjectRegionClusterListCall {
             hub: self.hub,
@@ -2402,7 +2783,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
-    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `region` - Required. The Dataproc region in which to handle the request.
     pub fn regions_jobs_list(&self, project_id: &str, region: &str) -> ProjectRegionJobListCall<'a, C, A> {
         ProjectRegionJobListCall {
             hub: self.hub,
@@ -2457,13 +2838,32 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets cluster diagnostic information. After the operation completes, the Operation.response field contains DiagnoseClusterOutputLocation.
+    /// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
+    pub fn locations_autoscaling_policies_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> {
+        ProjectLocationAutoscalingPolicyGetIamPolicyCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets cluster diagnostic information. The returned Operation.metadata will be ClusterOperationMetadata (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#clusteroperationmetadata). After the operation completes, Operation.response contains DiagnoseClusterResults (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#diagnoseclusterresults).
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the cluster belongs to.
-    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `clusterName` - Required. The cluster name.
     pub fn regions_clusters_diagnose(&self, request: DiagnoseClusterRequest, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterDiagnoseCall<'a, C, A> {
         ProjectRegionClusterDiagnoseCall {
@@ -2485,7 +2885,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Output only. The "resource name" of the template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// * `name` - Output only. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names.
+    ///            For projects.regions.workflowTemplates, the resource name of the  template has the following format:  projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    ///            For projects.locations.workflowTemplates, the resource name of the  template has the following format:  projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
     pub fn regions_workflow_templates_update(&self, request: WorkflowTemplate, name: &str) -> ProjectRegionWorkflowTemplateUpdateCall<'a, C, A> {
         ProjectRegionWorkflowTemplateUpdateCall {
             hub: self.hub,
@@ -2499,7 +2901,47 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy.
+    /// Deletes an autoscaling policy. It is an error to delete an autoscaling policy that is in use by one or more clusters.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names.
+    ///            For projects.regions.autoscalingPolicies.delete, the resource name  of the policy has the following format:  projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}
+    ///            For projects.locations.autoscalingPolicies.delete, the resource name  of the policy has the following format:  projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
+    pub fn locations_autoscaling_policies_delete(&self, name: &str) -> ProjectLocationAutoscalingPolicyDeleteCall<'a, C, A> {
+        ProjectLocationAutoscalingPolicyDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Submits job to a cluster.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
+    /// * `region` - Required. The Dataproc region in which to handle the request.
+    pub fn regions_jobs_submit_as_operation(&self, request: SubmitJobRequest, project_id: &str, region: &str) -> ProjectRegionJobSubmitAsOperationCall<'a, C, A> {
+        ProjectRegionJobSubmitAsOperationCall {
+            hub: self.hub,
+            _request: request,
+            _project_id: project_id.to_string(),
+            _region: region.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
     /// 
     /// # Arguments
     ///
@@ -2542,7 +2984,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The "resource name" of the workflow template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// * `name` - Required. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names.
+    ///            For projects.regions.workflowTemplates.delete, the resource name of the template has the following format:  projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    ///            For projects.locations.workflowTemplates.instantiate, the resource name  of the template has the following format:  projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
     pub fn locations_workflow_templates_delete(&self, name: &str) -> ProjectLocationWorkflowTemplateDeleteCall<'a, C, A> {
         ProjectLocationWorkflowTemplateDeleteCall {
             hub: self.hub,
@@ -2556,7 +3000,49 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy.
+    /// Updates (replaces) autoscaling policy.Disabled check for update_mask, because all updates will be full replacements.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Output only. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names.
+    ///            For projects.regions.autoscalingPolicies, the resource name of the  policy has the following format:  projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}
+    ///            For projects.locations.autoscalingPolicies, the resource name of the  policy has the following format:  projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
+    pub fn regions_autoscaling_policies_update(&self, request: AutoscalingPolicy, name: &str) -> ProjectRegionAutoscalingPolicyUpdateCall<'a, C, A> {
+        ProjectRegionAutoscalingPolicyUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates (replaces) autoscaling policy.Disabled check for update_mask, because all updates will be full replacements.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Output only. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names.
+    ///            For projects.regions.autoscalingPolicies, the resource name of the  policy has the following format:  projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}
+    ///            For projects.locations.autoscalingPolicies, the resource name of the  policy has the following format:  projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
+    pub fn locations_autoscaling_policies_update(&self, request: AutoscalingPolicy, name: &str) -> ProjectLocationAutoscalingPolicyUpdateCall<'a, C, A> {
+        ProjectLocationAutoscalingPolicyUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
     /// 
     /// # Arguments
     ///
@@ -2567,6 +3053,25 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves autoscaling policy.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names.
+    ///            For projects.regions.autoscalingPolicies.get, the resource name  of the policy has the following format:  projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}
+    ///            For projects.locations.autoscalingPolicies.get, the resource name  of the policy has the following format:  projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
+    pub fn locations_autoscaling_policies_get(&self, name: &str) -> ProjectLocationAutoscalingPolicyGetCall<'a, C, A> {
+        ProjectLocationAutoscalingPolicyGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2586,6 +3091,25 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves autoscaling policy.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names.
+    ///            For projects.regions.autoscalingPolicies.get, the resource name  of the policy has the following format:  projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}
+    ///            For projects.locations.autoscalingPolicies.get, the resource name  of the policy has the following format:  projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
+    pub fn regions_autoscaling_policies_get(&self, name: &str) -> ProjectRegionAutoscalingPolicyGetCall<'a, C, A> {
+        ProjectRegionAutoscalingPolicyGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2618,7 +3142,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
-    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `jobId` - Required. The job ID.
     pub fn regions_jobs_get(&self, project_id: &str, region: &str, job_id: &str) -> ProjectRegionJobGetCall<'a, C, A> {
         ProjectRegionJobGetCall {
@@ -2626,6 +3150,25 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _project_id: project_id.to_string(),
             _region: region.to_string(),
             _job_id: job_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes an autoscaling policy. It is an error to delete an autoscaling policy that is in use by one or more clusters.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names.
+    ///            For projects.regions.autoscalingPolicies.delete, the resource name  of the policy has the following format:  projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}
+    ///            For projects.locations.autoscalingPolicies.delete, the resource name  of the policy has the following format:  projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
+    pub fn regions_autoscaling_policies_delete(&self, name: &str) -> ProjectRegionAutoscalingPolicyDeleteCall<'a, C, A> {
+        ProjectRegionAutoscalingPolicyDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2653,12 +3196,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a cluster in a project.
+    /// Deletes a cluster in a project. The returned Operation.metadata will be ClusterOperationMetadata (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#clusteroperationmetadata).
     /// 
     /// # Arguments
     ///
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the cluster belongs to.
-    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `clusterName` - Required. The cluster name.
     pub fn regions_clusters_delete(&self, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterDeleteCall<'a, C, A> {
         ProjectRegionClusterDeleteCall {
@@ -2676,12 +3219,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Instantiates a template and begins execution.This method is equivalent to executing the sequence CreateWorkflowTemplate, InstantiateWorkflowTemplate, DeleteWorkflowTemplate.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata.On successful completion, Operation.response will be Empty.
+    /// Instantiates a template and begins execution.This method is equivalent to executing the sequence CreateWorkflowTemplate, InstantiateWorkflowTemplate, DeleteWorkflowTemplate.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#workflowmetadata). Also see Using WorkflowMetadata (https://cloud.google.com/dataproc/docs/concepts/workflows/debugging#using_workflowmetadata).On successful completion, Operation.response will be Empty.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The "resource name" of the workflow template region, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}
+    /// * `parent` - Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    ///              For projects.regions.workflowTemplates,instantiateinline, the resource  name of the region has the following format:  projects/{project_id}/regions/{region}
+    ///              For projects.locations.workflowTemplates.instantiateinline, the  resource name of the location has the following format:  projects/{project_id}/locations/{location}
     pub fn regions_workflow_templates_instantiate_inline(&self, request: WorkflowTemplate, parent: &str) -> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a, C, A> {
         ProjectRegionWorkflowTemplateInstantiateInlineCall {
             hub: self.hub,
@@ -2707,6 +3252,27 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists autoscaling policies in the project.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The "resource name" of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    ///              For projects.regions.autoscalingPolicies.list, the resource name  of the region has the following format:  projects/{project_id}/regions/{region}
+    ///              For projects.locations.autoscalingPolicies.list, the resource name  of the location has the following format:  projects/{project_id}/locations/{location}
+    pub fn regions_autoscaling_policies_list(&self, parent: &str) -> ProjectRegionAutoscalingPolicyListCall<'a, C, A> {
+        ProjectRegionAutoscalingPolicyListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2757,7 +3323,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The "resource name" of the workflow template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// * `name` - Required. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names.
+    ///            For projects.regions.workflowTemplates.get, the resource name of the  template has the following format:  projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    ///            For projects.locations.workflowTemplates.get, the resource name of the  template has the following format:  projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
     pub fn regions_workflow_templates_get(&self, name: &str) -> ProjectRegionWorkflowTemplateGetCall<'a, C, A> {
         ProjectRegionWorkflowTemplateGetCall {
             hub: self.hub,
@@ -2776,7 +3344,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The "resource name" of the region, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}
+    /// * `parent` - Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    ///              For projects.regions.workflowTemplates,create, the resource name of the  region has the following format:  projects/{project_id}/regions/{region}
+    ///              For projects.locations.workflowTemplates.create, the resource name of  the location has the following format:  projects/{project_id}/locations/{location}
     pub fn regions_workflow_templates_create(&self, request: WorkflowTemplate, parent: &str) -> ProjectRegionWorkflowTemplateCreateCall<'a, C, A> {
         ProjectRegionWorkflowTemplateCreateCall {
             hub: self.hub,
@@ -2795,7 +3365,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
-    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `jobId` - Required. The job ID.
     pub fn regions_jobs_delete(&self, project_id: &str, region: &str, job_id: &str) -> ProjectRegionJobDeleteCall<'a, C, A> {
         ProjectRegionJobDeleteCall {
@@ -2811,7 +3381,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy.
+    /// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
     /// 
     /// # Arguments
     ///
@@ -2830,13 +3400,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Starts a job cancellation request. To access the job resource after cancellation, call regions/{region}/jobs.list or regions/{region}/jobs.get.
+    /// Starts a job cancellation request. To access the job resource after cancellation, call regions/{region}/jobs.list (https://cloud.google.com/dataproc/docs/reference/rest/v1/projects.regions.jobs/list) or regions/{region}/jobs.get (https://cloud.google.com/dataproc/docs/reference/rest/v1/projects.regions.jobs/get).
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
-    /// * `region` - Required. The Cloud Dataproc region in which to handle the request.
+    /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `jobId` - Required. The job ID.
     pub fn regions_jobs_cancel(&self, request: CancelJobRequest, project_id: &str, region: &str, job_id: &str) -> ProjectRegionJobCancelCall<'a, C, A> {
         ProjectRegionJobCancelCall {
@@ -3139,6 +3709,561 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a, C, A> wher
 }
 
 
+/// Lists autoscaling policies in the project.
+///
+/// A builder for the *locations.autoscalingPolicies.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dataproc1::Dataproc;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dataproc::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_autoscaling_policies_list("parent")
+///              .page_token("dolores")
+///              .page_size(-63)
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationAutoscalingPolicyListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dataproc<C, A>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationAutoscalingPolicyListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationAutoscalingPolicyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListAutoscalingPoliciesResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dataproc.projects.locations.autoscalingPolicies.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/autoscalingPolicies";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The "resource name" of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.autoscalingPolicies.list, the resource name  of the region has the following format:  projects/{project_id}/regions/{region}
+    /// For projects.locations.autoscalingPolicies.list, the resource name  of the location has the following format:  projects/{project_id}/locations/{location}
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. The page token, returned by a previous call, to request the next page of results.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The maximum number of results to return in each response. Must be less than or equal to 1000. Defaults to 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAutoscalingPolicyListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationAutoscalingPolicyListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Creates new autoscaling policy.
+///
+/// A builder for the *locations.autoscalingPolicies.create* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dataproc1 as dataproc1;
+/// use dataproc1::AutoscalingPolicy;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dataproc1::Dataproc;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dataproc::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AutoscalingPolicy::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_autoscaling_policies_create(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationAutoscalingPolicyCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dataproc<C, A>,
+    _request: AutoscalingPolicy,
+    _parent: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationAutoscalingPolicyCreateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationAutoscalingPolicyCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, AutoscalingPolicy)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dataproc.projects.locations.autoscalingPolicies.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/autoscalingPolicies";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AutoscalingPolicy) -> ProjectLocationAutoscalingPolicyCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The "resource name" of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.autoscalingPolicies.create, the resource name  of the region has the following format:  projects/{project_id}/regions/{region}
+    /// For projects.locations.autoscalingPolicies.create, the resource name  of the location has the following format:  projects/{project_id}/locations/{location}
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyCreateCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationAutoscalingPolicyCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Gets the resource representation for a cluster in a project.
 ///
 /// A builder for the *regions.clusters.get* method supported by a *project* resource.
@@ -3324,7 +4449,7 @@ impl<'a, C, A> ProjectRegionClusterGetCall<'a, C, A> where C: BorrowMut<hyper::C
         self._project_id = new_value.to_string();
         self
     }
-    /// Required. The Cloud Dataproc region in which to handle the request.
+    /// Required. The Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -3714,8 +4839,8 @@ impl<'a, C, A> ProjectRegionOperationTestIamPermissionCall<'a, C, A> where C: Bo
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workflow_templates_list("parent")
-///              .page_token("justo")
-///              .page_size(-1)
+///              .page_token("sea")
+///              .page_size(-90)
 ///              .doit();
 /// # }
 /// ```
@@ -3871,7 +4996,9 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateListCall<'a, C, A> where C: Borrow
     }
 
 
-    /// Required. The "resource name" of the region, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}
+    /// Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.workflowTemplates,list, the resource  name of the region has the following format:  projects/{project_id}/regions/{region}
+    /// For projects.locations.workflowTemplates.list, the  resource name of the location has the following format:  projects/{project_id}/locations/{location}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -4234,8 +5361,8 @@ impl<'a, C, A> ProjectRegionOperationGetCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_workflow_templates_list("parent")
-///              .page_token("sea")
-///              .page_size(-90)
+///              .page_token("sadipscing")
+///              .page_size(-31)
 ///              .doit();
 /// # }
 /// ```
@@ -4391,7 +5518,9 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateListCall<'a, C, A> where C: BorrowMu
     }
 
 
-    /// Required. The "resource name" of the region, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}
+    /// Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.workflowTemplates,list, the resource  name of the region has the following format:  projects/{project_id}/regions/{region}
+    /// For projects.locations.workflowTemplates.list, the  resource name of the location has the following format:  projects/{project_id}/locations/{location}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -4478,7 +5607,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateListCall<'a, C, A> where C: BorrowMu
 }
 
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy.
+/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 ///
 /// A builder for the *regions.operations.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4785,7 +5914,7 @@ impl<'a, C, A> ProjectRegionOperationSetIamPolicyCall<'a, C, A> where C: BorrowM
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workflow_templates_get("name")
-///              .version(-95)
+///              .version(-21)
 ///              .doit();
 /// # }
 /// ```
@@ -4937,7 +6066,9 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateGetCall<'a, C, A> where C: BorrowM
     }
 
 
-    /// Required. The "resource name" of the workflow template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// Required. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.workflowTemplates.get, the resource name of the  template has the following format:  projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// For projects.locations.workflowTemplates.get, the resource name of the  template has the following format:  projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4947,7 +6078,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateGetCall<'a, C, A> where C: BorrowM
         self._name = new_value.to_string();
         self
     }
-    /// Optional. The version of workflow template to retrieve. Only previously instatiated versions can be retrieved.If unspecified, retrieves the current version.
+    /// Optional. The version of workflow template to retrieve. Only previously instantiated versions can be retrieved.If unspecified, retrieves the current version.
     ///
     /// Sets the *version* query property to the given value.
     pub fn version(mut self, new_value: i32) -> ProjectLocationWorkflowTemplateGetCall<'a, C, A> {
@@ -5051,7 +6182,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateGetCall<'a, C, A> where C: BorrowM
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_jobs_patch(req, "projectId", "region", "jobId")
-///              .update_mask("justo")
+///              .update_mask("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -5238,7 +6369,7 @@ impl<'a, C, A> ProjectRegionJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._project_id = new_value.to_string();
         self
     }
-    /// Required. The Cloud Dataproc region in which to handle the request.
+    /// Required. The Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -5635,7 +6766,7 @@ impl<'a, C, A> ProjectRegionJobTestIamPermissionCall<'a, C, A> where C: BorrowMu
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_workflow_templates_delete("name")
-///              .version(-17)
+///              .version(-21)
 ///              .doit();
 /// # }
 /// ```
@@ -5787,7 +6918,9 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateDeleteCall<'a, C, A> where C: Borrow
     }
 
 
-    /// Required. The "resource name" of the workflow template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// Required. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.workflowTemplates.delete, the resource name of the template has the following format:  projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// For projects.locations.workflowTemplates.instantiate, the resource name  of the template has the following format:  projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -5867,7 +7000,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateDeleteCall<'a, C, A> where C: Borrow
 }
 
 
-/// Instantiates a template and begins execution.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata.On successful completion, Operation.response will be Empty.
+/// Instantiates a template and begins execution.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#workflowmetadata). Also see Using WorkflowMetadata (https://cloud.google.com/dataproc/docs/concepts/workflows/debugging#using_workflowmetadata).On successful completion, Operation.response will be Empty.
 ///
 /// A builder for the *regions.workflowTemplates.instantiate* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6073,7 +7206,9 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateInstantiateCall<'a, C, A> where C: B
         self._request = new_value;
         self
     }
-    /// Required. The "resource name" of the workflow template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// Required. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.workflowTemplates.instantiate, the resource name of the template has the following format:  projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// For projects.locations.workflowTemplates.instantiate, the resource name  of the template has the following format:  projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -6425,7 +7560,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a, C, A> wh
 }
 
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy.
+/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 ///
 /// A builder for the *regions.clusters.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6910,7 +8045,9 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateCreateCall<'a, C, A> where C: Borr
         self._request = new_value;
         self
     }
-    /// Required. The "resource name" of the region, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}
+    /// Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.workflowTemplates,create, the resource name of the  region has the following format:  projects/{project_id}/regions/{region}
+    /// For projects.locations.workflowTemplates.create, the resource name of  the location has the following format:  projects/{project_id}/locations/{location}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -7262,7 +8399,7 @@ impl<'a, C, A> ProjectRegionClusterTestIamPermissionCall<'a, C, A> where C: Borr
 }
 
 
-/// Updates a cluster in a project.
+/// Updates a cluster in a project. The returned Operation.metadata will be ClusterOperationMetadata (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#clusteroperationmetadata).
 ///
 /// A builder for the *regions.clusters.patch* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7296,9 +8433,9 @@ impl<'a, C, A> ProjectRegionClusterTestIamPermissionCall<'a, C, A> where C: Borr
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_clusters_patch(req, "projectId", "region", "clusterName")
-///              .update_mask("eos")
-///              .request_id("erat")
-///              .graceful_decommission_timeout("sadipscing")
+///              .update_mask("eirmod")
+///              .request_id("elitr")
+///              .graceful_decommission_timeout("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -7493,7 +8630,7 @@ impl<'a, C, A> ProjectRegionClusterPatchCall<'a, C, A> where C: BorrowMut<hyper:
         self._project_id = new_value.to_string();
         self
     }
-    /// Required. The Cloud Dataproc region in which to handle the request.
+    /// Required. The Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -7529,7 +8666,7 @@ impl<'a, C, A> ProjectRegionClusterPatchCall<'a, C, A> where C: BorrowMut<hyper:
     /// }
     /// }
     /// }
-    /// <strong>Note:</strong> Currently, only the following fields can be updated:<table>  <tbody>  <tr>  <td><strong>Mask</strong></td>  <td><strong>Purpose</strong></td>  </tr>  <tr>  <td><strong><em>labels</em></strong></td>  <td>Update labels</td>  </tr>  <tr>  <td><strong><em>config.worker_config.num_instances</em></strong></td>  <td>Resize primary worker group</td>  </tr>  <tr>  <td><strong><em>config.secondary_worker_config.num_instances</em></strong></td>  <td>Resize secondary worker group</td>  </tr>  </tbody>  </table>
+    /// <strong>Note:</strong> Currently, only the following fields can be updated:<table>  <tbody>  <tr>  <td><strong>Mask</strong></td>  <td><strong>Purpose</strong></td>  </tr>  <tr>  <td><strong><em>labels</em></strong></td>  <td>Update labels</td>  </tr>  <tr>  <td><strong><em>config.worker_config.num_instances</em></strong></td>  <td>Resize primary worker group</td>  </tr>  <tr>  <td><strong><em>config.secondary_worker_config.num_instances</em></strong></td>  <td>Resize secondary worker group</td>  </tr>  <tr>  <td>config.autoscaling_config.policy_uri</td><td>Use, stop using, or  change autoscaling policies</td>  </tr>  </tbody>  </table>
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: &str) -> ProjectRegionClusterPatchCall<'a, C, A> {
@@ -7543,7 +8680,7 @@ impl<'a, C, A> ProjectRegionClusterPatchCall<'a, C, A> where C: BorrowMut<hyper:
         self._request_id = Some(new_value.to_string());
         self
     }
-    /// Optional. Timeout for graceful YARN decomissioning. Graceful decommissioning allows removing nodes from the cluster without interrupting jobs in progress. Timeout specifies how long to wait for jobs in progress to finish before forcefully removing nodes (and potentially interrupting jobs). Default timeout is 0 (for forceful decommission), and the maximum allowed timeout is 1 day.Only supported on Dataproc image versions 1.2 and higher.
+    /// Optional. Timeout for graceful YARN decomissioning. Graceful decommissioning allows removing nodes from the cluster without interrupting jobs in progress. Timeout specifies how long to wait for jobs in progress to finish before forcefully removing nodes (and potentially interrupting jobs). Default timeout is 0 (for forceful decommission), and the maximum allowed timeout is 1 day. (see JSON representation of Duration (https://developers.google.com/protocol-buffers/docs/proto3#json)).Only supported on Dataproc image versions 1.2 and higher.
     ///
     /// Sets the *graceful decommission timeout* query property to the given value.
     pub fn graceful_decommission_timeout(mut self, new_value: &str) -> ProjectRegionClusterPatchCall<'a, C, A> {
@@ -7861,9 +8998,9 @@ impl<'a, C, A> ProjectRegionOperationDeleteCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
+/// Creates new autoscaling policy.
 ///
-/// A builder for the *locations.autoscalingPolicies.getIamPolicy* method supported by a *project* resource.
+/// A builder for the *regions.autoscalingPolicies.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -7875,7 +9012,7 @@ impl<'a, C, A> ProjectRegionOperationDeleteCall<'a, C, A> where C: BorrowMut<hyp
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_dataproc1 as dataproc1;
-/// use dataproc1::GetIamPolicyRequest;
+/// use dataproc1::AutoscalingPolicy;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7889,33 +9026,33 @@ impl<'a, C, A> ProjectRegionOperationDeleteCall<'a, C, A> where C: BorrowMut<hyp
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = GetIamPolicyRequest::default();
+/// let mut req = AutoscalingPolicy::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_autoscaling_policies_get_iam_policy(req, "resource")
+/// let result = hub.projects().regions_autoscaling_policies_create(req, "parent")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A>
+pub struct ProjectRegionAutoscalingPolicyCreateCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Dataproc<C, A>,
-    _request: GetIamPolicyRequest,
-    _resource: String,
+    _request: AutoscalingPolicy,
+    _parent: String,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectRegionAutoscalingPolicyCreateCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectRegionAutoscalingPolicyCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, AutoscalingPolicy)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -7924,11 +9061,11 @@ impl<'a, C, A> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> where 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "dataproc.projects.locations.autoscalingPolicies.getIamPolicy",
+        dlg.begin(MethodInfo { id: "dataproc.projects.regions.autoscalingPolicies.create",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7940,12 +9077,12 @@ impl<'a, C, A> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> where 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/autoscalingPolicies";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -7960,7 +9097,7 @@ impl<'a, C, A> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> where 
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["resource"].iter() {
+            for param_name in ["parent"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -8063,18 +9200,20 @@ impl<'a, C, A> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> {
+    pub fn request(mut self, new_value: AutoscalingPolicy) -> ProjectRegionAutoscalingPolicyCreateCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
+    /// Required. The "resource name" of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.autoscalingPolicies.create, the resource name  of the region has the following format:  projects/{project_id}/regions/{region}
+    /// For projects.locations.autoscalingPolicies.create, the resource name  of the location has the following format:  projects/{project_id}/locations/{location}
     ///
-    /// Sets the *resource* path property to the given value.
+    /// Sets the *parent* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> {
-        self._resource = new_value.to_string();
+    pub fn parent(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyCreateCall<'a, C, A> {
+        self._parent = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -8083,7 +9222,7 @@ impl<'a, C, A> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectRegionAutoscalingPolicyCreateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8108,7 +9247,7 @@ impl<'a, C, A> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> where 
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8128,7 +9267,7 @@ impl<'a, C, A> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> where 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyCreateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8354,7 +9493,7 @@ impl<'a, C, A> ProjectRegionJobSubmitCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._project_id = new_value.to_string();
         self
     }
-    /// Required. The Cloud Dataproc region in which to handle the request.
+    /// Required. The Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -8427,7 +9566,7 @@ impl<'a, C, A> ProjectRegionJobSubmitCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Creates a cluster in a project.
+/// Creates a cluster in a project. The returned Operation.metadata will be ClusterOperationMetadata (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#clusteroperationmetadata).
 ///
 /// A builder for the *regions.clusters.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -8461,7 +9600,7 @@ impl<'a, C, A> ProjectRegionJobSubmitCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_clusters_create(req, "projectId", "region")
-///              .request_id("eirmod")
+///              .request_id("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -8646,7 +9785,7 @@ impl<'a, C, A> ProjectRegionClusterCreateCall<'a, C, A> where C: BorrowMut<hyper
         self._project_id = new_value.to_string();
         self
     }
-    /// Required. The Cloud Dataproc region in which to handle the request.
+    /// Required. The Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -8726,7 +9865,7 @@ impl<'a, C, A> ProjectRegionClusterCreateCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy.
+/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 ///
 /// A builder for the *locations.workflowTemplates.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9005,7 +10144,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a, C, A> where C
 }
 
 
-/// Instantiates a template and begins execution.This method is equivalent to executing the sequence CreateWorkflowTemplate, InstantiateWorkflowTemplate, DeleteWorkflowTemplate.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata.On successful completion, Operation.response will be Empty.
+/// Instantiates a template and begins execution.This method is equivalent to executing the sequence CreateWorkflowTemplate, InstantiateWorkflowTemplate, DeleteWorkflowTemplate.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#workflowmetadata). Also see Using WorkflowMetadata (https://cloud.google.com/dataproc/docs/concepts/workflows/debugging#using_workflowmetadata).On successful completion, Operation.response will be Empty.
 ///
 /// A builder for the *locations.workflowTemplates.instantiateInline* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9039,7 +10178,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a, C, A> where C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workflow_templates_instantiate_inline(req, "parent")
-///              .request_id("aliquyam")
+///              .request_id("et")
 ///              .doit();
 /// # }
 /// ```
@@ -9216,7 +10355,9 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a, C, A> wh
         self._request = new_value;
         self
     }
-    /// Required. The "resource name" of the workflow template region, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}
+    /// Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.workflowTemplates,instantiateinline, the resource  name of the region has the following format:  projects/{project_id}/regions/{region}
+    /// For projects.locations.workflowTemplates.instantiateinline, the  resource name of the location has the following format:  projects/{project_id}/locations/{location}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -9502,7 +10643,9 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateUpdateCall<'a, C, A> where C: Borr
         self._request = new_value;
         self
     }
-    /// Output only. The "resource name" of the template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// Output only. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.workflowTemplates, the resource name of the  template has the following format:  projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// For projects.locations.workflowTemplates, the resource name of the  template has the following format:  projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -9575,7 +10718,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateUpdateCall<'a, C, A> where C: Borr
 }
 
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy.
+/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 ///
 /// A builder for the *regions.autoscalingPolicies.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9854,7 +10997,7 @@ impl<'a, C, A> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a, C, A> where C:
 }
 
 
-/// Instantiates a template and begins execution.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata.On successful completion, Operation.response will be Empty.
+/// Instantiates a template and begins execution.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#workflowmetadata). Also see Using WorkflowMetadata (https://cloud.google.com/dataproc/docs/concepts/workflows/debugging#using_workflowmetadata).On successful completion, Operation.response will be Empty.
 ///
 /// A builder for the *locations.workflowTemplates.instantiate* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10060,7 +11203,9 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateInstantiateCall<'a, C, A> where C:
         self._request = new_value;
         self
     }
-    /// Required. The "resource name" of the workflow template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// Required. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.workflowTemplates.instantiate, the resource name of the template has the following format:  projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// For projects.locations.workflowTemplates.instantiate, the resource name  of the template has the following format:  projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -10412,7 +11557,7 @@ impl<'a, C, A> ProjectRegionClusterGetIamPolicyCall<'a, C, A> where C: BorrowMut
 }
 
 
-/// Lists all regions/{region}/clusters in a project.
+/// Lists all regions/{region}/clusters in a project alphabetically.
 ///
 /// A builder for the *regions.clusters.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10440,9 +11585,9 @@ impl<'a, C, A> ProjectRegionClusterGetIamPolicyCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_clusters_list("projectId", "region")
-///              .page_token("eirmod")
-///              .page_size(-58)
-///              .filter("et")
+///              .page_token("et")
+///              .page_size(-45)
+///              .filter("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -10610,7 +11755,7 @@ impl<'a, C, A> ProjectRegionClusterListCall<'a, C, A> where C: BorrowMut<hyper::
         self._project_id = new_value.to_string();
         self
     }
-    /// Required. The Cloud Dataproc region in which to handle the request.
+    /// Required. The Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -10732,11 +11877,11 @@ impl<'a, C, A> ProjectRegionClusterListCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_jobs_list("projectId", "region")
-///              .page_token("consetetur")
-///              .page_size(-36)
-///              .job_state_matcher("ea")
-///              .filter("sed")
-///              .cluster_name("dolor")
+///              .page_token("dolor")
+///              .page_size(-48)
+///              .job_state_matcher("dolor")
+///              .filter("et")
+///              .cluster_name("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -10912,7 +12057,7 @@ impl<'a, C, A> ProjectRegionJobListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._project_id = new_value.to_string();
         self
     }
-    /// Required. The Cloud Dataproc region in which to handle the request.
+    /// Required. The Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -11547,7 +12692,286 @@ impl<'a, C, A> ProjectRegionOperationCancelCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Gets cluster diagnostic information. After the operation completes, the Operation.response field contains DiagnoseClusterOutputLocation.
+/// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
+///
+/// A builder for the *locations.autoscalingPolicies.getIamPolicy* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dataproc1 as dataproc1;
+/// use dataproc1::GetIamPolicyRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dataproc1::Dataproc;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dataproc::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GetIamPolicyRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_autoscaling_policies_get_iam_policy(req, "resource")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dataproc<C, A>,
+    _request: GetIamPolicyRequest,
+    _resource: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dataproc.projects.locations.autoscalingPolicies.getIamPolicy",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resource"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets cluster diagnostic information. The returned Operation.metadata will be ClusterOperationMetadata (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#clusteroperationmetadata). After the operation completes, Operation.response contains DiagnoseClusterResults (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#diagnoseclusterresults).
 ///
 /// A builder for the *regions.clusters.diagnose* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -11763,7 +13187,7 @@ impl<'a, C, A> ProjectRegionClusterDiagnoseCall<'a, C, A> where C: BorrowMut<hyp
         self._project_id = new_value.to_string();
         self
     }
-    /// Required. The Cloud Dataproc region in which to handle the request.
+    /// Required. The Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -12052,7 +13476,9 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateUpdateCall<'a, C, A> where C: Borrow
         self._request = new_value;
         self
     }
-    /// Output only. The "resource name" of the template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// Output only. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.workflowTemplates, the resource name of the  template has the following format:  projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// For projects.locations.workflowTemplates, the resource name of the  template has the following format:  projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -12125,7 +13551,544 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateUpdateCall<'a, C, A> where C: Borrow
 }
 
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy.
+/// Deletes an autoscaling policy. It is an error to delete an autoscaling policy that is in use by one or more clusters.
+///
+/// A builder for the *locations.autoscalingPolicies.delete* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dataproc1::Dataproc;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dataproc::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_autoscaling_policies_delete("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationAutoscalingPolicyDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dataproc<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationAutoscalingPolicyDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationAutoscalingPolicyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dataproc.projects.locations.autoscalingPolicies.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.autoscalingPolicies.delete, the resource name  of the policy has the following format:  projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}
+    /// For projects.locations.autoscalingPolicies.delete, the resource name  of the policy has the following format:  projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyDeleteCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationAutoscalingPolicyDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Submits job to a cluster.
+///
+/// A builder for the *regions.jobs.submitAsOperation* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dataproc1 as dataproc1;
+/// use dataproc1::SubmitJobRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dataproc1::Dataproc;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dataproc::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SubmitJobRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().regions_jobs_submit_as_operation(req, "projectId", "region")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectRegionJobSubmitAsOperationCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dataproc<C, A>,
+    _request: SubmitJobRequest,
+    _project_id: String,
+    _region: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectRegionJobSubmitAsOperationCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectRegionJobSubmitAsOperationCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dataproc.projects.regions.jobs.submitAsOperation",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("projectId", self._project_id.to_string()));
+        params.push(("region", self._region.to_string()));
+        for &field in ["alt", "projectId", "region"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/projects/{projectId}/regions/{region}/jobs:submitAsOperation";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{region}", "region")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["region", "projectId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SubmitJobRequest) -> ProjectRegionJobSubmitAsOperationCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The ID of the Google Cloud Platform project that the job belongs to.
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> ProjectRegionJobSubmitAsOperationCall<'a, C, A> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// Required. The Dataproc region in which to handle the request.
+    ///
+    /// Sets the *region* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn region(mut self, new_value: &str) -> ProjectRegionJobSubmitAsOperationCall<'a, C, A> {
+        self._region = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectRegionJobSubmitAsOperationCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobSubmitAsOperationCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionJobSubmitAsOperationCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 ///
 /// A builder for the *locations.autoscalingPolicies.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -12432,9 +14395,9 @@ impl<'a, C, A> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a, C, A> where 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_operations_list("name")
-///              .page_token("justo")
-///              .page_size(-52)
-///              .filter("vero")
+///              .page_token("sadipscing")
+///              .page_size(-88)
+///              .filter("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -12716,7 +14679,7 @@ impl<'a, C, A> ProjectRegionOperationListCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workflow_templates_delete("name")
-///              .version(-66)
+///              .version(-19)
 ///              .doit();
 /// # }
 /// ```
@@ -12868,7 +14831,9 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateDeleteCall<'a, C, A> where C: Borr
     }
 
 
-    /// Required. The "resource name" of the workflow template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// Required. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.workflowTemplates.delete, the resource name of the template has the following format:  projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// For projects.locations.workflowTemplates.instantiate, the resource name  of the template has the following format:  projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -12948,7 +14913,569 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateDeleteCall<'a, C, A> where C: Borr
 }
 
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy.
+/// Updates (replaces) autoscaling policy.Disabled check for update_mask, because all updates will be full replacements.
+///
+/// A builder for the *regions.autoscalingPolicies.update* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dataproc1 as dataproc1;
+/// use dataproc1::AutoscalingPolicy;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dataproc1::Dataproc;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dataproc::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AutoscalingPolicy::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().regions_autoscaling_policies_update(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectRegionAutoscalingPolicyUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dataproc<C, A>,
+    _request: AutoscalingPolicy,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectRegionAutoscalingPolicyUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectRegionAutoscalingPolicyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, AutoscalingPolicy)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dataproc.projects.regions.autoscalingPolicies.update",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AutoscalingPolicy) -> ProjectRegionAutoscalingPolicyUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Output only. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.autoscalingPolicies, the resource name of the  policy has the following format:  projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}
+    /// For projects.locations.autoscalingPolicies, the resource name of the  policy has the following format:  projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyUpdateCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectRegionAutoscalingPolicyUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyUpdateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Updates (replaces) autoscaling policy.Disabled check for update_mask, because all updates will be full replacements.
+///
+/// A builder for the *locations.autoscalingPolicies.update* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dataproc1 as dataproc1;
+/// use dataproc1::AutoscalingPolicy;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dataproc1::Dataproc;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dataproc::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AutoscalingPolicy::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_autoscaling_policies_update(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationAutoscalingPolicyUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dataproc<C, A>,
+    _request: AutoscalingPolicy,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationAutoscalingPolicyUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationAutoscalingPolicyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, AutoscalingPolicy)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dataproc.projects.locations.autoscalingPolicies.update",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AutoscalingPolicy) -> ProjectLocationAutoscalingPolicyUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Output only. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.autoscalingPolicies, the resource name of the  policy has the following format:  projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}
+    /// For projects.locations.autoscalingPolicies, the resource name of the  policy has the following format:  projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyUpdateCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationAutoscalingPolicyUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyUpdateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 ///
 /// A builder for the *regions.workflowTemplates.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -13216,6 +15743,256 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a, C, A> where C: 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieves autoscaling policy.
+///
+/// A builder for the *locations.autoscalingPolicies.get* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dataproc1::Dataproc;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dataproc::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_autoscaling_policies_get("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationAutoscalingPolicyGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dataproc<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationAutoscalingPolicyGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationAutoscalingPolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, AutoscalingPolicy)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dataproc.projects.locations.autoscalingPolicies.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.autoscalingPolicies.get, the resource name  of the policy has the following format:  projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}
+    /// For projects.locations.autoscalingPolicies.get, the resource name  of the policy has the following format:  projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectLocationAutoscalingPolicyGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13495,6 +16272,256 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a, C, A> where C: 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieves autoscaling policy.
+///
+/// A builder for the *regions.autoscalingPolicies.get* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dataproc1::Dataproc;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dataproc::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().regions_autoscaling_policies_get("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectRegionAutoscalingPolicyGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dataproc<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectRegionAutoscalingPolicyGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectRegionAutoscalingPolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, AutoscalingPolicy)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dataproc.projects.regions.autoscalingPolicies.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.autoscalingPolicies.get, the resource name  of the policy has the following format:  projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}
+    /// For projects.locations.autoscalingPolicies.get, the resource name  of the policy has the following format:  projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectRegionAutoscalingPolicyGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13970,7 +16997,7 @@ impl<'a, C, A> ProjectRegionJobGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._project_id = new_value.to_string();
         self
     }
-    /// Required. The Cloud Dataproc region in which to handle the request.
+    /// Required. The Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -14042,6 +17069,256 @@ impl<'a, C, A> ProjectRegionJobGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionJobGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes an autoscaling policy. It is an error to delete an autoscaling policy that is in use by one or more clusters.
+///
+/// A builder for the *regions.autoscalingPolicies.delete* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dataproc1::Dataproc;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dataproc::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().regions_autoscaling_policies_delete("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectRegionAutoscalingPolicyDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dataproc<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectRegionAutoscalingPolicyDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectRegionAutoscalingPolicyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dataproc.projects.regions.autoscalingPolicies.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.autoscalingPolicies.delete, the resource name  of the policy has the following format:  projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}
+    /// For projects.locations.autoscalingPolicies.delete, the resource name  of the policy has the following format:  projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyDeleteCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectRegionAutoscalingPolicyDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14332,7 +17609,7 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a, C, A> where C
 }
 
 
-/// Deletes a cluster in a project.
+/// Deletes a cluster in a project. The returned Operation.metadata will be ClusterOperationMetadata (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#clusteroperationmetadata).
 ///
 /// A builder for the *regions.clusters.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -14360,8 +17637,8 @@ impl<'a, C, A> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a, C, A> where C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_clusters_delete("projectId", "region", "clusterName")
-///              .request_id("et")
-///              .cluster_uuid("clita")
+///              .request_id("rebum.")
+///              .cluster_uuid("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -14527,7 +17804,7 @@ impl<'a, C, A> ProjectRegionClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper
         self._project_id = new_value.to_string();
         self
     }
-    /// Required. The Cloud Dataproc region in which to handle the request.
+    /// Required. The Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -14624,7 +17901,7 @@ impl<'a, C, A> ProjectRegionClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Instantiates a template and begins execution.This method is equivalent to executing the sequence CreateWorkflowTemplate, InstantiateWorkflowTemplate, DeleteWorkflowTemplate.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata.On successful completion, Operation.response will be Empty.
+/// Instantiates a template and begins execution.This method is equivalent to executing the sequence CreateWorkflowTemplate, InstantiateWorkflowTemplate, DeleteWorkflowTemplate.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#workflowmetadata). Also see Using WorkflowMetadata (https://cloud.google.com/dataproc/docs/concepts/workflows/debugging#using_workflowmetadata).On successful completion, Operation.response will be Empty.
 ///
 /// A builder for the *regions.workflowTemplates.instantiateInline* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -14658,7 +17935,7 @@ impl<'a, C, A> ProjectRegionClusterDeleteCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_workflow_templates_instantiate_inline(req, "parent")
-///              .request_id("takimata")
+///              .request_id("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -14835,7 +18112,9 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a, C, A> wher
         self._request = new_value;
         self
     }
-    /// Required. The "resource name" of the workflow template region, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}
+    /// Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.workflowTemplates,instantiateinline, the resource  name of the region has the following format:  projects/{project_id}/regions/{region}
+    /// For projects.locations.workflowTemplates.instantiateinline, the  resource name of the location has the following format:  projects/{project_id}/locations/{location}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -15183,6 +18462,280 @@ impl<'a, C, A> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a, C, A> whe
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists autoscaling policies in the project.
+///
+/// A builder for the *regions.autoscalingPolicies.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dataproc1 as dataproc1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dataproc1::Dataproc;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dataproc::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().regions_autoscaling_policies_list("parent")
+///              .page_token("eirmod")
+///              .page_size(-46)
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectRegionAutoscalingPolicyListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dataproc<C, A>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectRegionAutoscalingPolicyListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectRegionAutoscalingPolicyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListAutoscalingPoliciesResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dataproc.projects.regions.autoscalingPolicies.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/autoscalingPolicies";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The "resource name" of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.autoscalingPolicies.list, the resource name  of the region has the following format:  projects/{project_id}/regions/{region}
+    /// For projects.locations.autoscalingPolicies.list, the resource name  of the location has the following format:  projects/{project_id}/locations/{location}
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. The page token, returned by a previous call, to request the next page of results.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The maximum number of results to return in each response. Must be less than or equal to 1000. Defaults to 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectRegionAutoscalingPolicyListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectRegionAutoscalingPolicyListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15780,7 +19333,7 @@ impl<'a, C, A> ProjectRegionOperationGetIamPolicyCall<'a, C, A> where C: BorrowM
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().regions_workflow_templates_get("name")
-///              .version(-27)
+///              .version(-62)
 ///              .doit();
 /// # }
 /// ```
@@ -15932,7 +19485,9 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateGetCall<'a, C, A> where C: BorrowMut
     }
 
 
-    /// Required. The "resource name" of the workflow template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// Required. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.workflowTemplates.get, the resource name of the  template has the following format:  projects/{project_id}/regions/{region}/workflowTemplates/{template_id}
+    /// For projects.locations.workflowTemplates.get, the resource name of the  template has the following format:  projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -15942,7 +19497,7 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateGetCall<'a, C, A> where C: BorrowMut
         self._name = new_value.to_string();
         self
     }
-    /// Optional. The version of workflow template to retrieve. Only previously instatiated versions can be retrieved.If unspecified, retrieves the current version.
+    /// Optional. The version of workflow template to retrieve. Only previously instantiated versions can be retrieved.If unspecified, retrieves the current version.
     ///
     /// Sets the *version* query property to the given value.
     pub fn version(mut self, new_value: i32) -> ProjectRegionWorkflowTemplateGetCall<'a, C, A> {
@@ -16218,7 +19773,9 @@ impl<'a, C, A> ProjectRegionWorkflowTemplateCreateCall<'a, C, A> where C: Borrow
         self._request = new_value;
         self
     }
-    /// Required. The "resource name" of the region, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}
+    /// Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names.
+    /// For projects.regions.workflowTemplates,create, the resource name of the  region has the following format:  projects/{project_id}/regions/{region}
+    /// For projects.locations.workflowTemplates.create, the resource name of  the location has the following format:  projects/{project_id}/locations/{location}
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -16476,7 +20033,7 @@ impl<'a, C, A> ProjectRegionJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._project_id = new_value.to_string();
         self
     }
-    /// Required. The Cloud Dataproc region in which to handle the request.
+    /// Required. The Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///
@@ -16559,7 +20116,7 @@ impl<'a, C, A> ProjectRegionJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy.
+/// Sets the access control policy on the specified resource. Replaces any existing policy.Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 ///
 /// A builder for the *regions.jobs.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -16838,7 +20395,7 @@ impl<'a, C, A> ProjectRegionJobSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Starts a job cancellation request. To access the job resource after cancellation, call regions/{region}/jobs.list or regions/{region}/jobs.get.
+/// Starts a job cancellation request. To access the job resource after cancellation, call regions/{region}/jobs.list (https://cloud.google.com/dataproc/docs/reference/rest/v1/projects.regions.jobs/list) or regions/{region}/jobs.get (https://cloud.google.com/dataproc/docs/reference/rest/v1/projects.regions.jobs/get).
 ///
 /// A builder for the *regions.jobs.cancel* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -17054,7 +20611,7 @@ impl<'a, C, A> ProjectRegionJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._project_id = new_value.to_string();
         self
     }
-    /// Required. The Cloud Dataproc region in which to handle the request.
+    /// Required. The Dataproc region in which to handle the request.
     ///
     /// Sets the *region* path property to the given value.
     ///

@@ -3998,7 +3998,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("services-versions-instances-delete",
-                    Some(r##"Stops a running instance."##),
+                    Some(r##"Stops a running instance.The instance might be automatically recreated based on the scaling settings of the version. For more information, see "How Instances are Managed" (standard environment (https://cloud.google.com/appengine/docs/standard/python/how-instances-are-managed) | flexible environment (https://cloud.google.com/appengine/docs/flexible/python/how-instances-are-managed)).To ensure that instances are not re-created and avoid getting billed, you can stop all instances within the target version by changing the serving status of the version to STOPPED with the apps.services.versions.patch (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions/patch) method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/apps_services-versions-instances-delete",
                   vec![
                     (Some(r##"apps-id"##),
@@ -4198,7 +4198,7 @@ fn main() {
     
     let mut app = App::new("appengine1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190624")
+           .version("1.0.13+20200403")
            .about("Provisions and manages developers' App Engine applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_appengine1_cli")
            .arg(Arg::with_name("url")

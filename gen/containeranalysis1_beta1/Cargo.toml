@@ -4,12 +4,12 @@
 [package]
 
 name = "google-containeranalysis1_beta1"
-version = "1.0.12+20190625"
+version = "1.0.13+20200327"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Container Analysis (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/containeranalysis1_beta1"
 homepage = "https://cloud.google.com/container-analysis/api/reference/rest/"
-documentation = "https://docs.rs/google-containeranalysis1_beta1/1.0.12+20190625"
+documentation = "https://docs.rs/google-containeranalysis1_beta1/1.0.13+20200327"
 license = "MIT"
 keywords = ["containeranalysis", "google", "protocol", "web", "api"]
 autobins = false

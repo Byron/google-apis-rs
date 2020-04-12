@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Pubsub* crate version *1.0.12+20190625*, where *20190625* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Pubsub* crate version *1.0.13+20200403*, where *20200403* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Pubsub* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/pubsub/docs).
@@ -86,7 +86,6 @@
 //! extern crate hyper_rustls;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_pubsub1 as pubsub1;
-//! use pubsub1::SetIamPolicyRequest;
 //! use pubsub1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -105,15 +104,11 @@
 //!                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 //!                               <MemoryStorage as Default>::default(), None);
 //! let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-//! // As the method needs a request, you would usually fill it with the desired information
-//! // into the respective structure. Some of the parts shown here might not be applicable !
-//! // Values shown here are possibly random and not representative !
-//! let mut req = SetIamPolicyRequest::default();
-//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().snapshots_set_iam_policy(req, "resource")
+//! let result = hub.projects().snapshots_get_iam_policy("resource")
+//!              .options_requested_policy_version(-42)
 //!              .doit();
 //! 
 //! match result {
@@ -273,7 +268,6 @@ impl Default for Scope {
 /// extern crate hyper_rustls;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_pubsub1 as pubsub1;
-/// use pubsub1::SetIamPolicyRequest;
 /// use pubsub1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -292,15 +286,11 @@ impl Default for Scope {
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = SetIamPolicyRequest::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().snapshots_set_iam_policy(req, "resource")
+/// let result = hub.projects().snapshots_get_iam_policy("resource")
+///              .options_requested_policy_version(-18)
 ///              .doit();
 /// 
 /// match result {
@@ -338,7 +328,7 @@ impl<'a, C, A> Pubsub<C, A>
         Pubsub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://pubsub.googleapis.com/".to_string(),
             _root_url: "https://pubsub.googleapis.com/".to_string(),
         }
@@ -349,7 +339,7 @@ impl<'a, C, A> Pubsub<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -388,14 +378,18 @@ impl<'a, C, A> Pubsub<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PullRequest {
-    /// If this field set to true, the system will respond immediately even if
+    /// Optional. If this field set to true, the system will respond immediately even if
     /// it there are no messages available to return in the `Pull` response.
     /// Otherwise, the system may wait (for a bounded amount of time) until at
-    /// least one message is available, rather than returning no messages.
+    /// least one message is available, rather than returning no messages. Warning:
+    /// setting this field to `true` is discouraged because it adversely impacts
+    /// the performance of `Pull` operations. We recommend that users do not set
+    /// this field.
     #[serde(rename="returnImmediately")]
     pub return_immediately: Option<bool>,
-    /// The maximum number of messages returned for this request. The Pub/Sub
-    /// system may return fewer than the number specified.
+    /// Required. The maximum number of messages to return for this request. Must be a
+    /// positive integer. The Pub/Sub system may return fewer than the number
+    /// specified.
     #[serde(rename="maxMessages")]
     pub max_messages: Option<i32>,
 }
@@ -460,6 +454,24 @@ pub struct ReceivedMessage {
     pub ack_id: Option<String>,
     /// The message.
     pub message: Option<PubsubMessage>,
+    /// Delivery attempt counter is 1 + (the sum of number of NACKs and number of
+    /// ack_deadline exceeds) for this message.
+    /// 
+    /// A NACK is any call to ModifyAckDeadline with a 0 deadline. An ack_deadline
+    /// exceeds event is whenever a message is not acknowledged within
+    /// ack_deadline. Note that ack_deadline is initially
+    /// Subscription.ackDeadlineSeconds, but may get extended automatically by
+    /// the client library.
+    /// 
+    /// The first delivery of a given message will have this value as 1. The value
+    /// is calculated at best effort and is approximate.
+    /// 
+    /// If a DeadLetterPolicy is not set on the subscription, this will be 0.
+    /// <b>EXPERIMENTAL:</b> This feature is part of a closed alpha release. This
+    /// API might be changed in backward-incompatible ways and is not recommended
+    /// for production use. It is not subject to any SLA or deprecation policy.
+    #[serde(rename="deliveryAttempt")]
+    pub delivery_attempt: Option<i32>,
 }
 
 impl Part for ReceivedMessage {}
@@ -476,7 +488,7 @@ impl Part for ReceivedMessage {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AcknowledgeRequest {
-    /// The acknowledgment ID for the messages being acknowledged that was returned
+    /// Required. The acknowledgment ID for the messages being acknowledged that was returned
     /// by the Pub/Sub system in the `Pull` response. Must not be empty.
     #[serde(rename="ackIds")]
     pub ack_ids: Option<Vec<String>>,
@@ -496,7 +508,7 @@ impl RequestValue for AcknowledgeRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ModifyAckDeadlineRequest {
-    /// The new ack deadline with respect to the time this request was sent to
+    /// Required. The new ack deadline with respect to the time this request was sent to
     /// the Pub/Sub system. For example, if the value is 10, the new
     /// ack deadline will expire 10 seconds after the `ModifyAckDeadline` call
     /// was made. Specifying zero might immediately make the message available for
@@ -506,7 +518,7 @@ pub struct ModifyAckDeadlineRequest {
     /// The maximum deadline you can specify is 600 seconds (10 minutes).
     #[serde(rename="ackDeadlineSeconds")]
     pub ack_deadline_seconds: Option<i32>,
-    /// List of acknowledgment IDs.
+    /// Required. List of acknowledgment IDs.
     #[serde(rename="ackIds")]
     pub ack_ids: Option<Vec<String>>,
 }
@@ -557,7 +569,7 @@ impl RequestValue for SeekRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PublishRequest {
-    /// The messages to publish.
+    /// Required. The messages to publish.
     pub messages: Option<Vec<PubsubMessage>>,
 }
 
@@ -586,37 +598,50 @@ pub struct ListSnapshotsResponse {
 impl ResponseResult for ListSnapshotsResponse {}
 
 
-/// Defines an Identity and Access Management (IAM) policy. It is used to
-/// specify access control policies for Cloud Platform resources.
+/// An Identity and Access Management (IAM) policy, which specifies access
+/// controls for Google Cloud resources.
 /// 
-/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
-/// `members` to a `role`, where the members can be user accounts, Google groups,
-/// Google domains, and service accounts. A `role` is a named list of permissions
-/// defined by IAM.
+/// A `Policy` is a collection of `bindings`. A `binding` binds one or more
+/// `members` to a single `role`. Members can be user accounts, service accounts,
+/// Google groups, and domains (such as G Suite). A `role` is a named list of
+/// permissions; each `role` can be an IAM predefined role or a user-created
+/// custom role.
 /// 
-/// **JSON Example**
+/// Optionally, a `binding` can specify a `condition`, which is a logical
+/// expression that allows access to a resource only if the expression evaluates
+/// to `true`. A condition can add constraints based on attributes of the
+/// request, the resource, or both.
+/// 
+/// **JSON example:**
 /// 
 /// ````text
 /// {
 ///   "bindings": [
 ///     {
-///       "role": "roles/owner",
+///       "role": "roles/resourcemanager.organizationAdmin",
 ///       "members": [
 ///         "user:mike@example.com",
 ///         "group:admins@example.com",
 ///         "domain:google.com",
-///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
+///         "serviceAccount:my-project-id@appspot.gserviceaccount.com"
 ///       ]
 ///     },
 ///     {
-///       "role": "roles/viewer",
-///       "members": ["user:sean@example.com"]
+///       "role": "roles/resourcemanager.organizationViewer",
+///       "members": ["user:eve@example.com"],
+///       "condition": {
+///         "title": "expirable access",
+///         "description": "Does not grant access after Sep 2020",
+///         "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')",
+///       }
 ///     }
-///   ]
+///   ],
+///   "etag": "BwWWja0YfJA=",
+///   "version": 3
 /// }
 /// ````
 /// 
-/// **YAML Example**
+/// **YAML example:**
 /// 
 /// ````text
 /// bindings:
@@ -624,15 +649,21 @@ impl ResponseResult for ListSnapshotsResponse {}
 ///   - user:mike@example.com
 ///   - group:admins@example.com
 ///   - domain:google.com
-///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///   role: roles/owner
+///   - serviceAccount:my-project-id@appspot.gserviceaccount.com
+///   role: roles/resourcemanager.organizationAdmin
 /// - members:
-///   - user:sean@example.com
-///   role: roles/viewer
+///   - user:eve@example.com
+///   role: roles/resourcemanager.organizationViewer
+///   condition:
+///     title: expirable access
+///     description: Does not grant access after Sep 2020
+///     expression: request.time < timestamp('2020-10-01T00:00:00.000Z')
+/// - etag: BwWWja0YfJA=
+/// - version: 3
 /// ````
 /// 
 /// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam/docs).
+/// [IAM documentation](https://cloud.google.com/iam/docs/).
 /// 
 /// # Activities
 /// 
@@ -647,8 +678,9 @@ impl ResponseResult for ListSnapshotsResponse {}
 /// * [subscriptions set iam policy projects](struct.ProjectSubscriptionSetIamPolicyCall.html) (response)
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
+    /// Associates a list of `members` to a `role`. Optionally, may specify a
+    /// `condition` that determines how and when the `bindings` are applied. Each
+    /// of the `bindings` must contain at least one member.
     pub bindings: Option<Vec<Binding>>,
     /// `etag` is used for optimistic concurrency control as a way to help
     /// prevent simultaneous updates of a policy from overwriting each other.
@@ -658,10 +690,32 @@ pub struct Policy {
     /// systems are expected to put that etag in the request to `setIamPolicy` to
     /// ensure that their change will be applied to the same version of the policy.
     /// 
-    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
-    /// policy is overwritten blindly.
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
     pub etag: Option<String>,
-    /// Deprecated.
+    /// Specifies the format of the policy.
+    /// 
+    /// Valid values are `0`, `1`, and `3`. Requests that specify an invalid value
+    /// are rejected.
+    /// 
+    /// Any operation that affects conditional role bindings must specify version
+    /// `3`. This requirement applies to the following operations:
+    /// 
+    /// * Getting a policy that includes a conditional role binding
+    /// * Adding a conditional role binding to a policy
+    /// * Changing a conditional role binding in a policy
+    /// * Removing any role binding, with or without a condition, from a policy
+    ///   that includes conditions
+    /// 
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
+    /// 
+    /// If a policy does not include any conditions, operations on that policy may
+    /// specify any valid version or leave the field unset.
     pub version: Option<i32>,
 }
 
@@ -724,7 +778,7 @@ impl ResponseResult for ListTopicsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ModifyPushConfigRequest {
-    /// The push configuration for future deliveries.
+    /// Required. The push configuration for future deliveries.
     /// 
     /// An empty `pushConfig` indicates that the Pub/Sub system should
     /// stop pushing messages from the given subscription and allow
@@ -777,13 +831,13 @@ impl ResponseResult for Empty {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UpdateTopicRequest {
-    /// The updated topic object.
+    /// Required. The updated topic object.
     pub topic: Option<Topic>,
-    /// Indicates which fields in the provided topic to update. Must be specified
+    /// Required. Indicates which fields in the provided topic to update. Must be specified
     /// and non-empty. Note that if `update_mask` contains
-    /// "message_storage_policy" then the new value will be determined based on the
-    /// policy configured at the project or organization level. The
-    /// `message_storage_policy` must not be set in the `topic` provided above.
+    /// "message_storage_policy" but the `message_storage_policy` is not set in
+    /// the `topic` provided above, then the updated value is determined by the
+    /// policy configured at the project or organization level.
     #[serde(rename="updateMask")]
     pub update_mask: Option<String>,
 }
@@ -839,6 +893,70 @@ pub struct OidcToken {
 impl Part for OidcToken {}
 
 
+/// Associates `members` with a `role`.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Binding {
+    /// Role that is assigned to `members`.
+    /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
+    pub role: Option<String>,
+    /// The condition that is associated with this binding.
+    /// NOTE: An unsatisfied condition will not allow user access via current
+    /// binding. Different bindings, including their conditions, are examined
+    /// independently.
+    pub condition: Option<Expr>,
+    /// Specifies the identities requesting access for a Cloud Platform resource.
+    /// `members` can have the following values:
+    /// 
+    /// * `allUsers`: A special identifier that represents anyone who is
+    ///    on the internet; with or without a Google account.
+    /// 
+    /// * `allAuthenticatedUsers`: A special identifier that represents anyone
+    ///    who is authenticated with a Google account or a service account.
+    /// 
+    /// * `user:{emailid}`: An email address that represents a specific Google
+    ///    account. For example, `alice@example.com` .
+    /// 
+    /// 
+    /// * `serviceAccount:{emailid}`: An email address that represents a service
+    ///    account. For example, `my-other-app@appspot.gserviceaccount.com`.
+    /// 
+    /// * `group:{emailid}`: An email address that represents a Google group.
+    ///    For example, `admins@example.com`.
+    /// 
+    /// * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a user that has been recently deleted. For
+    ///    example, `alice@example.com?uid=123456789012345678901`. If the user is
+    ///    recovered, this value reverts to `user:{emailid}` and the recovered user
+    ///    retains the role in the binding.
+    /// 
+    /// * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus
+    ///    unique identifier) representing a service account that has been recently
+    ///    deleted. For example,
+    ///    `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.
+    ///    If the service account is undeleted, this value reverts to
+    ///    `serviceAccount:{emailid}` and the undeleted service account retains the
+    ///    role in the binding.
+    /// 
+    /// * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a Google group that has been recently
+    ///    deleted. For example, `admins@example.com?uid=123456789012345678901`. If
+    ///    the group is recovered, this value reverts to `group:{emailid}` and the
+    ///    recovered group retains the role in the binding.
+    /// 
+    /// 
+    /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
+    ///    users of that domain. For example, `google.com` or `example.com`.
+    /// 
+    /// 
+    pub members: Option<Vec<String>>,
+}
+
+impl Part for Binding {}
+
+
 /// Response for the `Pull` method.
 /// 
 /// # Activities
@@ -884,47 +1002,6 @@ pub struct ListTopicSnapshotsResponse {
 impl ResponseResult for ListTopicSnapshotsResponse {}
 
 
-/// Configuration for a push delivery endpoint.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PushConfig {
-    /// Endpoint configuration attributes.
-    /// 
-    /// Every endpoint has a set of API supported attributes that can be used to
-    /// control different aspects of the message delivery.
-    /// 
-    /// The currently supported attribute is `x-goog-version`, which you can
-    /// use to change the format of the pushed message. This attribute
-    /// indicates the version of the data expected by the endpoint. This
-    /// controls the shape of the pushed message (i.e., its fields and metadata).
-    /// The endpoint version is based on the version of the Pub/Sub API.
-    /// 
-    /// If not present during the `CreateSubscription` call, it will default to
-    /// the version of the API used to make such call. If not present during a
-    /// `ModifyPushConfig` call, its value will not be changed. `GetSubscription`
-    /// calls will always return a valid version, even if the subscription was
-    /// created without this attribute.
-    /// 
-    /// The possible values for this attribute are:
-    /// 
-    /// * `v1beta1`: uses the push format defined in the v1beta1 Pub/Sub API.
-    /// * `v1` or `v1beta2`: uses the push format defined in the v1 Pub/Sub API.
-    pub attributes: Option<HashMap<String, String>>,
-    /// If specified, Pub/Sub will generate and attach an OIDC JWT token as an
-    /// `Authorization` header in the HTTP request for every pushed message.
-    #[serde(rename="oidcToken")]
-    pub oidc_token: Option<OidcToken>,
-    /// A URL locating the endpoint to which messages should be pushed.
-    /// For example, a Webhook endpoint might use "https://example.com/push".
-    #[serde(rename="pushEndpoint")]
-    pub push_endpoint: Option<String>,
-}
-
-impl Part for PushConfig {}
-
-
 /// A subscription resource.
 /// 
 /// # Activities
@@ -938,7 +1015,7 @@ impl Part for PushConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Subscription {
-    /// The name of the subscription. It must have the format
+    /// Required. The name of the subscription. It must have the format
     /// `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
     /// start with a letter, and contain only letters (`[A-Za-z]`), numbers
     /// (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
@@ -975,7 +1052,7 @@ pub struct Subscription {
     /// will pull and ack messages using API methods.
     #[serde(rename="pushConfig")]
     pub push_config: Option<PushConfig>,
-    /// The name of the topic from which this subscription is receiving messages.
+    /// Required. The name of the topic from which this subscription is receiving messages.
     /// Format is `projects/{project}/topics/{topic}`.
     /// The value of this field will be `_deleted-topic_` if the topic has been
     /// deleted.
@@ -997,6 +1074,19 @@ pub struct Subscription {
     /// Seek to a timestamp</a>.
     #[serde(rename="retainAckedMessages")]
     pub retain_acked_messages: Option<bool>,
+    /// A policy that specifies the conditions for dead lettering messages in
+    /// this subscription. If dead_letter_policy is not set, dead lettering
+    /// is disabled.
+    /// 
+    /// The Cloud Pub/Sub service account associated with this subscriptions's
+    /// parent project (i.e.,
+    /// service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com) must have
+    /// permission to Acknowledge() messages on this subscription.
+    /// <b>EXPERIMENTAL:</b> This feature is part of a closed alpha release. This
+    /// API might be changed in backward-incompatible ways and is not recommended
+    /// for production use. It is not subject to any SLA or deprecation policy.
+    #[serde(rename="deadLetterPolicy")]
+    pub dead_letter_policy: Option<DeadLetterPolicy>,
     /// A policy that specifies the conditions for this subscription's expiration.
     /// A subscription is considered active as long as any connected subscriber is
     /// successfully consuming messages from the subscription or is issuing
@@ -1049,30 +1139,59 @@ pub struct TestIamPermissionsRequest {
 impl RequestValue for TestIamPermissionsRequest {}
 
 
-/// Represents an expression text. Example:
+/// Represents a textual expression in the Common Expression Language (CEL)
+/// syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+/// are documented at https://github.com/google/cel-spec.
+/// 
+/// Example (Comparison):
 /// 
 /// ````text
-/// title: "User account presence"
-/// description: "Determines whether the request has a user account"
-/// expression: "size(request.user) > 0"
+/// title: "Summary size limit"
+/// description: "Determines if a summary is less than 100 chars"
+/// expression: "document.summary.size() < 100"
 /// ````
+/// 
+/// Example (Equality):
+/// 
+/// ````text
+/// title: "Requestor is owner"
+/// description: "Determines if requestor is the document owner"
+/// expression: "document.owner == request.auth.claims.email"
+/// ````
+/// 
+/// Example (Logic):
+/// 
+/// ````text
+/// title: "Public documents"
+/// description: "Determine whether the document should be publicly visible"
+/// expression: "document.type != 'private' && document.type != 'internal'"
+/// ````
+/// 
+/// Example (Data Manipulation):
+/// 
+/// ````text
+/// title: "Notification string"
+/// description: "Create a notification string with a timestamp."
+/// expression: "'New message received at ' + string(document.create_time)"
+/// ````
+/// 
+/// The exact variables and functions that may be referenced within an expression
+/// are determined by the service that evaluates it. See the service
+/// documentation for additional information.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
-    /// An optional description of the expression. This is a longer text which
+    /// Optional. Description of the expression. This is a longer text which
     /// describes the expression, e.g. when hovered over it in a UI.
     pub description: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
+    /// Textual representation of an expression in Common Expression Language
+    /// syntax.
     pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error
+    /// Optional. String indicating the location of the expression for error
     /// reporting, e.g. a file name and a position in the file.
     pub location: Option<String>,
-    /// An optional title for the expression, i.e. a short string describing
+    /// Optional. Title for the expression, i.e. a short string describing
     /// its purpose. This can be used e.g. in UIs which allow to enter the
     /// expression.
     pub title: Option<String>,
@@ -1162,6 +1281,47 @@ pub struct MessageStoragePolicy {
 impl Part for MessageStoragePolicy {}
 
 
+/// Dead lettering is done on a best effort basis. The same message might be
+/// dead lettered multiple times.
+/// 
+/// If validation on any of the fields fails at subscription creation/updation,
+/// the create/update subscription request will fail.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeadLetterPolicy {
+    /// The name of the topic to which dead letter messages should be published.
+    /// Format is `projects/{project}/topics/{topic}`.The Cloud Pub/Sub service
+    /// account associated with the enclosing subscription's parent project (i.e.,
+    /// service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com) must have
+    /// permission to Publish() to this topic.
+    /// 
+    /// The operation will fail if the topic does not exist.
+    /// Users should ensure that there is a subscription attached to this topic
+    /// since messages published to a topic with no subscriptions are lost.
+    #[serde(rename="deadLetterTopic")]
+    pub dead_letter_topic: Option<String>,
+    /// The maximum number of delivery attempts for any message. The value must be
+    /// between 5 and 100.
+    /// 
+    /// The number of delivery attempts is defined as 1 + (the sum of number of
+    /// NACKs and number of times the acknowledgement deadline has been exceeded
+    /// for the message).
+    /// 
+    /// A NACK is any call to ModifyAckDeadline with a 0 deadline. Note that
+    /// client libraries may automatically extend ack_deadlines.
+    /// 
+    /// This field will be honored on a best effort basis.
+    /// 
+    /// If this parameter is 0, a default value of 5 is used.
+    #[serde(rename="maxDeliveryAttempts")]
+    pub max_delivery_attempts: Option<i32>,
+}
+
+impl Part for DeadLetterPolicy {}
+
+
 /// A policy that specifies the conditions for resource expiration (i.e.,
 /// automatic resource deletion).
 /// 
@@ -1181,48 +1341,45 @@ pub struct ExpirationPolicy {
 impl Part for ExpirationPolicy {}
 
 
-/// Associates `members` with a `role`.
+/// Configuration for a push delivery endpoint.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Binding {
-    /// Role that is assigned to `members`.
-    /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
-    pub role: Option<String>,
-    /// The condition that is associated with this binding.
-    /// NOTE: An unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
-    pub condition: Option<Expr>,
-    /// Specifies the identities requesting access for a Cloud Platform resource.
-    /// `members` can have the following values:
+pub struct PushConfig {
+    /// Endpoint configuration attributes that can be used to control different
+    /// aspects of the message delivery.
     /// 
-    /// * `allUsers`: A special identifier that represents anyone who is
-    ///    on the internet; with or without a Google account.
+    /// The only currently supported attribute is `x-goog-version`, which you can
+    /// use to change the format of the pushed message. This attribute
+    /// indicates the version of the data expected by the endpoint. This
+    /// controls the shape of the pushed message (i.e., its fields and metadata).
     /// 
-    /// * `allAuthenticatedUsers`: A special identifier that represents anyone
-    ///    who is authenticated with a Google account or a service account.
+    /// If not present during the `CreateSubscription` call, it will default to
+    /// the version of the Pub/Sub API used to make such call. If not present in a
+    /// `ModifyPushConfig` call, its value will not be changed. `GetSubscription`
+    /// calls will always return a valid version, even if the subscription was
+    /// created without this attribute.
     /// 
-    /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` .
+    /// The only supported values for the `x-goog-version` attribute are:
     /// 
+    /// * `v1beta1`: uses the push format defined in the v1beta1 Pub/Sub API.
+    /// * `v1` or `v1beta2`: uses the push format defined in the v1 Pub/Sub API.
     /// 
-    /// * `serviceAccount:{emailid}`: An email address that represents a service
-    ///    account. For example, `my-other-app@appspot.gserviceaccount.com`.
-    /// 
-    /// * `group:{emailid}`: An email address that represents a Google group.
-    ///    For example, `admins@example.com`.
-    /// 
-    /// 
-    /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
-    ///    users of that domain. For example, `google.com` or `example.com`.
-    /// 
-    /// 
-    pub members: Option<Vec<String>>,
+    /// For example:
+    /// <pre><code>attributes { "x-goog-version": "v1" } </code></pre>
+    pub attributes: Option<HashMap<String, String>>,
+    /// If specified, Pub/Sub will generate and attach an OIDC JWT token as an
+    /// `Authorization` header in the HTTP request for every pushed message.
+    #[serde(rename="oidcToken")]
+    pub oidc_token: Option<OidcToken>,
+    /// A URL locating the endpoint to which messages should be pushed.
+    /// For example, a Webhook endpoint might use "https://example.com/push".
+    #[serde(rename="pushEndpoint")]
+    pub push_endpoint: Option<String>,
 }
 
-impl Part for Binding {}
+impl Part for PushConfig {}
 
 
 /// Request for the `CreateSnapshot` method.
@@ -1239,7 +1396,7 @@ pub struct CreateSnapshotRequest {
     /// See <a href="https://cloud.google.com/pubsub/docs/labels"> Creating and
     /// managing labels</a>.
     pub labels: Option<HashMap<String, String>>,
-    /// The subscription whose backlog the snapshot retains.
+    /// Required. The subscription whose backlog the snapshot retains.
     /// Specifically, the created snapshot is guaranteed to retain:
     /// (a) The existing backlog on the subscription. More precisely, this is
     /// defined as the messages in the subscription's backlog that are
@@ -1270,7 +1427,7 @@ pub struct Topic {
     /// See <a href="https://cloud.google.com/pubsub/docs/labels"> Creating and
     /// managing labels</a>.
     pub labels: Option<HashMap<String, String>>,
-    /// The name of the topic. It must have the format
+    /// Required. The name of the topic. It must have the format
     /// `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
     /// and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),
     /// underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent
@@ -1305,11 +1462,11 @@ impl ResponseResult for Topic {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UpdateSubscriptionRequest {
-    /// Indicates which fields in the provided subscription to update.
+    /// Required. Indicates which fields in the provided subscription to update.
     /// Must be specified and non-empty.
     #[serde(rename="updateMask")]
     pub update_mask: Option<String>,
-    /// The updated subscription object.
+    /// Required. The updated subscription object.
     pub subscription: Option<Subscription>,
 }
 
@@ -1327,9 +1484,9 @@ impl RequestValue for UpdateSubscriptionRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UpdateSnapshotRequest {
-    /// The updated snapshot object.
+    /// Required. The updated snapshot object.
     pub snapshot: Option<Snapshot>,
-    /// Indicates which fields in the provided snapshot to update.
+    /// Required. Indicates which fields in the provided snapshot to update.
     /// Must be specified and non-empty.
     #[serde(rename="updateMask")]
     pub update_mask: Option<String>,
@@ -1351,7 +1508,8 @@ impl RequestValue for UpdateSnapshotRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PubsubMessage {
-    /// Optional attributes for this message.
+    /// Attributes for this message. If this field is empty, the message must
+    /// contain non-empty data.
     pub attributes: Option<HashMap<String, String>>,
     /// The message data field. If this field is empty, the message must contain
     /// at least one attribute.
@@ -1422,7 +1580,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `project` - The name of the project in which to list subscriptions.
+    /// * `project` - Required. The name of the project in which to list subscriptions.
     ///               Format is `projects/{project-id}`.
     pub fn subscriptions_list(&self, project: &str) -> ProjectSubscriptionListCall<'a, C, A> {
         ProjectSubscriptionListCall {
@@ -1445,7 +1603,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the topic. It must have the format
+    /// * `name` - Required. The name of the topic. It must have the format
     ///            `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
     ///            and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),
     ///            underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent
@@ -1549,7 +1707,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `subscription` - The subscription from which messages should be pulled.
+    /// * `subscription` - Required. The subscription from which messages should be pulled.
     ///                    Format is `projects/{project}/subscriptions/{sub}`.
     pub fn subscriptions_pull(&self, request: PullRequest, subscription: &str) -> ProjectSubscriptionPullCall<'a, C, A> {
         ProjectSubscriptionPullCall {
@@ -1574,7 +1732,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `subscription` - The name of the subscription.
+    /// * `subscription` - Required. The name of the subscription.
     ///                    Format is `projects/{project}/subscriptions/{sub}`.
     pub fn subscriptions_modify_push_config(&self, request: ModifyPushConfigRequest, subscription: &str) -> ProjectSubscriptionModifyPushConfigCall<'a, C, A> {
         ProjectSubscriptionModifyPushConfigCall {
@@ -1601,6 +1759,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectSnapshotGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1618,7 +1777,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `subscription` - The name of the subscription.
+    /// * `subscription` - Required. The name of the subscription.
     ///                    Format is `projects/{project}/subscriptions/{sub}`.
     pub fn subscriptions_modify_ack_deadline(&self, request: ModifyAckDeadlineRequest, subscription: &str) -> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> {
         ProjectSubscriptionModifyAckDeadlineCall {
@@ -1645,6 +1804,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectTopicGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1664,7 +1824,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `subscription` - The subscription whose message is being acknowledged.
+    /// * `subscription` - Required. The subscription whose message is being acknowledged.
     ///                    Format is `projects/{project}/subscriptions/{sub}`.
     pub fn subscriptions_acknowledge(&self, request: AcknowledgeRequest, subscription: &str) -> ProjectSubscriptionAcknowledgeCall<'a, C, A> {
         ProjectSubscriptionAcknowledgeCall {
@@ -1687,7 +1847,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `subscription` - The subscription to delete.
+    /// * `subscription` - Required. The subscription to delete.
     ///                    Format is `projects/{project}/subscriptions/{sub}`.
     pub fn subscriptions_delete(&self, subscription: &str) -> ProjectSubscriptionDeleteCall<'a, C, A> {
         ProjectSubscriptionDeleteCall {
@@ -1709,7 +1869,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `snapshot` - The name of the snapshot to get.
+    /// * `snapshot` - Required. The name of the snapshot to get.
     ///                Format is `projects/{project}/snapshots/{snap}`.
     pub fn snapshots_get(&self, snapshot: &str) -> ProjectSnapshotGetCall<'a, C, A> {
         ProjectSnapshotGetCall {
@@ -1735,6 +1895,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectSubscriptionGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1747,7 +1908,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `project` - The name of the project in which to list topics.
+    /// * `project` - Required. The name of the project in which to list topics.
     ///               Format is `projects/{project-id}`.
     pub fn topics_list(&self, project: &str) -> ProjectTopicListCall<'a, C, A> {
         ProjectTopicListCall {
@@ -1793,7 +1954,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `topic` - The messages in the request will be published on this topic.
+    /// * `topic` - Required. The messages in the request will be published on this topic.
     ///             Format is `projects/{project}/topics/{topic}`.
     pub fn topics_publish(&self, request: PublishRequest, topic: &str) -> ProjectTopicPublishCall<'a, C, A> {
         ProjectTopicPublishCall {
@@ -1812,7 +1973,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `topic` - The name of the topic to get.
+    /// * `topic` - Required. The name of the topic to get.
     ///             Format is `projects/{project}/topics/{topic}`.
     pub fn topics_get(&self, topic: &str) -> ProjectTopicGetCall<'a, C, A> {
         ProjectTopicGetCall {
@@ -1839,7 +2000,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `snapshot` - The name of the snapshot to delete.
+    /// * `snapshot` - Required. The name of the snapshot to delete.
     ///                Format is `projects/{project}/snapshots/{snap}`.
     pub fn snapshots_delete(&self, snapshot: &str) -> ProjectSnapshotDeleteCall<'a, C, A> {
         ProjectSnapshotDeleteCall {
@@ -1855,6 +2016,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
+    /// 
+    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
     /// 
     /// # Arguments
     ///
@@ -1880,7 +2043,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the topic. It must have the format
+    /// * `name` - Required. The name of the topic. It must have the format
     ///            `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
     ///            and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),
     ///            underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent
@@ -1916,7 +2079,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the subscription. It must have the format
+    /// * `name` - Required. The name of the subscription. It must have the format
     ///            `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
     ///            start with a letter, and contain only letters (`[A-Za-z]`), numbers
     ///            (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
@@ -1941,7 +2104,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the subscription. It must have the format
+    /// * `name` - Required. The name of the subscription. It must have the format
     ///            `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
     ///            start with a letter, and contain only letters (`[A-Za-z]`), numbers
     ///            (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
@@ -1982,13 +2145,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Optional user-provided name for this snapshot.
-    ///            If the name is not provided in the request, the server will assign a random
-    ///            name for this snapshot on the same project as the subscription.
-    ///            Note that for REST API requests, you must specify a name.  See the
-    ///            <a href="https://cloud.google.com/pubsub/docs/admin#resource_names">
-    ///            resource name rules</a>.
-    ///            Format is `projects/{project}/snapshots/{snap}`.
+    /// * `name` - Required. User-provided name for this snapshot. If the name is not provided in the
+    ///            request, the server will assign a random name for this snapshot on the same
+    ///            project as the subscription. Note that for REST API requests, you must
+    ///            specify a name.  See the <a
+    ///            href="https://cloud.google.com/pubsub/docs/admin#resource_names"> resource
+    ///            name rules</a>. Format is `projects/{project}/snapshots/{snap}`.
     pub fn snapshots_create(&self, request: CreateSnapshotRequest, name: &str) -> ProjectSnapshotCreateCall<'a, C, A> {
         ProjectSnapshotCreateCall {
             hub: self.hub,
@@ -2010,7 +2172,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `topic` - Name of the topic to delete.
+    /// * `topic` - Required. Name of the topic to delete.
     ///             Format is `projects/{project}/topics/{topic}`.
     pub fn topics_delete(&self, topic: &str) -> ProjectTopicDeleteCall<'a, C, A> {
         ProjectTopicDeleteCall {
@@ -2033,7 +2195,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `project` - The name of the project in which to list snapshots.
+    /// * `project` - Required. The name of the project in which to list snapshots.
     ///               Format is `projects/{project-id}`.
     pub fn snapshots_list(&self, project: &str) -> ProjectSnapshotListCall<'a, C, A> {
         ProjectSnapshotListCall {
@@ -2051,6 +2213,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
+    /// 
+    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
     /// 
     /// # Arguments
     ///
@@ -2082,7 +2246,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `subscription` - The subscription to affect.
+    /// * `subscription` - Required. The subscription to affect.
     pub fn subscriptions_seek(&self, request: SeekRequest, subscription: &str) -> ProjectSubscriptionSeekCall<'a, C, A> {
         ProjectSubscriptionSeekCall {
             hub: self.hub,
@@ -2100,7 +2264,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `subscription` - The name of the subscription to get.
+    /// * `subscription` - Required. The name of the subscription to get.
     ///                    Format is `projects/{project}/subscriptions/{sub}`.
     pub fn subscriptions_get(&self, subscription: &str) -> ProjectSubscriptionGetCall<'a, C, A> {
         ProjectSubscriptionGetCall {
@@ -2118,7 +2282,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `topic` - The name of the topic that subscriptions are attached to.
+    /// * `topic` - Required. The name of the topic that subscriptions are attached to.
     ///             Format is `projects/{project}/topics/{topic}`.
     pub fn topics_subscriptions_list(&self, topic: &str) -> ProjectTopicSubscriptionListCall<'a, C, A> {
         ProjectTopicSubscriptionListCall {
@@ -2143,7 +2307,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `topic` - The name of the topic that snapshots are attached to.
+    /// * `topic` - Required. The name of the topic that snapshots are attached to.
     ///             Format is `projects/{project}/topics/{topic}`.
     pub fn topics_snapshots_list(&self, topic: &str) -> ProjectTopicSnapshotListCall<'a, C, A> {
         ProjectTopicSnapshotListCall {
@@ -2161,6 +2325,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
+    /// 
+    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
     /// 
     /// # Arguments
     ///
@@ -2215,8 +2381,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().subscriptions_list("project")
-///              .page_token("et")
-///              .page_size(-18)
+///              .page_token("accusam")
+///              .page_size(-8)
 ///              .doit();
 /// # }
 /// ```
@@ -2372,7 +2538,7 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    /// The name of the project in which to list subscriptions.
+    /// Required. The name of the project in which to list subscriptions.
     /// Format is `projects/{project-id}`.
     ///
     /// Sets the *project* path property to the given value.
@@ -2670,7 +2836,7 @@ impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._request = new_value;
         self
     }
-    /// The name of the topic. It must have the format
+    /// Required. The name of the topic. It must have the format
     /// `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
     /// and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),
     /// underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent
@@ -3814,7 +3980,7 @@ impl<'a, C, A> ProjectSubscriptionPullCall<'a, C, A> where C: BorrowMut<hyper::C
         self._request = new_value;
         self
     }
-    /// The subscription from which messages should be pulled.
+    /// Required. The subscription from which messages should be pulled.
     /// Format is `projects/{project}/subscriptions/{sub}`.
     ///
     /// Sets the *subscription* path property to the given value.
@@ -4099,7 +4265,7 @@ impl<'a, C, A> ProjectSubscriptionModifyPushConfigCall<'a, C, A> where C: Borrow
         self._request = new_value;
         self
     }
-    /// The name of the subscription.
+    /// Required. The name of the subscription.
     /// Format is `projects/{project}/subscriptions/{sub}`.
     ///
     /// Sets the *subscription* path property to the given value.
@@ -4203,6 +4369,7 @@ impl<'a, C, A> ProjectSubscriptionModifyPushConfigCall<'a, C, A> where C: Borrow
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().snapshots_get_iam_policy("resource")
+///              .options_requested_policy_version(-61)
 ///              .doit();
 /// # }
 /// ```
@@ -4211,6 +4378,7 @@ pub struct ProjectSnapshotGetIamPolicyCall<'a, C, A>
 
     hub: &'a Pubsub<C, A>,
     _resource: String,
+    _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -4233,9 +4401,12 @@ impl<'a, C, A> ProjectSnapshotGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.snapshots.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        if let Some(value) = self._options_requested_policy_version {
+            params.push(("options.requestedPolicyVersion", value.to_string()));
+        }
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4359,6 +4530,20 @@ impl<'a, C, A> ProjectSnapshotGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
     /// we provide this method for API completeness.
     pub fn resource(mut self, new_value: &str) -> ProjectSnapshotGetIamPolicyCall<'a, C, A> {
         self._resource = new_value.to_string();
+        self
+    }
+    /// Optional. The policy format version to be returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectSnapshotGetIamPolicyCall<'a, C, A> {
+        self._options_requested_policy_version = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -4634,7 +4819,7 @@ impl<'a, C, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> where C: Borro
         self._request = new_value;
         self
     }
-    /// The name of the subscription.
+    /// Required. The name of the subscription.
     /// Format is `projects/{project}/subscriptions/{sub}`.
     ///
     /// Sets the *subscription* path property to the given value.
@@ -4738,6 +4923,7 @@ impl<'a, C, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> where C: Borro
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().topics_get_iam_policy("resource")
+///              .options_requested_policy_version(-66)
 ///              .doit();
 /// # }
 /// ```
@@ -4746,6 +4932,7 @@ pub struct ProjectTopicGetIamPolicyCall<'a, C, A>
 
     hub: &'a Pubsub<C, A>,
     _resource: String,
+    _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -4768,9 +4955,12 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.topics.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        if let Some(value) = self._options_requested_policy_version {
+            params.push(("options.requestedPolicyVersion", value.to_string()));
+        }
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4894,6 +5084,20 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     /// we provide this method for API completeness.
     pub fn resource(mut self, new_value: &str) -> ProjectTopicGetIamPolicyCall<'a, C, A> {
         self._resource = new_value.to_string();
+        self
+    }
+    /// Optional. The policy format version to be returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectTopicGetIamPolicyCall<'a, C, A> {
+        self._options_requested_policy_version = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5171,7 +5375,7 @@ impl<'a, C, A> ProjectSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<h
         self._request = new_value;
         self
     }
-    /// The subscription whose message is being acknowledged.
+    /// Required. The subscription whose message is being acknowledged.
     /// Format is `projects/{project}/subscriptions/{sub}`.
     ///
     /// Sets the *subscription* path property to the given value.
@@ -5424,7 +5628,7 @@ impl<'a, C, A> ProjectSubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// The subscription to delete.
+    /// Required. The subscription to delete.
     /// Format is `projects/{project}/subscriptions/{sub}`.
     ///
     /// Sets the *subscription* path property to the given value.
@@ -5677,7 +5881,7 @@ impl<'a, C, A> ProjectSnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// The name of the snapshot to get.
+    /// Required. The name of the snapshot to get.
     /// Format is `projects/{project}/snapshots/{snap}`.
     ///
     /// Sets the *snapshot* path property to the given value.
@@ -5781,6 +5985,7 @@ impl<'a, C, A> ProjectSnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().subscriptions_get_iam_policy("resource")
+///              .options_requested_policy_version(-17)
 ///              .doit();
 /// # }
 /// ```
@@ -5789,6 +5994,7 @@ pub struct ProjectSubscriptionGetIamPolicyCall<'a, C, A>
 
     hub: &'a Pubsub<C, A>,
     _resource: String,
+    _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5811,9 +6017,12 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.subscriptions.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        if let Some(value) = self._options_requested_policy_version {
+            params.push(("options.requestedPolicyVersion", value.to_string()));
+        }
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5939,6 +6148,20 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
         self._resource = new_value.to_string();
         self
     }
+    /// Optional. The policy format version to be returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectSubscriptionGetIamPolicyCall<'a, C, A> {
+        self._options_requested_policy_version = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -6030,8 +6253,8 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().topics_list("project")
-///              .page_token("no")
-///              .page_size(-21)
+///              .page_token("ipsum")
+///              .page_size(-5)
 ///              .doit();
 /// # }
 /// ```
@@ -6187,7 +6410,7 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// The name of the project in which to list topics.
+    /// Required. The name of the project in which to list topics.
     /// Format is `projects/{project-id}`.
     ///
     /// Sets the *project* path property to the given value.
@@ -6768,7 +6991,7 @@ impl<'a, C, A> ProjectTopicPublishCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._request = new_value;
         self
     }
-    /// The messages in the request will be published on this topic.
+    /// Required. The messages in the request will be published on this topic.
     /// Format is `projects/{project}/topics/{topic}`.
     ///
     /// Sets the *topic* path property to the given value.
@@ -7017,7 +7240,7 @@ impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// The name of the topic to get.
+    /// Required. The name of the topic to get.
     /// Format is `projects/{project}/topics/{topic}`.
     ///
     /// Sets the *topic* path property to the given value.
@@ -7275,7 +7498,7 @@ impl<'a, C, A> ProjectSnapshotDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// The name of the snapshot to delete.
+    /// Required. The name of the snapshot to delete.
     /// Format is `projects/{project}/snapshots/{snap}`.
     ///
     /// Sets the *snapshot* path property to the given value.
@@ -7351,6 +7574,8 @@ impl<'a, C, A> ProjectSnapshotDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
+/// 
+/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 ///
 /// A builder for the *topics.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7837,7 +8062,7 @@ impl<'a, C, A> ProjectTopicPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._request = new_value;
         self
     }
-    /// The name of the topic. It must have the format
+    /// Required. The name of the topic. It must have the format
     /// `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
     /// and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),
     /// underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent
@@ -8133,7 +8358,7 @@ impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper:
         self._request = new_value;
         self
     }
-    /// The name of the subscription. It must have the format
+    /// Required. The name of the subscription. It must have the format
     /// `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
     /// start with a letter, and contain only letters (`[A-Za-z]`), numbers
     /// (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
@@ -8418,7 +8643,7 @@ impl<'a, C, A> ProjectSubscriptionPatchCall<'a, C, A> where C: BorrowMut<hyper::
         self._request = new_value;
         self
     }
-    /// The name of the subscription. It must have the format
+    /// Required. The name of the subscription. It must have the format
     /// `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
     /// start with a letter, and contain only letters (`[A-Za-z]`), numbers
     /// (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
@@ -8719,13 +8944,12 @@ impl<'a, C, A> ProjectSnapshotCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._request = new_value;
         self
     }
-    /// Optional user-provided name for this snapshot.
-    /// If the name is not provided in the request, the server will assign a random
-    /// name for this snapshot on the same project as the subscription.
-    /// Note that for REST API requests, you must specify a name.  See the
-    /// <a href="https://cloud.google.com/pubsub/docs/admin#resource_names">
-    /// resource name rules</a>.
-    /// Format is `projects/{project}/snapshots/{snap}`.
+    /// Required. User-provided name for this snapshot. If the name is not provided in the
+    /// request, the server will assign a random name for this snapshot on the same
+    /// project as the subscription. Note that for REST API requests, you must
+    /// specify a name.  See the <a
+    /// href="https://cloud.google.com/pubsub/docs/admin#resource_names"> resource
+    /// name rules</a>. Format is `projects/{project}/snapshots/{snap}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -8977,7 +9201,7 @@ impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// Name of the topic to delete.
+    /// Required. Name of the topic to delete.
     /// Format is `projects/{project}/topics/{topic}`.
     ///
     /// Sets the *topic* path property to the given value.
@@ -9084,8 +9308,8 @@ impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().snapshots_list("project")
-///              .page_token("eos")
-///              .page_size(-81)
+///              .page_token("amet")
+///              .page_size(-60)
 ///              .doit();
 /// # }
 /// ```
@@ -9241,7 +9465,7 @@ impl<'a, C, A> ProjectSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// The name of the project in which to list snapshots.
+    /// Required. The name of the project in which to list snapshots.
     /// Format is `projects/{project-id}`.
     ///
     /// Sets the *project* path property to the given value.
@@ -9333,6 +9557,8 @@ impl<'a, C, A> ProjectSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
+/// 
+/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 ///
 /// A builder for the *snapshots.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9825,7 +10051,7 @@ impl<'a, C, A> ProjectSubscriptionSeekCall<'a, C, A> where C: BorrowMut<hyper::C
         self._request = new_value;
         self
     }
-    /// The subscription to affect.
+    /// Required. The subscription to affect.
     ///
     /// Sets the *subscription* path property to the given value.
     ///
@@ -10073,7 +10299,7 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
-    /// The name of the subscription to get.
+    /// Required. The name of the subscription to get.
     /// Format is `projects/{project}/subscriptions/{sub}`.
     ///
     /// Sets the *subscription* path property to the given value.
@@ -10175,8 +10401,8 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().topics_subscriptions_list("topic")
-///              .page_token("amet")
-///              .page_size(-60)
+///              .page_token("aliquyam")
+///              .page_size(-73)
 ///              .doit();
 /// # }
 /// ```
@@ -10332,7 +10558,7 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
     }
 
 
-    /// The name of the topic that subscriptions are attached to.
+    /// Required. The name of the topic that subscriptions are attached to.
     /// Format is `projects/{project}/topics/{topic}`.
     ///
     /// Sets the *topic* path property to the given value.
@@ -10455,8 +10681,8 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().topics_snapshots_list("topic")
-///              .page_token("eirmod")
-///              .page_size(-33)
+///              .page_token("sea")
+///              .page_size(-21)
 ///              .doit();
 /// # }
 /// ```
@@ -10612,7 +10838,7 @@ impl<'a, C, A> ProjectTopicSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
-    /// The name of the topic that snapshots are attached to.
+    /// Required. The name of the topic that snapshots are attached to.
     /// Format is `projects/{project}/topics/{topic}`.
     ///
     /// Sets the *topic* path property to the given value.
@@ -10704,6 +10930,8 @@ impl<'a, C, A> ProjectTopicSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::
 
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
+/// 
+/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
 ///
 /// A builder for the *subscriptions.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.

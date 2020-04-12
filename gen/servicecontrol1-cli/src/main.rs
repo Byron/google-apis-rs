@@ -161,11 +161,10 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "skip-activation-check" => Some(("skipActivationCheck", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "operation.operation-name" => Some(("operation.operationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "operation.consumer-id" => Some(("operation.consumerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "operation.importance" => Some(("operation.importance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "operation.labels" => Some(("operation.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "operation.quota-properties.quota-mode" => Some(("operation.quotaProperties.quotaMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "operation.resource-container" => Some(("operation.resourceContainer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "operation.consumer-id" => Some(("operation.consumerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "operation.user-labels" => Some(("operation.userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "operation.start-time" => Some(("operation.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "operation.end-time" => Some(("operation.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -173,7 +172,7 @@ impl<'n> Engine<'n> {
                     "service-config-id" => Some(("serviceConfigId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request-project-settings" => Some(("requestProjectSettings", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["consumer-id", "end-time", "importance", "labels", "operation", "operation-id", "operation-name", "quota-mode", "quota-properties", "request-project-settings", "resource-container", "service-config-id", "skip-activation-check", "start-time", "user-labels"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["consumer-id", "end-time", "importance", "labels", "operation", "operation-id", "operation-name", "quota-mode", "quota-properties", "request-project-settings", "service-config-id", "skip-activation-check", "start-time", "user-labels"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -525,7 +524,8 @@ fn main() {
         the aggregation time window to avoid data loss risk more than 0.01%
         for business and compliance reasons.
         
-        NOTE: the ReportRequest has the size limit of 1MB.
+        NOTE: the ReportRequest has the size limit (wire-format byte size) of
+        1MB.
         
         This method requires the `servicemanagement.services.report` permission
         on the specified service. For more information, see
@@ -567,7 +567,7 @@ fn main() {
     
     let mut app = App::new("servicecontrol1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190622")
+           .version("1.0.13+20200407")
            .about("Provides control plane functionality to managed services, such as logging, monitoring, and status checks.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_servicecontrol1_cli")
            .arg(Arg::with_name("url")

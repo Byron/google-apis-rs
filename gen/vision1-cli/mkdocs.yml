@@ -1,4 +1,4 @@
-site_name: Vision v1.0.12+20190628
+site_name: Vision v1.0.13+20200329
 site_url: http://byron.github.io/google-apis-rs/google-vision1-cli
 site_description: A complete library to interact with Vision (protocol v1)
 
@@ -18,6 +18,14 @@ pages:
 - ['operations_delete.md', 'Operations', 'Delete']
 - ['operations_get.md', 'Operations', 'Get']
 - ['operations_list.md', 'Operations', 'List']
+- ['projects_files-annotate.md', 'Projects', 'Files Annotate']
+- ['projects_files-async-batch-annotate.md', 'Projects', 'Files Async Batch Annotate']
+- ['projects_images-annotate.md', 'Projects', 'Images Annotate']
+- ['projects_images-async-batch-annotate.md', 'Projects', 'Images Async Batch Annotate']
+- ['projects_locations-files-annotate.md', 'Projects', 'Locations Files Annotate']
+- ['projects_locations-files-async-batch-annotate.md', 'Projects', 'Locations Files Async Batch Annotate']
+- ['projects_locations-images-annotate.md', 'Projects', 'Locations Images Annotate']
+- ['projects_locations-images-async-batch-annotate.md', 'Projects', 'Locations Images Async Batch Annotate']
 - ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
 - ['projects_locations-product-sets-add-product.md', 'Projects', 'Locations Product Sets Add Product']
 - ['projects_locations-product-sets-create.md', 'Projects', 'Locations Product Sets Create']
@@ -33,6 +41,7 @@ pages:
 - ['projects_locations-products-get.md', 'Projects', 'Locations Products Get']
 - ['projects_locations-products-list.md', 'Projects', 'Locations Products List']
 - ['projects_locations-products-patch.md', 'Projects', 'Locations Products Patch']
+- ['projects_locations-products-purge.md', 'Projects', 'Locations Products Purge']
 - ['projects_locations-products-reference-images-create.md', 'Projects', 'Locations Products Reference Images Create']
 - ['projects_locations-products-reference-images-delete.md', 'Projects', 'Locations Products Reference Images Delete']
 - ['projects_locations-products-reference-images-get.md', 'Projects', 'Locations Products Reference Images Get']

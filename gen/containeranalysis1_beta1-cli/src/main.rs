@@ -170,6 +170,7 @@ impl<'n> Engine<'n> {
                     "vulnerability.cvss-v3.confidentiality-impact" => Some(("vulnerability.cvssV3.confidentialityImpact", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-score" => Some(("vulnerability.cvssScore", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "vulnerability.severity" => Some(("vulnerability.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.source-update-time" => Some(("vulnerability.sourceUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deployable.resource-uri" => Some(("deployable.resourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "attestation-authority.hint.human-readable-name" => Some(("attestationAuthority.hint.humanReadableName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -188,7 +189,7 @@ impl<'n> Engine<'n> {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "discovery.analysis-kind" => Some(("discovery.analysisKind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-kind", "attack-complexity", "attack-vector", "attestation-authority", "availability-impact", "base-image", "base-score", "build", "builder-version", "confidentiality-impact", "create-time", "cvss-score", "cvss-v3", "deployable", "discovery", "expiration-time", "exploitability-score", "fingerprint", "hint", "human-readable-name", "impact-score", "integrity-impact", "key-id", "key-type", "kind", "long-description", "name", "package", "privileges-required", "public-key", "related-note-names", "resource-uri", "resource-url", "scope", "severity", "short-description", "signature", "update-time", "user-interaction", "v1-name", "v2-blob", "v2-name", "vulnerability"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-kind", "attack-complexity", "attack-vector", "attestation-authority", "availability-impact", "base-image", "base-score", "build", "builder-version", "confidentiality-impact", "create-time", "cvss-score", "cvss-v3", "deployable", "discovery", "expiration-time", "exploitability-score", "fingerprint", "hint", "human-readable-name", "impact-score", "integrity-impact", "key-id", "key-type", "kind", "long-description", "name", "package", "privileges-required", "public-key", "related-note-names", "resource-uri", "resource-url", "scope", "severity", "short-description", "signature", "source-update-time", "update-time", "user-interaction", "v1-name", "v2-blob", "v2-name", "vulnerability"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -379,8 +380,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "options.requested-policy-version" => Some(("options.requestedPolicyVersion", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["options", "requested-policy-version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -604,6 +606,7 @@ impl<'n> Engine<'n> {
                     "vulnerability.cvss-v3.confidentiality-impact" => Some(("vulnerability.cvssV3.confidentialityImpact", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cvss-score" => Some(("vulnerability.cvssScore", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "vulnerability.severity" => Some(("vulnerability.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.source-update-time" => Some(("vulnerability.sourceUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deployable.resource-uri" => Some(("deployable.resourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "attestation-authority.hint.human-readable-name" => Some(("attestationAuthority.hint.humanReadableName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -622,7 +625,7 @@ impl<'n> Engine<'n> {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "discovery.analysis-kind" => Some(("discovery.analysisKind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-kind", "attack-complexity", "attack-vector", "attestation-authority", "availability-impact", "base-image", "base-score", "build", "builder-version", "confidentiality-impact", "create-time", "cvss-score", "cvss-v3", "deployable", "discovery", "expiration-time", "exploitability-score", "fingerprint", "hint", "human-readable-name", "impact-score", "integrity-impact", "key-id", "key-type", "kind", "long-description", "name", "package", "privileges-required", "public-key", "related-note-names", "resource-uri", "resource-url", "scope", "severity", "short-description", "signature", "update-time", "user-interaction", "v1-name", "v2-blob", "v2-name", "vulnerability"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-kind", "attack-complexity", "attack-vector", "attestation-authority", "availability-impact", "base-image", "base-score", "build", "builder-version", "confidentiality-impact", "create-time", "cvss-score", "cvss-v3", "deployable", "discovery", "expiration-time", "exploitability-score", "fingerprint", "hint", "human-readable-name", "impact-score", "integrity-impact", "key-id", "key-type", "kind", "long-description", "name", "package", "privileges-required", "public-key", "related-note-names", "resource-uri", "resource-url", "scope", "severity", "short-description", "signature", "source-update-time", "update-time", "user-interaction", "v1-name", "v2-blob", "v2-name", "vulnerability"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -711,9 +714,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "update-mask", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1218,8 +1220,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "options.requested-policy-version" => Some(("options.requestedPolicyVersion", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["options", "requested-policy-version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1627,9 +1630,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "update-mask", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2154,7 +2156,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the project in the form of `projects/[PROJECT_ID]`, under which
+                     Some(r##"Required. The name of the project in the form of `projects/[PROJECT_ID]`, under which
         the notes are to be created."##),
                      Some(true),
                      Some(false)),
@@ -2183,7 +2185,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the project in the form of `projects/[PROJECT_ID]`, under which
+                     Some(r##"Required. The name of the project in the form of `projects/[PROJECT_ID]`, under which
         the note is to be created."##),
                      Some(true),
                      Some(false)),
@@ -2212,7 +2214,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the note in the form of
+                     Some(r##"Required. The name of the note in the form of
         `projects/[PROVIDER_ID]/notes/[NOTE_ID]`."##),
                      Some(true),
                      Some(false)),
@@ -2235,7 +2237,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the note in the form of
+                     Some(r##"Required. The name of the note in the form of
         `projects/[PROVIDER_ID]/notes/[NOTE_ID]`."##),
                      Some(true),
                      Some(false)),
@@ -2294,7 +2296,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the project to list notes for in the form of
+                     Some(r##"Required. The name of the project to list notes for in the form of
         `projects/[PROJECT_ID]`."##),
                      Some(true),
                      Some(false)),
@@ -2319,7 +2321,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the note to list occurrences for in the form of
+                     Some(r##"Required. The name of the note to list occurrences for in the form of
         `projects/[PROVIDER_ID]/notes/[NOTE_ID]`."##),
                      Some(true),
                      Some(false)),
@@ -2342,7 +2344,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the note in the form of
+                     Some(r##"Required. The name of the note in the form of
         `projects/[PROVIDER_ID]/notes/[NOTE_ID]`."##),
                      Some(true),
                      Some(false)),
@@ -2442,7 +2444,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the project in the form of `projects/[PROJECT_ID]`, under which
+                     Some(r##"Required. The name of the project in the form of `projects/[PROJECT_ID]`, under which
         the occurrences are to be created."##),
                      Some(true),
                      Some(false)),
@@ -2471,7 +2473,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the project in the form of `projects/[PROJECT_ID]`, under which
+                     Some(r##"Required. The name of the project in the form of `projects/[PROJECT_ID]`, under which
         the occurrence is to be created."##),
                      Some(true),
                      Some(false)),
@@ -2502,7 +2504,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the occurrence in the form of
+                     Some(r##"Required. The name of the occurrence in the form of
         `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`."##),
                      Some(true),
                      Some(false)),
@@ -2525,7 +2527,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the occurrence in the form of
+                     Some(r##"Required. The name of the occurrence in the form of
         `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`."##),
                      Some(true),
                      Some(false)),
@@ -2585,7 +2587,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the occurrence in the form of
+                     Some(r##"Required. The name of the occurrence in the form of
         `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`."##),
                      Some(true),
                      Some(false)),
@@ -2608,7 +2610,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the project to get a vulnerability summary for in the form of
+                     Some(r##"Required. The name of the project to get a vulnerability summary for in the form of
         `projects/[PROJECT_ID]`."##),
                      Some(true),
                      Some(false)),
@@ -2631,7 +2633,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the project to list occurrences for in the form of
+                     Some(r##"Required. The name of the project to list occurrences for in the form of
         `projects/[PROJECT_ID]`."##),
                      Some(true),
                      Some(false)),
@@ -2654,7 +2656,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the occurrence in the form of
+                     Some(r##"Required. The name of the occurrence in the form of
         `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`."##),
                      Some(true),
                      Some(false)),
@@ -2754,7 +2756,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the scan configuration in the form of
+                     Some(r##"Required. The name of the scan configuration in the form of
         `projects/[PROJECT_ID]/scanConfigs/[SCAN_CONFIG_ID]`."##),
                      Some(true),
                      Some(false)),
@@ -2777,7 +2779,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the project to list scan configurations for in the form of
+                     Some(r##"Required. The name of the project to list scan configurations for in the form of
         `projects/[PROJECT_ID]`."##),
                      Some(true),
                      Some(false)),
@@ -2800,7 +2802,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the scan configuration in the form of
+                     Some(r##"Required. The name of the scan configuration in the form of
         `projects/[PROJECT_ID]/scanConfigs/[SCAN_CONFIG_ID]`."##),
                      Some(true),
                      Some(false)),
@@ -2829,7 +2831,7 @@ fn main() {
     
     let mut app = App::new("containeranalysis1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190625")
+           .version("1.0.13+20200327")
            .about("An implementation of the Grafeas API, which stores, and enables querying and retrieval of critical metadata about all of your software artifacts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_containeranalysis1_beta1_cli")
            .arg(Arg::with_name("url")

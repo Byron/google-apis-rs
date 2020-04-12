@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Speech* crate version *1.0.12+20190627*, where *20190627* is the exact revision of the *speech:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Speech* crate version *1.0.13+20200406*, where *20200406* is the exact revision of the *speech:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Speech* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/speech-to-text/docs/quickstart-protocol).
@@ -332,7 +332,7 @@ impl<'a, C, A> Speech<C, A>
         Speech {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://speech.googleapis.com/".to_string(),
             _root_url: "https://speech.googleapis.com/".to_string(),
         }
@@ -349,7 +349,7 @@ impl<'a, C, A> Speech<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -377,32 +377,6 @@ impl<'a, C, A> Speech<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// The `Status` type defines a logical error model that is suitable for
-/// different programming environments, including REST APIs and RPC APIs. It is
-/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
-/// three pieces of data: error code, error message, and error details.
-/// 
-/// You can find out more about this error model and how to work with it in the
-/// [API Design Guide](https://cloud.google.com/apis/design/errors).
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Status {
-    /// A developer-facing error message, which should be in English. Any
-    /// user-facing error message should be localized and sent in the
-    /// google.rpc.Status.details field, or localized by the client.
-    pub message: Option<String>,
-    /// The status code, which should be an enum value of google.rpc.Code.
-    pub code: Option<i32>,
-    /// A list of messages that carry the error details.  There is a common set of
-    /// message types for APIs to use.
-    pub details: Option<Vec<HashMap<String, String>>>,
-}
-
-impl Part for Status {}
-
-
 /// A speech recognition result corresponding to a portion of the audio.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -414,7 +388,7 @@ pub struct SpeechRecognitionResult {
     /// For audio_channel_count = N, its output values can range from '1' to 'N'.
     #[serde(rename="channelTag")]
     pub channel_tag: Option<i32>,
-    /// Output only. May contain one or more recognition hypotheses (up to the
+    /// May contain one or more recognition hypotheses (up to the
     /// maximum specified in `max_alternatives`).
     /// These alternatives are ordered in terms of accuracy, with the top (first)
     /// alternative being the most probable, as ranked by the recognizer.
@@ -437,7 +411,7 @@ impl Part for SpeechRecognitionResult {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RecognizeResponse {
-    /// Output only. Sequential list of transcription results corresponding to
+    /// Sequential list of transcription results corresponding to
     /// sequential portions of audio.
     pub results: Option<Vec<SpeechRecognitionResult>>,
 }
@@ -445,32 +419,79 @@ pub struct RecognizeResponse {
 impl ResponseResult for RecognizeResponse {}
 
 
-/// The response message for Operations.ListOperations.
+/// Description of audio data to be recognized.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list operations](struct.OperationListCall.html) (response)
-/// * [locations operations list projects](struct.ProjectLocationOperationListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListOperationsResponse {
-    /// The standard List next-page token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// A list of operations that matches the specified filter in the request.
-    pub operations: Option<Vec<Operation>>,
+pub struct RecognitionMetadata {
+    /// The type of device the speech was recorded with.
+    #[serde(rename="recordingDeviceType")]
+    pub recording_device_type: Option<String>,
+    /// The original media the speech was recorded on.
+    #[serde(rename="originalMediaType")]
+    pub original_media_type: Option<String>,
+    /// The audio type that most closely describes the audio being recognized.
+    #[serde(rename="microphoneDistance")]
+    pub microphone_distance: Option<String>,
+    /// Mime type of the original audio file.  For example `audio/m4a`,
+    /// `audio/x-alaw-basic`, `audio/mp3`, `audio/3gpp`.
+    /// A list of possible audio mime types is maintained at
+    /// http://www.iana.org/assignments/media-types/media-types.xhtml#audio
+    #[serde(rename="originalMimeType")]
+    pub original_mime_type: Option<String>,
+    /// The industry vertical to which this speech recognition request most
+    /// closely applies. This is most indicative of the topics contained
+    /// in the audio.  Use the 6-digit NAICS code to identify the industry
+    /// vertical - see https://www.naics.com/search/.
+    #[serde(rename="industryNaicsCodeOfAudio")]
+    pub industry_naics_code_of_audio: Option<u32>,
+    /// Description of the content. Eg. "Recordings of federal supreme court
+    /// hearings from 2012".
+    #[serde(rename="audioTopic")]
+    pub audio_topic: Option<String>,
+    /// The device used to make the recording.  Examples 'Nexus 5X' or
+    /// 'Polycom SoundStation IP 6000' or 'POTS' or 'VoIP' or
+    /// 'Cardioid Microphone'.
+    #[serde(rename="recordingDeviceName")]
+    pub recording_device_name: Option<String>,
+    /// The use case most closely describing the audio content to be recognized.
+    #[serde(rename="interactionType")]
+    pub interaction_type: Option<String>,
 }
 
-impl ResponseResult for ListOperationsResponse {}
+impl Part for RecognitionMetadata {}
+
+
+/// Provides "hints" to the speech recognizer to favor specific words and phrases
+/// in the results.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SpeechContext {
+    /// A list of strings containing words and phrases "hints" so that
+    /// the speech recognition is more likely to recognize them. This can be used
+    /// to improve the accuracy for specific words and phrases, for example, if
+    /// specific commands are typically spoken by the user. This can also be used
+    /// to add additional words to the vocabulary of the recognizer. See
+    /// [usage limits](https://cloud.google.com/speech-to-text/quotas#content).
+    /// 
+    /// List items can also be set to classes for groups of words that represent
+    /// common concepts that occur in natural language. For example, rather than
+    /// providing phrase hints for every month of the year, using the $MONTH class
+    /// improves the likelihood of correctly transcribing audio that includes
+    /// months.
+    pub phrases: Option<Vec<String>>,
+}
+
+impl Part for SpeechContext {}
 
 
 /// Contains audio data in the encoding specified in the `RecognitionConfig`.
 /// Either `content` or `uri` must be supplied. Supplying both or neither
 /// returns google.rpc.Code.INVALID_ARGUMENT. See
-/// [content limits](/speech-to-text/quotas#content).
+/// [content limits](https://cloud.google.com/speech-to-text/quotas#content).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -499,7 +520,7 @@ impl Part for RecognitionAudio {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WordInfo {
-    /// Output only. Time offset relative to the beginning of the audio,
+    /// Time offset relative to the beginning of the audio,
     /// and corresponding to the end of the spoken word.
     /// This field is only set if `enable_word_time_offsets=true` and only
     /// in the top hypothesis.
@@ -507,9 +528,9 @@ pub struct WordInfo {
     /// vary.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
-    /// Output only. The word corresponding to this set of information.
+    /// The word corresponding to this set of information.
     pub word: Option<String>,
-    /// Output only. Time offset relative to the beginning of the audio,
+    /// Time offset relative to the beginning of the audio,
     /// and corresponding to the start of the spoken word.
     /// This field is only set if `enable_word_time_offsets=true` and only
     /// in the top hypothesis.
@@ -517,9 +538,93 @@ pub struct WordInfo {
     /// vary.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
+    /// Output only. A distinct integer value is assigned for every speaker within
+    /// the audio. This field specifies which one of those speakers was detected to
+    /// have spoken this word. Value ranges from '1' to diarization_speaker_count.
+    /// speaker_tag is set if enable_speaker_diarization = 'true' and only in the
+    /// top alternative.
+    #[serde(rename="speakerTag")]
+    pub speaker_tag: Option<i32>,
 }
 
 impl Part for WordInfo {}
+
+
+/// Config to enable speaker diarization.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SpeakerDiarizationConfig {
+    /// Minimum number of speakers in the conversation. This range gives you more
+    /// flexibility by allowing the system to automatically determine the correct
+    /// number of speakers. If not set, the default value is 2.
+    #[serde(rename="minSpeakerCount")]
+    pub min_speaker_count: Option<i32>,
+    /// If 'true', enables speaker detection for each recognized word in
+    /// the top alternative of the recognition result using a speaker_tag provided
+    /// in the WordInfo.
+    #[serde(rename="enableSpeakerDiarization")]
+    pub enable_speaker_diarization: Option<bool>,
+    /// Maximum number of speakers in the conversation. This range gives you more
+    /// flexibility by allowing the system to automatically determine the correct
+    /// number of speakers. If not set, the default value is 6.
+    #[serde(rename="maxSpeakerCount")]
+    pub max_speaker_count: Option<i32>,
+    /// Output only. Unused.
+    #[serde(rename="speakerTag")]
+    pub speaker_tag: Option<i32>,
+}
+
+impl Part for SpeakerDiarizationConfig {}
+
+
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). Each `Status` message contains
+/// three pieces of data: error code, error message, and error details.
+/// 
+/// You can find out more about this error model and how to work with it in the
+/// [API Design Guide](https://cloud.google.com/apis/design/errors).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Status {
+    /// A developer-facing error message, which should be in English. Any
+    /// user-facing error message should be localized and sent in the
+    /// google.rpc.Status.details field, or localized by the client.
+    pub message: Option<String>,
+    /// The status code, which should be an enum value of google.rpc.Code.
+    pub code: Option<i32>,
+    /// A list of messages that carry the error details.  There is a common set of
+    /// message types for APIs to use.
+    pub details: Option<Vec<HashMap<String, String>>>,
+}
+
+impl Part for Status {}
+
+
+/// The response message for Operations.ListOperations.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list operations](struct.OperationListCall.html) (response)
+/// * [locations operations list projects](struct.ProjectLocationOperationListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListOperationsResponse {
+    /// The standard List next-page token.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of operations that matches the specified filter in the request.
+    pub operations: Option<Vec<Operation>>,
+}
+
+impl ResponseResult for ListOperationsResponse {}
 
 
 /// The top-level message sent by the client for the `LongRunningRecognize`
@@ -534,39 +639,14 @@ impl Part for WordInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LongRunningRecognizeRequest {
-    /// *Required* The audio data to be recognized.
+    /// Required. The audio data to be recognized.
     pub audio: Option<RecognitionAudio>,
-    /// *Required* Provides information to the recognizer that specifies how to
+    /// Required. Provides information to the recognizer that specifies how to
     /// process the request.
     pub config: Option<RecognitionConfig>,
 }
 
 impl RequestValue for LongRunningRecognizeRequest {}
-
-
-/// Provides "hints" to the speech recognizer to favor specific words and phrases
-/// in the results.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SpeechContext {
-    /// *Optional* A list of strings containing words and phrases "hints" so that
-    /// the speech recognition is more likely to recognize them. This can be used
-    /// to improve the accuracy for specific words and phrases, for example, if
-    /// specific commands are typically spoken by the user. This can also be used
-    /// to add additional words to the vocabulary of the recognizer. See
-    /// [usage limits](/speech-to-text/quotas#content).
-    /// 
-    /// List items can also be set to classes for groups of words that represent
-    /// common concepts that occur in natural language. For example, rather than
-    /// providing phrase hints for every month of the year, using the $MONTH class
-    /// improves the likelihood of correctly transcribing audio that includes
-    /// months.
-    pub phrases: Option<Vec<String>>,
-}
-
-impl Part for SpeechContext {}
 
 
 /// This resource represents a long-running operation that is the result of a
@@ -625,9 +705,9 @@ impl ResponseResult for Operation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RecognizeRequest {
-    /// *Required* The audio data to be recognized.
+    /// Required. The audio data to be recognized.
     pub audio: Option<RecognitionAudio>,
-    /// *Required* Provides information to the recognizer that specifies how to
+    /// Required. Provides information to the recognizer that specifies how to
     /// process the request.
     pub config: Option<RecognitionConfig>,
 }
@@ -641,7 +721,7 @@ impl RequestValue for RecognizeRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SpeechRecognitionAlternative {
-    /// Output only. The confidence estimate between 0.0 and 1.0. A higher number
+    /// The confidence estimate between 0.0 and 1.0. A higher number
     /// indicates an estimated greater likelihood that the recognized words are
     /// correct. This field is set only for the top alternative of a non-streaming
     /// result or, of a streaming result where `is_final=true`.
@@ -649,9 +729,9 @@ pub struct SpeechRecognitionAlternative {
     /// to be always provided.
     /// The default of 0.0 is a sentinel value indicating `confidence` was not set.
     pub confidence: Option<f32>,
-    /// Output only. Transcript text representing the words that the user spoke.
+    /// Transcript text representing the words that the user spoke.
     pub transcript: Option<String>,
-    /// Output only. A list of word-specific information for each recognized word.
+    /// A list of word-specific information for each recognized word.
     /// Note: When `enable_speaker_diarization` is true, you will see all the words
     /// from the beginning of the audio.
     pub words: Option<Vec<WordInfo>>,
@@ -667,14 +747,15 @@ impl Part for SpeechRecognitionAlternative {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RecognitionConfig {
-    /// *Required* The language of the supplied audio as a
+    /// Required. The language of the supplied audio as a
     /// [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag.
     /// Example: "en-US".
-    /// See [Language Support](/speech-to-text/docs/languages)
-    /// for a list of the currently supported language codes.
+    /// See [Language
+    /// Support](https://cloud.google.com/speech-to-text/docs/languages) for a list
+    /// of the currently supported language codes.
     #[serde(rename="languageCode")]
     pub language_code: Option<String>,
-    /// *Optional* The number of channels in the input audio data.
+    /// The number of channels in the input audio data.
     /// ONLY set this for MULTI-CHANNEL recognition.
     /// Valid values for LINEAR16 and FLAC are `1`-`8`.
     /// Valid values for OGG_OPUS are '1'-'254'.
@@ -689,13 +770,10 @@ pub struct RecognitionConfig {
     /// This field is optional for `FLAC` and `WAV` audio files and required
     /// for all other audio formats. For details, see AudioEncoding.
     pub encoding: Option<String>,
-    /// *Optional* If 'true', adds punctuation to recognition result hypotheses.
+    /// If 'true', adds punctuation to recognition result hypotheses.
     /// This feature is only available in select languages. Setting this for
     /// requests in other languages has no effect at all.
     /// The default 'false' value does not add punctuation to result hypotheses.
-    /// Note: This is currently offered as an experimental service, complimentary
-    /// to all users. In the future this may be exclusively available as a
-    /// premium feature.
     #[serde(rename="enableAutomaticPunctuation")]
     pub enable_automatic_punctuation: Option<bool>,
     /// This needs to be set to `true` explicitly and `audio_channel_count` > 1
@@ -706,13 +784,13 @@ pub struct RecognitionConfig {
     /// `audio_channel_count` multiplied by the length of the audio.
     #[serde(rename="enableSeparateRecognitionPerChannel")]
     pub enable_separate_recognition_per_channel: Option<bool>,
-    /// *Optional* If `true`, the top result includes a list of words and
+    /// If `true`, the top result includes a list of words and
     /// the start and end time offsets (timestamps) for those words. If
     /// `false`, no word-level time offset information is returned. The default is
     /// `false`.
     #[serde(rename="enableWordTimeOffsets")]
     pub enable_word_time_offsets: Option<bool>,
-    /// *Optional* Maximum number of recognition hypotheses to be returned.
+    /// Maximum number of recognition hypotheses to be returned.
     /// Specifically, the maximum number of `SpeechRecognitionAlternative` messages
     /// within each `SpeechRecognitionResult`.
     /// The server may return fewer than `max_alternatives`.
@@ -720,7 +798,7 @@ pub struct RecognitionConfig {
     /// one. If omitted, will return a maximum of one.
     #[serde(rename="maxAlternatives")]
     pub max_alternatives: Option<i32>,
-    /// *Optional* Set to true to use an enhanced model for speech recognition.
+    /// Set to true to use an enhanced model for speech recognition.
     /// If `use_enhanced` is set to true and the `model` field is not set, then
     /// an appropriate enhanced model is chosen if an enhanced model exists for
     /// the audio.
@@ -739,13 +817,13 @@ pub struct RecognitionConfig {
     /// required for all other audio formats. For details, see AudioEncoding.
     #[serde(rename="sampleRateHertz")]
     pub sample_rate_hertz: Option<i32>,
-    /// *Optional* If set to `true`, the server will attempt to filter out
+    /// If set to `true`, the server will attempt to filter out
     /// profanities, replacing all but the initial character in each filtered word
     /// with asterisks, e.g. "f***". If set to `false` or omitted, profanities
     /// won't be filtered out.
     #[serde(rename="profanityFilter")]
     pub profanity_filter: Option<bool>,
-    /// *Optional* Which model to select for the given request. Select the model
+    /// Which model to select for the given request. Select the model
     /// best suited to your domain to get best results. If a model is not
     /// explicitly specified, then we auto-select a model based on the parameters
     /// in the RecognitionConfig.
@@ -779,64 +857,28 @@ pub struct RecognitionConfig {
     ///   </tr>
     /// </table>
     pub model: Option<String>,
-    /// *Optional* array of SpeechContext.
+    /// Config to enable speaker diarization and set additional
+    /// parameters to make diarization better suited for your application.
+    /// Note: When this is enabled, we send all the words from the beginning of the
+    /// audio for the top alternative in every consecutive STREAMING responses.
+    /// This is done in order to improve our speaker tags as our models learn to
+    /// identify the speakers in the conversation over time.
+    /// For non-streaming requests, the diarization results will be provided only
+    /// in the top alternative of the FINAL SpeechRecognitionResult.
+    #[serde(rename="diarizationConfig")]
+    pub diarization_config: Option<SpeakerDiarizationConfig>,
+    /// Array of SpeechContext.
     /// A means to provide context to assist the speech recognition. For more
-    /// information, see [Phrase Hints](/speech-to-text/docs/basics#phrase-hints).
+    /// information, see
+    /// [speech
+    /// adaptation](https://cloud.google.com/speech-to-text/docs/context-strength).
     #[serde(rename="speechContexts")]
     pub speech_contexts: Option<Vec<SpeechContext>>,
-    /// *Optional* Metadata regarding this request.
+    /// Metadata regarding this request.
     pub metadata: Option<RecognitionMetadata>,
 }
 
 impl Part for RecognitionConfig {}
-
-
-/// Description of audio data to be recognized.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RecognitionMetadata {
-    /// The type of device the speech was recorded with.
-    #[serde(rename="recordingDeviceType")]
-    pub recording_device_type: Option<String>,
-    /// The original media the speech was recorded on.
-    #[serde(rename="originalMediaType")]
-    pub original_media_type: Option<String>,
-    /// The audio type that most closely describes the audio being recognized.
-    #[serde(rename="microphoneDistance")]
-    pub microphone_distance: Option<String>,
-    /// Obfuscated (privacy-protected) ID of the user, to identify number of
-    /// unique users using the service.
-    #[serde(rename="obfuscatedId")]
-    pub obfuscated_id: Option<String>,
-    /// Mime type of the original audio file.  For example `audio/m4a`,
-    /// `audio/x-alaw-basic`, `audio/mp3`, `audio/3gpp`.
-    /// A list of possible audio mime types is maintained at
-    /// http://www.iana.org/assignments/media-types/media-types.xhtml#audio
-    #[serde(rename="originalMimeType")]
-    pub original_mime_type: Option<String>,
-    /// The industry vertical to which this speech recognition request most
-    /// closely applies. This is most indicative of the topics contained
-    /// in the audio.  Use the 6-digit NAICS code to identify the industry
-    /// vertical - see https://www.naics.com/search/.
-    #[serde(rename="industryNaicsCodeOfAudio")]
-    pub industry_naics_code_of_audio: Option<u32>,
-    /// Description of the content. Eg. "Recordings of federal supreme court
-    /// hearings from 2012".
-    #[serde(rename="audioTopic")]
-    pub audio_topic: Option<String>,
-    /// The device used to make the recording.  Examples 'Nexus 5X' or
-    /// 'Polycom SoundStation IP 6000' or 'POTS' or 'VoIP' or
-    /// 'Cardioid Microphone'.
-    #[serde(rename="recordingDeviceName")]
-    pub recording_device_name: Option<String>,
-    /// The use case most closely describing the audio content to be recognized.
-    #[serde(rename="interactionType")]
-    pub interaction_type: Option<String>,
-}
-
-impl Part for RecognitionMetadata {}
 
 
 

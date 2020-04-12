@@ -1817,9 +1817,11 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "google-groups" => Some(("googleGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "google-plus-communities" => Some(("googlePlusCommunities", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "auto-enrolled-android-groups" => Some(("autoEnrolledAndroidGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "auto-enrolled-google-groups" => Some(("autoEnrolledGoogleGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "excluded-google-groups" => Some(("excludedGoogleGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["google-groups", "google-plus-communities"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-enrolled-android-groups", "auto-enrolled-google-groups", "excluded-google-groups", "google-groups"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1903,9 +1905,11 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "google-groups" => Some(("googleGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "google-plus-communities" => Some(("googlePlusCommunities", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "auto-enrolled-android-groups" => Some(("autoEnrolledAndroidGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "auto-enrolled-google-groups" => Some(("autoEnrolledGoogleGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "excluded-google-groups" => Some(("excludedGoogleGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["google-groups", "google-plus-communities"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-enrolled-android-groups", "auto-enrolled-google-groups", "excluded-google-groups", "google-groups"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2414,10 +2418,6 @@ impl<'n> Engine<'n> {
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription-period" => Some(("subscriptionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "grace-period" => Some(("gracePeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "season.start.day" => Some(("season.start.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "season.start.month" => Some(("season.start.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "season.end.day" => Some(("season.end.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "season.end.month" => Some(("season.end.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trial-period" => Some(("trialPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purchase-type" => Some(("purchaseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2425,7 +2425,7 @@ impl<'n> Engine<'n> {
                     "default-price.currency" => Some(("defaultPrice.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-price.price-micros" => Some(("defaultPrice.priceMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "day", "default-language", "default-price", "end", "grace-period", "month", "package-name", "price-micros", "purchase-type", "season", "sku", "start", "status", "subscription-period", "trial-period"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "default-language", "default-price", "grace-period", "package-name", "price-micros", "purchase-type", "sku", "status", "subscription-period", "trial-period"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2578,10 +2578,6 @@ impl<'n> Engine<'n> {
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription-period" => Some(("subscriptionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "grace-period" => Some(("gracePeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "season.start.day" => Some(("season.start.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "season.start.month" => Some(("season.start.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "season.end.day" => Some(("season.end.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "season.end.month" => Some(("season.end.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trial-period" => Some(("trialPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purchase-type" => Some(("purchaseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2589,7 +2585,7 @@ impl<'n> Engine<'n> {
                     "default-price.currency" => Some(("defaultPrice.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-price.price-micros" => Some(("defaultPrice.priceMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "day", "default-language", "default-price", "end", "grace-period", "month", "package-name", "price-micros", "purchase-type", "season", "sku", "start", "status", "subscription-period", "trial-period"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "default-language", "default-price", "grace-period", "package-name", "price-micros", "purchase-type", "sku", "status", "subscription-period", "trial-period"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2680,10 +2676,6 @@ impl<'n> Engine<'n> {
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription-period" => Some(("subscriptionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "grace-period" => Some(("gracePeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "season.start.day" => Some(("season.start.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "season.start.month" => Some(("season.start.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "season.end.day" => Some(("season.end.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "season.end.month" => Some(("season.end.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trial-period" => Some(("trialPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purchase-type" => Some(("purchaseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2691,7 +2683,7 @@ impl<'n> Engine<'n> {
                     "default-price.currency" => Some(("defaultPrice.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-price.price-micros" => Some(("defaultPrice.priceMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "day", "default-language", "default-price", "end", "grace-period", "month", "package-name", "price-micros", "purchase-type", "season", "sku", "start", "status", "subscription-period", "trial-period"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "default-language", "default-price", "grace-period", "package-name", "price-micros", "purchase-type", "sku", "status", "subscription-period", "trial-period"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3397,6 +3389,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "type" => {
+                    call = call.type_(arg_from_str(value.unwrap_or("-0"), err, "type", "integer"));
+                },
                 "token" => {
                     call = call.token(value.unwrap_or(""));
                 },
@@ -3425,7 +3420,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["token", "end-time", "max-results", "start-index", "start-time"].iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results", "token", "start-time", "end-time", "type"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3616,6 +3611,256 @@ impl<'n> Engine<'n> {
         }
         let mut request: api::ReviewsReplyRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.reviews().reply(request, opt.value_of("package-name").unwrap_or(""), opt.value_of("review-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _systemapks_variants_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "device-spec.screen-density" => Some(("deviceSpec.screenDensity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "device-spec.supported-abis" => Some(("deviceSpec.supportedAbis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "device-spec.supported-locales" => Some(("deviceSpec.supportedLocales", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["device-spec", "screen-density", "supported-abis", "supported-locales"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SystemApkVariantsCreateRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.systemapks().variants_create(request, opt.value_of("package-name").unwrap_or(""), opt.value_of("version-code").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _systemapks_variants_download(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let variant_id: u32 = arg_from_str(&opt.value_of("variant-id").unwrap_or(""), err, "<variant-id>", "integer");
+        let mut download_mode = false;
+        let mut call = self.hub.systemapks().variants_download(opt.value_of("package-name").unwrap_or(""), opt.value_of("version-code").unwrap_or(""), variant_id);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            if key == "alt" && value.unwrap_or("unset") == "media" {
+                                download_mode = true;
+                            }
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    if !download_mode {
+                    } else {
+                    io::copy(&mut response, &mut ostream).unwrap();
+                    ostream.flush().unwrap();
+                    }
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _systemapks_variants_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let variant_id: u32 = arg_from_str(&opt.value_of("variant-id").unwrap_or(""), err, "<variant-id>", "integer");
+        let mut call = self.hub.systemapks().variants_get(opt.value_of("package-name").unwrap_or(""), opt.value_of("version-code").unwrap_or(""), variant_id);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _systemapks_variants_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.systemapks().variants_list(opt.value_of("package-name").unwrap_or(""), opt.value_of("version-code").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3882,6 +4127,26 @@ impl<'n> Engine<'n> {
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("reviews".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("systemapks", Some(opt)) => {
+                match opt.subcommand() {
+                    ("variants-create", Some(opt)) => {
+                        call_result = self._systemapks_variants_create(opt, dry_run, &mut err);
+                    },
+                    ("variants-download", Some(opt)) => {
+                        call_result = self._systemapks_variants_download(opt, dry_run, &mut err);
+                    },
+                    ("variants-get", Some(opt)) => {
+                        call_result = self._systemapks_variants_get(opt, dry_run, &mut err);
+                    },
+                    ("variants-list", Some(opt)) => {
+                        call_result = self._systemapks_variants_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("systemapks".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -5825,11 +6090,144 @@ fn main() {
                   ]),
             ]),
         
+        ("systemapks", "methods: 'variants-create', 'variants-download', 'variants-get' and 'variants-list'", vec![
+            ("variants-create",
+                    Some(r##"Creates a new variant of APK which is suitable for inclusion in a system image."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/systemapks_variants-create",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Unique identifier for the Android app; for example, "com.spiffygame"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"version-code"##),
+                     None,
+                     Some(r##"The version code of the App Bundle."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("variants-download",
+                    Some(r##"Download a previously created APK which is suitable for inclusion in a system image."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/systemapks_variants-download",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Unique identifier for the Android app; for example, "com.spiffygame"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"version-code"##),
+                     None,
+                     Some(r##"The version code of the App Bundle."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"variant-id"##),
+                     None,
+                     None,
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("variants-get",
+                    Some(r##"Returns a previously created system APK variant."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/systemapks_variants-get",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Unique identifier for the Android app; for example, "com.spiffygame"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"version-code"##),
+                     None,
+                     Some(r##"The version code of the App Bundle."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"variant-id"##),
+                     None,
+                     Some(r##"Unique identifier for this variant."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("variants-list",
+                    Some(r##"Returns the list of previously created system APK variants."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/systemapks_variants-list",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Unique identifier for the Android app; for example, "com.spiffygame"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"version-code"##),
+                     None,
+                     Some(r##"The version code of the App Bundle."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
     ];
     
     let mut app = App::new("androidpublisher3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190702")
+           .version("1.0.13+20200331")
            .about("Accesses Android application developers' Google Play accounts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli")
            .arg(Arg::with_name("url")

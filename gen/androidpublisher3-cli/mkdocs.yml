@@ -1,4 +1,4 @@
-site_name: Android Publisher v1.0.12+20190702
+site_name: Android Publisher v1.0.13+20200331
 site_url: http://byron.github.io/google-apis-rs/google-androidpublisher3-cli
 site_description: A complete library to interact with Android Publisher (protocol v3)
 
@@ -65,6 +65,10 @@ pages:
 - ['reviews_get.md', 'Reviews', 'Get']
 - ['reviews_list.md', 'Reviews', 'List']
 - ['reviews_reply.md', 'Reviews', 'Reply']
+- ['systemapks_variants-create.md', 'Systemapks', 'Variants Create']
+- ['systemapks_variants-download.md', 'Systemapks', 'Variants Download']
+- ['systemapks_variants-get.md', 'Systemapks', 'Variants Get']
+- ['systemapks_variants-list.md', 'Systemapks', 'Variants List']
 
 theme: readthedocs
 

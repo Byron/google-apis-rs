@@ -1,4 +1,4 @@
-site_name: books v1.0.12+20181212
+site_name: books v1.0.13+20200310
 site_url: http://byron.github.io/google-apis-rs/google-books1-cli
 site_description: A complete library to interact with books (protocol v1)
 

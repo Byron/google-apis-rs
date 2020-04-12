@@ -1006,7 +1006,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"[Resource name](https://cloud.google.com/apis/design/resource_names) of the
+                     Some(r##"Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
         Group in the format: `groups/{group_id}`, where `group_id` is the unique ID
         assigned to the Group."##),
                      Some(true),
@@ -1030,7 +1030,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"[Resource name](https://cloud.google.com/apis/design/resource_names) of the
+                     Some(r##"Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
         Group in the format: `groups/{group_id}`, where `group_id` is the unique ID
         assigned to the Group."##),
                      Some(true),
@@ -1049,7 +1049,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"List groups within a customer or a domain."##),
+                    Some(r##"Lists groups within a customer or a domain."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudidentity1_cli/groups_list",
                   vec![
                     (Some(r##"v"##),
@@ -1088,7 +1088,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"[Resource name](https://cloud.google.com/apis/design/resource_names) of the
+                     Some(r##"Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
         Group to create Membership within. Format: `groups/{group_id}`, where
         `group_id` is the unique ID assigned to the Group."##),
                      Some(true),
@@ -1118,7 +1118,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"[Resource name](https://cloud.google.com/apis/design/resource_names) of the
+                     Some(r##"Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
         Membership to be deleted.
         
         Format: `groups/{group_id}/memberships/{member_id}`, where `group_id` is
@@ -1145,7 +1145,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"[Resource name](https://cloud.google.com/apis/design/resource_names) of the
+                     Some(r##"Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
         Membership to be retrieved.
         
         Format: `groups/{group_id}/memberships/{member_id}`, where `group_id` is
@@ -1167,12 +1167,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("memberships-list",
-                    Some(r##"List Memberships within a Group."##),
+                    Some(r##"Lists Memberships within a Group."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudidentity1_cli/groups_memberships-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"[Resource name](https://cloud.google.com/apis/design/resource_names) of the
+                     Some(r##"Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
         Group to list Memberships within.
         
         Format: `groups/{group_id}`, where `group_id` is the unique ID assigned to
@@ -1200,7 +1200,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"[Resource name](https://cloud.google.com/apis/design/resource_names) of the
+                     Some(r##"Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
         Group to lookup Membership within.
         
         Format: `groups/{group_id}`, where `group_id` is the unique ID assigned to
@@ -1226,7 +1226,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"[Resource name](https://cloud.google.com/apis/design/resource_names) of the
+                     Some(r##"Output only. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
         Group in the format: `groups/{group_id}`, where group_id is the unique ID
         assigned to the Group.
         
@@ -1274,7 +1274,7 @@ fn main() {
     
     let mut app = App::new("cloudidentity1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190629")
+           .version("1.0.13+20200401")
            .about("API for provisioning and managing identity resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudidentity1_cli")
            .arg(Arg::with_name("url")

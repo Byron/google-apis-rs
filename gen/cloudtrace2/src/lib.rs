@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Trace* crate version *1.0.12+20190622*, where *20190622* is the exact revision of the *cloudtrace:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Cloud Trace* crate version *1.0.13+20200330*, where *20200330* is the exact revision of the *cloudtrace:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Cloud Trace* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/trace).
@@ -333,7 +333,7 @@ impl<'a, C, A> CloudTrace<C, A>
         CloudTrace {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://cloudtrace.googleapis.com/".to_string(),
             _root_url: "https://cloudtrace.googleapis.com/".to_string(),
         }
@@ -344,7 +344,7 @@ impl<'a, C, A> CloudTrace<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -413,13 +413,13 @@ impl Part for StackTrace {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Span {
-    /// An optional final status for this span.
+    /// Optional. The final status for this span.
     pub status: Option<Status>,
-    /// An optional number of child spans that were generated while this span
+    /// Optional. The number of child spans that were generated while this span
     /// was active. If set, allows implementation to detect missing child spans.
     #[serde(rename="childSpanCount")]
     pub child_span_count: Option<i32>,
-    /// A description of the span's operation (up to 128 bytes).
+    /// Required. A description of the span's operation (up to 128 bytes).
     /// Stackdriver Trace displays the description in the
     /// Google Cloud Platform Console.
     /// For example, the display name can be a qualified method name or a file name
@@ -444,11 +444,16 @@ pub struct Span {
     /// Stack trace captured at the start of the span.
     #[serde(rename="stackTrace")]
     pub stack_trace: Option<StackTrace>,
+    /// Distinguishes between spans generated in a particular context. For example,
+    /// two spans with the same name may be distinguished using `CLIENT` (caller)
+    /// and `SERVER` (callee) to identify an RPC call.
+    #[serde(rename="spanKind")]
+    pub span_kind: Option<String>,
     /// The [SPAN_ID] of this span's parent span. If this is a root span,
     /// then this field must be empty.
     #[serde(rename="parentSpanId")]
     pub parent_span_id: Option<String>,
-    /// The start time of the span. On the client side, this is the time kept by
+    /// Required. The start time of the span. On the client side, this is the time kept by
     /// the local machine where the span execution starts. On the server side, this
     /// is the time when the server's application handler starts running.
     #[serde(rename="startTime")]
@@ -456,19 +461,19 @@ pub struct Span {
     /// A set of attributes on the span. You can have up to 32 attributes per
     /// span.
     pub attributes: Option<Attributes>,
-    /// The [SPAN_ID] portion of the span's resource name.
+    /// Required. The [SPAN_ID] portion of the span's resource name.
     #[serde(rename="spanId")]
     pub span_id: Option<String>,
     /// A set of time events. You can have up to 32 annotations and 128 message
     /// events per span.
     #[serde(rename="timeEvents")]
     pub time_events: Option<TimeEvents>,
-    /// The end time of the span. On the client side, this is the time kept by
+    /// Required. The end time of the span. On the client side, this is the time kept by
     /// the local machine where the span execution ends. On the server side, this
     /// is the time when the server application handler stops running.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
-    /// (Optional) Set this parameter to indicate whether this span is in
+    /// Optional. Set this parameter to indicate whether this span is in
     /// the same process as its parent. If you do not set this parameter,
     /// Stackdriver Trace is unable to take advantage of this helpful
     /// information.
@@ -628,7 +633,7 @@ impl Part for MessageEvent {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchWriteSpansRequest {
-    /// A list of new spans. The span names must not match existing
+    /// Required. A list of new spans. The span names must not match existing
     /// spans, or the results are undefined.
     pub spans: Option<Vec<Span>>,
 }
@@ -868,6 +873,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Creates a new span.
+    /// In this case, writing traces is not considered an active developer
+    /// method since traces are machine generated.
     /// 
     /// # Arguments
     ///
@@ -892,6 +899,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Sends new spans to new or existing traces. You cannot update
     /// existing spans.
+    /// In this case, writing traces is not considered an active developer
+    /// method since traces are machine generated.
     /// 
     /// # Arguments
     ///
@@ -919,6 +928,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // #################
 
 /// Creates a new span.
+/// In this case, writing traces is not considered an active developer
+/// method since traces are machine generated.
 ///
 /// A builder for the *traces.spans.createSpan* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -1208,6 +1219,8 @@ impl<'a, C, A> ProjectTraceSpanCreateSpanCall<'a, C, A> where C: BorrowMut<hyper
 
 /// Sends new spans to new or existing traces. You cannot update
 /// existing spans.
+/// In this case, writing traces is not considered an active developer
+/// method since traces are machine generated.
 ///
 /// A builder for the *traces.batchWrite* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.

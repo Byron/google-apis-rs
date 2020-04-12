@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *iam* API at revision *20190627*. The CLI is at version *1.0.12*.
+This documentation was generated from the *iam* API at revision *20200319*. The CLI is at version *1.0.13*.
 
 ```bash
 iam1 [options]
@@ -58,6 +58,7 @@ iam1 [options]
                 service-accounts-keys-delete <name> [-p <v>]... [-o <out>]
                 service-accounts-keys-get <name> [-p <v>]... [-o <out>]
                 service-accounts-keys-list <name> [-p <v>]... [-o <out>]
+                service-accounts-keys-upload <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-list <name> [-p <v>]... [-o <out>]
                 service-accounts-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]

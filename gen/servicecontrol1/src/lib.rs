@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Service Control* crate version *1.0.12+20190622*, where *20190622* is the exact revision of the *servicecontrol:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Service Control* crate version *1.0.13+20200407*, where *20200407* is the exact revision of the *servicecontrol:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Service Control* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/service-control/).
@@ -333,7 +333,7 @@ impl<'a, C, A> ServiceControl<C, A>
         ServiceControl {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://servicecontrol.googleapis.com/".to_string(),
             _root_url: "https://servicecontrol.googleapis.com/".to_string(),
         }
@@ -344,7 +344,7 @@ impl<'a, C, A> ServiceControl<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -410,6 +410,7 @@ pub struct MetricValue {
     /// The labels describing the metric value.
     /// See comments on google.api.servicecontrol.v1.Operation.labels for
     /// the overriding relationship.
+    /// Note that this map must not contain monitored resource labels.
     pub labels: Option<HashMap<String, String>>,
     /// A double precision floating point value.
     #[serde(rename="doubleValue")]
@@ -490,15 +491,57 @@ pub struct QuotaOperation {
     /// of the service that generated the operation, and guarantees idempotency in
     /// case of retries.
     /// 
-    /// UUID version 4 is recommended, though not required. In scenarios where an
-    /// operation is computed from existing information and an idempotent id is
-    /// desirable for deduplication purpose, UUID version 5 is recommended. See
-    /// RFC 4122 for details.
+    /// In order to ensure best performance and latency in the Quota backends,
+    /// operation_ids are optimally associated with time, so that related
+    /// operations can be accessed fast in storage. For this reason, the
+    /// recommended token for services that intend to operate at a high QPS is
+    /// Unix time in nanos + UUID
     #[serde(rename="operationId")]
     pub operation_id: Option<String>,
 }
 
 impl Part for QuotaOperation {}
+
+
+/// Response message for the AllocateQuota method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [allocate quota services](struct.ServiceAllocateQuotaCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AllocateQuotaResponse {
+    /// Indicates the decision of the allocate.
+    #[serde(rename="allocateErrors")]
+    pub allocate_errors: Option<Vec<QuotaError>>,
+    /// ID of the actual config used to process the request.
+    #[serde(rename="serviceConfigId")]
+    pub service_config_id: Option<String>,
+    /// Quota metrics to indicate the result of allocation. Depending on the
+    /// request, one or more of the following metrics will be included:
+    /// 
+    /// 1. Per quota group or per quota metric incremental usage will be specified
+    /// using the following delta metric :
+    ///   "serviceruntime.googleapis.com/api/consumer/quota_used_count"
+    /// 
+    /// 2. The quota limit reached condition will be specified using the following
+    /// boolean metric :
+    ///   "serviceruntime.googleapis.com/quota/exceeded"
+    #[serde(rename="quotaMetrics")]
+    pub quota_metrics: Option<Vec<MetricValueSet>>,
+    /// WARNING: DO NOT use this field until this warning message is removed.
+    #[serde(rename="allocateInfo")]
+    pub allocate_info: Option<AllocateInfo>,
+    /// The same operation_id value used in the AllocateQuotaRequest. Used for
+    /// logging and diagnostics purposes.
+    #[serde(rename="operationId")]
+    pub operation_id: Option<String>,
+}
+
+impl ResponseResult for AllocateQuotaResponse {}
 
 
 /// Request message for the Report method.
@@ -519,9 +562,9 @@ pub struct ReportRequest {
     /// be used only when multiple operations are natually available at the time
     /// of the report.
     /// 
-    /// If multiple operations are in a single request, the total request size
-    /// should be no larger than 1MB. See ReportResponse.report_errors for
-    /// partial failure behavior.
+    /// There is no limit on the number of operations in the same ReportRequest,
+    /// however the ReportRequest size should be no larger than 1MB. See
+    /// ReportResponse.report_errors for partial failure behavior.
     pub operations: Option<Vec<Operation>>,
     /// Specifies which version of service config should be used to process the
     /// request.
@@ -580,61 +623,77 @@ pub struct QuotaInfo {
 impl Part for QuotaInfo {}
 
 
-/// Distribution represents a frequency distribution of double-valued sample
-/// points. It contains the size of the population of sample points plus
-/// additional optional information:
-/// 
-///   - the arithmetic mean of the samples
-///   - the minimum and maximum of the samples
-///   - the sum-squared-deviation of the samples, used to compute variance
-///   - a histogram of the values of the sample points
+/// A span represents a single operation within a trace. Spans can be
+/// nested to form a trace tree. Often, a trace contains a root span
+/// that describes the end-to-end latency, and one or more subspans for
+/// its sub-operations. A trace can also contain multiple root spans,
+/// or none at all. Spans do not need to be contiguous&mdash;there may be
+/// gaps or overlaps between spans in a trace.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Distribution {
-    /// The total number of samples in the distribution. Must be >= 0.
-    pub count: Option<String>,
-    /// The number of samples in each histogram bucket. `bucket_counts` are
-    /// optional. If present, they must sum to the `count` value.
+pub struct TraceSpan {
+    /// An optional final status for this span.
+    pub status: Option<Status>,
+    /// An optional number of child spans that were generated while this span
+    /// was active. If set, allows implementation to detect missing child spans.
+    #[serde(rename="childSpanCount")]
+    pub child_span_count: Option<i32>,
+    /// A description of the span's operation (up to 128 bytes).
+    /// Stackdriver Trace displays the description in the
+    /// Google Cloud Platform Console.
+    /// For example, the display name can be a qualified method name or a file name
+    /// and a line number where the operation is called. A best practice is to use
+    /// the same display name within an application and at the same call point.
+    /// This makes it easier to correlate spans in different traces.
+    #[serde(rename="displayName")]
+    pub display_name: Option<TruncatableString>,
+    /// The resource name of the span in the following format:
     /// 
-    /// The buckets are defined below in `bucket_option`. There are N buckets.
-    /// `bucket_counts[0]` is the number of samples in the underflow bucket.
-    /// `bucket_counts[1]` to `bucket_counts[N-1]` are the numbers of samples
-    /// in each of the finite buckets. And `bucket_counts[N] is the number
-    /// of samples in the overflow bucket. See the comments of `bucket_option`
-    /// below for more details.
+    /// ````text
+    /// projects/[PROJECT_ID]/traces/[TRACE_ID]/spans/SPAN_ID is a unique identifier for a trace within a project;
+    /// ````
     /// 
-    /// Any suffix of trailing zeros may be omitted.
-    #[serde(rename="bucketCounts")]
-    pub bucket_counts: Option<Vec<String>>,
-    /// Buckets with exponentially growing width.
-    #[serde(rename="exponentialBuckets")]
-    pub exponential_buckets: Option<ExponentialBuckets>,
-    /// The minimum of the population of values. Ignored if `count` is zero.
-    pub minimum: Option<f64>,
-    /// The maximum of the population of values. Ignored if `count` is zero.
-    pub maximum: Option<f64>,
-    /// Example points. Must be in increasing order of `value` field.
-    pub exemplars: Option<Vec<Exemplar>>,
-    /// The sum of squared deviations from the mean:
-    ///   Sum[i=1..count]((x_i - mean)^2)
-    /// where each x_i is a sample values. If `count` is zero then this field
-    /// must be zero, otherwise validation of the request fails.
-    #[serde(rename="sumOfSquaredDeviation")]
-    pub sum_of_squared_deviation: Option<f64>,
-    /// Buckets with constant width.
-    #[serde(rename="linearBuckets")]
-    pub linear_buckets: Option<LinearBuckets>,
-    /// Buckets with arbitrary user-provided width.
-    #[serde(rename="explicitBuckets")]
-    pub explicit_buckets: Option<ExplicitBuckets>,
-    /// The arithmetic mean of the samples in the distribution. If `count` is
-    /// zero then this field must be zero.
-    pub mean: Option<f64>,
+    /// it is a 32-character hexadecimal encoding of a 16-byte array.
+    /// 
+    /// [SPAN_ID] is a unique identifier for a span within a trace; it
+    /// is a 16-character hexadecimal encoding of an 8-byte array.
+    pub name: Option<String>,
+    /// Distinguishes between spans generated in a particular context. For example,
+    /// two spans with the same name may be distinguished using `CLIENT` (caller)
+    /// and `SERVER` (callee) to identify an RPC call.
+    #[serde(rename="spanKind")]
+    pub span_kind: Option<String>,
+    /// The [SPAN_ID] of this span's parent span. If this is a root span,
+    /// then this field must be empty.
+    #[serde(rename="parentSpanId")]
+    pub parent_span_id: Option<String>,
+    /// The start time of the span. On the client side, this is the time kept by
+    /// the local machine where the span execution starts. On the server side, this
+    /// is the time when the server's application handler starts running.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+    /// A set of attributes on the span. You can have up to 32 attributes per
+    /// span.
+    pub attributes: Option<Attributes>,
+    /// The [SPAN_ID] portion of the span's resource name.
+    #[serde(rename="spanId")]
+    pub span_id: Option<String>,
+    /// The end time of the span. On the client side, this is the time kept by
+    /// the local machine where the span execution ends. On the server side, this
+    /// is the time when the server application handler stops running.
+    #[serde(rename="endTime")]
+    pub end_time: Option<String>,
+    /// (Optional) Set this parameter to indicate whether this span is in
+    /// the same process as its parent. If you do not set this parameter,
+    /// Stackdriver Trace is unable to take advantage of this helpful
+    /// information.
+    #[serde(rename="sameProcessAsParentSpan")]
+    pub same_process_as_parent_span: Option<bool>,
 }
 
-impl Part for Distribution {}
+impl Part for TraceSpan {}
 
 
 /// Describing buckets with arbitrary user-provided width.
@@ -808,7 +867,7 @@ pub struct ReportResponse {
     /// The actual config id used to process the request.
     #[serde(rename="serviceConfigId")]
     pub service_config_id: Option<String>,
-    /// Unimplemented. The current service rollout id used to process the request.
+    /// The current service rollout id used to process the request.
     #[serde(rename="serviceRolloutId")]
     pub service_rollout_id: Option<String>,
 }
@@ -923,6 +982,10 @@ pub struct LogEntry {
     /// Optional. Information about an operation associated with the log entry, if
     /// applicable.
     pub operation: Option<LogEntryOperation>,
+    /// Optional. Source code location information associated with the log entry,
+    /// if any.
+    #[serde(rename="sourceLocation")]
+    pub source_location: Option<LogEntrySourceLocation>,
     /// The severity of the log entry. The default value is
     /// `LogSeverity.DEFAULT`.
     pub severity: Option<String>,
@@ -990,7 +1053,7 @@ pub struct CheckResponse {
     /// Used for logging and diagnostics purposes.
     #[serde(rename="operationId")]
     pub operation_id: Option<String>,
-    /// Unimplemented. The current service rollout id used to process the request.
+    /// The current service rollout id used to process the request.
     #[serde(rename="serviceRolloutId")]
     pub service_rollout_id: Option<String>,
 }
@@ -1022,6 +1085,31 @@ pub struct Status {
 }
 
 impl Part for Status {}
+
+
+/// Additional information about the source code location that produced the log
+/// entry.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LogEntrySourceLocation {
+    /// Optional. Human-readable name of the function or method being invoked, with
+    /// optional context such as the class or package name. This information may be
+    /// used in contexts such as the logs viewer, where a file and line number are
+    /// less meaningful. The format can vary by language. For example:
+    /// `qual.if.ied.Class.method` (Java), `dir/package.func` (Go), `function`
+    /// (Python).
+    pub function: Option<String>,
+    /// Optional. Line within the source file. 1-based; 0 indicates no line number
+    /// available.
+    pub line: Option<String>,
+    /// Optional. Source file name. Depending on the runtime environment, this
+    /// might be a simple name or a fully-qualified name.
+    pub file: Option<String>,
+}
+
+impl Part for LogEntrySourceLocation {}
 
 
 /// Request message for the AllocateQuota method.
@@ -1057,12 +1145,36 @@ pub struct AllocateInfo {
     /// A list of label keys that were unused by the server in processing the
     /// request. Thus, for similar requests repeated in a certain future time
     /// window, the caller can choose to ignore these labels in the requests
-    /// to achieve better client-side cache hits and quota aggregation.
+    /// to achieve better client-side cache hits and quota aggregation for rate
+    /// quota. This field is not populated for allocation quota checks.
     #[serde(rename="unusedArguments")]
     pub unused_arguments: Option<Vec<String>>,
 }
 
 impl Part for AllocateInfo {}
+
+
+/// Additional information about a potentially long-running operation with which
+/// a log entry is associated.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LogEntryOperation {
+    /// Optional. Set this to True if this is the last log entry in the operation.
+    pub last: Option<bool>,
+    /// Optional. An arbitrary operation identifier. Log entries with the
+    /// same identifier are assumed to be part of the same operation.
+    pub id: Option<String>,
+    /// Optional. An arbitrary producer identifier. The combination of
+    /// `id` and `producer` must be globally unique.  Examples for `producer`:
+    /// `"MyDivision.MyBigCompany.com"`, `"github.com/MyProject/MyApplication"`.
+    pub producer: Option<String>,
+    /// Optional. Set this to True if this is the first log entry in the operation.
+    pub first: Option<bool>,
+}
+
+impl Part for LogEntryOperation {}
 
 
 /// Exemplars are example points that may be used to annotate aggregated
@@ -1097,45 +1209,131 @@ pub struct Exemplar {
 impl Part for Exemplar {}
 
 
-/// Response message for the AllocateQuota method.
+/// Represents a string that might be shortened to a specified length.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [allocate quota services](struct.ServiceAllocateQuotaCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AllocateQuotaResponse {
-    /// Indicates the decision of the allocate.
-    #[serde(rename="allocateErrors")]
-    pub allocate_errors: Option<Vec<QuotaError>>,
-    /// ID of the actual config used to process the request.
-    #[serde(rename="serviceConfigId")]
-    pub service_config_id: Option<String>,
-    /// Quota metrics to indicate the result of allocation. Depending on the
-    /// request, one or more of the following metrics will be included:
+pub struct TruncatableString {
+    /// The shortened string. For example, if the original string is 500
+    /// bytes long and the limit of the string is 128 bytes, then
+    /// `value` contains the first 128 bytes of the 500-byte string.
     /// 
-    /// 1. Per quota group or per quota metric incremental usage will be specified
-    /// using the following delta metric :
-    ///   "serviceruntime.googleapis.com/api/consumer/quota_used_count"
-    /// 
-    /// 2. The quota limit reached condition will be specified using the following
-    /// boolean metric :
-    ///   "serviceruntime.googleapis.com/quota/exceeded"
-    #[serde(rename="quotaMetrics")]
-    pub quota_metrics: Option<Vec<MetricValueSet>>,
-    /// WARNING: DO NOT use this field until this warning message is removed.
-    #[serde(rename="allocateInfo")]
-    pub allocate_info: Option<AllocateInfo>,
-    /// The same operation_id value used in the AllocateQuotaRequest. Used for
-    /// logging and diagnostics purposes.
-    #[serde(rename="operationId")]
-    pub operation_id: Option<String>,
+    /// Truncation always happens on a UTF8 character boundary. If there
+    /// are multi-byte characters in the string, then the length of the
+    /// shortened string might be less than the size limit.
+    pub value: Option<String>,
+    /// The number of bytes removed from the original string. If this
+    /// value is 0, then the string was not shortened.
+    #[serde(rename="truncatedByteCount")]
+    pub truncated_byte_count: Option<i32>,
 }
 
-impl ResponseResult for AllocateQuotaResponse {}
+impl Part for TruncatableString {}
+
+
+/// A set of attributes, each in the format `[KEY]:[VALUE]`.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Attributes {
+    /// The number of attributes that were discarded. Attributes can be discarded
+    /// because their keys are too long or because there are too many attributes.
+    /// If this value is 0 then all attributes are valid.
+    #[serde(rename="droppedAttributesCount")]
+    pub dropped_attributes_count: Option<i32>,
+    /// The set of attributes. Each attribute's key can be up to 128 bytes
+    /// long. The value can be a string up to 256 bytes, a signed 64-bit integer,
+    /// or the Boolean values `true` and `false`. For example:
+    /// 
+    /// ````text
+    /// "/instance_id": "my-instance"
+    /// "/http/user_agent": ""
+    /// "/http/request_bytes": 300
+    /// "abc.com/myattribute": true````
+    #[serde(rename="attributeMap")]
+    pub attribute_map: Option<HashMap<String, AttributeValue>>,
+}
+
+impl Part for Attributes {}
+
+
+/// Distribution represents a frequency distribution of double-valued sample
+/// points. It contains the size of the population of sample points plus
+/// additional optional information:
+/// 
+///   - the arithmetic mean of the samples
+///   - the minimum and maximum of the samples
+///   - the sum-squared-deviation of the samples, used to compute variance
+///   - a histogram of the values of the sample points
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Distribution {
+    /// The total number of samples in the distribution. Must be >= 0.
+    pub count: Option<String>,
+    /// The number of samples in each histogram bucket. `bucket_counts` are
+    /// optional. If present, they must sum to the `count` value.
+    /// 
+    /// The buckets are defined below in `bucket_option`. There are N buckets.
+    /// `bucket_counts[0]` is the number of samples in the underflow bucket.
+    /// `bucket_counts[1]` to `bucket_counts[N-1]` are the numbers of samples
+    /// in each of the finite buckets. And `bucket_counts[N] is the number
+    /// of samples in the overflow bucket. See the comments of `bucket_option`
+    /// below for more details.
+    /// 
+    /// Any suffix of trailing zeros may be omitted.
+    #[serde(rename="bucketCounts")]
+    pub bucket_counts: Option<Vec<String>>,
+    /// Buckets with exponentially growing width.
+    #[serde(rename="exponentialBuckets")]
+    pub exponential_buckets: Option<ExponentialBuckets>,
+    /// The minimum of the population of values. Ignored if `count` is zero.
+    pub minimum: Option<f64>,
+    /// The maximum of the population of values. Ignored if `count` is zero.
+    pub maximum: Option<f64>,
+    /// Example points. Must be in increasing order of `value` field.
+    pub exemplars: Option<Vec<Exemplar>>,
+    /// The sum of squared deviations from the mean:
+    ///   Sum[i=1..count]((x_i - mean)^2)
+    /// where each x_i is a sample values. If `count` is zero then this field
+    /// must be zero, otherwise validation of the request fails.
+    #[serde(rename="sumOfSquaredDeviation")]
+    pub sum_of_squared_deviation: Option<f64>,
+    /// Buckets with constant width.
+    #[serde(rename="linearBuckets")]
+    pub linear_buckets: Option<LinearBuckets>,
+    /// Buckets with arbitrary user-provided width.
+    #[serde(rename="explicitBuckets")]
+    pub explicit_buckets: Option<ExplicitBuckets>,
+    /// The arithmetic mean of the samples in the distribution. If `count` is
+    /// zero then this field must be zero.
+    pub mean: Option<f64>,
+}
+
+impl Part for Distribution {}
+
+
+/// The allowed types for [VALUE] in a `[KEY]:[VALUE]` attribute.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AttributeValue {
+    /// A string up to 256 bytes long.
+    #[serde(rename="stringValue")]
+    pub string_value: Option<TruncatableString>,
+    /// A Boolean value represented by `true` or `false`.
+    #[serde(rename="boolValue")]
+    pub bool_value: Option<bool>,
+    /// A 64-bit signed integer.
+    #[serde(rename="intValue")]
+    pub int_value: Option<String>,
+}
+
+impl Part for AttributeValue {}
 
 
 /// Describing buckets with exponentially growing width.
@@ -1255,29 +1453,6 @@ pub struct QuotaProperties {
 impl Part for QuotaProperties {}
 
 
-/// Additional information about a potentially long-running operation with which
-/// a log entry is associated.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LogEntryOperation {
-    /// Optional. Set this to True if this is the last log entry in the operation.
-    pub last: Option<bool>,
-    /// Optional. An arbitrary operation identifier. Log entries with the
-    /// same identifier are assumed to be part of the same operation.
-    pub id: Option<String>,
-    /// Optional. An arbitrary producer identifier. The combination of
-    /// `id` and `producer` must be globally unique.  Examples for `producer`:
-    /// `"MyDivision.MyBigCompany.com"`, `"github.com/MyProject/MyApplication"`.
-    pub producer: Option<String>,
-    /// Optional. Set this to True if this is the first log entry in the operation.
-    pub first: Option<bool>,
-}
-
-impl Part for LogEntryOperation {}
-
-
 /// Represents information regarding an operation.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1287,6 +1462,11 @@ pub struct Operation {
     /// Fully qualified name of the operation. Reserved for future use.
     #[serde(rename="operationName")]
     pub operation_name: Option<String>,
+    /// Unimplemented. A list of Cloud Trace spans. The span names shall contain
+    /// the id of the destination project which can be either the produce or the
+    /// consumer project.
+    #[serde(rename="traceSpans")]
+    pub trace_spans: Option<Vec<TraceSpan>>,
     /// Represents information about this operation. Each MetricValueSet
     /// corresponds to a metric defined in the service configuration.
     /// The data type used in the MetricValueSet must agree with
@@ -1323,31 +1503,6 @@ pub struct Operation {
     /// check will be performed.
     #[serde(rename="quotaProperties")]
     pub quota_properties: Option<QuotaProperties>,
-    /// DO NOT USE. This field is deprecated, use "resources" field instead.
-    /// The resource name of the parent of a resource in the resource hierarchy.
-    /// 
-    /// This can be in one of the following formats:
-    /// - “projects/<project-id or project-number>”
-    /// - “folders/<folder-id>”
-    /// - “organizations/<organization-id>”
-    #[serde(rename="resourceContainer")]
-    pub resource_container: Option<String>,
-    /// User defined labels for the resource that this operation is associated
-    /// with. Only a combination of 1000 user labels per consumer project are
-    /// allowed.
-    #[serde(rename="userLabels")]
-    pub user_labels: Option<HashMap<String, String>>,
-    /// End time of the operation.
-    /// Required when the operation is used in ServiceController.Report,
-    /// but optional when the operation is used in ServiceController.Check.
-    #[serde(rename="endTime")]
-    pub end_time: Option<String>,
-    /// Represents information to be logged.
-    #[serde(rename="logEntries")]
-    pub log_entries: Option<Vec<LogEntry>>,
-    /// Required. Start time of the operation.
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
     /// Identity of the consumer who is using the service.
     /// This field should be filled in for the operations initiated by a
     /// consumer, but not for service-initiated operations that are
@@ -1362,6 +1517,22 @@ pub struct Operation {
     ///   * api`_`key:API_KEY.
     #[serde(rename="consumerId")]
     pub consumer_id: Option<String>,
+    /// User defined labels for the resource that this operation is associated
+    /// with. Only a combination of 1000 user labels per consumer project are
+    /// allowed.
+    #[serde(rename="userLabels")]
+    pub user_labels: Option<HashMap<String, String>>,
+    /// Represents information to be logged.
+    #[serde(rename="logEntries")]
+    pub log_entries: Option<Vec<LogEntry>>,
+    /// Required. Start time of the operation.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+    /// End time of the operation.
+    /// Required when the operation is used in ServiceController.Report,
+    /// but optional when the operation is used in ServiceController.Check.
+    #[serde(rename="endTime")]
+    pub end_time: Option<String>,
     /// The resources that are involved in the operation.
     /// The maximum supported number of entries in this field is 100.
     pub resources: Option<Vec<ResourceInfo>>,
@@ -1499,7 +1670,8 @@ impl<'a, C, A> ServiceMethods<'a, C, A> {
     /// the aggregation time window to avoid data loss risk more than 0.01%
     /// for business and compliance reasons.
     /// 
-    /// NOTE: the ReportRequest has the size limit of 1MB.
+    /// NOTE: the ReportRequest has the size limit (wire-format byte size) of
+    /// 1MB.
     /// 
     /// This method requires the `servicemanagement.services.report` permission
     /// on the specified service. For more information, see
@@ -1868,7 +2040,8 @@ impl<'a, C, A> ServiceCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// the aggregation time window to avoid data loss risk more than 0.01%
 /// for business and compliance reasons.
 /// 
-/// NOTE: the ReportRequest has the size limit of 1MB.
+/// NOTE: the ReportRequest has the size limit (wire-format byte size) of
+/// 1MB.
 /// 
 /// This method requires the `servicemanagement.services.report` permission
 /// on the specified service. For more information, see

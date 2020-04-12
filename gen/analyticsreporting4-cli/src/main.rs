@@ -389,7 +389,7 @@ fn main() {
     
     let mut app = App::new("analyticsreporting4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.12+20190625")
+           .version("1.0.13+20200405")
            .about("Accesses Analytics report data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analyticsreporting4_cli")
            .arg(Arg::with_name("url")

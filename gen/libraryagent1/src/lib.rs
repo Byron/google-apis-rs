@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Libraryagent* crate version *1.0.12+20190703*, where *20190703* is the exact revision of the *libraryagent:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Libraryagent* crate version *1.0.13+20200409*, where *20200409* is the exact revision of the *libraryagent:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Libraryagent* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/docs/quota).
@@ -319,7 +319,7 @@ impl<'a, C, A> Libraryagent<C, A>
         Libraryagent {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://libraryagent.googleapis.com/".to_string(),
             _root_url: "https://libraryagent.googleapis.com/".to_string(),
         }
@@ -330,7 +330,7 @@ impl<'a, C, A> Libraryagent<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -511,7 +511,7 @@ impl<'a, C, A> ShelveMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the book to return.
+    /// * `name` - Required. The name of the book to return.
     pub fn books_return(&self, name: &str) -> ShelveBookReturnCall<'a, C, A> {
         ShelveBookReturnCall {
             hub: self.hub,
@@ -528,7 +528,7 @@ impl<'a, C, A> ShelveMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the shelf to retrieve.
+    /// * `name` - Required. The name of the shelf to retrieve.
     pub fn get(&self, name: &str) -> ShelveGetCall<'a, C, A> {
         ShelveGetCall {
             hub: self.hub,
@@ -548,7 +548,7 @@ impl<'a, C, A> ShelveMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the book to borrow.
+    /// * `name` - Required. The name of the book to borrow.
     pub fn books_borrow(&self, name: &str) -> ShelveBookBorrowCall<'a, C, A> {
         ShelveBookBorrowCall {
             hub: self.hub,
@@ -582,7 +582,7 @@ impl<'a, C, A> ShelveMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The name of the shelf whose books we'd like to list.
+    /// * `parent` - Required. The name of the shelf whose books we'd like to list.
     pub fn books_list(&self, parent: &str) -> ShelveBookListCall<'a, C, A> {
         ShelveBookListCall {
             hub: self.hub,
@@ -601,7 +601,7 @@ impl<'a, C, A> ShelveMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the book to retrieve.
+    /// * `name` - Required. The name of the book to retrieve.
     pub fn books_get(&self, name: &str) -> ShelveBookGetCall<'a, C, A> {
         ShelveBookGetCall {
             hub: self.hub,
@@ -799,7 +799,7 @@ impl<'a, C, A> ShelveBookReturnCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// The name of the book to return.
+    /// Required. The name of the book to return.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -1047,7 +1047,7 @@ impl<'a, C, A> ShelveGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// The name of the shelf to retrieve.
+    /// Required. The name of the shelf to retrieve.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -1298,7 +1298,7 @@ impl<'a, C, A> ShelveBookBorrowCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// The name of the book to borrow.
+    /// Required. The name of the book to borrow.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -1798,7 +1798,7 @@ impl<'a, C, A> ShelveBookListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// The name of the shelf whose books we'd like to list.
+    /// Required. The name of the shelf whose books we'd like to list.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -2064,7 +2064,7 @@ impl<'a, C, A> ShelveBookGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// The name of the book to retrieve.
+    /// Required. The name of the book to retrieve.
     ///
     /// Sets the *name* path property to the given value.
     ///

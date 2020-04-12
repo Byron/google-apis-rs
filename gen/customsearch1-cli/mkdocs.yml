@@ -1,4 +1,4 @@
-site_name: customsearch v1.0.12+20181001
+site_name: customsearch v1.0.13+20181001
 site_url: http://byron.github.io/google-apis-rs/google-customsearch1-cli
 site_description: A complete library to interact with customsearch (protocol v1)
 

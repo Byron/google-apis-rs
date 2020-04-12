@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Publisher* crate version *1.0.12+20190702*, where *20190702* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Android Publisher* crate version *1.0.13+20200331*, where *20200331* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Android Publisher* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/android-publisher).
@@ -350,7 +350,7 @@ impl<'a, C, A> AndroidPublisher<C, A>
         AndroidPublisher {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://www.googleapis.com/androidpublisher/v2/applications/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -373,7 +373,7 @@ impl<'a, C, A> AndroidPublisher<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -438,26 +438,6 @@ pub struct SubscriptionPurchasesDeferRequest {
 }
 
 impl RequestValue for SubscriptionPurchasesDeferRequest {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [apks list edits](struct.EditApkListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ApksListResponse {
-    /// no description provided
-    pub apks: Option<Vec<Apk>>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#apksListResponse".
-    pub kind: Option<String>,
-}
-
-impl ResponseResult for ApksListResponse {}
 
 
 /// There is no detailed description.
@@ -532,11 +512,9 @@ pub struct InAppProduct {
     /// Subscription period, specified in ISO 8601 format. Acceptable values are "P1W" (one week), "P1M" (one month), "P3M" (three months), "P6M" (six months), and "P1Y" (one year).
     #[serde(rename="subscriptionPeriod")]
     pub subscription_period: Option<String>,
-    /// Grace period of the subscription, specified in ISO 8601 format. It will allow developers to give their subscribers a grace period when the payment for the new recurrence period is declined. Acceptable values = "P3D" (three days) and "P7D" (seven days)
+    /// Grace period of the subscription, specified in ISO 8601 format. It will allow developers to give their subscribers a grace period when the payment for the new recurrence period is declined. Acceptable values = "P3D" (three days), "P7D" (seven days), "P14D" (fourteen days), and "P30D" (thirty days)
     #[serde(rename="gracePeriod")]
     pub grace_period: Option<String>,
-    /// Definition of a season for a seasonal subscription. Can be defined only for yearly subscriptions.
-    pub season: Option<Season>,
     /// The package name of the parent app.
     #[serde(rename="packageName")]
     pub package_name: Option<String>,
@@ -709,21 +687,6 @@ pub struct DeviceMetadata {
 impl Part for DeviceMetadata {}
 
 
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MonthDay {
-    /// Day of a month, value in [1, 31] range. Valid range depends on the specified month.
-    pub day: Option<u32>,
-    /// Month of a year. e.g. 1 = JAN, 2 = FEB etc.
-    pub month: Option<u32>,
-}
-
-impl Part for MonthDay {}
-
-
 /// A ProductPurchase resource indicates the status of a user's inapp product purchase.
 /// 
 /// # Activities
@@ -829,16 +792,14 @@ impl ResponseResult for ReviewsReplyResponse {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Season {
-    /// Optionally present list of prorations for the season. Each proration is a one-off discounted entry into a subscription. Each proration contains the first date on which the discount is available and the new pricing information.
-    pub prorations: Option<Vec<Prorate>>,
-    /// Inclusive end date of the recurrence period.
-    pub end: Option<MonthDay>,
-    /// Inclusive start date of the recurrence period.
-    pub start: Option<MonthDay>,
+pub struct Timestamp {
+    /// no description provided
+    pub nanos: Option<i32>,
+    /// no description provided
+    pub seconds: Option<String>,
 }
 
-impl Part for Season {}
+impl Part for Timestamp {}
 
 
 /// There is no detailed description.
@@ -1245,9 +1206,6 @@ pub struct Testers {
     /// A list of all Google Groups, as email addresses, that define testers for this track.
     #[serde(rename="googleGroups")]
     pub google_groups: Option<Vec<String>>,
-    /// A list of all Google+ Communities, as URLs, that define testers for this track.
-    #[serde(rename="googlePlusCommunities")]
-    pub google_plus_communities: Option<Vec<String>>,
 }
 
 impl RequestValue for Testers {}
@@ -1265,7 +1223,7 @@ pub struct VoidedPurchase {
     /// The time at which the purchase was canceled/refunded/charged-back, in milliseconds since the epoch (Jan 1, 1970).
     #[serde(rename="voidedTimeMillis")]
     pub voided_time_millis: Option<String>,
-    /// The token that was generated when a purchase was made. This uniquely identifies a purchase.
+    /// The token which uniquely identifies a one-time purchase or subscription. To uniquely identify subscription renewals use order_id (available starting from version 3 of the API).
     #[serde(rename="purchaseToken")]
     pub purchase_token: Option<String>,
     /// The time at which the purchase was made, in milliseconds since the epoch (Jan 1, 1970).
@@ -1400,7 +1358,8 @@ pub struct SubscriptionPurchase {
     #[serde(rename="priceChange")]
     pub price_change: Option<SubscriptionPriceChange>,
     /// The type of purchase of the subscription. This field is only set if this purchase was not made using the standard in-app billing flow. Possible values are:  
-    /// - Test (i.e. purchased from a license testing account)
+    /// - Test (i.e. purchased from a license testing account) 
+    /// - Promo (i.e. purchased using a promo code)
     #[serde(rename="purchaseType")]
     pub purchase_type: Option<i32>,
     /// ISO 4217 currency code for the subscription price. For example, if the price is specified in British pounds sterling, price_currency_code is "GBP".
@@ -1447,39 +1406,6 @@ pub struct DeobfuscationFilesUploadResponse {
 impl ResponseResult for DeobfuscationFilesUploadResponse {}
 
 
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Image {
-    /// A URL that will serve a preview of the image.
-    pub url: Option<String>,
-    /// A sha1 hash of the image that was uploaded.
-    pub sha1: Option<String>,
-    /// A unique id representing this image.
-    pub id: Option<String>,
-}
-
-impl Part for Image {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Prorate {
-    /// Defines the first day on which the price takes effect.
-    pub start: Option<MonthDay>,
-    /// Default price cannot be zero and must be less than the full subscription price. Default price is always in the developer's Checkout merchant currency. Targeted countries have their prices set automatically based on the default_price.
-    #[serde(rename="defaultPrice")]
-    pub default_price: Option<Price>,
-}
-
-impl Part for Prorate {}
-
-
 /// Represents an edit of an app. An edit allows clients to make multiple changes before committing them in one operation.
 /// 
 /// # Activities
@@ -1503,6 +1429,26 @@ pub struct AppEdit {
 
 impl RequestValue for AppEdit {}
 impl ResponseResult for AppEdit {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [apks list edits](struct.EditApkListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApksListResponse {
+    /// no description provided
+    pub apks: Option<Vec<Apk>>,
+    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#apksListResponse".
+    pub kind: Option<String>,
+}
+
+impl ResponseResult for ApksListResponse {}
 
 
 /// There is no detailed description.
@@ -1613,14 +1559,18 @@ impl ResponseResult for Track {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Timestamp {
-    /// no description provided
-    pub nanos: Option<i32>,
-    /// no description provided
-    pub seconds: Option<String>,
+pub struct Image {
+    /// A URL that will serve a preview of the image.
+    pub url: Option<String>,
+    /// A sha256 hash of the image that was uploaded.
+    pub sha256: Option<String>,
+    /// A unique id representing this image.
+    pub id: Option<String>,
+    /// A sha1 hash of the image that was uploaded.
+    pub sha1: Option<String>,
 }
 
-impl Part for Timestamp {}
+impl Part for Image {}
 
 
 /// There is no detailed description.
@@ -4955,7 +4905,7 @@ impl<'a, C, A> PurchaseVoidedpurchaseListCall<'a, C, A> where C: BorrowMut<hyper
         self._token = Some(new_value.to_string());
         self
     }
-    /// The time, in milliseconds since the Epoch, of the oldest voided in-app product purchase that you want to see in the response. The value of this parameter cannot be older than 30 days and is ignored if a pagination token is set. Default value is current time minus 30 days. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.
+    /// The time, in milliseconds since the Epoch, of the oldest voided purchase that you want to see in the response. The value of this parameter cannot be older than 30 days and is ignored if a pagination token is set. Default value is current time minus 30 days. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.
     ///
     /// Sets the *start time* query property to the given value.
     pub fn start_time(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, C, A> {
@@ -4974,7 +4924,7 @@ impl<'a, C, A> PurchaseVoidedpurchaseListCall<'a, C, A> where C: BorrowMut<hyper
         self._max_results = Some(new_value);
         self
     }
-    /// The time, in milliseconds since the Epoch, of the newest voided in-app product purchase that you want to see in the response. The value of this parameter cannot be greater than the current time and is ignored if a pagination token is set. Default value is current time. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.
+    /// The time, in milliseconds since the Epoch, of the newest voided purchase that you want to see in the response. The value of this parameter cannot be greater than the current time and is ignored if a pagination token is set. Default value is current time. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.
     ///
     /// Sets the *end time* query property to the given value.
     pub fn end_time(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, C, A> {

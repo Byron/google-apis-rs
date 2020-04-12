@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Functions* crate version *1.0.12+20190620*, where *20190620* is the exact revision of the *cloudfunctions:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Cloud Functions* crate version *1.0.13+20200401*, where *20200401* is the exact revision of the *cloudfunctions:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Cloud Functions* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/functions).
@@ -331,7 +331,7 @@ impl<'a, C, A> CloudFunctions<C, A>
         CloudFunctions {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://cloudfunctions.googleapis.com/".to_string(),
             _root_url: "https://cloudfunctions.googleapis.com/".to_string(),
         }
@@ -345,7 +345,7 @@ impl<'a, C, A> CloudFunctions<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -384,7 +384,7 @@ impl<'a, C, A> CloudFunctions<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CallFunctionRequest {
-    /// Input to be passed to the function.
+    /// Required. Input to be passed to the function.
     pub data: Option<String>,
 }
 
@@ -511,30 +511,59 @@ pub struct SetIamPolicyRequest {
 impl RequestValue for SetIamPolicyRequest {}
 
 
-/// Represents an expression text. Example:
+/// Represents a textual expression in the Common Expression Language (CEL)
+/// syntax. CEL is a C-like expression language. The syntax and semantics of CEL
+/// are documented at https://github.com/google/cel-spec.
+/// 
+/// Example (Comparison):
 /// 
 /// ````text
-/// title: "User account presence"
-/// description: "Determines whether the request has a user account"
-/// expression: "size(request.user) > 0"
+/// title: "Summary size limit"
+/// description: "Determines if a summary is less than 100 chars"
+/// expression: "document.summary.size() < 100"
 /// ````
+/// 
+/// Example (Equality):
+/// 
+/// ````text
+/// title: "Requestor is owner"
+/// description: "Determines if requestor is the document owner"
+/// expression: "document.owner == request.auth.claims.email"
+/// ````
+/// 
+/// Example (Logic):
+/// 
+/// ````text
+/// title: "Public documents"
+/// description: "Determine whether the document should be publicly visible"
+/// expression: "document.type != 'private' && document.type != 'internal'"
+/// ````
+/// 
+/// Example (Data Manipulation):
+/// 
+/// ````text
+/// title: "Notification string"
+/// description: "Create a notification string with a timestamp."
+/// expression: "'New message received at ' + string(document.create_time)"
+/// ````
+/// 
+/// The exact variables and functions that may be referenced within an expression
+/// are determined by the service that evaluates it. See the service
+/// documentation for additional information.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
-    /// An optional description of the expression. This is a longer text which
+    /// Optional. Description of the expression. This is a longer text which
     /// describes the expression, e.g. when hovered over it in a UI.
     pub description: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
+    /// Textual representation of an expression in Common Expression Language
+    /// syntax.
     pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error
+    /// Optional. String indicating the location of the expression for error
     /// reporting, e.g. a file name and a position in the file.
     pub location: Option<String>,
-    /// An optional title for the expression, i.e. a short string describing
+    /// Optional. Title for the expression, i.e. a short string describing
     /// its purpose. This can be used e.g. in UIs which allow to enter the
     /// expression.
     pub title: Option<String>,
@@ -552,7 +581,7 @@ impl Part for Expr {}
 ///     {
 ///       "log_type": "DATA_READ",
 ///       "exempted_members": [
-///         "user:foo@gmail.com"
+///         "user:jose@example.com"
 ///       ]
 ///     },
 ///     {
@@ -563,7 +592,7 @@ impl Part for Expr {}
 /// ````
 /// 
 /// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
-/// foo@gmail.com from DATA_READ logging.
+/// jose@example.com from DATA_READ logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -652,37 +681,50 @@ pub struct Location {
 impl Part for Location {}
 
 
-/// Defines an Identity and Access Management (IAM) policy. It is used to
-/// specify access control policies for Cloud Platform resources.
+/// An Identity and Access Management (IAM) policy, which specifies access
+/// controls for Google Cloud resources.
 /// 
-/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
-/// `members` to a `role`, where the members can be user accounts, Google groups,
-/// Google domains, and service accounts. A `role` is a named list of permissions
-/// defined by IAM.
+/// A `Policy` is a collection of `bindings`. A `binding` binds one or more
+/// `members` to a single `role`. Members can be user accounts, service accounts,
+/// Google groups, and domains (such as G Suite). A `role` is a named list of
+/// permissions; each `role` can be an IAM predefined role or a user-created
+/// custom role.
 /// 
-/// **JSON Example**
+/// Optionally, a `binding` can specify a `condition`, which is a logical
+/// expression that allows access to a resource only if the expression evaluates
+/// to `true`. A condition can add constraints based on attributes of the
+/// request, the resource, or both.
+/// 
+/// **JSON example:**
 /// 
 /// ````text
 /// {
 ///   "bindings": [
 ///     {
-///       "role": "roles/owner",
+///       "role": "roles/resourcemanager.organizationAdmin",
 ///       "members": [
 ///         "user:mike@example.com",
 ///         "group:admins@example.com",
 ///         "domain:google.com",
-///         "serviceAccount:my-other-app@appspot.gserviceaccount.com"
+///         "serviceAccount:my-project-id@appspot.gserviceaccount.com"
 ///       ]
 ///     },
 ///     {
-///       "role": "roles/viewer",
-///       "members": ["user:sean@example.com"]
+///       "role": "roles/resourcemanager.organizationViewer",
+///       "members": ["user:eve@example.com"],
+///       "condition": {
+///         "title": "expirable access",
+///         "description": "Does not grant access after Sep 2020",
+///         "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')",
+///       }
 ///     }
-///   ]
+///   ],
+///   "etag": "BwWWja0YfJA=",
+///   "version": 3
 /// }
 /// ````
 /// 
-/// **YAML Example**
+/// **YAML example:**
 /// 
 /// ````text
 /// bindings:
@@ -690,15 +732,21 @@ impl Part for Location {}
 ///   - user:mike@example.com
 ///   - group:admins@example.com
 ///   - domain:google.com
-///   - serviceAccount:my-other-app@appspot.gserviceaccount.com
-///   role: roles/owner
+///   - serviceAccount:my-project-id@appspot.gserviceaccount.com
+///   role: roles/resourcemanager.organizationAdmin
 /// - members:
-///   - user:sean@example.com
-///   role: roles/viewer
+///   - user:eve@example.com
+///   role: roles/resourcemanager.organizationViewer
+///   condition:
+///     title: expirable access
+///     description: Does not grant access after Sep 2020
+///     expression: request.time < timestamp('2020-10-01T00:00:00.000Z')
+/// - etag: BwWWja0YfJA=
+/// - version: 3
 /// ````
 /// 
 /// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam/docs).
+/// [IAM documentation](https://cloud.google.com/iam/docs/).
 /// 
 /// # Activities
 /// 
@@ -720,13 +768,36 @@ pub struct Policy {
     /// systems are expected to put that etag in the request to `setIamPolicy` to
     /// ensure that their change will be applied to the same version of the policy.
     /// 
-    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
-    /// policy is overwritten blindly.
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
     pub etag: Option<String>,
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
+    /// Associates a list of `members` to a `role`. Optionally, may specify a
+    /// `condition` that determines how and when the `bindings` are applied. Each
+    /// of the `bindings` must contain at least one member.
     pub bindings: Option<Vec<Binding>>,
-    /// Deprecated.
+    /// Specifies the format of the policy.
+    /// 
+    /// Valid values are `0`, `1`, and `3`. Requests that specify an invalid value
+    /// are rejected.
+    /// 
+    /// Any operation that affects conditional role bindings must specify version
+    /// `3`. This requirement applies to the following operations:
+    /// 
+    /// * Getting a policy that includes a conditional role binding
+    /// * Adding a conditional role binding to a policy
+    /// * Changing a conditional role binding in a policy
+    /// * Removing any role binding, with or without a condition, from a policy
+    ///   that includes conditions
+    /// 
+    /// **Important:** If you use IAM Conditions, you must include the `etag` field
+    /// whenever you call `setIamPolicy`. If you omit this field, then IAM allows
+    /// you to overwrite a version `3` policy with a version `1` policy, and all of
+    /// the conditions in the version `3` policy are lost.
+    /// 
+    /// If a policy does not include any conditions, operations on that policy may
+    /// specify any valid version or leave the field unset.
     pub version: Option<i32>,
 }
 
@@ -938,7 +1009,7 @@ pub struct Binding {
     ///    who is authenticated with a Google account or a service account.
     /// 
     /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` .
+    ///    account. For example, `alice@example.com` .
     /// 
     /// 
     /// * `serviceAccount:{emailid}`: An email address that represents a service
@@ -946,6 +1017,26 @@ pub struct Binding {
     /// 
     /// * `group:{emailid}`: An email address that represents a Google group.
     ///    For example, `admins@example.com`.
+    /// 
+    /// * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a user that has been recently deleted. For
+    ///    example, `alice@example.com?uid=123456789012345678901`. If the user is
+    ///    recovered, this value reverts to `user:{emailid}` and the recovered user
+    ///    retains the role in the binding.
+    /// 
+    /// * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus
+    ///    unique identifier) representing a service account that has been recently
+    ///    deleted. For example,
+    ///    `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`.
+    ///    If the service account is undeleted, this value reverts to
+    ///    `serviceAccount:{emailid}` and the undeleted service account retains the
+    ///    role in the binding.
+    /// 
+    /// * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique
+    ///    identifier) representing a Google group that has been recently
+    ///    deleted. For example, `admins@example.com?uid=123456789012345678901`. If
+    ///    the group is recovered, this value reverts to `group:{emailid}` and the
+    ///    recovered group retains the role in the binding.
     /// 
     /// 
     /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
@@ -1029,6 +1120,9 @@ pub struct ListFunctionsResponse {
     /// to get more functions.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// Locations that could not be reached. The response does not include any
+    /// functions from these locations.
+    pub unreachable: Option<Vec<String>>,
     /// The functions that match the request.
     pub functions: Option<Vec<CloudFunction>>,
 }
@@ -1072,7 +1166,7 @@ impl RequestValue for GenerateUploadUrlRequest {}
 ///         {
 ///           "log_type": "DATA_READ",
 ///           "exempted_members": [
-///             "user:foo@gmail.com"
+///             "user:jose@example.com"
 ///           ]
 ///         },
 ///         {
@@ -1084,7 +1178,7 @@ impl RequestValue for GenerateUploadUrlRequest {}
 ///       ]
 ///     },
 ///     {
-///       "service": "fooservice.googleapis.com"
+///       "service": "sampleservice.googleapis.com"
 ///       "audit_log_configs": [
 ///         {
 ///           "log_type": "DATA_READ",
@@ -1092,7 +1186,7 @@ impl RequestValue for GenerateUploadUrlRequest {}
 ///         {
 ///           "log_type": "DATA_WRITE",
 ///           "exempted_members": [
-///             "user:bar@gmail.com"
+///             "user:aliya@example.com"
 ///           ]
 ///         }
 ///       ]
@@ -1101,9 +1195,9 @@ impl RequestValue for GenerateUploadUrlRequest {}
 /// }
 /// ````
 /// 
-/// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
-/// logging. It also exempts foo@gmail.com from DATA_READ logging, and
-/// bar@gmail.com from DATA_WRITE logging.
+/// For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
+/// logging. It also exempts jose@example.com from DATA_READ logging, and
+/// aliya@example.com from DATA_WRITE logging.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1122,7 +1216,6 @@ impl Part for AuditConfig {}
 
 /// Describes a Cloud Function that contains user computation executed in
 /// response to an event. It encapsulate function and triggers configurations.
-/// LINT.IfChange
 /// 
 /// # Activities
 /// 
@@ -1163,8 +1256,11 @@ pub struct CloudFunction {
     pub source_archive_url: Option<String>,
     /// Labels associated with this Cloud Function.
     pub labels: Option<HashMap<String, String>>,
-    /// Output only.
-    /// The version identifier of the Cloud Function. Each deployment attempt
+    /// The egress settings for the connector, controlling what traffic is diverted
+    /// through it.
+    #[serde(rename="vpcConnectorEgressSettings")]
+    pub vpc_connector_egress_settings: Option<String>,
+    /// Output only. The version identifier of the Cloud Function. Each deployment attempt
     /// results in a new version of a function being created.
     #[serde(rename="versionId")]
     pub version_id: Option<String>,
@@ -1193,8 +1289,6 @@ pub struct CloudFunction {
     /// 
     /// See [the VPC documentation](https://cloud.google.com/compute/docs/vpc) for
     /// more information on connecting Cloud projects.
-    /// 
-    /// This feature is currently in alpha, available only for whitelisted users.
     pub network: Option<String>,
     /// The amount of memory in MB available for a function.
     /// Defaults to 256MB.
@@ -1210,8 +1304,6 @@ pub struct CloudFunction {
     /// 
     /// See [the VPC documentation](https://cloud.google.com/compute/docs/vpc) for
     /// more information on connecting Cloud projects.
-    /// 
-    /// This feature is currently in alpha, available only for whitelisted users.
     #[serde(rename="vpcConnector")]
     pub vpc_connector: Option<String>,
     /// Environment variables that shall be available during function execution.
@@ -1222,20 +1314,22 @@ pub struct CloudFunction {
     #[serde(rename="sourceUploadUrl")]
     pub source_upload_url: Option<String>,
     /// The email of the function's service account. If empty, defaults to
-    /// {project_id}@appspot.gserviceaccount.com.
+    /// `{project_id}@appspot.gserviceaccount.com`.
     #[serde(rename="serviceAccountEmail")]
     pub service_account_email: Option<String>,
     /// The function execution timeout. Execution is considered failed and
     /// can be terminated if the function is not completed at the end of the
     /// timeout period. Defaults to 60 seconds.
     pub timeout: Option<String>,
-    /// Required. The runtime in which the function is going to run. Choices:
-    /// 
-    /// * `nodejs6`: Node.js 6
-    /// * `nodejs8`: Node.js 8
-    /// * `nodejs10`: Node.js 10
-    /// * `python37`: Python 3.7
-    /// * `go111`: Go 1.11
+    /// The ingress settings for the function, controlling what traffic can reach
+    /// it.
+    #[serde(rename="ingressSettings")]
+    pub ingress_settings: Option<String>,
+    /// The runtime in which to run the function. Required when deploying a new
+    /// function, optional when updating an existing function. For a complete
+    /// list of possible choices, see the
+    /// [`gcloud` command
+    /// reference](/sdk/gcloud/reference/functions/deploy#--runtime).
     pub runtime: Option<String>,
 }
 
@@ -1422,7 +1516,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the function which should be deleted.
+    /// * `name` - Required. The name of the function which should be deleted.
     pub fn locations_functions_delete(&self, name: &str) -> ProjectLocationFunctionDeleteCall<'a, C, A> {
         ProjectLocationFunctionDeleteCall {
             hub: self.hub,
@@ -1447,6 +1541,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectLocationFunctionGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1459,7 +1554,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the function which details should be obtained.
+    /// * `name` - Required. The name of the function which details should be obtained.
     pub fn locations_functions_get(&self, name: &str) -> ProjectLocationFunctionGetCall<'a, C, A> {
         ProjectLocationFunctionGetCall {
             hub: self.hub,
@@ -1502,7 +1597,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `location` - The project and location in which the function should be created, specified
+    /// * `location` - Required. The project and location in which the function should be created, specified
     ///                in the format `projects/*/locations/*`
     pub fn locations_functions_create(&self, request: CloudFunction, location: &str) -> ProjectLocationFunctionCreateCall<'a, C, A> {
         ProjectLocationFunctionCreateCall {
@@ -1590,7 +1685,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the function to be called.
+    /// * `name` - Required. The name of the function to be called.
     pub fn locations_functions_call(&self, request: CallFunctionRequest, name: &str) -> ProjectLocationFunctionCallCall<'a, C, A> {
         ProjectLocationFunctionCallCall {
             hub: self.hub,
@@ -1635,7 +1730,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `parent` - The project and location from which the function should be listed,
     ///              specified in the format `projects/*/locations/*`
     ///              If you want to list functions in all locations, use "-" in place of a
-    ///              location.
+    ///              location. When listing functions in all locations, if one or more
+    ///              location(s) are unreachable, the response will contain functions from all
+    ///              reachable locations along with the names of any unreachable locations.
     pub fn locations_functions_list(&self, parent: &str) -> ProjectLocationFunctionListCall<'a, C, A> {
         ProjectLocationFunctionListCall {
             hub: self.hub,
@@ -2084,14 +2181,14 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// The standard list page token.
+    /// Token identifying which result to start with, which is returned by a previous list call.<br><br> Pagination is only supported when querying for a specific function.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a, C, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The standard list page size.
+    /// The maximum number of records that should be returned.<br> Requested page size cannot exceed 100. If not set, the default page size is 100.<br><br> Pagination is only supported when querying for a specific function.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> OperationListCall<'a, C, A> {
@@ -2105,7 +2202,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._name = Some(new_value.to_string());
         self
     }
-    /// Required. A filter for matching the requested operations.<br><br> The supported formats of <b>filter</b> are:<br> To query for specific function: <code>project:*,location:*,function:*</code><br> To query for all of the latest operations for a project: <code>project:*,latest:true</code>
+    /// Required. A filter for matching the requested operations.<br><br> The supported formats of <b>filter</b> are:<br> To query for a specific function: <code>project:*,location:*,function:*</code><br> To query for all of the latest operations for a project: <code>project:*,latest:true</code>
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> OperationListCall<'a, C, A> {
@@ -2917,7 +3014,7 @@ impl<'a, C, A> ProjectLocationFunctionDeleteCall<'a, C, A> where C: BorrowMut<hy
     }
 
 
-    /// The name of the function which should be deleted.
+    /// Required. The name of the function which should be deleted.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -3020,6 +3117,7 @@ impl<'a, C, A> ProjectLocationFunctionDeleteCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_functions_get_iam_policy("resource")
+///              .options_requested_policy_version(-17)
 ///              .doit();
 /// # }
 /// ```
@@ -3028,6 +3126,7 @@ pub struct ProjectLocationFunctionGetIamPolicyCall<'a, C, A>
 
     hub: &'a CloudFunctions<C, A>,
     _resource: String,
+    _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -3050,9 +3149,12 @@ impl<'a, C, A> ProjectLocationFunctionGetIamPolicyCall<'a, C, A> where C: Borrow
         };
         dlg.begin(MethodInfo { id: "cloudfunctions.projects.locations.functions.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        if let Some(value) = self._options_requested_policy_version {
+            params.push(("options.requestedPolicyVersion", value.to_string()));
+        }
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -3176,6 +3278,20 @@ impl<'a, C, A> ProjectLocationFunctionGetIamPolicyCall<'a, C, A> where C: Borrow
     /// we provide this method for API completeness.
     pub fn resource(mut self, new_value: &str) -> ProjectLocationFunctionGetIamPolicyCall<'a, C, A> {
         self._resource = new_value.to_string();
+        self
+    }
+    /// Optional. The policy format version to be returned.
+    /// 
+    /// Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+    /// rejected.
+    /// 
+    /// Requests for policies with any conditional bindings must specify version 3.
+    /// Policies without any conditional bindings may specify any valid value or
+    /// leave the field unset.
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationFunctionGetIamPolicyCall<'a, C, A> {
+        self._options_requested_policy_version = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -3416,7 +3532,7 @@ impl<'a, C, A> ProjectLocationFunctionGetCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// The name of the function which details should be obtained.
+    /// Required. The name of the function which details should be obtained.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -3980,7 +4096,7 @@ impl<'a, C, A> ProjectLocationFunctionCreateCall<'a, C, A> where C: BorrowMut<hy
         self._request = new_value;
         self
     }
-    /// The project and location in which the function should be created, specified
+    /// Required. The project and location in which the function should be created, specified
     /// in the format `projects/*/locations/*`
     ///
     /// Sets the *location* path property to the given value.
@@ -4088,7 +4204,7 @@ impl<'a, C, A> ProjectLocationFunctionCreateCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_functions_patch(req, "name")
-///              .update_mask("et")
+///              .update_mask("duo")
 ///              .doit();
 /// # }
 /// ```
@@ -4859,7 +4975,7 @@ impl<'a, C, A> ProjectLocationFunctionCallCall<'a, C, A> where C: BorrowMut<hype
         self._request = new_value;
         self
     }
-    /// The name of the function to be called.
+    /// Required. The name of the function to be called.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -5244,8 +5360,8 @@ impl<'a, C, A> ProjectLocationFunctionGenerateDownloadUrlCall<'a, C, A> where C:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_functions_list("parent")
-///              .page_token("eos")
-///              .page_size(-81)
+///              .page_token("erat")
+///              .page_size(-95)
 ///              .doit();
 /// # }
 /// ```
@@ -5404,7 +5520,9 @@ impl<'a, C, A> ProjectLocationFunctionListCall<'a, C, A> where C: BorrowMut<hype
     /// The project and location from which the function should be listed,
     /// specified in the format `projects/*/locations/*`
     /// If you want to list functions in all locations, use "-" in place of a
-    /// location.
+    /// location. When listing functions in all locations, if one or more
+    /// location(s) are unreachable, the response will contain functions from all
+    /// reachable locations along with the names of any unreachable locations.
     ///
     /// Sets the *parent* path property to the given value.
     ///

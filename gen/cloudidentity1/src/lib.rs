@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Identity* crate version *1.0.12+20190629*, where *20190629* is the exact revision of the *cloudidentity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.12*.
+//! This documentation was generated from *Cloud Identity* crate version *1.0.13+20200401*, where *20200401* is the exact revision of the *cloudidentity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Cloud Identity* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/identity/).
@@ -237,18 +237,22 @@ pub use cmn::*;
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
+    /// See, change, create, and delete any of the Cloud Identity Groups that you can access, including the members of each group
+    CloudIdentityGroup,
+
     /// See any Cloud Identity Groups that you can access, including group members and their emails
     CloudIdentityGroupReadonly,
 
-    /// See, change, create, and delete any of the Cloud Identity Groups that you can access, including the members of each group
-    CloudIdentityGroup,
+    /// View and manage your data across Google Cloud Platform services
+    CloudPlatform,
 }
 
 impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
-            Scope::CloudIdentityGroupReadonly => "https://www.googleapis.com/auth/cloud-identity.groups.readonly",
             Scope::CloudIdentityGroup => "https://www.googleapis.com/auth/cloud-identity.groups",
+            Scope::CloudIdentityGroupReadonly => "https://www.googleapis.com/auth/cloud-identity.groups.readonly",
+            Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
         }
     }
 }
@@ -338,7 +342,7 @@ impl<'a, C, A> CloudIdentity<C, A>
         CloudIdentity {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.12".to_string(),
+            _user_agent: "google-api-rust-client/1.0.13".to_string(),
             _base_url: "https://cloudidentity.googleapis.com/".to_string(),
             _root_url: "https://cloudidentity.googleapis.com/".to_string(),
         }
@@ -349,7 +353,7 @@ impl<'a, C, A> CloudIdentity<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.12`.
+    /// It defaults to `google-api-rust-client/1.0.13`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -470,34 +474,34 @@ impl ResponseResult for LookupMembershipNameResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Group {
-    /// The time when the Group was last updated.
+    /// Output only. The time when the Group was last updated.
     /// Output only.
     #[serde(rename="updateTime")]
     pub update_time: Option<String>,
     /// The Group's display name.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// [Resource name](https://cloud.google.com/apis/design/resource_names) of the
+    /// Output only. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
     /// Group in the format: `groups/{group_id}`, where group_id is the unique ID
     /// assigned to the Group.
     /// 
     /// Must be left blank while creating a Group.
     pub name: Option<String>,
-    /// The entity under which this Group resides in Cloud Identity resource
+    /// Required. Immutable. The entity under which this Group resides in Cloud Identity resource
     /// hierarchy. Must be set when creating a Group, read-only afterwards.
     /// 
     /// Currently allowed types: `identitysources`.
     pub parent: Option<String>,
-    /// `Required`. Labels for Group resource.
+    /// Required. `Required`. Labels for Group resource.
     /// For creating Groups under a namespace, set label key to
     /// 'labels/system/groups/external' and label value as empty.
     pub labels: Option<HashMap<String, String>>,
-    /// EntityKey of the Group.
+    /// Required. Immutable. EntityKey of the Group.
     /// 
     /// Must be set when creating a Group, read-only afterwards.
     #[serde(rename="groupKey")]
     pub group_key: Option<EntityKey>,
-    /// The time when the Group was created.
+    /// Output only. The time when the Group was created.
     /// Output only.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
@@ -583,23 +587,23 @@ impl ResponseResult for LookupGroupNameResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Membership {
-    /// Last updated timestamp of the Membership. Output only.
+    /// Output only. Last updated timestamp of the Membership. Output only.
     #[serde(rename="updateTime")]
     pub update_time: Option<String>,
-    /// EntityKey of the entity to be added as the member. Must be set while
+    /// Required. Immutable. EntityKey of the entity to be added as the member. Must be set while
     /// creating a Membership, read-only afterwards.
     /// 
     /// Currently allowed entity types: `Users`, `Groups`.
     #[serde(rename="preferredMemberKey")]
     pub preferred_member_key: Option<EntityKey>,
-    /// Creation timestamp of the Membership. Output only.
+    /// Output only. Creation timestamp of the Membership. Output only.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
     /// Roles for a member within the Group.
     /// 
     /// Currently supported MembershipRoles: `"MEMBER"`.
     pub roles: Option<Vec<MembershipRole>>,
-    /// [Resource name](https://cloud.google.com/apis/design/resource_names) of the
+    /// Output only. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
     /// Membership in the format: `groups/{group_id}/memberships/{member_id}`,
     /// where group_id is the unique ID assigned to the Group to which Membership
     /// belongs to, and member_id is the unique ID assigned to the member
@@ -753,7 +757,7 @@ impl<'a, C, A> GroupMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - [Resource name](https://cloud.google.com/apis/design/resource_names) of the
+    /// * `parent` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
     ///              Group to create Membership within. Format: `groups/{group_id}`, where
     ///              `group_id` is the unique ID assigned to the Group.
     pub fn memberships_create(&self, request: Membership, parent: &str) -> GroupMembershipCreateCall<'a, C, A> {
@@ -769,11 +773,11 @@ impl<'a, C, A> GroupMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List Memberships within a Group.
+    /// Lists Memberships within a Group.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - [Resource name](https://cloud.google.com/apis/design/resource_names) of the
+    /// * `parent` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
     ///              Group to list Memberships within.
     ///              Format: `groups/{group_id}`, where `group_id` is the unique ID assigned to
     ///              the Group.
@@ -792,7 +796,7 @@ impl<'a, C, A> GroupMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List groups within a customer or a domain.
+    /// Lists groups within a customer or a domain.
     pub fn list(&self) -> GroupListCall<'a, C, A> {
         GroupListCall {
             hub: self.hub,
@@ -812,7 +816,7 @@ impl<'a, C, A> GroupMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - [Resource name](https://cloud.google.com/apis/design/resource_names) of the
+    /// * `name` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
     ///            Group in the format: `groups/{group_id}`, where `group_id` is the unique ID
     ///            assigned to the Group.
     pub fn get(&self, name: &str) -> GroupGetCall<'a, C, A> {
@@ -831,7 +835,7 @@ impl<'a, C, A> GroupMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - [Resource name](https://cloud.google.com/apis/design/resource_names) of the
+    /// * `name` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
     ///            Membership to be deleted.
     ///            Format: `groups/{group_id}/memberships/{member_id}`, where `group_id` is
     ///            the unique ID assigned to the Group to which Membership belongs to, and
@@ -868,7 +872,7 @@ impl<'a, C, A> GroupMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - [Resource name](https://cloud.google.com/apis/design/resource_names) of the
+    /// * `name` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
     ///            Membership to be retrieved.
     ///            Format: `groups/{group_id}/memberships/{member_id}`, where `group_id` is
     ///            the unique id assigned to the Group to which Membership belongs to, and
@@ -922,7 +926,7 @@ impl<'a, C, A> GroupMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - [Resource name](https://cloud.google.com/apis/design/resource_names) of the
+    /// * `name` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
     ///            Group in the format: `groups/{group_id}`, where `group_id` is the unique ID
     ///            assigned to the Group.
     pub fn delete(&self, name: &str) -> GroupDeleteCall<'a, C, A> {
@@ -942,7 +946,7 @@ impl<'a, C, A> GroupMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - [Resource name](https://cloud.google.com/apis/design/resource_names) of the
+    /// * `name` - Output only. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
     ///            Group in the format: `groups/{group_id}`, where group_id is the unique ID
     ///            assigned to the Group.
     ///            Must be left blank while creating a Group.
@@ -966,7 +970,7 @@ impl<'a, C, A> GroupMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - [Resource name](https://cloud.google.com/apis/design/resource_names) of the
+    /// * `parent` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
     ///              Group to lookup Membership within.
     ///              Format: `groups/{group_id}`, where `group_id` is the unique ID assigned to
     ///              the Group.
@@ -1197,7 +1201,7 @@ impl<'a, C, A> GroupMembershipCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._request = new_value;
         self
     }
-    /// [Resource name](https://cloud.google.com/apis/design/resource_names) of the
+    /// Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
     /// Group to create Membership within. Format: `groups/{group_id}`, where
     /// `group_id` is the unique ID assigned to the Group.
     ///
@@ -1272,7 +1276,7 @@ impl<'a, C, A> GroupMembershipCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// List Memberships within a Group.
+/// Lists Memberships within a Group.
 ///
 /// A builder for the *memberships.list* method supported by a *group* resource.
 /// It is not used directly, but through a `GroupMethods` instance.
@@ -1462,7 +1466,7 @@ impl<'a, C, A> GroupMembershipListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// [Resource name](https://cloud.google.com/apis/design/resource_names) of the
+    /// Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
     /// Group to list Memberships within.
     /// 
     /// Format: `groups/{group_id}`, where `group_id` is the unique ID assigned to
@@ -1561,7 +1565,7 @@ impl<'a, C, A> GroupMembershipListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// List groups within a customer or a domain.
+/// Lists groups within a customer or a domain.
 ///
 /// A builder for the *list* method supported by a *group* resource.
 /// It is not used directly, but through a `GroupMethods` instance.
@@ -1736,8 +1740,7 @@ impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._view = Some(new_value.to_string());
         self
     }
-    /// `Required`. May be made Optional in the future.
-    /// Customer ID to list all groups from.
+    /// Required. Customer ID to list all groups from.
     ///
     /// Sets the *parent* query property to the given value.
     pub fn parent(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
@@ -1997,7 +2000,7 @@ impl<'a, C, A> GroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
-    /// [Resource name](https://cloud.google.com/apis/design/resource_names) of the
+    /// Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
     /// Group in the format: `groups/{group_id}`, where `group_id` is the unique ID
     /// assigned to the Group.
     ///
@@ -2247,7 +2250,7 @@ impl<'a, C, A> GroupMembershipDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// [Resource name](https://cloud.google.com/apis/design/resource_names) of the
+    /// Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
     /// Membership to be deleted.
     /// 
     /// Format: `groups/{group_id}/memberships/{member_id}`, where `group_id` is
@@ -2500,7 +2503,7 @@ impl<'a, C, A> GroupSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._view = Some(new_value.to_string());
         self
     }
-    /// `Required`. Query string for performing search on groups. Users can search
+    /// Required. `Required`. Query string for performing search on groups. Users can search
     /// on parent and label attributes of groups.
     /// EXACT match ('==') is supported on parent, and CONTAINS match ('in') is
     /// supported on labels.
@@ -2763,7 +2766,7 @@ impl<'a, C, A> GroupMembershipGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// [Resource name](https://cloud.google.com/apis/design/resource_names) of the
+    /// Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
     /// Membership to be retrieved.
     /// 
     /// Format: `groups/{group_id}/memberships/{member_id}`, where `group_id` is
@@ -3501,7 +3504,7 @@ impl<'a, C, A> GroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// [Resource name](https://cloud.google.com/apis/design/resource_names) of the
+    /// Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
     /// Group in the format: `groups/{group_id}`, where `group_id` is the unique ID
     /// assigned to the Group.
     ///
@@ -3787,7 +3790,7 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._request = new_value;
         self
     }
-    /// [Resource name](https://cloud.google.com/apis/design/resource_names) of the
+    /// Output only. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
     /// Group in the format: `groups/{group_id}`, where group_id is the unique ID
     /// assigned to the Group.
     /// 
@@ -3801,7 +3804,7 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._name = new_value.to_string();
         self
     }
-    /// Editable fields: `display_name`, `description`
+    /// Required. Editable fields: `display_name`, `description`
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: &str) -> GroupPatchCall<'a, C, A> {
@@ -4058,7 +4061,7 @@ impl<'a, C, A> GroupMembershipLookupCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// [Resource name](https://cloud.google.com/apis/design/resource_names) of the
+    /// Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the
     /// Group to lookup Membership within.
     /// 
     /// Format: `groups/{group_id}`, where `group_id` is the unique ID assigned to
