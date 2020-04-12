@@ -22,8 +22,8 @@ jobs:
         curl https://pyenv.run | bash
         { echo 'export PATH="$PYENV_ROOT/bin:$PATH"';
         echo 'eval "$(pyenv init -)"';
-        echo 'eval "$(pyenv virtualenv-init -)"'; } >> ~/.bashrc
-        source ~/.bashrc
+        echo 'eval "$(pyenv virtualenv-init -)"'; } >> ~/.profile
+        source ~/.profile
         pyenv versions
         pyenv install --skip-existing "${PYENV_VERSION}"
         pyenv versions
@@ -31,6 +31,7 @@ jobs:
         pyenv version
     - name: Run tests
       run: |
+        source ~/.profile
         make test-gen
         make gen-all-cli cargo-api ARGS=test
         make cargo-api ARGS=doc
