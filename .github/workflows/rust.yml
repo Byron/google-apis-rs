@@ -13,13 +13,13 @@ jobs:
     env:
       PYENV_VERSION: "2.7.13"
       PYENV_ROOT: $HOME/.pyenv
-      PATH: "$HOME/.pyenv/bin:$PATH"
 
     steps:
     - uses: actions/checkout@v2
     - name: Prepare python
       run: |
         curl https://pyenv.run | bash
+        echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
         pyenv versions
         pyenv install --skip-existing "${PYENV_VERSION}"
         pyenv versions
