@@ -95,7 +95,7 @@ license: LICENSE.md
 regen-apis: | clean-all-api clean-all-cli gen-all-api gen-all-cli license
 
 test-gen: $(PYTHON_BIN)
-	$(PYTEST) --cov=src src
+	$(PYTEST) src
 
 codecov-upload: $(PYTHON_BIN)
 	$(CODECOV)
