@@ -10,24 +10,12 @@ jobs:
   build-and-test:
 
     runs-on: ubuntu-latest
-    env:
-      PYENV_VERSION: "2.7.17"
-      PYENV_ROOT: $HOME/.pyenv
-
     steps:
     - uses: actions/checkout@v2
-    - name: Prepare python
-      run: |
-        curl https://pyenv.run | bash
-        { echo 'export PATH="$PYENV_ROOT/bin:$PATH"';
-        echo 'eval "$(pyenv init -)"';
-        echo 'eval "$(pyenv virtualenv-init -)"'; } >> ~/.profile
-        source ~/.profile
-        pyenv versions
-        pyenv install --skip-existing "${PYENV_VERSION}"
-        pyenv versions
-        pyenv global "${PYENV_VERSION}"
-        pyenv version
+    - name: setup pyenv
+      uses: "gabrielfalcao/pyenv-action@v5"
+      with:
+        default: 2.7.17
     - name: Run tests
       run: |
         source ~/.profile
