@@ -18,6 +18,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Prepare python
       run: |
+        curl https://pyenv.run | bash
         pyenv versions
         pyenv install --skip-existing "${PYENV_VERSION}"
         pyenv versions
