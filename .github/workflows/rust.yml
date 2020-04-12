@@ -10,6 +10,8 @@ jobs:
   build-and-test:
 
     runs-on: ubuntu-latest
+    env:
+      TRAVIS: true # emulate CI, some code depends on it to do less work
     steps:
     - uses: actions/checkout@v2
     - name: setup pyenv
