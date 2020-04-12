@@ -1,4 +1,4 @@
-.PHONY: help deps regen-apis license test-gen test codecov-upload clean
+.PHONY: help deps regen-apis license test-gen test clean
 .SUFFIXES:
 
 VIRTUALENV_VERSION = 16.0.0
@@ -10,7 +10,6 @@ PYTHON_BIN := $(VENV_DIR)/bin/python
 PYTHON := . $(VENV_DIR)/bin/activate; python
 PIP := $(PYTHON) -m pip
 PYTEST := $(PYTHON) -m pytest
-CODECOV := $(PYTHON) -m codecov
 
 MAKO_RENDER := etc/bin/mako-render
 API_VERSION_GEN := etc/bin/api_version_to_yaml.py
@@ -56,7 +55,7 @@ help:
 	$(info publish-api    -   publish all api crates to crates.io)
 	$(info publish-cli    -   publish all cli crates to crates.io, required for `cargo install` to work)
 	$(info deps           -   generate a file to tell how to build libraries and programs)
-	$(info test-gen       -   run unit tests for python code, including coverage)
+	$(info test-gen       -   run unit tests for python code)
 	$(info test           -   run all tests)
 	$(info help           -   print this help)
 
@@ -95,10 +94,7 @@ license: LICENSE.md
 regen-apis: | clean-all-api clean-all-cli gen-all-api gen-all-cli license
 
 test-gen: $(PYTHON_BIN)
-	$(PYTEST) src
-
-codecov-upload: $(PYTHON_BIN)
-	$(CODECOV)
+	export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; $(PYTEST) src
 
 test: test-gen
 
