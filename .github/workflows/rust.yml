@@ -13,6 +13,7 @@ jobs:
     env:
       PYENV_VERSION: "2.7.13"
       PYENV_ROOT: $HOME/.pyenv
+      PATH: "$HOME/.pyenv/bin:$PATH"
 
     steps:
     - uses: actions/checkout@v2
