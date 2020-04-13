@@ -180,7 +180,7 @@ The [delegate trait](https://docs.rs/google-sheets4/1.0.13+20200402/google_sheet
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](https://docs.rs/google-sheets4/1.0.13+20200402/google_sheets4/trait.RequestValue.html) and 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-sheets4/1.0.13+20200402/google_sheets4/trait.RequestValue.html) and 
 [decodable](https://docs.rs/google-sheets4/1.0.13+20200402/google_sheets4/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
 Most optionals are are considered [Parts](https://docs.rs/google-sheets4/1.0.13+20200402/google_sheets4/trait.Part.html) which are identifiable by name, which will be sent to 

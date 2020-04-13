@@ -180,7 +180,7 @@ The [delegate trait](https://docs.rs/google-gmail1/1.0.7+20180904/google_gmail1/
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](https://docs.rs/google-gmail1/1.0.7+20180904/google_gmail1/trait.RequestValue.html) and 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-gmail1/1.0.7+20180904/google_gmail1/trait.RequestValue.html) and 
 [decodable](https://docs.rs/google-gmail1/1.0.7+20180904/google_gmail1/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
 Most optionals are are considered [Parts](https://docs.rs/google-gmail1/1.0.7+20180904/google_gmail1/trait.Part.html) which are identifiable by name, which will be sent to 

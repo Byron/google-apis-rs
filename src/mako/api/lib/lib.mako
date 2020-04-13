@@ -222,7 +222,7 @@ The ${link('delegate trait', delegate_url)} is default-implemented, allowing you
 
 ${'##'} Optional Parts in Server-Requests
 
-All structures provided by this library are made to be ${link('enocodable', request_trait_url)} and 
+All structures provided by this library are made to be ${link('encodable', request_trait_url)} and 
 ${link('decodable', response_trait_url)} via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
 Most optionals are are considered ${link('Parts', part_trait_url)} which are identifiable by name, which will be sent to 

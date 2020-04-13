@@ -156,7 +156,7 @@ The [delegate trait](https://docs.rs/google-docs1/1.0.10+20190627/google_docs1/t
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](https://docs.rs/google-docs1/1.0.10+20190627/google_docs1/trait.RequestValue.html) and 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-docs1/1.0.10+20190627/google_docs1/trait.RequestValue.html) and 
 [decodable](https://docs.rs/google-docs1/1.0.10+20190627/google_docs1/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
 Most optionals are are considered [Parts](https://docs.rs/google-docs1/1.0.10+20190627/google_docs1/trait.Part.html) which are identifiable by name, which will be sent to 
