@@ -189,7 +189,7 @@
 //! 
 //! ## Optional Parts in Server-Requests
 //! 
-//! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
+//! All structures provided by this library are made to be [encodable](trait.RequestValue.html) and 
 //! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 //! are valid.
 //! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
@@ -5463,9 +5463,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a, C, A> where C: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -5747,9 +5753,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreDeidentifyCall<'a, C, A> where C:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -6068,9 +6080,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreSearchCall<'a, C, A> where C: Borr
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -6331,9 +6349,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRendered
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -6591,9 +6615,15 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a, C, A> where
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -6844,9 +6874,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRen
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -7132,9 +7168,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a, C, A> wh
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -7415,9 +7457,15 @@ impl<'a, C, A> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a, C, A> w
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -7677,9 +7725,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFra
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -7952,9 +8006,15 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -8247,9 +8307,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, C, A> 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -8549,9 +8615,15 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a, C, A> where 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -8832,9 +8904,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreListCall<'a, C, A> where C: Borrow
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -9117,9 +9195,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirVreadCall<'a, C, A> where C: B
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -9392,9 +9476,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreExportCall<'a, C, A> where C: Bor
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -9655,9 +9745,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, C, A> wh
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -9907,9 +10003,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a, C
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -10183,9 +10285,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, C, A> where
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -10456,9 +10564,15 @@ impl<'a, C, A> ProjectLocationDatasetSetIamPolicyCall<'a, C, A> where C: BorrowM
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -10741,9 +10855,15 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a, C, A> where
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -11022,9 +11142,15 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a, C, A> where
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -11286,9 +11412,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, C, A> where 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -11585,9 +11717,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreExportCall<'a, C, A> where C: Borr
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -11847,9 +11985,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -12133,9 +12277,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a, C, A> where C
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -12395,9 +12545,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -12670,9 +12826,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreListCall<'a, C, A> where C: Borro
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -12995,9 +13157,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, C, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -13294,9 +13462,15 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreCreateCall<'a, C, A> where C: Bor
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -13563,9 +13737,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, C, A> whe
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -13860,9 +14040,15 @@ impl<'a, C, A> ProjectLocationDatasetDeidentifyCall<'a, C, A> where C: BorrowMut
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -14120,9 +14306,15 @@ impl<'a, C, A> ProjectLocationDatasetOperationGetCall<'a, C, A> where C: BorrowM
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -14370,9 +14562,15 @@ impl<'a, C, A> ProjectLocationDatasetDeleteCall<'a, C, A> where C: BorrowMut<hyp
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -14648,9 +14846,15 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, C, A> where C
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -14964,9 +15168,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a, C,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -15230,9 +15440,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadata
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -15490,9 +15706,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreGetCall<'a, C, A> where C: Borrow
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -15788,9 +16010,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, C, A> wh
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -16072,9 +16300,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreCreateCall<'a, C, A> where C: Bor
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -16341,9 +16575,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a, C, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -16601,9 +16841,15 @@ impl<'a, C, A> ProjectLocationDatasetGetCall<'a, C, A> where C: BorrowMut<hyper:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -16850,9 +17096,15 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreGetCall<'a, C, A> where C: Borrow
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -17124,9 +17376,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, C, A> where
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -17425,9 +17683,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreDeidentifyCall<'a, C, A> where C: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -17717,9 +17981,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, C, A> where C:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -18052,9 +18322,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirPatchCall<'a, C, A> where C: B
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -18312,9 +18588,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, C, A> where C
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -18588,9 +18870,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirReadCall<'a, C, A> where C: Bo
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -18863,9 +19151,15 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StorePatchCall<'a, C, A> where C: Borr
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -19163,9 +19457,15 @@ impl<'a, C, A> ProjectLocationDatasetCreateCall<'a, C, A> where C: BorrowMut<hyp
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -19447,9 +19747,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, C, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -19712,9 +20018,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, C, A> where
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -19975,9 +20287,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, C, A> 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -20239,9 +20557,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstance
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -20527,9 +20851,15 @@ impl<'a, C, A> ProjectLocationDatasetTestIamPermissionCall<'a, C, A> where C: Bo
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -20785,9 +21115,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreGetCall<'a, C, A> where C: BorrowM
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -21034,9 +21370,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreDeleteCall<'a, C, A> where C: Bor
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -21376,9 +21718,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreImportCall<'a, C, A> where C: Borr
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -21638,9 +21986,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a, C, A> w
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -21948,9 +22302,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, C, A>
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -22256,9 +22616,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, C, A>
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -22507,9 +22873,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a, C, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -22782,9 +23154,15 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreListCall<'a, C, A> where C: Borro
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -23082,9 +23460,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a, C, A> w
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -23345,9 +23729,15 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a, C, A> where C:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -23681,9 +24071,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, C, A> where C: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -23938,9 +24334,15 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -24189,9 +24591,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a, C, A> wher
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -24475,9 +24883,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStorePatchCall<'a, C, A> where C: Borro
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -24791,9 +25205,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, C, A> where C: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -25070,9 +25490,15 @@ impl<'a, C, A> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a, C, A> w
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -25334,9 +25760,15 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreDeleteCall<'a, C, A> where C: Bor
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -25609,9 +26041,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreCreateCall<'a, C, A> where C: Borr
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -25900,9 +26338,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, C, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -26194,9 +26638,15 @@ impl<'a, C, A> ProjectLocationDatasetListCall<'a, C, A> where C: BorrowMut<hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -26502,9 +26952,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, C, A> where C: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -26766,9 +27222,15 @@ impl<'a, C, A> ProjectLocationDatasetGetIamPolicyCall<'a, C, A> where C: BorrowM
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -27058,9 +27520,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreImportCall<'a, C, A> where C: Bor
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -27342,9 +27810,15 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a, C, A> where 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -27624,9 +28098,15 @@ impl<'a, C, A> ProjectLocationDatasetOperationListCall<'a, C, A> where C: Borrow
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -27896,9 +28376,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, C, A> 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -28183,9 +28669,15 @@ impl<'a, C, A> ProjectLocationDatasetPatchCall<'a, C, A> where C: BorrowMut<hype
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -28475,9 +28967,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a, C, A> where 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -28740,9 +29238,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, C, A> where C
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -29031,9 +29535,15 @@ impl<'a, C, A> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a, C,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -29316,9 +29826,15 @@ impl<'a, C, A> ProjectLocationDatasetDicomStorePatchCall<'a, C, A> where C: Borr
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -29583,9 +30099,15 @@ impl<'a, C, A> ProjectLocationDatasetFhirStoreDeleteCall<'a, C, A> where C: Borr
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -29859,9 +30381,15 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a, C, A> w
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -30148,9 +30676,15 @@ impl<'a, C, A> ProjectLocationDatasetOperationCancelCall<'a, C, A> where C: Borr
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }
@@ -30412,9 +30946,15 @@ impl<'a, C, A> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, C, A> where 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
+                                                              json_server_error,
+                                                              server_error) {
                             sleep(d);
                             continue;
                         }

@@ -176,7 +176,7 @@ The [delegate trait](https://docs.rs/google-analytics3/1.0.13+20190807/google_an
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](https://docs.rs/google-analytics3/1.0.13+20190807/google_analytics3/trait.RequestValue.html) and 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-analytics3/1.0.13+20190807/google_analytics3/trait.RequestValue.html) and 
 [decodable](https://docs.rs/google-analytics3/1.0.13+20190807/google_analytics3/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
 Most optionals are are considered [Parts](https://docs.rs/google-analytics3/1.0.13+20190807/google_analytics3/trait.Part.html) which are identifiable by name, which will be sent to 

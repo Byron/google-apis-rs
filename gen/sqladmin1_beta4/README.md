@@ -208,7 +208,7 @@ The [delegate trait](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sq
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.RequestValue.html) and 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.RequestValue.html) and 
 [decodable](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
 Most optionals are are considered [Parts](https://docs.rs/google-sql1_beta4/1.0.13+20200331/google_sql1_beta4/trait.Part.html) which are identifiable by name, which will be sent to 
