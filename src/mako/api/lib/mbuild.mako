@@ -133,6 +133,9 @@ pub struct ${ThisType}
 impl${mb_tparams} ${CALL_BUILDER_MARKERT_TRAIT} for ${ThisType} {}
 
 impl${mb_tparams} ${ThisType} where ${', '.join(mb_type_bounds())} {
+% if ThisType.startswith('FileUpdateCall'):
+${self._action_fn(c, resource, method, m, params, request_value, parts, custom = "doit_without_upload")}\
+% endif
 
 ${self._action_fn(c, resource, method, m, params, request_value, parts)}\
 
@@ -396,11 +399,14 @@ match result {
 ## create an entire 'api.terms.action' method
 ###############################################################################################
 ###############################################################################################
-<%def name="_action_fn(c, resource, method, m, params, request_value, parts)">\
+<%def name="_action_fn(c, resource, method, m, params, request_value, parts, custom = None)">\
 <%
     import os.path
     join_url = lambda b, e: b.strip('/') + e
-    media_params = method_media_params(m)
+    if custom == 'doit_without_upload':
+        media_params = []
+    else:
+        media_params = method_media_params(m)
 
     type_params = ''
     where = ''
@@ -433,7 +439,10 @@ match result {
                 resumable_media_param = p
     # end handle media params
 
-    action_fn = qualifier + 'fn ' + api.terms.action + type_params + ('(mut self%s)' % add_args) + ' -> ' + rtype + where
+    if custom == 'doit_without_upload':
+        action_fn = qualifier + 'fn ' + "doit_without_upload" + type_params + '(mut self)' + ' -> ' + rtype + where
+    else:
+        action_fn = qualifier + 'fn ' + api.terms.action + type_params + ('(mut self%s)' % add_args) + ' -> ' + rtype + where
 
     field_params = [p for p in params if p.get('is_query_param', True)]
 
@@ -485,7 +494,11 @@ match result {
     # end for each possible url
     del seen
 %>
+    % if custom == 'doit_without_upload':
+    /// Perform the operation you have build so far, but without uploading. This is used to e.g. renaming or updating the description for a file
+    % else:
     /// Perform the operation you have build so far.
+    % endif
     ${action_fn} {
         % if URL_ENCODE in special_cases:
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
