@@ -20,19 +20,20 @@
 
 	central_api_index = lambda crate_name: doc_root + '/' + util.to_extern_crate_name(crate_name) + '/index.html'
 
-	discovery_url = 'https://www.googleapis.com/discovery/v1/'
-	apis = json.loads(urllib2.urlopen(discovery_url + "apis").read())
+	if os.environ.get('FETCH_APIS') is not None:
+		discovery_url = 'https://www.googleapis.com/discovery/v1/'
+		apis = json.loads(urllib2.urlopen(discovery_url + "apis").read())
 
-	print('Loaded {} apis from Google'.format(len(apis['items'])))
+		print('Loaded {} apis from Google'.format(len(apis['items'])))
 
-	for manualy_api in api.get('manually_added', list()):
-		apis['items'].append({
-			'name': manualy_api['name'],
-			'version': manualy_api['version'],
-			'discoveryRestUrl': manualy_api['discovery_rest_url']
-			})
+		for manualy_api in api.get('manually_added', list()):
+			apis['items'].append({
+				'name': manualy_api['name'],
+				'version': manualy_api['version'],
+				'discoveryRestUrl': manualy_api['discovery_rest_url']
+				})
 
-	print('Total  {} apis'.format(len(apis['items'])))
+		print('Total  {} apis'.format(len(apis['items'])))
 
 	json_api_targets = []
 
@@ -183,7 +184,7 @@ help${agsuffix}:
 % if global_targets:
 .PHONY += update-json
 
-% for info in apis['items']:
+% for info in ('apis' in globals() and apis.get('items') or []):
 <%
 	import util
 	import os
