@@ -133,8 +133,8 @@ pub struct ${ThisType}
 impl${mb_tparams} ${CALL_BUILDER_MARKERT_TRAIT} for ${ThisType} {}
 
 impl${mb_tparams} ${ThisType} where ${', '.join(mb_type_bounds())} {
-% if ThisType.startswith('FileUpdateCall'):
-${self._action_fn(c, resource, method, m, params, request_value, parts, custom = "doit_without_upload")}\
+% if api.get('no_upload_prefix') is not None and ThisType.startswith(api.no_upload_prefix):
+${self._action_fn(c, resource, method, m, params, request_value, parts, doit_without_upload = True)}\
 % endif
 
 ${self._action_fn(c, resource, method, m, params, request_value, parts)}\
@@ -399,11 +399,11 @@ match result {
 ## create an entire 'api.terms.action' method
 ###############################################################################################
 ###############################################################################################
-<%def name="_action_fn(c, resource, method, m, params, request_value, parts, custom = None)">\
+<%def name="_action_fn(c, resource, method, m, params, request_value, parts, doit_without_upload = False)">\
 <%
     import os.path
     join_url = lambda b, e: b.strip('/') + e
-    if custom == 'doit_without_upload':
+    if doit_without_upload:
         media_params = []
     else:
         media_params = method_media_params(m)
@@ -439,7 +439,7 @@ match result {
                 resumable_media_param = p
     # end handle media params
 
-    if custom == 'doit_without_upload':
+    if doit_without_upload:
         action_fn = qualifier + 'fn ' + "doit_without_upload" + type_params + '(mut self)' + ' -> ' + rtype + where
     else:
         action_fn = qualifier + 'fn ' + api.terms.action + type_params + ('(mut self%s)' % add_args) + ' -> ' + rtype + where
@@ -494,7 +494,7 @@ match result {
     # end for each possible url
     del seen
 %>
-    % if custom == 'doit_without_upload':
+    % if doit_without_upload:
     /// Perform the operation you have build so far, but without uploading. This is used to e.g. renaming or updating the description for a file
     % else:
     /// Perform the operation you have build so far.
