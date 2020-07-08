@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Pubsub* crate version *1.0.13+20200403*, where *20200403* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
+//! This documentation was generated from *Pubsub* crate version *1.0.13+20200623*, where *20200623* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.13*.
 //! 
 //! Everything else about the *Pubsub* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/pubsub/docs).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Pubsub.html) ... 
 //! 
 //! * projects
-//!  * [*snapshots create*](struct.ProjectSnapshotCreateCall.html), [*snapshots delete*](struct.ProjectSnapshotDeleteCall.html), [*snapshots get*](struct.ProjectSnapshotGetCall.html), [*snapshots get iam policy*](struct.ProjectSnapshotGetIamPolicyCall.html), [*snapshots list*](struct.ProjectSnapshotListCall.html), [*snapshots patch*](struct.ProjectSnapshotPatchCall.html), [*snapshots set iam policy*](struct.ProjectSnapshotSetIamPolicyCall.html), [*snapshots test iam permissions*](struct.ProjectSnapshotTestIamPermissionCall.html), [*subscriptions acknowledge*](struct.ProjectSubscriptionAcknowledgeCall.html), [*subscriptions create*](struct.ProjectSubscriptionCreateCall.html), [*subscriptions delete*](struct.ProjectSubscriptionDeleteCall.html), [*subscriptions get*](struct.ProjectSubscriptionGetCall.html), [*subscriptions get iam policy*](struct.ProjectSubscriptionGetIamPolicyCall.html), [*subscriptions list*](struct.ProjectSubscriptionListCall.html), [*subscriptions modify ack deadline*](struct.ProjectSubscriptionModifyAckDeadlineCall.html), [*subscriptions modify push config*](struct.ProjectSubscriptionModifyPushConfigCall.html), [*subscriptions patch*](struct.ProjectSubscriptionPatchCall.html), [*subscriptions pull*](struct.ProjectSubscriptionPullCall.html), [*subscriptions seek*](struct.ProjectSubscriptionSeekCall.html), [*subscriptions set iam policy*](struct.ProjectSubscriptionSetIamPolicyCall.html), [*subscriptions test iam permissions*](struct.ProjectSubscriptionTestIamPermissionCall.html), [*topics create*](struct.ProjectTopicCreateCall.html), [*topics delete*](struct.ProjectTopicDeleteCall.html), [*topics get*](struct.ProjectTopicGetCall.html), [*topics get iam policy*](struct.ProjectTopicGetIamPolicyCall.html), [*topics list*](struct.ProjectTopicListCall.html), [*topics patch*](struct.ProjectTopicPatchCall.html), [*topics publish*](struct.ProjectTopicPublishCall.html), [*topics set iam policy*](struct.ProjectTopicSetIamPolicyCall.html), [*topics snapshots list*](struct.ProjectTopicSnapshotListCall.html), [*topics subscriptions list*](struct.ProjectTopicSubscriptionListCall.html) and [*topics test iam permissions*](struct.ProjectTopicTestIamPermissionCall.html)
+//!  * [*snapshots create*](struct.ProjectSnapshotCreateCall.html), [*snapshots delete*](struct.ProjectSnapshotDeleteCall.html), [*snapshots get*](struct.ProjectSnapshotGetCall.html), [*snapshots get iam policy*](struct.ProjectSnapshotGetIamPolicyCall.html), [*snapshots list*](struct.ProjectSnapshotListCall.html), [*snapshots patch*](struct.ProjectSnapshotPatchCall.html), [*snapshots set iam policy*](struct.ProjectSnapshotSetIamPolicyCall.html), [*snapshots test iam permissions*](struct.ProjectSnapshotTestIamPermissionCall.html), [*subscriptions acknowledge*](struct.ProjectSubscriptionAcknowledgeCall.html), [*subscriptions create*](struct.ProjectSubscriptionCreateCall.html), [*subscriptions delete*](struct.ProjectSubscriptionDeleteCall.html), [*subscriptions detach*](struct.ProjectSubscriptionDetachCall.html), [*subscriptions get*](struct.ProjectSubscriptionGetCall.html), [*subscriptions get iam policy*](struct.ProjectSubscriptionGetIamPolicyCall.html), [*subscriptions list*](struct.ProjectSubscriptionListCall.html), [*subscriptions modify ack deadline*](struct.ProjectSubscriptionModifyAckDeadlineCall.html), [*subscriptions modify push config*](struct.ProjectSubscriptionModifyPushConfigCall.html), [*subscriptions patch*](struct.ProjectSubscriptionPatchCall.html), [*subscriptions pull*](struct.ProjectSubscriptionPullCall.html), [*subscriptions seek*](struct.ProjectSubscriptionSeekCall.html), [*subscriptions set iam policy*](struct.ProjectSubscriptionSetIamPolicyCall.html), [*subscriptions test iam permissions*](struct.ProjectSubscriptionTestIamPermissionCall.html), [*topics create*](struct.ProjectTopicCreateCall.html), [*topics delete*](struct.ProjectTopicDeleteCall.html), [*topics get*](struct.ProjectTopicGetCall.html), [*topics get iam policy*](struct.ProjectTopicGetIamPolicyCall.html), [*topics list*](struct.ProjectTopicListCall.html), [*topics patch*](struct.ProjectTopicPatchCall.html), [*topics publish*](struct.ProjectTopicPublishCall.html), [*topics set iam policy*](struct.ProjectTopicSetIamPolicyCall.html), [*topics snapshots list*](struct.ProjectTopicSnapshotListCall.html), [*topics subscriptions list*](struct.ProjectTopicSubscriptionListCall.html) and [*topics test iam permissions*](struct.ProjectTopicTestIamPermissionCall.html)
 //! 
 //! 
 //! 
@@ -413,34 +413,40 @@ pub struct ListTopicSubscriptionsResponse {
     /// `ListTopicSubscriptionsRequest` to get more subscriptions.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The names of the subscriptions that match the request.
+    /// The names of subscriptions attached to the topic specified in the request.
     pub subscriptions: Option<Vec<String>>,
 }
 
 impl ResponseResult for ListTopicSubscriptionsResponse {}
 
 
-/// Request message for `SetIamPolicy` method.
+/// A policy that specifies how Cloud Pub/Sub retries message delivery.
 /// 
-/// # Activities
+/// Retry delay will be exponential based on provided minimum and maximum
+/// backoffs. https://en.wikipedia.org/wiki/Exponential_backoff.
 /// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// RetryPolicy will be triggered on NACKs or acknowledgement deadline exceeded
+/// events for a given message.
 /// 
-/// * [subscriptions set iam policy projects](struct.ProjectSubscriptionSetIamPolicyCall.html) (request)
-/// * [topics set iam policy projects](struct.ProjectTopicSetIamPolicyCall.html) (request)
-/// * [snapshots set iam policy projects](struct.ProjectSnapshotSetIamPolicyCall.html) (request)
+/// Retry Policy is implemented on a best effort basis. At times, the delay
+/// between consecutive deliveries may not match the configuration. That is,
+/// delay can be more or less than configured backoff.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SetIamPolicyRequest {
-    /// REQUIRED: The complete policy to be applied to the `resource`. The size of
-    /// the policy is limited to a few 10s of KB. An empty policy is a
-    /// valid policy but certain Cloud Platform services (such as Projects)
-    /// might reject them.
-    pub policy: Option<Policy>,
+pub struct RetryPolicy {
+    /// The maximum delay between consecutive deliveries of a given message.
+    /// Value should be between 0 and 600 seconds. Defaults to 600 seconds.
+    #[serde(rename="maximumBackoff")]
+    pub maximum_backoff: Option<String>,
+    /// The minimum delay between consecutive deliveries of a given message.
+    /// Value should be between 0 and 600 seconds. Defaults to 10 seconds.
+    #[serde(rename="minimumBackoff")]
+    pub minimum_backoff: Option<String>,
 }
 
-impl RequestValue for SetIamPolicyRequest {}
+impl Part for RetryPolicy {}
 
 
 /// A message and its corresponding acknowledgment ID.
@@ -454,8 +460,11 @@ pub struct ReceivedMessage {
     pub ack_id: Option<String>,
     /// The message.
     pub message: Option<PubsubMessage>,
-    /// Delivery attempt counter is 1 + (the sum of number of NACKs and number of
-    /// ack_deadline exceeds) for this message.
+    /// The approximate number of times that Cloud Pub/Sub has attempted to deliver
+    /// the associated message to a subscriber.
+    /// 
+    /// More precisely, this is 1 + (number of NACKs) +
+    /// (number of ack_deadline exceeds) for this message.
     /// 
     /// A NACK is any call to ModifyAckDeadline with a 0 deadline. An ack_deadline
     /// exceeds event is whenever a message is not acknowledged within
@@ -463,13 +472,10 @@ pub struct ReceivedMessage {
     /// Subscription.ackDeadlineSeconds, but may get extended automatically by
     /// the client library.
     /// 
-    /// The first delivery of a given message will have this value as 1. The value
-    /// is calculated at best effort and is approximate.
+    /// Upon the first delivery of a given message, `delivery_attempt` will have a
+    /// value of 1. The value is calculated at best effort and is approximate.
     /// 
     /// If a DeadLetterPolicy is not set on the subscription, this will be 0.
-    /// <b>EXPERIMENTAL:</b> This feature is part of a closed alpha release. This
-    /// API might be changed in backward-incompatible ways and is not recommended
-    /// for production use. It is not subject to any SLA or deprecation policy.
     #[serde(rename="deliveryAttempt")]
     pub delivery_attempt: Option<i32>,
 }
@@ -607,10 +613,12 @@ impl ResponseResult for ListSnapshotsResponse {}
 /// permissions; each `role` can be an IAM predefined role or a user-created
 /// custom role.
 /// 
-/// Optionally, a `binding` can specify a `condition`, which is a logical
-/// expression that allows access to a resource only if the expression evaluates
-/// to `true`. A condition can add constraints based on attributes of the
-/// request, the resource, or both.
+/// For some types of Google Cloud resources, a `binding` can also specify a
+/// `condition`, which is a logical expression that allows access to a resource
+/// only if the expression evaluates to `true`. A condition can add constraints
+/// based on attributes of the request, the resource, or both. To learn which
+/// resources support conditions in their IAM policies, see the
+/// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
 /// 
 /// **JSON example:**
 /// 
@@ -628,7 +636,9 @@ impl ResponseResult for ListSnapshotsResponse {}
 ///     },
 ///     {
 ///       "role": "roles/resourcemanager.organizationViewer",
-///       "members": ["user:eve@example.com"],
+///       "members": [
+///         "user:eve@example.com"
+///       ],
 ///       "condition": {
 ///         "title": "expirable access",
 ///         "description": "Does not grant access after Sep 2020",
@@ -716,6 +726,9 @@ pub struct Policy {
     /// 
     /// If a policy does not include any conditions, operations on that policy may
     /// specify any valid version or leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub version: Option<i32>,
 }
 
@@ -820,6 +833,22 @@ pub struct Empty { _never_set: Option<bool> }
 impl ResponseResult for Empty {}
 
 
+/// Response for the DetachSubscription method.
+/// Reserved for future use.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions detach projects](struct.ProjectSubscriptionDetachCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DetachSubscriptionResponse { _never_set: Option<bool> }
+
+impl ResponseResult for DetachSubscriptionResponse {}
+
+
 /// Request for the UpdateTopic method.
 /// 
 /// # Activities
@@ -903,9 +932,17 @@ pub struct Binding {
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
     /// The condition that is associated with this binding.
-    /// NOTE: An unsatisfied condition will not allow user access via current
-    /// binding. Different bindings, including their conditions, are examined
-    /// independently.
+    /// 
+    /// If the condition evaluates to `true`, then this binding applies to the
+    /// current request.
+    /// 
+    /// If the condition evaluates to `false`, then this binding does not apply to
+    /// the current request. However, a different role binding might grant the same
+    /// role to one or more of the members in this binding.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
@@ -1015,6 +1052,12 @@ impl ResponseResult for ListTopicSnapshotsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Subscription {
+    /// An expression written in the Pub/Sub [filter
+    /// language](https://cloud.google.com/pubsub/docs/filtering). If non-empty,
+    /// then only `PubsubMessage`s whose `attributes` field matches the filter are
+    /// delivered on this subscription. If empty, then no messages are filtered
+    /// out.
+    pub filter: Option<String>,
     /// Required. The name of the subscription. It must have the format
     /// `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
     /// start with a letter, and contain only letters (`[A-Za-z]`), numbers
@@ -1022,6 +1065,15 @@ pub struct Subscription {
     /// plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters
     /// in length, and it must not start with `"goog"`.
     pub name: Option<String>,
+    /// A policy that specifies how Pub/Sub retries message delivery for this
+    /// subscription.
+    /// 
+    /// If not set, the default retry policy is applied. This generally implies
+    /// that messages will be retried as soon as possible for healthy subscribers.
+    /// RetryPolicy will be triggered on NACKs or acknowledgement deadline
+    /// exceeded events for a given message.
+    #[serde(rename="retryPolicy")]
+    pub retry_policy: Option<RetryPolicy>,
     /// The approximate amount of time (on a best-effort basis) Pub/Sub waits for
     /// the subscriber to acknowledge receipt before resending the message. In the
     /// interval after the message is delivered and before it is acknowledged, it
@@ -1082,9 +1134,6 @@ pub struct Subscription {
     /// parent project (i.e.,
     /// service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com) must have
     /// permission to Acknowledge() messages on this subscription.
-    /// <b>EXPERIMENTAL:</b> This feature is part of a closed alpha release. This
-    /// API might be changed in backward-incompatible ways and is not recommended
-    /// for production use. It is not subject to any SLA or deprecation policy.
     #[serde(rename="deadLetterPolicy")]
     pub dead_letter_policy: Option<DeadLetterPolicy>,
     /// A policy that specifies the conditions for this subscription's expiration.
@@ -1114,6 +1163,29 @@ impl ResponseResult for Subscription {}
 pub struct SeekResponse { _never_set: Option<bool> }
 
 impl ResponseResult for SeekResponse {}
+
+
+/// Request message for `SetIamPolicy` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions set iam policy projects](struct.ProjectSubscriptionSetIamPolicyCall.html) (request)
+/// * [topics set iam policy projects](struct.ProjectTopicSetIamPolicyCall.html) (request)
+/// * [snapshots set iam policy projects](struct.ProjectSnapshotSetIamPolicyCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SetIamPolicyRequest {
+    /// REQUIRED: The complete policy to be applied to the `resource`. The size of
+    /// the policy is limited to a few 10s of KB. An empty policy is a
+    /// valid policy but certain Cloud Platform services (such as Projects)
+    /// might reject them.
+    pub policy: Option<Policy>,
+}
+
+impl RequestValue for SetIamPolicyRequest {}
 
 
 /// Request message for `TestIamPermissions` method.
@@ -1263,7 +1335,7 @@ pub struct Snapshot {
 impl ResponseResult for Snapshot {}
 
 
-/// There is no detailed description.
+/// A policy constraining the storage of messages published to the topic.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1374,7 +1446,7 @@ pub struct PushConfig {
     #[serde(rename="oidcToken")]
     pub oidc_token: Option<OidcToken>,
     /// A URL locating the endpoint to which messages should be pushed.
-    /// For example, a Webhook endpoint might use "https://example.com/push".
+    /// For example, a Webhook endpoint might use `https://example.com/push`.
     #[serde(rename="pushEndpoint")]
     pub push_endpoint: Option<String>,
 }
@@ -1509,7 +1581,8 @@ impl RequestValue for UpdateSnapshotRequest {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PubsubMessage {
     /// Attributes for this message. If this field is empty, the message must
-    /// contain non-empty data.
+    /// contain non-empty data. This can be used to filter messages on the
+    /// subscription.
     pub attributes: Option<HashMap<String, String>>,
     /// The message data field. If this field is empty, the message must contain
     /// at least one attribute.
@@ -1559,7 +1632,7 @@ impl Part for PubsubMessage {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `snapshots_create(...)`, `snapshots_delete(...)`, `snapshots_get(...)`, `snapshots_get_iam_policy(...)`, `snapshots_list(...)`, `snapshots_patch(...)`, `snapshots_set_iam_policy(...)`, `snapshots_test_iam_permissions(...)`, `subscriptions_acknowledge(...)`, `subscriptions_create(...)`, `subscriptions_delete(...)`, `subscriptions_get(...)`, `subscriptions_get_iam_policy(...)`, `subscriptions_list(...)`, `subscriptions_modify_ack_deadline(...)`, `subscriptions_modify_push_config(...)`, `subscriptions_patch(...)`, `subscriptions_pull(...)`, `subscriptions_seek(...)`, `subscriptions_set_iam_policy(...)`, `subscriptions_test_iam_permissions(...)`, `topics_create(...)`, `topics_delete(...)`, `topics_get(...)`, `topics_get_iam_policy(...)`, `topics_list(...)`, `topics_patch(...)`, `topics_publish(...)`, `topics_set_iam_policy(...)`, `topics_snapshots_list(...)`, `topics_subscriptions_list(...)` and `topics_test_iam_permissions(...)`
+/// // like `snapshots_create(...)`, `snapshots_delete(...)`, `snapshots_get(...)`, `snapshots_get_iam_policy(...)`, `snapshots_list(...)`, `snapshots_patch(...)`, `snapshots_set_iam_policy(...)`, `snapshots_test_iam_permissions(...)`, `subscriptions_acknowledge(...)`, `subscriptions_create(...)`, `subscriptions_delete(...)`, `subscriptions_detach(...)`, `subscriptions_get(...)`, `subscriptions_get_iam_policy(...)`, `subscriptions_list(...)`, `subscriptions_modify_ack_deadline(...)`, `subscriptions_modify_push_config(...)`, `subscriptions_patch(...)`, `subscriptions_pull(...)`, `subscriptions_seek(...)`, `subscriptions_set_iam_policy(...)`, `subscriptions_test_iam_permissions(...)`, `topics_create(...)`, `topics_delete(...)`, `topics_get(...)`, `topics_get_iam_policy(...)`, `topics_list(...)`, `topics_patch(...)`, `topics_publish(...)`, `topics_set_iam_policy(...)`, `topics_snapshots_list(...)`, `topics_subscriptions_list(...)` and `topics_test_iam_permissions(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1624,7 +1697,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Returns permissions that a caller has on the specified resource.
     /// If the resource does not exist, this will return an empty set of
-    /// permissions, not a NOT_FOUND error.
+    /// permissions, not a `NOT_FOUND` error.
     /// 
     /// Note: This operation is designed to be used for building permission-aware
     /// UIs and command-line tools, not for authorization checking. This operation
@@ -1650,7 +1723,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Returns permissions that a caller has on the specified resource.
     /// If the resource does not exist, this will return an empty set of
-    /// permissions, not a NOT_FOUND error.
+    /// permissions, not a `NOT_FOUND` error.
     /// 
     /// Note: This operation is designed to be used for building permission-aware
     /// UIs and command-line tools, not for authorization checking. This operation
@@ -1676,7 +1749,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Returns permissions that a caller has on the specified resource.
     /// If the resource does not exist, this will return an empty set of
-    /// permissions, not a NOT_FOUND error.
+    /// permissions, not a `NOT_FOUND` error.
     /// 
     /// Note: This operation is designed to be used for building permission-aware
     /// UIs and command-line tools, not for authorization checking. This operation
@@ -1904,6 +1977,27 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Detaches a subscription from this topic. All messages retained in the
+    /// subscription are dropped. Subsequent `Pull` and `StreamingPull` requests
+    /// will return FAILED_PRECONDITION. If the subscription is a push
+    /// subscription, pushes to the endpoint will stop.
+    /// 
+    /// # Arguments
+    ///
+    /// * `subscription` - Required. The subscription to detach.
+    ///                    Format is `projects/{project}/subscriptions/{subscription}`.
+    pub fn subscriptions_detach(&self, subscription: &str) -> ProjectSubscriptionDetachCall<'a, C, A> {
+        ProjectSubscriptionDetachCall {
+            hub: self.hub,
+            _subscription: subscription.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Lists matching topics.
     /// 
     /// # Arguments
@@ -2017,7 +2111,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
     /// 
-    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
     /// 
     /// # Arguments
     ///
@@ -2214,7 +2308,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
     /// 
-    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
     /// 
     /// # Arguments
     ///
@@ -2278,7 +2372,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the names of the subscriptions on this topic.
+    /// Lists the names of the attached subscriptions on this topic.
     /// 
     /// # Arguments
     ///
@@ -2326,7 +2420,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
     /// 
-    /// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+    /// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
     /// 
     /// # Arguments
     ///
@@ -2928,7 +3022,7 @@ impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 /// Returns permissions that a caller has on the specified resource.
 /// If the resource does not exist, this will return an empty set of
-/// permissions, not a NOT_FOUND error.
+/// permissions, not a `NOT_FOUND` error.
 /// 
 /// Note: This operation is designed to be used for building permission-aware
 /// UIs and command-line tools, not for authorization checking. This operation
@@ -3220,7 +3314,7 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
 
 /// Returns permissions that a caller has on the specified resource.
 /// If the resource does not exist, this will return an empty set of
-/// permissions, not a NOT_FOUND error.
+/// permissions, not a `NOT_FOUND` error.
 /// 
 /// Note: This operation is designed to be used for building permission-aware
 /// UIs and command-line tools, not for authorization checking. This operation
@@ -3512,7 +3606,7 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
 
 /// Returns permissions that a caller has on the specified resource.
 /// If the resource does not exist, this will return an empty set of
-/// permissions, not a NOT_FOUND error.
+/// permissions, not a `NOT_FOUND` error.
 /// 
 /// Note: This operation is designed to be used for building permission-aware
 /// UIs and command-line tools, not for authorization checking. This operation
@@ -4588,6 +4682,10 @@ impl<'a, C, A> ProjectSnapshotGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
     pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectSnapshotGetIamPolicyCall<'a, C, A> {
@@ -5154,6 +5252,10 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
     pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectTopicGetIamPolicyCall<'a, C, A> {
@@ -6240,6 +6342,10 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
     /// Requests for policies with any conditional bindings must specify version 3.
     /// Policies without any conditional bindings may specify any valid value or
     /// leave the field unset.
+    /// 
+    /// To learn which resources support conditions in their IAM policies, see the
+    /// [IAM
+    /// documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
     pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectSubscriptionGetIamPolicyCall<'a, C, A> {
@@ -6309,6 +6415,264 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
 }
 
 
+/// Detaches a subscription from this topic. All messages retained in the
+/// subscription are dropped. Subsequent `Pull` and `StreamingPull` requests
+/// will return FAILED_PRECONDITION. If the subscription is a push
+/// subscription, pushes to the endpoint will stop.
+///
+/// A builder for the *subscriptions.detach* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1 as pubsub1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use pubsub1::Pubsub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().subscriptions_detach("subscription")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSubscriptionDetachCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Pubsub<C, A>,
+    _subscription: String,
+    _delegate: Option<&'a mut dyn Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSubscriptionDetachCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSubscriptionDetachCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, DetachSubscriptionResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut dyn Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "pubsub.projects.subscriptions.detach",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("subscription", self._subscription.to_string()));
+        for &field in ["alt", "subscription"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+subscription}:detach";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+subscription}", "subscription")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["subscription"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+
+                        let json_server_error = json::from_str::<JsonServerError>(&json_err).ok();
+                        let server_error = json::from_str::<ServerError>(&json_err)
+                            .or_else(|_| json::from_str::<ErrorResponse>(&json_err).map(|r| r.error))
+                            .ok();
+
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json_server_error,
+                                                              server_error) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The subscription to detach.
+    /// Format is `projects/{project}/subscriptions/{subscription}`.
+    ///
+    /// Sets the *subscription* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn subscription(mut self, new_value: &str) -> ProjectSubscriptionDetachCall<'a, C, A> {
+        self._subscription = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn Delegate) -> ProjectSubscriptionDetachCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionDetachCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSubscriptionDetachCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Lists matching topics.
 ///
 /// A builder for the *topics.list* method supported by a *project* resource.
@@ -6337,8 +6701,8 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().topics_list("project")
-///              .page_token("ipsum")
-///              .page_size(-5)
+///              .page_token("Lorem")
+///              .page_size(-21)
 ///              .doit();
 /// # }
 /// ```
@@ -7689,7 +8053,7 @@ impl<'a, C, A> ProjectSnapshotDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
 /// 
-/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+/// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
 ///
 /// A builder for the *topics.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9458,8 +9822,8 @@ impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().snapshots_list("project")
-///              .page_token("amet")
-///              .page_size(-60)
+///              .page_token("no")
+///              .page_size(-36)
 ///              .doit();
 /// # }
 /// ```
@@ -9714,7 +10078,7 @@ impl<'a, C, A> ProjectSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
 /// 
-/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+/// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
 ///
 /// A builder for the *snapshots.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10547,7 +10911,7 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Lists the names of the subscriptions on this topic.
+/// Lists the names of the attached subscriptions on this topic.
 ///
 /// A builder for the *topics.subscriptions.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10575,8 +10939,8 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().topics_subscriptions_list("topic")
-///              .page_token("aliquyam")
-///              .page_size(-73)
+///              .page_token("accusam")
+///              .page_size(-56)
 ///              .doit();
 /// # }
 /// ```
@@ -10861,8 +11225,8 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().topics_snapshots_list("topic")
-///              .page_token("sea")
-///              .page_size(-21)
+///              .page_token("et")
+///              .page_size(-70)
 ///              .doit();
 /// # }
 /// ```
@@ -11117,7 +11481,7 @@ impl<'a, C, A> ProjectTopicSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
 /// 
-/// Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED
+/// Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
 ///
 /// A builder for the *subscriptions.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.

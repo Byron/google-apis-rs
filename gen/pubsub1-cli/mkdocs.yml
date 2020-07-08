@@ -1,4 +1,4 @@
-site_name: Pubsub v1.0.13+20200403
+site_name: Pubsub v1.0.13+20200623
 site_url: http://byron.github.io/google-apis-rs/google-pubsub1-cli
 site_description: A complete library to interact with Pubsub (protocol v1)
 
@@ -20,6 +20,7 @@ pages:
 - ['projects_subscriptions-acknowledge.md', 'Projects', 'Subscriptions Acknowledge']
 - ['projects_subscriptions-create.md', 'Projects', 'Subscriptions Create']
 - ['projects_subscriptions-delete.md', 'Projects', 'Subscriptions Delete']
+- ['projects_subscriptions-detach.md', 'Projects', 'Subscriptions Detach']
 - ['projects_subscriptions-get.md', 'Projects', 'Subscriptions Get']
 - ['projects_subscriptions-get-iam-policy.md', 'Projects', 'Subscriptions Get Iam Policy']
 - ['projects_subscriptions-list.md', 'Projects', 'Subscriptions List']

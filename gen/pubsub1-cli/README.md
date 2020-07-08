@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Pubsub* API at revision *20200403*. The CLI is at version *1.0.13*.
+This documentation was generated from the *Pubsub* API at revision *20200623*. The CLI is at version *1.0.13*.
 
 ```bash
 pubsub1 [options]
@@ -41,6 +41,7 @@ pubsub1 [options]
                 subscriptions-acknowledge <subscription> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-delete <subscription> [-p <v>]... [-o <out>]
+                subscriptions-detach <subscription> [-p <v>]... [-o <out>]
                 subscriptions-get <subscription> [-p <v>]... [-o <out>]
                 subscriptions-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 subscriptions-list <project> [-p <v>]... [-o <out>]
