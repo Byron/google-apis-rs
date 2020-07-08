@@ -719,21 +719,24 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "topic" => Some(("topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "retry-policy.maximum-backoff" => Some(("retryPolicy.maximumBackoff", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "retry-policy.minimum-backoff" => Some(("retryPolicy.minimumBackoff", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ack-deadline-seconds" => Some(("ackDeadlineSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "push-config.attributes" => Some(("pushConfig.attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "push-config.oidc-token.audience" => Some(("pushConfig.oidcToken.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "push-config.oidc-token.service-account-email" => Some(("pushConfig.oidcToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "push-config.push-endpoint" => Some(("pushConfig.pushEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "topic" => Some(("topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message-retention-duration" => Some(("messageRetentionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retain-acked-messages" => Some(("retainAckedMessages", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "dead-letter-policy.dead-letter-topic" => Some(("deadLetterPolicy.deadLetterTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dead-letter-policy.max-delivery-attempts" => Some(("deadLetterPolicy.maxDeliveryAttempts", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "expiration-policy.ttl" => Some(("expirationPolicy.ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "audience", "dead-letter-policy", "dead-letter-topic", "expiration-policy", "labels", "max-delivery-attempts", "message-retention-duration", "name", "oidc-token", "push-config", "push-endpoint", "retain-acked-messages", "service-account-email", "topic", "ttl"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "audience", "dead-letter-policy", "dead-letter-topic", "expiration-policy", "filter", "labels", "max-delivery-attempts", "maximum-backoff", "message-retention-duration", "minimum-backoff", "name", "oidc-token", "push-config", "push-endpoint", "retain-acked-messages", "retry-policy", "service-account-email", "topic", "ttl"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -796,6 +799,58 @@ impl<'n> Engine<'n> {
     fn _projects_subscriptions_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().subscriptions_delete(opt.value_of("subscription").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_subscriptions_detach(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().subscriptions_detach(opt.value_of("subscription").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1210,21 +1265,24 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription.topic" => Some(("subscription.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.name" => Some(("subscription.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription.retry-policy.maximum-backoff" => Some(("subscription.retryPolicy.maximumBackoff", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription.retry-policy.minimum-backoff" => Some(("subscription.retryPolicy.minimumBackoff", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.ack-deadline-seconds" => Some(("subscription.ackDeadlineSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "subscription.labels" => Some(("subscription.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "subscription.push-config.attributes" => Some(("subscription.pushConfig.attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "subscription.push-config.oidc-token.audience" => Some(("subscription.pushConfig.oidcToken.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.push-config.oidc-token.service-account-email" => Some(("subscription.pushConfig.oidcToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.push-config.push-endpoint" => Some(("subscription.pushConfig.pushEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "subscription.topic" => Some(("subscription.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription.filter" => Some(("subscription.filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.message-retention-duration" => Some(("subscription.messageRetentionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.retain-acked-messages" => Some(("subscription.retainAckedMessages", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "subscription.dead-letter-policy.dead-letter-topic" => Some(("subscription.deadLetterPolicy.deadLetterTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.dead-letter-policy.max-delivery-attempts" => Some(("subscription.deadLetterPolicy.maxDeliveryAttempts", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "subscription.expiration-policy.ttl" => Some(("subscription.expirationPolicy.ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "audience", "dead-letter-policy", "dead-letter-topic", "expiration-policy", "labels", "max-delivery-attempts", "message-retention-duration", "name", "oidc-token", "push-config", "push-endpoint", "retain-acked-messages", "service-account-email", "subscription", "topic", "ttl", "update-mask"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "audience", "dead-letter-policy", "dead-letter-topic", "expiration-policy", "filter", "labels", "max-delivery-attempts", "maximum-backoff", "message-retention-duration", "minimum-backoff", "name", "oidc-token", "push-config", "push-endpoint", "retain-acked-messages", "retry-policy", "service-account-email", "subscription", "topic", "ttl", "update-mask"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2436,6 +2494,9 @@ impl<'n> Engine<'n> {
                     ("subscriptions-delete", Some(opt)) => {
                         call_result = self._projects_subscriptions_delete(opt, dry_run, &mut err);
                     },
+                    ("subscriptions-detach", Some(opt)) => {
+                        call_result = self._projects_subscriptions_detach(opt, dry_run, &mut err);
+                    },
                     ("subscriptions-get", Some(opt)) => {
                         call_result = self._projects_subscriptions_get(opt, dry_run, &mut err);
                     },
@@ -2590,7 +2651,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'snapshots-create', 'snapshots-delete', 'snapshots-get', 'snapshots-get-iam-policy', 'snapshots-list', 'snapshots-patch', 'snapshots-set-iam-policy', 'snapshots-test-iam-permissions', 'subscriptions-acknowledge', 'subscriptions-create', 'subscriptions-delete', 'subscriptions-get', 'subscriptions-get-iam-policy', 'subscriptions-list', 'subscriptions-modify-ack-deadline', 'subscriptions-modify-push-config', 'subscriptions-patch', 'subscriptions-pull', 'subscriptions-seek', 'subscriptions-set-iam-policy', 'subscriptions-test-iam-permissions', 'topics-create', 'topics-delete', 'topics-get', 'topics-get-iam-policy', 'topics-list', 'topics-patch', 'topics-publish', 'topics-set-iam-policy', 'topics-snapshots-list', 'topics-subscriptions-list' and 'topics-test-iam-permissions'", vec![
+        ("projects", "methods: 'snapshots-create', 'snapshots-delete', 'snapshots-get', 'snapshots-get-iam-policy', 'snapshots-list', 'snapshots-patch', 'snapshots-set-iam-policy', 'snapshots-test-iam-permissions', 'subscriptions-acknowledge', 'subscriptions-create', 'subscriptions-delete', 'subscriptions-detach', 'subscriptions-get', 'subscriptions-get-iam-policy', 'subscriptions-list', 'subscriptions-modify-ack-deadline', 'subscriptions-modify-push-config', 'subscriptions-patch', 'subscriptions-pull', 'subscriptions-seek', 'subscriptions-set-iam-policy', 'subscriptions-test-iam-permissions', 'topics-create', 'topics-delete', 'topics-get', 'topics-get-iam-policy', 'topics-list', 'topics-patch', 'topics-publish', 'topics-set-iam-policy', 'topics-snapshots-list', 'topics-subscriptions-list' and 'topics-test-iam-permissions'", vec![
             ("snapshots-create",
                     Some(r##"Creates a snapshot from the requested subscription. Snapshots are used in
         <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
@@ -2790,7 +2851,7 @@ fn main() {
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
         existing policy.
         
-        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
+        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_snapshots-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -2821,7 +2882,7 @@ fn main() {
             ("snapshots-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -2945,6 +3006,32 @@ fn main() {
                      None,
                      Some(r##"Required. The subscription to delete.
         Format is `projects/{project}/subscriptions/{sub}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("subscriptions-detach",
+                    Some(r##"Detaches a subscription from this topic. All messages retained in the
+        subscription are dropped. Subsequent `Pull` and `StreamingPull` requests
+        will return FAILED_PRECONDITION. If the subscription is a push
+        subscription, pushes to the endpoint will stop."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_subscriptions-detach",
+                  vec![
+                    (Some(r##"subscription"##),
+                     None,
+                     Some(r##"Required. The subscription to detach.
+        Format is `projects/{project}/subscriptions/{subscription}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3202,7 +3289,7 @@ fn main() {
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
         existing policy.
         
-        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
+        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_subscriptions-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3233,7 +3320,7 @@ fn main() {
             ("subscriptions-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -3466,7 +3553,7 @@ fn main() {
                     Some(r##"Sets the access control policy on the specified resource. Replaces any
         existing policy.
         
-        Can return Public Errors: NOT_FOUND, INVALID_ARGUMENT and PERMISSION_DENIED"##),
+        Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_topics-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3523,7 +3610,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("topics-subscriptions-list",
-                    Some(r##"Lists the names of the subscriptions on this topic."##),
+                    Some(r##"Lists the names of the attached subscriptions on this topic."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_topics-subscriptions-list",
                   vec![
                     (Some(r##"topic"##),
@@ -3548,7 +3635,7 @@ fn main() {
             ("topics-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource.
         If the resource does not exist, this will return an empty set of
-        permissions, not a NOT_FOUND error.
+        permissions, not a `NOT_FOUND` error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -3586,7 +3673,7 @@ fn main() {
     
     let mut app = App::new("pubsub1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.13+20200403")
+           .version("1.0.13+20200623")
            .about("Provides reliable, many-to-many, asynchronous messaging between applications.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pubsub1_cli")
