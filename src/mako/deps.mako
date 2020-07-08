@@ -7,6 +7,7 @@
 	import urllib2
 	import json
 
+	apis = {}
 	api_info = []
 	doc_root = directories.output + '/' + directories.doc_subdir
 	doc_index = doc_root + '/index.html'
@@ -184,7 +185,7 @@ help${agsuffix}:
 % if global_targets:
 .PHONY += update-json
 
-% for info in ('apis' in globals() and apis.get('items') or []):
+% for info in (apis.get('items') or []):
 <%
 	import util
 	import os
